@@ -1,0 +1,24 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource>
+    <file>player_icons/close.png</file>
+    <file>player_icons/minimize.png</file>
+    <file>player_icons/music_player.png</file>
+    <file>player_icons/repeat.png</file>
+    <file>player_icons/repeat_selected.png</file>
+    <file>player_icons/next.png</file>
+    <file>player_icons/next_selected.png</file>
+    <file>player_icons/normal.png</file>
+    <file>player_icons/play.png</file>
+    <file>player_icons/previous.png</file>
+    <file>player_icons/previous_selected.png</file>
+    <file>player_icons/repeat_selected.png</file>
+    <file>player_icons/shuffle.png</file>
+    <file>player_icons/stop.png</file>
+    <file>player_icons/stop_selected.png</file>
+    <file>player_icons/pause.png</file>
+    <file>player_icons/cycle.png</file>
+    <file>player_icons/cycle_selected.png</file>
+    <file>player_icons/prev_page.png</file>
+    <file>player_icons/next_page.png</file>
+  </qresource>
+</RCC>

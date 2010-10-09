@@ -1,0 +1,15 @@
+Makefile.in
+Makefile
+.deps
+.libs
+oletest
+word9?_test
+test123456.doc
+word9?_test.doc
+iconvtest
+parsertest
+parsertest_mem
+helpertest
+ustringtest
+sharedptrtest
+handlertest
