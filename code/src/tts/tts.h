@@ -1,5 +1,5 @@
-#ifndef NABOO_LIB_TTS_H_
-#define NABOO_LIB_TTS_H_
+#ifndef ONYX_LIB_TTS_H_
+#define ONYX_LIB_TTS_H_
 
 #include "onyx/base/base.h"
 #include "onyx/ui/ui.h"
@@ -78,4 +78,4 @@ private:
 
 }   // namespace tts
 
-#endif  // NABOO_LIB_TTS_H_
+#endif  // ONYX_LIB_TTS_H_

@@ -1,11 +1,11 @@
 #include <mad.h>
-#include <taglib/tag.h>
-#include <taglib/fileref.h>
-#include <taglib/id3v1tag.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/apetag.h>
-#include <taglib/tfile.h>
-#include <taglib/mpegfile.h>
+#include <tag.h>
+#include <fileref.h>
+#include <id3v1tag.h>
+#include <id3v2tag.h>
+#include <apetag.h>
+#include <tfile.h>
+#include <mpegfile.h>
 
 #include <core/fileinfo.h>
 

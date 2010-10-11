@@ -1,5 +1,5 @@
-#ifndef NABOO_LIB_TTS_INTERFACE_H_
-#define NABOO_LIB_TTS_INTERFACE_H_
+#ifndef ONYX_LIB_TTS_INTERFACE_H_
+#define ONYX_LIB_TTS_INTERFACE_H_
 
 #include <QtGui/QtGui>
 #include "sound/sound.h"
@@ -44,4 +44,4 @@ Q_SIGNALS:
 
 }   // namespace tts
 
-#endif  // NABOO_LIB_TTS_INTERFACE_H_
+#endif  // ONYX_LIB_TTS_INTERFACE_H_

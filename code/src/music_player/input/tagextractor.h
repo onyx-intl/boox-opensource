@@ -1,11 +1,11 @@
 #ifndef PLAYER_TAGEXTRACTOR_H_
 #define PLAYER_TAGEXTRACTOR_H_
 
-#include <taglib/tag.h>
-#include <taglib/fileref.h>
-#include <taglib/id3v1tag.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/id3v2header.h>
+#include <tag.h>
+#include <fileref.h>
+#include <id3v1tag.h>
+#include <id3v2tag.h>
+#include <id3v2header.h>
 
 #include <utils/player_utils.h>
 
