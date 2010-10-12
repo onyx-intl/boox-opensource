@@ -1,8 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-  <qresource>
-    <file>images/tts_menu.png</file>
-    <file>images/tts_close.png</file>
-    <file>images/tts_play.png</file>
-    <file>images/tts_stop.png</file>
-  </qresource>
-</RCC>
