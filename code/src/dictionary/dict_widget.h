@@ -4,7 +4,7 @@
 #include "onyx/base/base.h"
 #include "onyx/ui/ui.h"
 #include "dictionary_manager.h"
-#include "tts/tts.h"
+#include "onyx/tts/tts.h"
 
 namespace ui
 {
