@@ -1,4 +1,5 @@
-/code
-    /lib
-        original opensource codes
-    /src our projects and other opensource codes involved.
+This repository includes open-source libraries used by Onyx
+International and some of Onyx International's own applications.
+
+Please check http://github.com/onyx-intl for other opensource packages
+released by Onyx International.
