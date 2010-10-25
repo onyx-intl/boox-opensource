@@ -108,12 +108,12 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_Down:
             application().doAction("decreaseFont");
             break;
-        case Qt::Key_Right:
-            application().doAction("redo");
-            break;
-        case Qt::Key_Left:
-            application().doAction("undo");
-            break;
+        //case Qt::Key_Right:
+        //    application().doAction("redo");
+        //    break;
+        //case Qt::Key_Left:
+        //    application().doAction("undo");
+        //    break;
         case ui::Device_Menu_Key:
             if (view_widget_)
             {
@@ -124,6 +124,8 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_Escape:
         case Qt::Key_PageDown:
         case Qt::Key_PageUp:
+        case Qt::Key_Right:
+        case Qt::Key_Left:
             if (view_widget_)
             {
                 view_widget_->processKeyReleaseEvent(event->key());
