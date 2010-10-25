@@ -8,6 +8,8 @@ ENABLE_QT()
 # lib wv2
 add_subdirectory(wv2-0.4.2)
 
+add_subdirectory(bzip2)
+
 # linebreak library
 FILE(GLOB_RECURSE linebreak_headers linebreak/*.h)
 FILE(GLOB_RECURSE linebreak_srcs linebreak/*.c)
