@@ -1,8 +1,8 @@
 #ifndef PLAYER_OUTPUT_ASYNCHRONOUS_H_
 #define PLAYER_OUTPUT_ASYNCHRONOUS_H_
 
-#include "onyx/sound/sound.h"
-#include "onyx/sound/async_player.h"
+#include "sound/sound.h"
+#include "sound/async_player.h"
 
 #include <core/output.h>
 #include <core/volumecontrol.h>

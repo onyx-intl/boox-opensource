@@ -583,7 +583,7 @@ void PlayerView::onItemActivated(const QModelIndex & index)
     {
         int current_row = item->data().toInt();
         model_->setCurrent(current_row);
-        play(true);
+        play();
     }
 }
 
@@ -617,10 +617,10 @@ void PlayerView::onRepeatListChanged(bool yes)
     onyx::screen::instance().flush(&cycle_button_, onyx::screen::ScreenProxy::GC, false);
 }
 
-void PlayerView::play(bool play_from_start)
+void PlayerView::play()
 {
     model_->doCurrentVisibleRequest();
-    if (core_->state() == PlayerUtils::Paused && !play_from_start)
+    if (core_->state() == PlayerUtils::Paused)
     {
         core_->pause();
         return;
