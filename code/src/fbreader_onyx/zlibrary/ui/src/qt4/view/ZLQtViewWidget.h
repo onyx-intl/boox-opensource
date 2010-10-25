@@ -30,8 +30,8 @@
 #include "onyx/sys/sys.h"
 #include "dictionary/dictionary_manager.h"
 #include "dictionary/dict_widget.h"
-#include "sound/sound.h"
-#include "tts/tts_widget.h"
+#include "onyx/sound/sound.h"
+#include "onyx/tts/tts_widget.h"
 
 
 
