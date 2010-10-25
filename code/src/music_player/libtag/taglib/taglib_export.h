@@ -28,9 +28,9 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #ifdef MAKE_TAGLIB_LIB
-#define TAGLIB_EXPORT __declspec(dllexport)
+#define TAGLIB_EXPORT //__declspec(dllexport)
 #else
-#define TAGLIB_EXPORT __declspec(dllimport)
+#define TAGLIB_EXPORT //__declspec(dllimport)
 #endif
 #else
 #define TAGLIB_EXPORT
