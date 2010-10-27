@@ -27,7 +27,7 @@ public:
     void enableProgressBar(bool enable) { progress_bar_enabled_ = enable; }
 
 public Q_SLOTS:
-    void play(bool play_from_start = false);
+    void play();
     void stop();
     void next();
     void previous();

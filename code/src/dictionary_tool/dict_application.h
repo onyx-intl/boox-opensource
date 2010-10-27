@@ -1,7 +1,7 @@
 #ifndef DICT_APPLICATION_H_
 #define DICT_APPLICATION_H_
 
-#include "dictionary/dict_frame.h"
+#include "onyx/dictionary/dict_frame.h"
 
 using namespace ui;
 

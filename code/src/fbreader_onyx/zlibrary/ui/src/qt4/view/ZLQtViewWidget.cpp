@@ -88,8 +88,9 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY|SCREEN_REFRESH);
     }
+
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
     connect(status_bar_, SIGNAL(progressClicked(const int, const int)),
         this, SLOT(onProgressClicked(const int, const int)));
@@ -364,6 +365,9 @@ void ZLQtViewWidget::updateActions()
     {
         tools.push_back(DICTIONARY_TOOL);
     }
+
+    // TODO: John: add toc later.
+    // tools.push_back(TOC_VIEW_TOOL);
     reading_tool_actions_.generateActions(tools);
 
     // Reading style
@@ -371,12 +375,10 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-    if (has_touch)
-    {
-        tools.clear();
-        tools.push_back(TEXT_TO_SPEECH);
-        reading_tool_actions_.generateActions(tools, true);
-    }
+
+    tools.clear();
+    tools.push_back(TEXT_TO_SPEECH);
+    reading_tool_actions_.generateActions(tools, true);
 
     // Reading tools of bookmark.
     tools.clear();
@@ -393,6 +395,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools of go to page.
     tools.clear();
     tools.push_back(GOTO_PAGE);
+    tools.push_back(CLOCK_TOOL);
     reading_tool_actions_.generateActions(tools, true);
     int total = (full_ >> shift(page_step_));
     reading_tool_actions_.action(GOTO_PAGE)->setEnabled(total > 1);
@@ -471,6 +474,14 @@ void ZLQtViewWidget::popupMenu()
         else if (reading_tool_actions_.selectedTool() == GOTO_PAGE)
         {
             showGotoPageDialog();
+        }
+        else if (reading_tool_actions_.selectedTool() == CLOCK_TOOL)
+        {
+            status_bar_->onClockClicked();
+        }
+        else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)
+        {
+            showTableOfContents();
         }
         else
         {
@@ -781,6 +792,12 @@ void ZLQtViewWidget::showGotoPageDialog()
     status_bar_->onMessageAreaClicked();
 }
 
+void ZLQtViewWidget::showTableOfContents()
+{
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    myApplication->doAction("toc");
+}
+
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
 {
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
@@ -843,11 +860,13 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                     break;
                 }
             case Qt::Key_PageUp:
+            case Qt::Key_Left:
                 {
                     myApplication->doAction("largeScrollBackward");
                     break;
                 }
             case Qt::Key_PageDown:
+            case Qt::Key_Right:
                 {
                     myApplication->doAction("largeScrollForward");
                     break;
