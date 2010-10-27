@@ -154,6 +154,7 @@ private:
     TTSWidget & ttsWidget();
 
     void showGotoPageDialog();
+    void showTableOfContents();
 
     void loadConf();
     void saveConf();

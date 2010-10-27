@@ -365,6 +365,9 @@ void ZLQtViewWidget::updateActions()
     {
         tools.push_back(DICTIONARY_TOOL);
     }
+
+    // TODO: John: add toc later.
+    // tools.push_back(TOC_VIEW_TOOL);
     reading_tool_actions_.generateActions(tools);
 
     // Reading style
@@ -475,6 +478,10 @@ void ZLQtViewWidget::popupMenu()
         else if (reading_tool_actions_.selectedTool() == CLOCK_TOOL)
         {
             status_bar_->onClockClicked();
+        }
+        else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)
+        {
+            showTableOfContents();
         }
         else
         {
@@ -783,6 +790,12 @@ void ZLQtViewWidget::showGotoPageDialog()
 {
     onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
     status_bar_->onMessageAreaClicked();
+}
+
+void ZLQtViewWidget::showTableOfContents()
+{
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    myApplication->doAction("toc");
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
