@@ -18,8 +18,9 @@
 #include "rss_feed_parser.h"
 #include "singleton.h"
 #include "widget_updater.h"
-
-
+#include "onyx/ui/system_actions.h"
+#include "onyx/ui/menu.h"
+#include "onyx/sys/sys_status.h"
 namespace onyx {
 namespace feed_reader {
 namespace {
@@ -164,7 +165,7 @@ MainWidget::MainWidget(QWidget* parent)
     tab_widget_->addTab(article_list_page_, tr("Items"));
     tab_widget_->addTab(article_page_, tr("Article"));
     ui::StatusBar* status_bar = new ui::StatusBar(
-            this, ui::MESSAGE|ui::BATTERY|ui::CONNECTION|ui::CLOCK|
+            this, ui::MENU| ui::MESSAGE|ui::BATTERY|ui::CONNECTION|ui::CLOCK|
             ui::SCREEN_REFRESH);
     layout->addWidget(status_bar);
     setLayout(layout);
@@ -175,6 +176,7 @@ MainWidget::MainWidget(QWidget* parent)
             this, SLOT(displayArticle(shared_ptr<Article>)));
     connect(tab_widget_, SIGNAL(currentChanged(int)),
             this, SLOT(updateTab(int)));
+    connect(status_bar, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
     // refresh feeds in 3 seconds at start
     feed_list_model_->loadFromDatabase();
     WidgetUpdater& updater(Singleton<WidgetUpdater>::instance());
@@ -229,6 +231,35 @@ void MainWidget::keyPressEvent (QKeyEvent* e) {
     if (e->key() == Qt::Key_Escape)
         qApp->quit();
     return;
+}
+
+void MainWidget::showContextMenu() {
+    using namespace ui;
+    PopupMenu menu(this);
+    SystemActions sy;
+    sy.generateActions();
+    menu.setSystemAction(&sy);
+    if (menu.popup() != QDialog::Accepted) {
+      QApplication::processEvents();
+      return;;
+    }
+    QAction * group = menu.selectedCategory();
+    if( group == sy.category()) {
+	SystemAction sy_tmp = sy.selected();
+	switch (sy_tmp) {
+	  case RETURN_TO_LIBRARY: {
+	      qApp->quit();
+	      break;
+	  }
+	  case ROTATE_SCREEN: {
+	      onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::INVALID);
+	      sys::SysStatus::instance().rotateScreen();
+	      break;
+	  }
+	  default:
+	    break;
+	}
+    }
 }
 
 }  // namespace feed_reader

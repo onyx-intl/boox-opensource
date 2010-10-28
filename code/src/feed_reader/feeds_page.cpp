@@ -38,13 +38,13 @@ FeedsPage::FeedsPage(FeedListModel* feed_list_model, QWidget* parent)
     ui::OnyxPushButton* add_feed_button(new ui::OnyxPushButton("",this));
     ui::OnyxPushButton* refresh_button(new ui::OnyxPushButton("",this));
     ui::OnyxPushButton* delete_feed_button(new ui::OnyxPushButton("",this));
-    ui::OnyxPushButton* quit_button(new ui::OnyxPushButton("",this));
+//    ui::OnyxPushButton* quit_button(new ui::OnyxPushButton("",this));
 
     // Set labels and size policies.
     add_feed_button->setText(tr("Add feed"));
     refresh_button->setText(tr("Refresh"));
     delete_feed_button->setText(tr("Delete feed"));
-    quit_button->setText(tr("Quit"));
+//    quit_button->setText(tr("Quit"));
     QSizePolicy size_policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     feed_list_view_->setSizePolicy(size_policy);
 
@@ -53,13 +53,14 @@ FeedsPage::FeedsPage(FeedListModel* feed_list_model, QWidget* parent)
     button_layout->addWidget(add_feed_button);
     button_layout->addWidget(refresh_button);
     button_layout->addWidget(delete_feed_button);
-    button_layout->addWidget(quit_button);
-
+ //   button_layout->addWidget(quit_button);
+    button_layout->setSpacing(2);
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(1, 0, 1, 0);
     layout->addWidget(feed_list_view_);
     layout->addLayout(button_layout);
+    layout->addSpacing(5);
     setLayout(layout);
 
     // Set up connections.
@@ -69,8 +70,8 @@ FeedsPage::FeedsPage(FeedListModel* feed_list_model, QWidget* parent)
             this, SLOT(addFeed()));
     connect(refresh_button, SIGNAL(clicked()),
             feed_list_model_, SLOT(refreshAllFeeds()));
-    connect(quit_button, SIGNAL(clicked()),
-            qApp, SLOT(quit()));
+//    connect(quit_button, SIGNAL(clicked()),
+ //           qApp, SLOT(quit()));
 
     connect(feed_list_view_, SIGNAL(activated(QModelIndex)),
             this, SLOT(handleActivated(const QModelIndex&)));
@@ -83,7 +84,7 @@ FeedsPage::FeedsPage(FeedListModel* feed_list_model, QWidget* parent)
     updater.addWidget(add_feed_button, ScreenProxy::GU);
     updater.addWidget(delete_feed_button, ScreenProxy::GU);
     updater.addWidget(refresh_button, ScreenProxy::GU);
-    updater.addWidget(quit_button, ScreenProxy::GU);
+//    updater.addWidget(quit_button, ScreenProxy::GU);
     updater.addWidget(feed_list_view_, ScreenProxy::GU);
 
     // Retain pointers for testing

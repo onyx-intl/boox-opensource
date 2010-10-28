@@ -36,7 +36,7 @@ class MainWidget : public QWidget
     void displayItemListForUrl(int id);
     void displayArticle(shared_ptr<Article> article);
     void updateTab(int index);
-
+    void showContextMenu();
   private:
     friend class AcceptanceTest;
 
