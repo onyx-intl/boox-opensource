@@ -56,6 +56,7 @@ void ArticleListPage::handleActivated(const QModelIndex& index) {
         article->saveOrUpdate();
         emit articleActivated(article);
     }
+    update();
     return;
 }
 
