@@ -1,0 +1,15 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>anti_diagonal.png</file>
+	<file>diagonal_anti_diagonal.png</file>
+	<file>diagonal.png</file>
+	<file>dihedral.png</file>
+	<file>horizontal.png</file>
+	<file>horizontal_vertical.png</file>
+	<file>none.png</file>
+	<file>random.png</file>
+	<file>rotational_180.png</file>
+	<file>rotational_full.png</file>
+	<file>vertical.png</file>
+</qresource>
+</RCC>
