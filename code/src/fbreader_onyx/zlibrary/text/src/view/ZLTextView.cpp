@@ -65,10 +65,14 @@ void ZLTextView::setModel(shared_ptr<ZLTextModel> model, const std::string &lang
 	clear();
 
 	myModel = model;
+
+
 	myLanguage = language.empty() ? ZLibrary::Language() : language;
 	myStyle.setBaseBidiLevel(ZLLanguageUtil::isRTLLanguage(myLanguage) ? 1 : 0);
 
 	if (myModel && (myModel->paragraphsNumber() != 0)) {
+
+
 		setStartCursor(ZLTextParagraphCursor::cursor(*myModel, myLanguage));
 
 		size_t size = myModel->paragraphsNumber();

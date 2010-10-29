@@ -367,7 +367,7 @@ void ZLQtViewWidget::updateActions()
     }
 
     // TODO: John: add toc later.
-    // tools.push_back(TOC_VIEW_TOOL);
+    tools.push_back(TOC_VIEW_TOOL);
     reading_tool_actions_.generateActions(tools);
 
     // Reading style
