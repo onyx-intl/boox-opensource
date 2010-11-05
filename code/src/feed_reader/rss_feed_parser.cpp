@@ -8,6 +8,8 @@
 #include "article.h"
 #include "feed.h"
 
+
+
 namespace onyx {
 namespace feed_reader {
 
@@ -17,7 +19,10 @@ RssFeedParser::RssFeedParser()
           xml_reader_(),
           current_article_(),
           current_text_(),
-          pudate_("") {
+          pudate_(""),
+          in_content_(false){
+              taglist_ /*<< "a" */<< "b" << "br"<< "i"  << "div" << "tt" << "img";
+              taglist_ << "li" << "ul" << "p";
 }
 
 RssFeedParser::~RssFeedParser() {
@@ -95,12 +100,22 @@ Image
    URL image file          url            url
 */
 void RssFeedParser::handleStartElement() {
-    shared_ptr<QString> name(
-            new QString(xml_reader_.name().toString()));
+    shared_ptr<QString> name(new QString(xml_reader_.name().toString()));
+    //Check if *name matches the tags that nested in the tags content or
+    //sumary in atom in which there is not surround them with CDATA tag.
+    if (in_content_) {
+        if (taglist_.indexOf(xml_reader_.name().toString())) {
+            //current_text_ =  (xml_reader_.tokenString()+ current_text_);
+            return;
+        }
+    }
     tag_stack_.push(name);
     current_text_.clear();
     if (*name == "item" || *name == "entry") {
         current_article_.reset(new Article(feed_));
+    }
+    if (*name == "content" || *name == "summary") {
+        in_content_ = true;
     }
 }
 
@@ -110,15 +125,12 @@ void RssFeedParser::handleEndElement() {
         tag_stack_.pop();
     }
     if (xml_reader_.name() == "title") {
-        if (tag_stack_.size() &&
-            (*(tag_stack_.top()) == "channel" || *(tag_stack_.top()) == "feed")
-            &&
-            feed_->title().isEmpty()) {
+        if (tag_stack_.size() && (*(tag_stack_.top()) == "channel"
+            || *(tag_stack_.top()) == "feed") && feed_->title().isEmpty()) {
             feed_->set_title(current_text_);
         }
-        if (tag_stack_.size() &&
-            (*(tag_stack_.top()) == "item" || *(tag_stack_.top()) == "entry") &&
-            current_article_.get() &&
+        if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
+            || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->title().isEmpty()) {
             current_article_->set_title(current_text_);
         }
@@ -127,43 +139,41 @@ void RssFeedParser::handleEndElement() {
             feed_->site_url().isEmpty()) {
             feed_->set_site_url(current_text_);
         }
-        if (tag_stack_.size() &&
-            (*(tag_stack_.top()) == "item" || *(tag_stack_.top()) == "entry") &&
-            current_article_.get() &&
+        if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
+            || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->url().isEmpty()) {
             current_article_->set_url(current_text_);
         }
-    } else if (xml_reader_.name() == "description") {
-        if (tag_stack_.size() &&
-            (*(tag_stack_.top()) == "item" || *(tag_stack_.top()) == "entry") &&
-            current_article_.get() &&
+    } else if (xml_reader_.name() == "description"
+           ) {
+        if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
+            || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->text().isEmpty()) {
             current_article_->set_text(current_text_);
         }
     } else if (xml_reader_.name() == "pubDate"
-                || xml_reader_.name() == "updated"
-                || xml_reader_.name() == "date") {
+            || xml_reader_.name() == "updated"
+            || xml_reader_.name() == "date") {
         if (tag_stack_.size() &&
             (*(tag_stack_.top()) == "item" || *(tag_stack_.top()) == "entry") &&
             current_article_.get() &&
             current_article_->pubdate().isEmpty()) {
             current_article_->set_pubdate(current_text_);
         }
-    } else if (xml_reader_.name() == "content" ||
+    } else if (xml_reader_.name() == "content" || xml_reader_.name() == "summary" ||
                xml_reader_.namespaceUri() ==
                "http://purl.org/rss/1.0/modules/content/") {
-        qDebug() << "prefix: " << xml_reader_.prefix();
+        in_content_ = false;
         if (tag_stack_.size() &&
             (*(tag_stack_.top()) == "item" || *(tag_stack_.top()) == "entry") &&
             current_article_.get()) {
-            // The content tag usually has more text than the
-            // description tag, so we overright the text no matter
-            // what.
-            current_article_->set_text(current_text_);
+             current_article_->set_text(current_text_);
+        qDebug()<< "current_text_" << current_text_;
         }
+    } else if (taglist_.indexOf(xml_reader_.name().toString()) && in_content_) {
+       // current_text_  = current_text_ +xml_reader_.tokenString();
     } else if ((xml_reader_.name() == "item" ||
-                xml_reader_.name() == "entry") &&
-               current_article_.get()) {
+                xml_reader_.name() == "entry") && current_article_.get()) {
         qDebug() << "One article parsed.";
         feed_->mutable_articles()->push_back(current_article_);
         if (is_new_article(*current_article_, feed_->articles())) {
