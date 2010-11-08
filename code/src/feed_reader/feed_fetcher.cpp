@@ -77,7 +77,8 @@ void FeedFetcher::scheduleFetch(shared_ptr<Feed> feed) {
 }
 
 void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
-    DCHECK(impl_->current_feed_.get());
+    if(!impl_->current_feed_.get())
+        return;
     if (response_header.statusCode() == 200) {
         QByteArray bytes(impl_->http_->readAll());
         qDebug() << bytes.size() << " bytes received.";

@@ -105,6 +105,11 @@ QTabWidget:tab-bar                            \
 QTabWidget::pane                               \
            {                                  \
                border-top: 1px solid black;    \
+           }\
+QCheckBox::indicator{\
+           width: 60px;\
+           height: 60px;\
+           background-color: yellow;\
            }";
 
 

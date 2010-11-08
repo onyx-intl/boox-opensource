@@ -43,9 +43,22 @@ void RssFeedParser::startNewFeedInternal(shared_ptr<Feed> feed) {
 }
 
 bool RssFeedParser::appendInternal(const QByteArray& data) {
-    xml_reader_.addData(data);
+    QByteArray data_ = xmlAtomValidator(data);
+    xml_reader_.addData(data_);
     return parseMore();
 }
+
+QByteArray RssFeedParser::xmlAtomValidator(const QByteArray& d)
+{
+    QString xml_plain_text(d);
+    if (xml_plain_text.indexOf("feed")) // This is an Atom
+    {
+        xml_plain_text.replace(QRegExp("<content>"), "<content><![CDATA[");
+        xml_plain_text.replace(QRegExp("</content>"), "]]</content>");
+    }
+    return xml_plain_text.toLocal8Bit();
+}
+
 
 bool RssFeedParser::hasErrorInternal() const {
     return xml_reader_.hasError() &&
@@ -109,25 +122,76 @@ void RssFeedParser::handleStartElement() {
     //Check if *name matches the tags that nested in the tags content or
     //sumary in atom in which there is not surround them with CDATA tag.
     if (in_content_) {
-        if (taglist_.indexOf(*name)) {
+        if (*name == "a") {
+            current_text_ += (QString("<a ")+ QString("href=\"") +
+            xml_reader_.attributes().value("href").toString() + QString("\" >"));
+            qDebug() << "Tag a: " << current_text_;
+            return;
+        } else if (taglist_.indexOf(*name)) {
             current_text_ += (QString("<")+ *name + QString(">"));
             return;
-        } else if (*name == "br" || *name == "hr" ||*name == "img") {
-            current_text_ += (QString("<")+ xml_reader_.text().toString()+QString("/>"));
+        } else if (*name == "br" || *name == "hr") {
+            current_text_ += (QString("<")+ *name + QString("/>"));
+            return;
+        } else if (*name == "img") {
+            current_text_ += QString("<img ");
+            if (!xml_reader_.attributes().value("src").toString().isEmpty()) {
+                current_text_ += QString("src=\"")
+                + xml_reader_.attributes().value("src").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("class").toString().isEmpty()) {
+                current_text_ += QString("class=\"")
+                + xml_reader_.attributes().value("class").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("align").toString().isEmpty()) {
+                current_text_ += QString("align=\"")
+                + xml_reader_.attributes().value("align").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("alt").toString().isEmpty()) {
+                current_text_ += QString("alt=\"")
+                + xml_reader_.attributes().value("alt").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("title").toString().isEmpty()) {
+                current_text_ += QString("title=\"")
+                + xml_reader_.attributes().value("title").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("border").toString().isEmpty()) {
+                current_text_ += QString("border=\"")
+                + xml_reader_.attributes().value("border").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("height").toString().isEmpty()) {
+                current_text_ += QString("height=\"")
+                + xml_reader_.attributes().value("height").toString()
+                + QString("\"");
+            }
+            if (!xml_reader_.attributes().value("width").toString().isEmpty()) {
+                current_text_ += QString("width=\"")
+                + xml_reader_.attributes().value("width").toString()
+                + QString("\"");
+            }
+            current_text_ += QString("/>");
+            qDebug() << "Tag img: " << current_text_;
             return;
         }
         return;
     }
-    current_text_.clear();
     if (*name == "content" || *name == "summary" ) {
         if (in_content_) qDebug() << "Error occurs";
        // qDebug() << "Content or Summary: " << xml_reader_.readElementText();
         in_content_ = true;
+        current_text_.clear();
        // xml_reader_.skipCurrentElement();
         return;
     }
     if (*name == "item" || *name == "entry") {
         tag_stack_.push(name);
+        current_text_.clear();
         current_article_.reset(new Article(feed_));
     }
 }
@@ -159,8 +223,7 @@ void RssFeedParser::handleEndElement() {
             current_article_->url().isEmpty()) {
             current_article_->set_url(current_text_);
         }
-    } else if (xml_reader_.name() == "description"
-           ) {
+    } else if (xml_reader_.name() == "description") {
         if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
             || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->text().isEmpty()) {
@@ -187,8 +250,8 @@ void RssFeedParser::handleEndElement() {
             current_article_->set_text(current_text_ );
         qDebug()<< "current_text_" << current_text_;
         }
-    } else if (taglist_.indexOf(xml_reader_.name().toString())
-        && in_content_ /** ensure inside the tag "content" or "summary"*/ ) {
+    } else if (taglist_.indexOf(xml_reader_.name().toString()) != -1 && in_content_)
+        {
         // well we accpet them :-/, perhaps we should check for each one
         current_text_ += (QString("</") + xml_reader_.name().toString() + QString(">"));
        // current_text_  = current_text_ +xml_reader_.tokenString();
@@ -207,6 +270,8 @@ void RssFeedParser::handleEndElement() {
 
 bool RssFeedParser::parseMore() {
     DCHECK(feed_.get());
+    //shoudl let content nested in the tag `content' or `summary'
+    //nestes in a CDATA section and call pass more again.
     while (!xml_reader_.atEnd()) {
         xml_reader_.readNext();
         if (xml_reader_.isStartElement()) {

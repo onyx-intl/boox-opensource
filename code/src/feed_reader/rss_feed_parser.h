@@ -26,12 +26,11 @@ class RssFeedParser : public FeedParser {
     virtual bool finishedInternal() const;
     virtual const shared_ptr<Feed> feedInternal() const;
     virtual void finalizeInternal();
-
+    QByteArray xmlAtomValidator(const QByteArray& d);
     void handleStartElement();
     void handleEndElement();
 
     bool parseMore();
-
     shared_ptr<Feed> feed_;
     QXmlStreamReader xml_reader_;
     // TODO(hjiang): Does QString do ref-counting? perhaps shared_ptr

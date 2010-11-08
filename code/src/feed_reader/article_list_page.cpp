@@ -7,6 +7,10 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QVBoxLayout>
+#include <QPainter>
+#include <QLabel>
+#include <QApplication>
+#include <QSpinBox>
 
 #include "onyx/screen/screen_proxy.h"
 
@@ -22,6 +26,7 @@ ArticleListPage::ArticleListPage(QAbstractItemModel* article_list_model,
         : QWidget(parent),
           article_list_view_(new QTableView(this)) {
     article_list_view_->setModel(article_list_model);
+    article_list_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
     QSizePolicy size_policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     article_list_view_->setSizePolicy(size_policy);
     article_list_view_->horizontalHeader()->hide();
@@ -47,24 +52,22 @@ ArticleListPage::ArticleListPage(QAbstractItemModel* article_list_model,
 ArticleListPage::~ArticleListPage() {}
 
 void ArticleListPage::handleActivated(const QModelIndex& index) {
-    shared_ptr<Article> article(article_list_view_->model()->data(
-                                         index,
-                                         ArticleListModel::ArticleDisplayRole)
-                                 .value<shared_ptr<Article> >());
-    if (index.column() == 1) {
+    if (index.column() == 0) {
+    shared_ptr<Article>  article(article_list_view_->model()->data( index,
+            ArticleListModel::ArticleDisplayRole).value<shared_ptr<Article> >());
         article->set_read(true);
         article->saveOrUpdate();
         emit articleActivated(article);
     }
     update();
-    return;
 }
 
 void ArticleListPage::showEvent(QShowEvent* event) {
-    article_list_view_->setColumnWidth(0, 220);
-    article_list_view_->setColumnWidth(1, width() - 235);
+    article_list_view_->setColumnWidth(0, width() - 128);
+    article_list_view_->setColumnWidth(1,96);
     QWidget::showEvent(event);
-}
+};
+
 
 }  // namespace onyx
 }  // namespace feed_reader

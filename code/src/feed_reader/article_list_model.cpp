@@ -31,16 +31,22 @@ QVariant ArticleListModel::data(const QModelIndex &index, int role) const {
 
     shared_ptr<Article> article = articles_.at(index.row());
 
-    if (index.column() == 1) {
+    if (index.column() == 0) {
         if (role == Qt::DisplayRole) {
             QString title = article->title();
-            title.truncate(32);
+            title.trimmed();
             title += QString("...");
+            title.truncate(30);
+            title += QString("...");
+            title.truncate(30);
             return title;
         } else if (role == ArticleIdentifierRole) {
             QString url = article->url();
-            url.truncate(32);
+            url.trimmed();
             url += QString("...");
+            url.truncate(30);
+            url += QString("...");
+            url.truncate(30);
             return url;
         } else if (role == ArticleDisplayRole) {
             return QVariant::fromValue(article);
@@ -51,60 +57,22 @@ QVariant ArticleListModel::data(const QModelIndex &index, int role) const {
                 return QVariant::fromValue(QFont("Mono", 14, QFont::Bold));
             }
         }
-    }
-
-    if (index.column() == 0) {
-        if (article->read()) {
-            switch (role) {
-                case Qt::DisplayRole: {
-                    QString pubdate =  article->pubdate();
-                    pubdate.truncate(25);
-                    return pubdate;
-                }
-                case Qt::FontRole:
-                    return QVariant::fromValue(QFont("Mono", 8));
-                case Qt::BackgroundColorRole:
-                    return QColor(255, 255, 255);
-                case  Qt::ForegroundRole:
-                    return QColor(0, 0, 0);
-                case Qt::CheckStateRole:
-                    return Qt::Checked;
+    } else if (index.column() == 1) {
+        if (role == Qt::EditRole){
+            if(article->read()) {
+                return true;
+            } else {
+                return false;
             }
-        } else {
-            switch (role) {
-                case Qt::DisplayRole: {
-                    QString pubdate =  article->pubdate();
-                    pubdate.truncate(25);
-                    return pubdate;
-                }
-                case Qt::FontRole:
-                    return QVariant::fromValue(QFont("Mono", 8, QFont::Bold));
-                case Qt::BackgroundColorRole:
-                    return QColor(0, 0, 0);
-                case  Qt::ForegroundRole:
-                    return QColor(255, 255, 255);
-                case Qt::CheckStateRole:
-                    return Qt::Unchecked;
+        } else if (role == Qt::CheckStateRole) {
+            if(article->read()) {
+                return Qt::Checked;
+            } else {
+                return Qt::Unchecked;
             }
         }
     }
     return QVariant();
-}
-
-
-bool ArticleListModel::setData(const QModelIndex& index, const QVariant& Value, int role)
-{
-    if (index.column() == 0/* && role == Qt::CheckStateRole*/) {
-        if (Value == Qt::Checked) {
-            articles_.at(index.row())->set_read(true);
-        } else {
-            articles_.at(index.row())->set_read(false);
-        }
-        // modify database
-        articles_.at(index.row())->saveOrUpdate();
-        return true;
-    }
-    return false;
 }
 
 void ArticleListModel::switchToFeed(shared_ptr<Feed> feed) {
@@ -112,14 +80,29 @@ void ArticleListModel::switchToFeed(shared_ptr<Feed> feed) {
     reset();
 }
 
+bool ArticleListModel::setData(const QModelIndex& index, const QVariant& Value, int role)
+{
+    if (index.column() == 1 && role == Qt::CheckStateRole) {
+        if (Value == Qt::Checked) {
+            articles_.at(index.row())->set_read(true);
+        } else {
+            articles_.at(index.row())->set_read(false);
+        }
+            // modify database
+        //articles_.at(index.row())->saveOrUpdate();
+        emit dataChanged(index, index);
+        return true;
+    }
+    return false;
+}
+
 Qt::ItemFlags ArticleListModel::flags(const QModelIndex& index) const {
     if (!index.isValid()) {
         return 0;
     }
-    if (index.column()==0) return  Qt::ItemIsEnabled | Qt::ItemIsUserCheckable;
-    return Qt::ItemIsEnabled;// | Qt::ItemIsSelectable;
+    if (index.column() == 1) return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
+    return Qt::ItemIsEditable;
 }
-
 
 }  // namespace feed_reader
 }  // namespace onyx
