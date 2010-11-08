@@ -41,8 +41,8 @@ class RssFeedParser : public FeedParser {
     QString current_text_;  // Text content of the current element.
     QString pudate_;
     vector<shared_ptr<Article> > new_articles_;
-    bool in_content_;
-    QStringList taglist_;
+    bool in_content_; ///< indicate whether inside of the tag content org summary
+    QStringList taglist_; ///< Html tags
     NO_COPY_AND_ASSIGN(RssFeedParser);
 };
 
