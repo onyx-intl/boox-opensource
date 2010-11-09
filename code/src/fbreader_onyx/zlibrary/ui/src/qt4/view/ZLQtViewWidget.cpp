@@ -47,6 +47,11 @@ static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 static bool has_touch = true;
 
+static bool isTTSAndDictEnabled()
+{
+    return qgetenv("ENABLE_TTS_DICT").toBool();
+}
+
 class MyQScrollBar : public QScrollBar {
 
 public:
@@ -360,7 +365,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools
     std::vector<ReadingToolsType> tools;
     tools.push_back(SEARCH_TOOL);
-    if (has_touch)
+    if (has_touch || isTTSAndDictEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
@@ -371,7 +376,7 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-    if (has_touch)
+    if (has_touch || isTTSAndDictEnabled())
     {
         tools.clear();
         tools.push_back(TEXT_TO_SPEECH);
