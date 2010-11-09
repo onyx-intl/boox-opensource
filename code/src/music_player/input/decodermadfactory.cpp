@@ -1,11 +1,11 @@
 #include <mad.h>
-#include <tag.h>
-#include <fileref.h>
-#include <id3v1tag.h>
-#include <id3v2tag.h>
-#include <apetag.h>
-#include <tfile.h>
-#include <mpegfile.h>
+#include <taglib/tag.h>
+#include <taglib/fileref.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
+#include <taglib/apetag.h>
+#include <taglib/tfile.h>
+#include <taglib/mpegfile.h>
 
 #include <core/fileinfo.h>
 
@@ -102,7 +102,7 @@ bool DecoderMADFactory::createPlayList(const QString &file_name,
         QTextCodec *codec = 0;
 
         uint tag_array[3];
-        tag_array[0] = settings.value("tag_1", APE).toInt();
+        tag_array[0] = settings.value("tag_1", ID3v2).toInt();
         tag_array[1] = settings.value("tag_2", Disabled).toInt();
         tag_array[2] = settings.value("tag_3", Disabled).toInt();
 
@@ -118,13 +118,13 @@ bool DecoderMADFactory::createPlayList(const QString &file_name,
             }
             case ID3v2:
             {
-                //QByteArray name;
-                //name = settings.value("ID3v2_encoding","UTF-8").toByteArray ();
-                //if (name.contains("UTF"))
-                //    codec = QTextCodec::codecForName ("UTF-8");
-                //else
-                //    codec = QTextCodec::codecForName(name);
-                codec =QTextCodec::codecForLocale();
+                QByteArray name;
+                name = settings.value("ID3v2_encoding","UTF-8").toByteArray ();
+                if (name.contains("UTF"))
+                    codec = QTextCodec::codecForName ("UTF-8");
+                else
+                    codec = QTextCodec::codecForName(name);
+                //codec =QTextCodec::codecForLocale();
                 tag = fileRef.ID3v2Tag();
                 break;
             }

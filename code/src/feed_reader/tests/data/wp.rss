@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>A Humble Programmer</title>
+	<atom:link href="http://hjiang.net/feed" rel="self" type="application/rss+xml" />
+	<link>http://hjiang.net</link>
+	<description>Notes on life, computing, and programming</description>
+	<lastBuildDate>Sun, 20 Dec 2009 07:37:23 +0000</lastBuildDate>
+	<generator>http://wordpress.org/?v=2.9.1</generator>
+	<language>en</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+			<item>
+		<title>Nonintrusive concurrency with Clojure</title>
+		<link>http://hjiang.net/archives/365</link>
+		<comments>http://hjiang.net/archives/365#comments</comments>
+		<pubDate>Sat, 12 Dec 2009 01:49:51 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[clojure]]></category>
+		<category><![CDATA[concurrency]]></category>
+		<category><![CDATA[programming]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=365</guid>
+		<description><![CDATA[最近对Clojure比较感兴趣，写了一个quick sort做测试。
+
+单线程版：
+
+(defn qsort-seq [seq]
+  (if (&#60;= (.length seq) 25)
+    (selection-sort seq)
+    (let [[first-half second-half] (qsort-partition seq 0)
+          sorted-first-half (qsort-seq first-half)
+          sorted-second-half (qsort-seq second-half)]
+        [...]]]></description>
+			<content:encoded><![CDATA[<p>最近对Clojure比较感兴趣，写了一个quick sort做测试。</p>
+
+<p>单线程版：</p>
+
+<pre><code>(defn qsort-seq [seq]
+  (if (&lt;= (.length seq) 25)
+    (selection-sort seq)
+    (let [[first-half second-half] (qsort-partition seq 0)
+          sorted-first-half (qsort-seq first-half)
+          sorted-second-half (qsort-seq second-half)]
+          (concat sorted-first-half sorted-second-half))))
+</code></pre>
+
+<p>多线程版：</p>
+
+<pre><code>(defn qsort [seq]
+  (if (&lt;= (.length seq) 25)
+    (selection-sort seq)
+    (let [[first-half second-half] (qsort-partition seq 0)
+      sorted-first-half (future (qsort first-half))
+      sorted-second-half (qsort second-half)]
+      (concat @sorted-first-half sorted-second-half))))
+</code></pre>
+
+<p>可以看到两个版本基本是一样的，所以在Clojure里通常可以很快把单线程的程序并行化。下面是一些调用到的函数：</p>
+
+<pre><code>(def random (new java.util.Random))
+
+(defn gen_rand_ints [n]
+  (loop [result [], i n]
+    (if (zero? i)
+      result
+      (recur (conj result (.nextInt random)) (dec i)))))
+
+(def values (vec (gen_rand_ints 10000)))
+
+(defn swap [vec i j]
+  (let [iv (vec i),
+    jv (vec j)]
+    (assoc vec i jv j iv)))
+
+(defn selection-sort [seq]
+  (defn index_of_smaller [seq i j]
+    (if (&lt; (seq i) (seq j)) i j))
+  (loop [seq- seq start 0]
+    (if (&lt; start (.length seq))
+      (let [index_of_smallest_v
+            (reduce (partial index_of_smaller seq-)
+                    (range start (.length seq-)))
+            new_seq (swap seq- start index_of_smallest_v)]
+        (recur new_seq (inc start)))
+      seq-)))
+
+(defn qsort-partition [seq pivot_index]
+  (let [pivot (seq pivot_index)
+    pair (loop [i 0, le [], gt []]
+           (if (&lt; i (.length seq))
+         (if (&lt;= (seq i) pivot)
+           (let [le (cons (seq i) le)]
+             (recur (inc i) le gt))
+           (let [gt (cons (seq i) gt)]
+             (recur (inc i) le gt)))
+         [(vec le), (vec gt)]))]
+    pair))
+</code></pre>
+
+<p>比较一下两个版本排列10000个数的时间：</p>
+
+<pre><code>(time (qsort-seq values))
+(time (qsort values))
+(shutdown-agents)
+</code></pre>
+
+<p>输出</p>
+
+<pre><code>"Elapsed time: 1532.536441 msecs"
+"Elapsed time: 1121.529135 msecs"
+</code></pre>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/365/feed</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>C++ Pragmatics: Testing (Part 2, Mechanics)</title>
+		<link>http://hjiang.net/archives/342</link>
+		<comments>http://hjiang.net/archives/342#comments</comments>
+		<pubDate>Thu, 05 Nov 2009 01:43:24 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[c++]]></category>
+		<category><![CDATA[programming]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=342</guid>
+		<description><![CDATA[
+
+There are many tools for testing, and there are different kinds of testing at different granularities, for different phases of the development cycle.
+
+For tests of the largest granularity, such as acceptance tests, the tools and methods are usually language neutral. For example, you can test a Ruby web application using webrat or watir, and you [...]]]></description>
+			<content:encoded><![CDATA[<p><a href="http://hjiang.net/wp-content/uploads/2009/11/IMG_1411.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/11/IMG_1411-453x480.jpg" alt="Jelly fish" title="Jelly fish" width="453" height="480" class="alignnone size-medium wp-image-352" /></a></p>
+
+<p>There are many tools for testing, and there are different kinds of testing at different granularities, for different phases of the development cycle.</p>
+
+<p>For tests of the largest granularity, such as acceptance tests, the tools and methods are usually language neutral. For example, you can test a Ruby web application using webrat or watir, and you can use the same set of tools to test a C++ web server. In this section, I&#8217;m just going to focus on small tests, in particular, tests of individual methods and classes.</p>
+
+<p>There are a number of test frameworks for C++. Boost has a <a href="http://www.boost.org/doc/libs/1_40_0/libs/test/doc/html/index.html">test library</a>, Qt has a <a href="http://doc.trolltech.com/solutions/4/qttestlib/">unit test library</a>, and Google also open-sourced its <a href="http://code.google.com/p/googletest/">C++ testing framework</a>. There are a few others. You could write tests without any of them, but the tools help to reduce repetition and make tests more concise. In my experience this is quite important, because the easier it is to write tests, the more motivated I am to write them.</p>
+
+<p>The testing frameworks all use similar terminology. Usually a test source file contains one or more <em>test case</em>s, and a test case contains one or more <em>test</em>s. It&#8217;s customary to write one test case for each class, and one or more tests for each public method. Most of those tools are similar, and it doesn&#8217;t really matter which one you use. I like Google&#8217;s framework because it&#8217;s the least verbose and it&#8217;s also what I use at work. Here&#8217;s a quick example of one test in a test case for an RSS feed parser:</p>
+
+<pre><code>class FeedParserTest: public ::testing::Test {
+  protected:
+    void SetUp() {
+        feed_.reset(new Feed);
+    }
+
+    RssFeedParser parser_;
+    shared_ptr&lt;Feed&gt; feed_;
+};
+
+TEST_F(FeedParserTest, ParseSlashdot) {
+    QFile rss(TEST_DATA_DIR "/slashdot.rss");
+    ASSERT_TRUE(rss.exists());
+    rss.open(QIODevice::ReadOnly);
+    parser_.startNewFeed(feed_);
+    while (rss.bytesAvailable() &gt; 0) {
+        parser_.append(rss.read(CHUNK_SIZE));
+    }
+    EXPECT_TRUE(parser_.finished());
+    EXPECT_EQ("Slashdot", parser_.feed()-&gt;title());
+    EXPECT_EQ("http://slashdot.org/", parser_.feed()-&gt;site_url());
+}
+</code></pre>
+
+<p>Each test class inherit from testing::Test, and there are two virtual functions you could override to set up and tear down your test fixture. <code>void SetUp()</code> and <code>void TearDown()</code> are called before and after each test respectively. You can also define two static class functions <code>static void SetUpTestCase()</code> and <code>static void TearDown()</code> which are called before and after all tests in the test case respectively. In other words, they are only called once for the test case. Ideally, you should implement the test fixture in <code>SetUp()</code> and <code>TearDown()</code>, because you don&#8217;t want to introduce dependencies between the tests. For example, you don&#8217;t want to be in a situation where just rearranging the order of tests would break them. <code>SetUpTestCase()</code> and <code>TearDownTestCase()</code> are mainly used for expensive initialization such as reading large amounts of data from disk, which you don&#8217;t want to do for every single test.</p>
+
+<p>The <code>TEST_F()</code> macro defines a <em>test with fixture</em>, which has access to the test class defined earlier. There is also a <code>TEST()</code> macro that defines a test without fixture which is essentially just a simple function. The framework provides two families of assertions that you can use in tests. The <code>ASSERT_*</code> family of assertions immediately abort the current test if the expected condition is not true. They are usually used when it doesn&#8217;t make sense to continue the test, for example, where there is a NULL pointer that you need to dereference later, or some critical data is missing. The <code>EXPECT_*</code> family of assertions cause the test fail if the condition does not hold, but they allow the test to continue, so that you can find all failing expectations in one run.</p>
+
+<p>There is no need to write a <code>main()</code> function. The testing framework provides a standard <code>main()</code> that you can link with, which runs all all defined tests. The resulting test executable has a few command line options that you can use to filter tests or change output formats. Just run your test executable with the <code>--help</code> flag to see all available options.</p>
+
+<p><em>(To be continued &#8230;)</em></p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/342/feed</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>C++ Pragmatics: Testing (Part 1)</title>
+		<link>http://hjiang.net/archives/334</link>
+		<comments>http://hjiang.net/archives/334#comments</comments>
+		<pubDate>Tue, 03 Nov 2009 06:54:38 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[c++]]></category>
+		<category><![CDATA[programming]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=334</guid>
+		<description><![CDATA[
+
+The first time that I truly appreciated the benefit of automated software testing was when I served as the teaching assistant for CS323 at Yale University, taught by Professor Stanley Eisenstat. If you have read Joel on Software, either the book or the blog, you would have heard of Stan and CS323@Yale a few times.
+
+The [...]]]></description>
+			<content:encoded><![CDATA[<p><a href="http://hjiang.net/wp-content/uploads/2009/11/IMG_1518.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/11/IMG_1518-480x320.jpg" alt="Tree @ Reyes Point" title="Tree @ Reyes Point" width="480" height="320" class="alignnone size-medium wp-image-333" /></a></p>
+
+<p>The first time that I truly appreciated the benefit of automated software testing was when I served as the teaching assistant for CS323 at Yale University, taught by Professor Stanley Eisenstat. If you have read Joel on Software, either the book or the blog, you would have heard of Stan and CS323@Yale a few times.</p>
+
+<p>The title of the course was <em>Introduction to Systems Programming and Computer Organization</em>. The student were taught computer systems, UNIX C programming, and some PERL. To quote Dan Andrei Iancu (from his homepage):</p>
+
+<blockquote>The turning point for many wannabe CS majors at Yale, Professor Eisenstat&#8217;s class can easily turn into a marathon of sleepless nights and endless frustration&#8230; However, the survivors can claim to have coded (among other things) a fully functional C shell, a Perl server, and an LZW compressor.</blockquote>
+
+<p>The students turned in their assignments by placing the source code under a specific path under their home directories on NFS. Stan gave me a sheet of very specific programming style criteria complete with how much weight to assign to each of the 25 or so items. I would read each solution and grade it for style &#8212; and for style only, because there is no way to reliably judge the correctness of a program just by reading it.</p>
+
+<p>To check correctness, I wrote acceptance tests for the assignments. For each assignment, I had a PERL script to compile the students&#8217; solutions and then ran them with STDIN and STDOUT redirected to my script with UNIX pipes. The script then went through each test case, feeding specified input and checking if the output was expected. Stan let me design the final project, which turned out to be a good exercise for writing requirements specification. I asked the students to design an old-school multi-user BBS system. The users would login with a Telnet client and can read, post, and reply with commands. I thought It would be a good practice for multi-threaded programming. Some of the programs turned in by students were quite impressive. I tested all solutions in a similar way, using a PERL script to simulate multiple users in the system and test various functionalities.</p>
+
+<p>Interestingly, the students&#8217; programs also served as tests for my scripts. I usually did the assignment myself and made sure my grading script could properly run my solutions and correctly parse the output, but it is hard to make sure that the script was robust enough to telerate minor differences. Sadly, I was not able to pass all the tests. One student wrote her solutions in Microsoft Word. Of course my script was never ready to parse .doc files. Talk about unexpected user behavior!</p>
+
+<p>Enough history. I will start writing the technical content next time.</p>
+
+<p><em>To be continued&#8230;</em></p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/334/feed</wfw:commentRss>
+		<slash:comments>2</slash:comments>
+		</item>
+		<item>
+		<title>History</title>
+		<link>http://hjiang.net/archives/328</link>
+		<comments>http://hjiang.net/archives/328#comments</comments>
+		<pubDate>Wed, 07 Oct 2009 15:03:18 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[beijing]]></category>
+		<category><![CDATA[china]]></category>
+		<category><![CDATA[photo]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=328</guid>
+		<description><![CDATA[故宫的大部分地方都翻修的比较新，只有这里保留着碎裂的地砖和中间的杂草，比较有历史感。
+]]></description>
+			<content:encoded><![CDATA[<p><div id="attachment_329" class="wp-caption alignnone" style="width: 522px"><a href="http://hjiang.net/wp-content/uploads/2009/10/IMG_2644.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/10/IMG_2644-512x341.jpg" alt="故宫" title="History" width="512" height="341" class="size-medium wp-image-329" /></a><p class="wp-caption-text">故宫</p></div>
+故宫的大部分地方都翻修的比较新，只有这里保留着碎裂的地砖和中间的杂草，比较有历史感。</p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/328/feed</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Demmy Award</title>
+		<link>http://hjiang.net/archives/325</link>
+		<comments>http://hjiang.net/archives/325#comments</comments>
+		<pubDate>Sat, 03 Oct 2009 17:45:08 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[google]]></category>
+		<category><![CDATA[photo]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=325</guid>
+		<description><![CDATA[
+]]></description>
+			<content:encoded><![CDATA[<div id="attachment_324" class="wp-caption alignnone" style="width: 490px"><img src="http://hjiang.net/wp-content/uploads/2009/10/IMG_2709.jpg" alt="Our team wins Google&#039;s engineering productivity award." title="The Demmy Award" width="480" height="320" class="size-full wp-image-324" /><p class="wp-caption-text">Our team wins Google's engineering productivity award.</p></div>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/325/feed</wfw:commentRss>
+		<slash:comments>2</slash:comments>
+		</item>
+		<item>
+		<title>The Forbidden City</title>
+		<link>http://hjiang.net/archives/312</link>
+		<comments>http://hjiang.net/archives/312#comments</comments>
+		<pubDate>Sun, 27 Sep 2009 20:47:04 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[beijing]]></category>
+		<category><![CDATA[photo]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=312</guid>
+		<description><![CDATA[
+]]></description>
+			<content:encoded><![CDATA[<p><a href="http://hjiang.net/wp-content/uploads/2009/09/gugong.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/09/gugong-512x339.jpg" alt="The Forbidden City" title="The Forbidden City" width="512" height="339" class="alignnone size-medium wp-image-313" /></a></p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/312/feed</wfw:commentRss>
+		<slash:comments>2</slash:comments>
+		</item>
+		<item>
+		<title>[Ruby notes] Beware of name collisions with mixed-in modules</title>
+		<link>http://hjiang.net/archives/305</link>
+		<comments>http://hjiang.net/archives/305#comments</comments>
+		<pubDate>Sun, 27 Sep 2009 20:15:11 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[programming]]></category>
+		<category><![CDATA[ruby]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=305</guid>
+		<description><![CDATA[This is mostly just note to self, since most Ruby developers probably know this.
+
+The following code snippet:
+
+module TestModule
+  def change_name
+    @name = "TestModule"
+  end
+
+  private
+  def private_fun
+    puts "private_fun"
+  end
+end
+
+class TestClass
+  attr_accessor :name
+  include TestModule
+
+  def initialize
+    @name [...]]]></description>
+			<content:encoded><![CDATA[<p>This is mostly just note to self, since most Ruby developers probably know this.</p>
+
+<p>The following code snippet:</p>
+
+<pre><code>module TestModule
+  def change_name
+    @name = "TestModule"
+  end
+
+  private
+  def private_fun
+    puts "private_fun"
+  end
+end
+
+class TestClass
+  attr_accessor :name
+  include TestModule
+
+  def initialize
+    @name = "TestClass"
+  end
+
+  def call_private
+    private_fun
+  end
+end
+
+tc = TestClass.new
+puts tc.name
+tc.change_name
+puts tc.name
+tc.call_private
+</code></pre>
+
+<p>Outputs</p>
+
+<pre><code>TestClass
+TestModule
+private_fun
+</code></pre>
+
+<p>It shows that when you include a module, everything is brought into the Class namespace, including private functions and instance variables. Coming from the C++ world, I found this somewhat surprising. This shows one of the practical difference between C++ multiple inheritance and Ruby mix-ins: included modules don&#8217;t have its own copy of instance variables, and private functions are visible.</p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/305/feed</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Roof &amp; Sky</title>
+		<link>http://hjiang.net/archives/301</link>
+		<comments>http://hjiang.net/archives/301#comments</comments>
+		<pubDate>Wed, 23 Sep 2009 08:16:28 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[photo]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=301</guid>
+		<description><![CDATA[
+]]></description>
+			<content:encoded><![CDATA[<div id="attachment_300" class="wp-caption alignnone" style="width: 522px"><a href="http://hjiang.net/wp-content/uploads/2009/09/IMG_2610.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/09/IMG_2610-512x341.jpg" alt="Roof &amp; sky" title="IMG_2610" width="512" height="341" class="size-medium wp-image-300" /></a><p class="wp-caption-text">Roof &amp; sky</p></div>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/301/feed</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>鸟巢夜景</title>
+		<link>http://hjiang.net/archives/290</link>
+		<comments>http://hjiang.net/archives/290#comments</comments>
+		<pubDate>Thu, 20 Aug 2009 17:32:26 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[photo]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=290</guid>
+		<description><![CDATA[
+]]></description>
+			<content:encoded><![CDATA[<div id="attachment_297" class="wp-caption alignnone" style="width: 522px"><a href="http://hjiang.net/wp-content/uploads/2009/08/IMG_2545.jpg"><img src="http://hjiang.net/wp-content/uploads/2009/08/IMG_2545-512x341.jpg" alt="鸟巢夜景。没有三脚架的条件下对效果还是比较满意的。" title="鸟巢夜景" width="512" height="341" class="size-medium wp-image-297" /></a><p class="wp-caption-text">鸟巢夜景。没有三脚架的条件下对效果还是比较满意的。</p></div>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/290/feed</wfw:commentRss>
+		<slash:comments>2</slash:comments>
+		</item>
+		<item>
+		<title>Emacs smart split for programmers</title>
+		<link>http://hjiang.net/archives/253</link>
+		<comments>http://hjiang.net/archives/253#comments</comments>
+		<pubDate>Fri, 13 Mar 2009 02:59:01 +0000</pubDate>
+		<dc:creator>j</dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+		<category><![CDATA[editor]]></category>
+		<category><![CDATA[emacs]]></category>
+		<category><![CDATA[lisp]]></category>
+		<category><![CDATA[programming]]></category>
+		<category><![CDATA[Software]]></category>
+
+		<guid isPermaLink="false">http://hjiang.net/?p=253</guid>
+		<description><![CDATA[I spend most of my conscious hours in front of Emacs in a terminal  window these days, and I share my configuration across all my computers. At work I have a huge monitor, so I split the emacs frame into 3 side-by-side 80-column windows. At home I have a smaller screen with room only [...]]]></description>
+			<content:encoded><![CDATA[<p>I spend most of my conscious hours in front of Emacs in a terminal  window these days, and I share my configuration across all my computers. At work I have a huge monitor, so I split the emacs frame into 3 side-by-side 80-column windows. At home I have a smaller screen with room only enough for two windows. To share the same configuration file, I use the following snippet:</p>
+
+<pre><code>(defun smart-split ()
+  "Split the frame into 80-column sub-windows, and make sure no window has
+   fewer than 80 columns."
+  (interactive)
+  (defun smart-split-helper (w)
+    "Helper function to split a given window into two, the first of which has 
+     80 columns."
+    (if (&gt; (window-width w) (* 2 81))
+    (let ((w2 (split-window w 82 t)))
+      (smart-split-helper w2))))
+  (smart-split-helper nil))
+
+(smart-split)
+</code></pre>
+
+<p>The <code>smart-split</code> function split the emacs frame into a maximum number of 80-column windows. A very portable solution.</p>
+]]></content:encoded>
+			<wfw:commentRss>http://hjiang.net/archives/253/feed</wfw:commentRss>
+		<slash:comments>4</slash:comments>
+		</item>
+	</channel>
+</rss>

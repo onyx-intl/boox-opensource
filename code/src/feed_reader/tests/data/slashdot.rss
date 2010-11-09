@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/" xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0">
+
+<channel rdf:about="http://slashdot.org/">
+<title>Slashdot</title>
+<link>http://slashdot.org/</link>
+<description>News for nerds, stuff that matters</description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright 1997-2009, Geeknet, Inc.  All Rights Reserved.</dc:rights>
+<dc:date>2009-11-06T00:50:14+00:00</dc:date>
+<dc:publisher>Geeknet, Inc.</dc:publisher>
+<dc:creator>help@slashdot.org</dc:creator>
+<dc:subject>Technology</dc:subject>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://developers.slashdot.org/story/09/11/05/2311241/Google-Releases-Open-Source-JavaScript-Tools?from=rss" />
+  <rdf:li rdf:resource="http://apple.slashdot.org/story/09/11/05/227236/Going-Head-To-Head-With-Genius-On-Playlists?from=rss" />
+  <rdf:li rdf:resource="http://hardware.slashdot.org/story/09/11/05/2110259/Apple-Not-Disabling-OS-X-Atom-Support-After-All?from=rss" />
+  <rdf:li rdf:resource="http://ask.slashdot.org/story/09/11/05/2021254/Home-Phone-System-That-Syncs-To-Computer?from=rss" />
+  <rdf:li rdf:resource="http://science.slashdot.org/story/09/11/05/1915224/NASA-May-Drop-Ares-I-Y-Test-Flight?from=rss" />
+  <rdf:li rdf:resource="http://it.slashdot.org/story/09/11/05/1853242/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems?from=rss" />
+  <rdf:li rdf:resource="http://linux.slashdot.org/story/09/11/05/1735225/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort?from=rss" />
+  <rdf:li rdf:resource="http://tech.slashdot.org/story/09/11/05/1632204/Computer-Failure-Causes-Gridlock-In-MD-County?from=rss" />
+  <rdf:li rdf:resource="http://yro.slashdot.org/story/09/11/05/1617220/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes?from=rss" />
+  <rdf:li rdf:resource="http://tech.slashdot.org/story/09/11/05/1552204/Facebook-and-MySpace-Backdoors-Found-Fixed?from=rss" />
+  <rdf:li rdf:resource="http://games.slashdot.org/story/09/11/05/1451256/Epic-Releases-Free-Version-of-Unreal-Engine?from=rss" />
+  <rdf:li rdf:resource="http://science.slashdot.org/story/09/11/05/1440210/LaserMotive-Finds-Success-In-Space-Elevator-Competition?from=rss" />
+  <rdf:li rdf:resource="http://it.slashdot.org/story/09/11/05/144252/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS?from=rss" />
+  <rdf:li rdf:resource="http://yro.slashdot.org/story/09/11/05/1318230/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites?from=rss" />
+  <rdf:li rdf:resource="http://science.slashdot.org/story/09/11/05/0336210/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels?from=rss" />
+ </rdf:Seq>
+</items>
+<image rdf:resource="http://a.fsdn.com/sd/topics/topicslashdot.gif" />
+<textinput rdf:resource="http://slashdot.org/search.pl" />
+<atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com" /></channel>
+
+<image rdf:about="http://a.fsdn.com/sd/topics/topicslashdot.gif">
+<title>Slashdot</title>
+<url>http://a.fsdn.com/sd/topics/topicslashdot.gif</url>
+<link>http://slashdot.org/</link>
+</image>
+
+<item rdf:about="http://developers.slashdot.org/story/09/11/05/2311241/Google-Releases-Open-Source-JavaScript-Tools?from=rss">
+<title>Google Releases Open Source JavaScript Tools</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/m7VDoaQ-wDk/Google-Releases-Open-Source-JavaScript-Tools</link>
+<description>Dan Jones writes "Google has open sourced several of its key JavaScript application development tools, hoping that they will prove useful for external programmers to build faster Web applications. According to Google, by enabling and allowing developers to use the same tools that Google uses, they can not only build rich applications but also make the Web really fast. The Closure JavaScript compiler and library are used as the standard Javascript library for pretty much any large, public Web application that Google is serving today, including some of its most popular Web applications, including Gmail, Google Docs and Google Maps. Google has also released Closure Templates which are designed to automate the dynamic creation of HTML. The announcement comes a few months after Google released and open sourced the NX server."&lt;p&gt;&lt;a href="http://developers.slashdot.org/story/09/11/05/2311241/Google-Releases-Open-Source-JavaScript-Tools?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/2311241"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://developers.slashdot.org/story/09/11/05/2311241/Google-Releases-Open-Source-JavaScript-Tools?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/QzuZxEcfb861_XOQeBLFskJfycQ/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/QzuZxEcfb861_XOQeBLFskJfycQ/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/QzuZxEcfb861_XOQeBLFskJfycQ/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/QzuZxEcfb861_XOQeBLFskJfycQ/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/m7VDoaQ-wDk" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T23:24:00+00:00</dc:date>
+<dc:subject>google</dc:subject>
+<slash:department>see-not-evil</slash:department>
+<slash:section>developers</slash:section>
+<slash:comments>36</slash:comments>
+<slash:hit_parade>36,35,29,22,5,2,0</slash:hit_parade>
+<feedburner:origLink>http://developers.slashdot.org/story/09/11/05/2311241/Google-Releases-Open-Source-JavaScript-Tools?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://apple.slashdot.org/story/09/11/05/227236/Going-Head-To-Head-With-Genius-On-Playlists?from=rss">
+<title>Going Head To Head With Genius On Playlists</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/IG6N77uXKOU/Going-Head-To-Head-With-Genius-On-Playlists</link>
+<description>brownerthanu writes "Engineers at the University of California, San Diego are developing a system to include an ignored sector of music, dubbed the 'long tail', in music recommendations. It's well known that radio suffers from a popularity bias, where the most popular songs receive an inordinate amount of exposure. In Apple's music recommender system, iTunes' Genius, this bias is magnified. An underground artist will never be recommended in a playlist due to insufficient data. It's an artifact of the popular collaborative filtering recommender algorithm, which Genius is based on. In order to establish a more holistic model of the music world, Luke Barrington and researchers at the Computer Audition Laboratory have created a machine learning system which classifies songs in an automated, Pandora-like, fashion. Instead of using humans to explicitly categorize individual songs, they capture the wisdom of the crowds via a Facebook game, Herd It, and use the data to train statistical models. The machine can then 'listen to,' describe and recommend any song, popular or not. As more people play the game, the machines get smarter. Their experiments show that automatic recommendations work at least as well as Genius for recommending undiscovered music."&lt;p&gt;&lt;a href="http://apple.slashdot.org/story/09/11/05/227236/Going-Head-To-Head-With-Genius-On-Playlists?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/227236"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://apple.slashdot.org/story/09/11/05/227236/Going-Head-To-Head-With-Genius-On-Playlists?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/dauP5vIkm2SgCa405HYq2pXJ5eI/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/dauP5vIkm2SgCa405HYq2pXJ5eI/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/dauP5vIkm2SgCa405HYq2pXJ5eI/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/dauP5vIkm2SgCa405HYq2pXJ5eI/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/IG6N77uXKOU" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T22:15:00+00:00</dc:date>
+<dc:subject>music</dc:subject>
+<slash:department>put-that-man-down</slash:department>
+<slash:section>apple</slash:section>
+<slash:comments>86</slash:comments>
+<slash:hit_parade>86,84,72,58,14,4,2</slash:hit_parade>
+<feedburner:origLink>http://apple.slashdot.org/story/09/11/05/227236/Going-Head-To-Head-With-Genius-On-Playlists?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://hardware.slashdot.org/story/09/11/05/2110259/Apple-Not-Disabling-OS-X-Atom-Support-After-All?from=rss">
+<title>Apple Not Disabling OS X Atom Support After All</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/rJh-rgxCt58/Apple-Not-Disabling-OS-X-Atom-Support-After-All</link>
+<description>bonch writes "Contrary to previous reports, Atom chip support is working fine in the latest 10C535 build of OS X 10.6.2. Apple's EULA still states that OS X is licensed to run only on Apple hardware, but it looks like OSX86 hackers can breathe easy ... for now."&lt;p&gt;&lt;a href="http://hardware.slashdot.org/story/09/11/05/2110259/Apple-Not-Disabling-OS-X-Atom-Support-After-All?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/2110259"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://hardware.slashdot.org/story/09/11/05/2110259/Apple-Not-Disabling-OS-X-Atom-Support-After-All?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/DAsGWUDdIs9q-xPKzPOg-dRj5DQ/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/DAsGWUDdIs9q-xPKzPOg-dRj5DQ/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/DAsGWUDdIs9q-xPKzPOg-dRj5DQ/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/DAsGWUDdIs9q-xPKzPOg-dRj5DQ/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/rJh-rgxCt58" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T21:32:00+00:00</dc:date>
+<dc:subject>macosx</dc:subject>
+<slash:department>If-you-like-that-sort-of-thing</slash:department>
+<slash:section>hardware</slash:section>
+<slash:comments>123</slash:comments>
+<slash:hit_parade>123,121,102,73,23,17,12</slash:hit_parade>
+<feedburner:origLink>http://hardware.slashdot.org/story/09/11/05/2110259/Apple-Not-Disabling-OS-X-Atom-Support-After-All?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://ask.slashdot.org/story/09/11/05/2021254/Home-Phone-System-That-Syncs-To-Computer?from=rss">
+<title>Home Phone System That Syncs To Computer?</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/8eCGtNg-jWI/Home-Phone-System-That-Syncs-To-Computer</link>
+<description>An anonymous reader writes 'In comparison to the advanced technology in today's smart phones, the standard home phone is painfully backwards. My current setup is a Panasonic system that has 4 cordless phones over one base station. Setting the time on one phone changes the time on all the phones; however, this is not the case for the phone book. Each entry must be manually copied (pushed) to each handset. Is this as far as home phone technology has come? What I would like is a phone system that I could sync to my computer so I could update the phone book over all the units (if not sync with Address Book or Outlook), keep a log of caller IDs, or even forward me new voicemail notifications. Does anyone know if such a system exists?'&lt;p&gt;&lt;a href="http://ask.slashdot.org/story/09/11/05/2021254/Home-Phone-System-That-Syncs-To-Computer?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/2021254"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://ask.slashdot.org/story/09/11/05/2021254/Home-Phone-System-That-Syncs-To-Computer?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/iIpWtD7AzE6fxV2oMn8e_n-t4Bc/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/iIpWtD7AzE6fxV2oMn8e_n-t4Bc/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/iIpWtD7AzE6fxV2oMn8e_n-t4Bc/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/iIpWtD7AzE6fxV2oMn8e_n-t4Bc/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/8eCGtNg-jWI" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T20:40:00+00:00</dc:date>
+<dc:subject>communications</dc:subject>
+<slash:department>not-where-the-action-is</slash:department>
+<slash:section>askslashdot</slash:section>
+<slash:comments>258</slash:comments>
+<slash:hit_parade>258,255,210,148,22,13,9</slash:hit_parade>
+<feedburner:origLink>http://ask.slashdot.org/story/09/11/05/2021254/Home-Phone-System-That-Syncs-To-Computer?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://science.slashdot.org/story/09/11/05/1915224/NASA-May-Drop-Ares-I-Y-Test-Flight?from=rss">
+<title>NASA May Drop Ares I-Y Test Flight</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/VOBssDTgICE/NASA-May-Drop-Ares-I-Y-Test-Flight</link>
+<description>Matt_dk writes "Just one week after the first test flight test of the Ares I-X rocket, NASA says it may decide to cancel a follow-up launch called Ares 1-Y, which wasn't scheduled until 2014. Reportedly, program managers recommended dropping the flight because, currently, there isn't the funding to get an upper stage engine ready in time. Depending on whether the Obama administration decides to continue the Ares I program, this decision may be moot. Earlier this week Sen. Bill Nelson said Obama may make a decision on NASA's future path, based on the report by the Augustine Commission, by the end of November."&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/1915224/NASA-May-Drop-Ares-I-Y-Test-Flight?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1915224"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/1915224/NASA-May-Drop-Ares-I-Y-Test-Flight?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/wKsybGDxTgp4b39I4mf-E_Om3aY/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/wKsybGDxTgp4b39I4mf-E_Om3aY/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/wKsybGDxTgp4b39I4mf-E_Om3aY/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/wKsybGDxTgp4b39I4mf-E_Om3aY/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/VOBssDTgICE" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T19:57:00+00:00</dc:date>
+<dc:subject>moon</dc:subject>
+<slash:department>other-people's-money</slash:department>
+<slash:section>science</slash:section>
+<slash:comments>140</slash:comments>
+<slash:hit_parade>140,137,109,93,26,14,4</slash:hit_parade>
+<feedburner:origLink>http://science.slashdot.org/story/09/11/05/1915224/NASA-May-Drop-Ares-I-Y-Test-Flight?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://it.slashdot.org/story/09/11/05/1853242/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems?from=rss">
+<title>Shockwave Vulnerabilities Affect More Than 450 Million Systems</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/ltV0u7uwxkE/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems</link>
+<description>Trinity writes "Researchers from VUPEN have discovered critical vulnerabilities in Adobe Shockwave, a technology installed on over 450 million Internet-enabled desktops. The vulnerabilities could allow remote code execution by tricking a user into visiting a web page using Internet Explorer or even Mozilla Firefox. Version 11.5.1.601 as well as earlier ones are affected. The vendor recommends upgrading to version 11.5.1.602." Especially sobering when you consider Adobe's current push to be essentially required as an intermediary player for anyone who wants to see certain government data.&lt;p&gt;&lt;a href="http://it.slashdot.org/story/09/11/05/1853242/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1853242"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://it.slashdot.org/story/09/11/05/1853242/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/CmGLXfpmFNgiEpc8orQK6kTgGKI/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/CmGLXfpmFNgiEpc8orQK6kTgGKI/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/CmGLXfpmFNgiEpc8orQK6kTgGKI/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/CmGLXfpmFNgiEpc8orQK6kTgGKI/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/ltV0u7uwxkE" height="1" width="1"/&gt;</description>
+<dc:creator>timothy</dc:creator>
+<dc:date>2009-11-05T19:14:00+00:00</dc:date>
+<dc:subject>security</dc:subject>
+<slash:department>drug-resistant-infections</slash:department>
+<slash:section>it</slash:section>
+<slash:comments>93</slash:comments>
+<slash:hit_parade>93,93,75,61,23,13,10</slash:hit_parade>
+<feedburner:origLink>http://it.slashdot.org/story/09/11/05/1853242/Shockwave-Vulnerabilities-Affect-More-Than-450-Million-Systems?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://linux.slashdot.org/story/09/11/05/1735225/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort?from=rss">
+<title>Ryan Gordon Ends FatELF Universal Binary Effort</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/orxab2y3jqM/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort</link>
+<description>recoiledsnake writes "A few years after the Con Kolivas fiasco, the FatELF project to implement the 'universal binaries' feature for Linux that allows a single binary file to run on multiple hardware platforms has been grounded. Ryan C. Gordon, who has ported a number of popular games and game servers to Linux, has this to say: 'It looks like the Linux kernel maintainers are frowning on the FatELF patches. Some got the idea and disagreed, some didn't seem to hear what I was saying, and some showed up just to be rude.' The launch of the project was recently discussed here. The FatELF project page and FAQ are still up."&lt;p&gt;&lt;a href="http://linux.slashdot.org/story/09/11/05/1735225/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1735225"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://linux.slashdot.org/story/09/11/05/1735225/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/i9dD-HcP7e2sfBME978fH-h6O0A/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/i9dD-HcP7e2sfBME978fH-h6O0A/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/i9dD-HcP7e2sfBME978fH-h6O0A/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/i9dD-HcP7e2sfBME978fH-h6O0A/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/orxab2y3jqM" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T18:30:00+00:00</dc:date>
+<dc:subject>software</dc:subject>
+<slash:department>that-was-quick</slash:department>
+<slash:section>linux</slash:section>
+<slash:comments>361</slash:comments>
+<slash:hit_parade>361,354,290,232,48,31,18</slash:hit_parade>
+<feedburner:origLink>http://linux.slashdot.org/story/09/11/05/1735225/Ryan-Gordon-Ends-FatELF-Universal-Binary-Effort?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://tech.slashdot.org/story/09/11/05/1632204/Computer-Failure-Causes-Gridlock-In-MD-County?from=rss">
+<title>Computer Failure Causes Gridlock In MD County</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/cbUu1Unbwow/Computer-Failure-Causes-Gridlock-In-MD-County</link>
+<description>Uncle Rummy writes "A central traffic control computer in Montgomery County, Maryland failed early Wednesday morning, leading to widespread gridlock across the entire county. The computer, which dates to the 1970s, is the single point of unified control for all traffic signals in the county, which comprises a number of major Washington DC-area suburban communities. When the system failed, it caused all signals to default to stand-alone operation, rather than the highly-tuned synchronization that usually serves to facilitate traffic flow during rush hours. The resulting chaos is a yet another stark reminder of how much modern civilization relies on behind-the-scenes automation to deliver and control basic services and infrastructure. The system remains down Thursday, with no ETA in sight."&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/09/11/05/1632204/Computer-Failure-Causes-Gridlock-In-MD-County?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1632204"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/09/11/05/1632204/Computer-Failure-Causes-Gridlock-In-MD-County?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/nKfJADQuJC0qnDlhMscnAbYtO48/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/nKfJADQuJC0qnDlhMscnAbYtO48/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/nKfJADQuJC0qnDlhMscnAbYtO48/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/nKfJADQuJC0qnDlhMscnAbYtO48/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/cbUu1Unbwow" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T17:49:00+00:00</dc:date>
+<dc:subject>transportation</dc:subject>
+<slash:department>single-point-of-roadrage</slash:department>
+<slash:section>technology</slash:section>
+<slash:comments>373</slash:comments>
+<slash:hit_parade>373,373,304,234,55,24,10</slash:hit_parade>
+<feedburner:origLink>http://tech.slashdot.org/story/09/11/05/1632204/Computer-Failure-Causes-Gridlock-In-MD-County?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://yro.slashdot.org/story/09/11/05/1617220/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes?from=rss">
+<title>EU Telecom Deal Finished &amp;mdash; No Three Strikes</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/H-oaxWdjcX4/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes</link>
+<description>a_n_d_e_r_s writes "The battle was hard, but the final text of the agreement ensures that people in the EU are not disconnected from the Internet without a chance to get a fair and impartial hearing beforehand. The important part is: 'Accordingly, these measures may only be taken with due respect for the principle of presumption of innocence and the right to privacy. A prior fair and impartial procedure shall be guaranteed, including the right to be heard of the person or persons concerned, subject to the need for appropriate conditions and procedural arrangements in duly substantiated cases of urgency in conformity with European Convention for the Protection of Human Rights and Fundamental Freedoms. The right to an effective and timely judicial review shall be guaranteed.' This means that if someone is accused of copyright infringement, they can't just be disconnected from Internet. It lets the accused get a chance to disagree and take it to court first. The urgency clause means that a computer can be disconnected if it is part of an ongoing DDoS attack. Next, this has to be implemented into the EU nations' own laws, so the final ruling on how this will be implemented is not out yet. But, overall, it looks like a great success in stopping informal three-strikes disconnections."&lt;p&gt;&lt;a href="http://yro.slashdot.org/story/09/11/05/1617220/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1617220"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://yro.slashdot.org/story/09/11/05/1617220/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/OTW2rshs0HTMFhrlJA3tDNE2yRA/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/OTW2rshs0HTMFhrlJA3tDNE2yRA/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/OTW2rshs0HTMFhrlJA3tDNE2yRA/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/OTW2rshs0HTMFhrlJA3tDNE2yRA/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/H-oaxWdjcX4" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T17:08:00+00:00</dc:date>
+<dc:subject>internet</dc:subject>
+<slash:department>infield-fly-rule-still-applies-though</slash:department>
+<slash:section>yro</slash:section>
+<slash:comments>77</slash:comments>
+<slash:hit_parade>77,75,68,53,29,14,6</slash:hit_parade>
+<feedburner:origLink>http://yro.slashdot.org/story/09/11/05/1617220/EU-Telecom-Deal-Finished-mdash-No-Three-Strikes?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://tech.slashdot.org/story/09/11/05/1552204/Facebook-and-MySpace-Backdoors-Found-Fixed?from=rss">
+<title>Facebook and MySpace Backdoors Found, Fixed</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/wAJE9YWW8bk/Facebook-and-MySpace-Backdoors-Found-Fixed</link>
+<description>jamie writes with news of a Facebook app developer who found a significant security hole while he was trying to get around function limitations for his application. Quoting: "Luckily &amp;mdash; just with browser AJAX requests &amp;mdash; a flash application hosted on domain X is unable to open a file on domain Y. If this would be possible, domain X [would be] able to access content on domain Y, and when the user is logged in on domain Y retrieve and post back any personal data. In certain cases this could limit a Flash application's capabilities. ... To resolve such issues, Adobe (Flash's developers) introduced a 'crossdomain.xml' file which could allow certain domains to access another domain, leading to cross-domain access by certain or all domains. While indeed Facebook locked the front door from any non-Facebook domain access via Flash, a simple subdomain change allowed any flash application (domain="*") to access its domain data." He found a similar problem in MySpace's crossdomain.xml. Both sites were notified, and they have implemented fixes.&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/09/11/05/1552204/Facebook-and-MySpace-Backdoors-Found-Fixed?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1552204"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://tech.slashdot.org/story/09/11/05/1552204/Facebook-and-MySpace-Backdoors-Found-Fixed?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/aA7RuSFiIdg_0Zuj7cf8M_Tev7o/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/aA7RuSFiIdg_0Zuj7cf8M_Tev7o/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/aA7RuSFiIdg_0Zuj7cf8M_Tev7o/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/aA7RuSFiIdg_0Zuj7cf8M_Tev7o/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/wAJE9YWW8bk" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T16:29:00+00:00</dc:date>
+<dc:subject>security</dc:subject>
+<slash:department>oh-adobe-you-card</slash:department>
+<slash:section>technology</slash:section>
+<slash:comments>88</slash:comments>
+<slash:hit_parade>88,87,73,59,10,6,5</slash:hit_parade>
+<feedburner:origLink>http://tech.slashdot.org/story/09/11/05/1552204/Facebook-and-MySpace-Backdoors-Found-Fixed?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://games.slashdot.org/story/09/11/05/1451256/Epic-Releases-Free-Version-of-Unreal-Engine?from=rss">
+<title>Epic Releases Free Version of Unreal Engine</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/i0yWyUYuow0/Epic-Releases-Free-Version-of-Unreal-Engine</link>
+<description>anomnomnomymous writes "Just a week after Unity announced its engine is now available for free to indie users, Epic Games has revealed a free version of its popular Unreal Engine technology. Called the Unreal Development Kit (UDK), it is a free edition of UE3 that allows community, modder and indie users more access to the engine's features and is available for all. Epic said game developers, students, hobbyists, researchers, creators of 3D visualizations and simulations plus digital filmmakers can all take advantage of the UDK for non-commercial use. The UDK site also offers detailed product features, technical documentation, commercial licensing terms and support resources."&lt;p&gt;&lt;a href="http://games.slashdot.org/story/09/11/05/1451256/Epic-Releases-Free-Version-of-Unreal-Engine?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1451256"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://games.slashdot.org/story/09/11/05/1451256/Epic-Releases-Free-Version-of-Unreal-Engine?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/oJAYks0yOZsi3EVLT6l1uXtgSyg/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/oJAYks0yOZsi3EVLT6l1uXtgSyg/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/oJAYks0yOZsi3EVLT6l1uXtgSyg/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/oJAYks0yOZsi3EVLT6l1uXtgSyg/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/i0yWyUYuow0" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T15:47:00+00:00</dc:date>
+<dc:subject>games</dc:subject>
+<slash:department>still-waiting-on-the-one-must-fall-engine</slash:department>
+<slash:section>games</slash:section>
+<slash:comments>147</slash:comments>
+<slash:hit_parade>147,146,107,76,27,15,11</slash:hit_parade>
+<feedburner:origLink>http://games.slashdot.org/story/09/11/05/1451256/Epic-Releases-Free-Version-of-Unreal-Engine?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://science.slashdot.org/story/09/11/05/1440210/LaserMotive-Finds-Success-In-Space-Elevator-Competition?from=rss">
+<title>LaserMotive Finds Success In Space Elevator Competition</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/IN8zNKWGeKk/LaserMotive-Finds-Success-In-Space-Elevator-Competition</link>
+<description>Bucc5062 writes "LaserMotive has achieved the first step towards the creation of a working space elevator by qualifying for the $900,000 prize in a contest sponsored by NASA. To achieve this first level, LaserMotive needed to propel a platform up a cable dangling from a helicopter at over 2 m/s. They hit a top speed of 4.13 m/s. The next level of qualification will be to achieve a climb speed greater then 5 m/s. LaserMotive beamed roughly 400 watts of laser power to a moving target at a distance of 1 kilometer, as part of the vertical laser alignment procedure. The target was a retro-reflective board a little larger than 1 meter on a side. The contest will continue for another two days with at least two other teams challenging for the prize. To win the Power Beaming competition, the LaserMotive system uses a high-power laser array to shine ultra-intense infrared light onto high-efficiency solar cells, converting the light into electric power which then drives a motor. 'Our system will track the vehicle as it climbs, compensating for motion due to wind and other changes. Building on our experience from last year&amp;rsquo;s competition, we are designing an improved system able to capture the full $2,000,000 prize.'"&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/1440210/LaserMotive-Finds-Success-In-Space-Elevator-Competition?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1440210"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/1440210/LaserMotive-Finds-Success-In-Space-Elevator-Competition?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/lx_-Gd3SgCDXmgYGCK8Ac8FIKOE/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/lx_-Gd3SgCDXmgYGCK8Ac8FIKOE/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/lx_-Gd3SgCDXmgYGCK8Ac8FIKOE/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/lx_-Gd3SgCDXmgYGCK8Ac8FIKOE/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/IN8zNKWGeKk" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T15:04:00+00:00</dc:date>
+<dc:subject>space</dc:subject>
+<slash:department>i'll-still-take-the-stairs-for-now</slash:department>
+<slash:section>science</slash:section>
+<slash:comments>201</slash:comments>
+<slash:hit_parade>201,198,178,143,26,14,7</slash:hit_parade>
+<feedburner:origLink>http://science.slashdot.org/story/09/11/05/1440210/LaserMotive-Finds-Success-In-Space-Elevator-Competition?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://it.slashdot.org/story/09/11/05/144252/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS?from=rss">
+<title>Man-In-the-Middle Vulnerability For SSL and TLS</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/_lYnneQGyL8/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS</link>
+<description>imbaczek writes "The SSL 3.0+ and TLS 1.0+ protocols are vulnerable to a set of related attacks which allow a man-in-the-middle (MITM) operating at or below the TCP layer to inject a chosen plaintext prefix into the encrypted data stream, often without detection by either end of the connection. This is possible because an 'authentication gap' exists during the renegotiation process, at which the MitM may splice together disparate TLS connections in a completely standards-compliant way. This represents a serious security defect for many or all protocols which run on top of TLS, including HTTPS."&lt;p&gt;&lt;a href="http://it.slashdot.org/story/09/11/05/144252/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/144252"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://it.slashdot.org/story/09/11/05/144252/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/cRaDmfQLBUNRATBzKjtFC7O4MrU/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/cRaDmfQLBUNRATBzKjtFC7O4MrU/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/cRaDmfQLBUNRATBzKjtFC7O4MrU/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/cRaDmfQLBUNRATBzKjtFC7O4MrU/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/_lYnneQGyL8" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T14:23:00+00:00</dc:date>
+<dc:subject>security</dc:subject>
+<slash:department>alphabet-soup</slash:department>
+<slash:section>it</slash:section>
+<slash:comments>137</slash:comments>
+<slash:hit_parade>137,137,107,82,21,14,10</slash:hit_parade>
+<feedburner:origLink>http://it.slashdot.org/story/09/11/05/144252/Man-In-the-Middle-Vulnerability-For-SSL-and-TLS?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://yro.slashdot.org/story/09/11/05/1318230/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites?from=rss">
+<title>Congress May Require ISPs To Block Certain Fraud Sites</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/gnj2OehjGDE/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites</link>
+<description>FutureDomain writes "A bill which just passed the House Financial Services Committee would require Internet Service Providers to block access to sites hosting financial scams that pose as members of the government-backed Securities Investor Protection Corporation (SIPC). The bill, called the Investor Protection Act and sponsored by Paul Kanjorski (D-PA), is broad enough to block not only websites, but email and any other 'electronic material.' 'Internet providers are also worried that Kanjorski's requirement &amp;mdash; and the accompanying civil penalties and injunctions &amp;mdash; would apply even if the blocking is not technically feasible.'"&lt;p&gt;&lt;a href="http://yro.slashdot.org/story/09/11/05/1318230/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/1318230"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://yro.slashdot.org/story/09/11/05/1318230/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/LbmgvQgHDU3SikUdhHz3FOEeOZg/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/LbmgvQgHDU3SikUdhHz3FOEeOZg/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/LbmgvQgHDU3SikUdhHz3FOEeOZg/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/LbmgvQgHDU3SikUdhHz3FOEeOZg/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/gnj2OehjGDE" height="1" width="1"/&gt;</description>
+<dc:creator>Soulskill</dc:creator>
+<dc:date>2009-11-05T13:39:00+00:00</dc:date>
+<dc:subject>government</dc:subject>
+<slash:department>just-getting-warmed-up</slash:department>
+<slash:section>yro</slash:section>
+<slash:comments>158</slash:comments>
+<slash:hit_parade>158,156,125,105,33,21,14</slash:hit_parade>
+<feedburner:origLink>http://yro.slashdot.org/story/09/11/05/1318230/Congress-May-Require-ISPs-To-Block-Certain-Fraud-Sites?from=rss</feedburner:origLink></item>
+
+<item rdf:about="http://science.slashdot.org/story/09/11/05/0336210/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels?from=rss">
+<title>Low-Energy Laser Etching May Replace Fruit Labels</title>
+<link>http://rss.slashdot.org/~r/Slashdot/slashdot/~3/jXs1goGhxk0/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels</link>
+<description>MikeChino writes "How many times have you bit into a piece of fruit only to find that you're also chomping on a sticker label? The small sticky labels have long been the bane of waste-conscious fruit and vegetable eaters, but that might all change thanks to new technology that uses a low-energy carbon dioxide laser beam to etch information directly onto produce. No more peeling those annoying labels! So far the technology is being used on a number of fruits and vegetables in New Zealand, Australia, and Pacific Rim countries, and it's currently going through the final stages of review by the FDA. Once the technology is approved in the US, researchers from the University of Florida and the USDA Agricultural Research Service hope that it will be used in Florida's massive grapefruit industry."&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/0336210/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels?from=rss"&gt;&lt;img src="http://slashdot.org/slashdot-it.pl?from=rss&amp;amp;op=image&amp;amp;style=h0&amp;amp;sid=09/11/05/0336210"&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href="http://science.slashdot.org/story/09/11/05/0336210/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels?from=rss"&gt;Read more of this story&lt;/a&gt; at Slashdot.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://feedads.g.doubleclick.net/~at/fv0H8BbOhHAa020O-LFKxwDmLzU/0/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fv0H8BbOhHAa020O-LFKxwDmLzU/0/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;br/&gt;
+&lt;a href="http://feedads.g.doubleclick.net/~at/fv0H8BbOhHAa020O-LFKxwDmLzU/1/da"&gt;&lt;img src="http://feedads.g.doubleclick.net/~at/fv0H8BbOhHAa020O-LFKxwDmLzU/1/di" border="0" ismap="true"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;img src="http://feeds.feedburner.com/~r/Slashdot/slashdot/~4/jXs1goGhxk0" height="1" width="1"/&gt;</description>
+<dc:creator>samzenpus</dc:creator>
+<dc:date>2009-11-05T12:57:00+00:00</dc:date>
+<dc:subject>idle</dc:subject>
+<slash:department>tattooed-fruit</slash:department>
+<slash:section>science</slash:section>
+<slash:comments>390</slash:comments>
+<slash:hit_parade>390,386,303,224,60,40,30</slash:hit_parade>
+<feedburner:origLink>http://science.slashdot.org/story/09/11/05/0336210/Low-Energy-Laser-Etching-May-Replace-Fruit-Labels?from=rss</feedburner:origLink></item>
+
+<textinput rdf:about="http://slashdot.org/search.pl">
+<title>Search Slashdot</title>
+<description>Search Slashdot stories</description>
+<name>query</name>
+<link>http://slashdot.org/search.pl</link>
+</textinput>
+
+</rdf:RDF>

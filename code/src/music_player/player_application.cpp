@@ -24,7 +24,6 @@ PlayerApplication::PlayerApplication(int &argc, char **argv)
     connect( &sys_status, SIGNAL( sdCardChangedSignal( bool ) ), this, SLOT( onSDChangedSignal( bool ) ) );
     connect(&sys_status, SIGNAL(aboutToSuspend()), this, SLOT(onAboutToSuspend()));
     connect(&sys_status, SIGNAL(wakeup()), this, SLOT(onWakeUp()));
-    connect(&sys_status, SIGNAL(connectToPC(bool)), this, SLOT(onConnectToPC(bool)));
 
 #ifdef Q_WS_QWS
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
@@ -153,7 +152,7 @@ void PlayerApplication::onMountTreeSignal(bool inserted, const QString &mount_po
     qDebug( "Mount point:%s %s",
             qPrintable( mount_point ),
             inserted ? "inserted" : "disconnect" );
-    if (path_.startsWith(mount_point))
+    if (!inserted && path_.startsWith(mount_point))
     {
         qApp->exit();
     }
@@ -161,17 +160,8 @@ void PlayerApplication::onMountTreeSignal(bool inserted, const QString &mount_po
 
 void PlayerApplication::onSDChangedSignal(bool inserted)
 {
-    qDebug("\n\nSD Card %s\n\n", inserted ? "Inserted" : "Removed");
-    if (path_.startsWith( SDMMC_ROOT ) && !inserted)
-    {
-        qApp->exit();
-    }
-}
-
-void PlayerApplication::onConnectToPC(bool connected)
-{
-    qDebug("\n\nPC %s\n\n", connected ? "connected" : "disconnected");
-    if ( connected )
+    qDebug("SD %s", inserted ? "inserted" : "disconnect");
+    if ( path_.startsWith( SDMMC_ROOT ) && !inserted )
     {
         qApp->exit();
     }

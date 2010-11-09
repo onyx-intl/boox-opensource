@@ -30,7 +30,6 @@ public Q_SLOTS:
     void onScreenSizeChanged(int);
     void onMountTreeSignal(bool inserted, const QString &mount_point);
     void onSDChangedSignal(bool inserted);
-    void onConnectToPC(bool connected);
     void onAboutToSuspend();
     void onWakeUp();
 

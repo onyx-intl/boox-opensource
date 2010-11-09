@@ -28,10 +28,10 @@
 #include "onyx/ui/ui.h"
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/sys/sys.h"
-#include "dictionary/dictionary_manager.h"
-#include "dictionary/dict_widget.h"
-#include "sound/sound.h"
-#include "tts/tts_widget.h"
+#include "onyx/dictionary/dictionary_manager.h"
+#include "onyx/dictionary/dict_widget.h"
+#include "onyx/sound/sound.h"
+#include "onyx/tts/tts_widget.h"
 
 
 
@@ -154,6 +154,7 @@ private:
     TTSWidget & ttsWidget();
 
     void showGotoPageDialog();
+    void showTableOfContents();
 
     void loadConf();
     void saveConf();
