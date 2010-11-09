@@ -26,7 +26,6 @@ class RssFeedParser : public FeedParser {
     virtual bool finishedInternal() const;
     virtual const shared_ptr<Feed> feedInternal() const;
     virtual void finalizeInternal();
-    QByteArray xmlAtomValidator(const QByteArray& d);
     void handleStartElement();
     void handleEndElement();
 
@@ -40,8 +39,6 @@ class RssFeedParser : public FeedParser {
     QString current_text_;  // Text content of the current element.
     QString pudate_;
     vector<shared_ptr<Article> > new_articles_;
-    bool in_content_; ///< indicate whether inside of the tag content org summary
-    QStringList taglist_; ///< Html tags
     NO_COPY_AND_ASSIGN(RssFeedParser);
 };
 

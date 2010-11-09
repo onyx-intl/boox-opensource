@@ -36,13 +36,14 @@ class FeedFetcher : public QObject {
   private:
     void startFetch();
     void parseXml();
-
+    QByteArray xmlAtomValidator(const QByteArray&);
     // Reinitialize the state of the object. Called before starting to
     // fetch a new feed.
     void init();
 
     struct Impl;
     scoped_ptr<Impl> impl_;
+    QByteArray bytes_;
 
     NO_COPY_AND_ASSIGN(FeedFetcher);
 };

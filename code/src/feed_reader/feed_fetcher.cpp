@@ -26,6 +26,7 @@ struct FeedFetcher::Impl {
 
 FeedFetcher::FeedFetcher(FeedParser* parser) : impl_(new Impl) {
     impl_->parser_.reset(parser);
+    bytes_.clear();
     init();
 }
 
@@ -80,12 +81,11 @@ void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
     if(!impl_->current_feed_.get())
         return;
     if (response_header.statusCode() == 200) {
-        QByteArray bytes(impl_->http_->readAll());
-        qDebug() << bytes.size() << " bytes received.";
-        if (!impl_->parser_->append(bytes)) {
-            qDebug() << "Error parsing feed: "
-                     << impl_->parser_->errorString();
-        }
+        //TODO in order to insert CDATA to invalid XML atom,
+        //we need capture data of full page
+        bytes_.append(impl_->http_->readAll());
+        qDebug() << bytes_.size() << " bytes received.";
+        // insert CDATA FLAG if not exists
     } else if ((response_header.statusCode() >300 || response_header.statusCode() <300) && response_header.hasKey("location")) {
         qDebug()<<response_header.statusCode();
         QUrl location = QUrl(response_header.value("location"));
@@ -97,7 +97,34 @@ void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
     }
 }
 
+QByteArray FeedFetcher::xmlAtomValidator(const QByteArray& d)
+{
+    QString xml_plain_text = QString::fromLocal8Bit(d);
+    if (xml_plain_text.indexOf("CDATA") ==-1) {
+    // If this is not well formed xml
+        static QRegExp rx_summary_head = QRegExp("<summary([^<]*)>");
+        static QRegExp rx_summary_end = QRegExp("(\\s*)</summary>");
+        static QRegExp rx_content_head = QRegExp("<content([^<]*)>");
+        static QRegExp rx_content_end = QRegExp("(\\s*)</content>");
+        xml_plain_text.replace(rx_summary_head, "<description><![CDATA[");
+        xml_plain_text.replace(rx_summary_end, "]]></description>");
+        xml_plain_text.replace(rx_content_head, "<description><![CDATA[");
+        xml_plain_text.replace(rx_content_end, "]]></description>");
+        //TODO change '<link xxx/>' to be '<link xxx> </link>'
+        static QRegExp rx_link = QRegExp("<link([^<]*)/>");
+        xml_plain_text.replace(rx_link, "<link \\1></link>");
+    }
+    return xml_plain_text.toLocal8Bit();
+}
+
 void FeedFetcher::finishFetch(int connection_id, bool error) {
+    // process data here, yeah, need a better way
+    QByteArray bytes = xmlAtomValidator(bytes_);
+    if (!impl_->parser_->append(bytes)) {
+        qDebug() << "Error parsing feed: "
+                    << impl_->parser_->errorString();
+    }
+    bytes_.clear();
     qDebug() << "Connection finished: " << connection_id;
     if (connection_id == impl_->connection_id_) {
         // Stop and clear all pending fetch ops if this is true
