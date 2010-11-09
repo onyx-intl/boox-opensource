@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QHttp>
 #include <QXmlStreamReader>
+#include <QTextCodec>
 
 #include "onyx/base/base.h"
 #include "onyx/base/shared_ptr.h"
@@ -66,7 +67,7 @@ void FeedFetcher::startFetch() {
     qDebug() << "Fetching '" << url.path() << "' from host " << url.host()
              << " and port " << port;
     impl_->http_->setHost(url.host(), port);
-    impl_->connection_id_ = impl_->http_->get(url.path());
+    impl_->connection_id_ = impl_->http_->get(url.toString());
 }
 
 void FeedFetcher::scheduleFetch(shared_ptr<Feed> feed) {
@@ -84,7 +85,7 @@ void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
         //TODO in order to insert CDATA to invalid XML atom,
         //we need capture data of full page
         bytes_.append(impl_->http_->readAll());
-        qDebug() << bytes_.size() << " bytes received.";
+//         qDebug() << bytes_.size() << " bytes received.";
         // insert CDATA FLAG if not exists
     } else if ((response_header.statusCode() >300 || response_header.statusCode() <300) && response_header.hasKey("location")) {
         qDebug()<<response_header.statusCode();
@@ -99,22 +100,25 @@ void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
 
 QByteArray FeedFetcher::xmlAtomValidator(const QByteArray& d)
 {
+
     QString xml_plain_text = QString::fromLocal8Bit(d);
-    if (xml_plain_text.indexOf("CDATA") ==-1) {
+    if (xml_plain_text.indexOf("<![CDATA[") ==-1) {
     // If this is not well formed xml
+        qDebug() << "No CDATA";
+        qDebug() << xml_plain_text;
         static QRegExp rx_summary_head = QRegExp("<summary([^<]*)>");
         static QRegExp rx_summary_end = QRegExp("(\\s*)</summary>");
         static QRegExp rx_content_head = QRegExp("<content([^<]*)>");
+        static QRegExp rx_link = QRegExp("<link([^<]*)/>");
         static QRegExp rx_content_end = QRegExp("(\\s*)</content>");
         xml_plain_text.replace(rx_summary_head, "<description><![CDATA[");
         xml_plain_text.replace(rx_summary_end, "]]></description>");
         xml_plain_text.replace(rx_content_head, "<description><![CDATA[");
         xml_plain_text.replace(rx_content_end, "]]></description>");
-        //TODO change '<link xxx/>' to be '<link xxx> </link>'
-        static QRegExp rx_link = QRegExp("<link([^<]*)/>");
         xml_plain_text.replace(rx_link, "<link \\1></link>");
+        xml_plain_text.toLocal8Bit();
     }
-    return xml_plain_text.toLocal8Bit();
+    return d;
 }
 
 void FeedFetcher::finishFetch(int connection_id, bool error) {

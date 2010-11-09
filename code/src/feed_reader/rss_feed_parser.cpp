@@ -120,6 +120,7 @@ void RssFeedParser::handleEndElement() {
             || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->title().isEmpty()) {
             current_article_->set_title(current_text_);
+            qDebug() << "Title " << current_text_;
         }
     } else if (xml_reader_.name() == "link" ||
                xml_reader_.name() == "id") {
@@ -140,6 +141,7 @@ void RssFeedParser::handleEndElement() {
             || *(tag_stack_.top()) == "entry") && current_article_.get()
             /*&& current_article_->text().isEmpty()*/) {
             current_article_->set_text(current_text_);
+            qDebug() << "Text: "<< current_text_;
         }
     } else if (xml_reader_.name() == "pubDate"
             || xml_reader_.name() == "updated"
