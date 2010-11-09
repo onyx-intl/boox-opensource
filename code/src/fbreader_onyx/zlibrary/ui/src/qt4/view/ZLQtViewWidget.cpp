@@ -49,7 +49,7 @@ static bool has_touch = true;
 
 static bool isTTSAndDictEnabled()
 {
-    return qgetenv("ENABLE_TTS_DICT").toBool();
+    return (qgetenv("ENABLE_TTS_DICT").toInt() > 0);
 }
 
 class MyQScrollBar : public QScrollBar {
