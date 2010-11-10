@@ -13,6 +13,8 @@
 #include "feed_fetcher.h"
 #include "feed_parser.h"
 
+#include <QDir>
+#include <QFile>
 namespace onyx {
 namespace feed_reader {
 
@@ -64,8 +66,7 @@ void FeedFetcher::startFetch() {
     int port = url.port() == -1 ? 80 : url.port();
     init();
     CHECK(impl_->http_.get());
-    qDebug() << "Fetching '" << url.path() << "' from host " << url.host()
-             << " and port " << port;
+
     impl_->http_->setHost(url.host(), port);
     impl_->connection_id_ = impl_->http_->get(url.toString());
 }
@@ -81,31 +82,46 @@ void FeedFetcher::scheduleFetch(shared_ptr<Feed> feed) {
 void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
     if(!impl_->current_feed_.get())
         return;
-    if (response_header.statusCode() == 200) {
+    int statusCode =  response_header.statusCode();
+
+    if (statusCode == 200) {
         //TODO in order to insert CDATA to invalid XML atom,
         //we need capture data of full page
         bytes_.append(impl_->http_->readAll());
 //         qDebug() << bytes_.size() << " bytes received.";
         // insert CDATA FLAG if not exists
-    } else if ((response_header.statusCode() >300 || response_header.statusCode() <300) && response_header.hasKey("location")) {
+    } else if ((statusCode >300 || statusCode <300) && response_header.hasKey("location")) {
         qDebug()<<response_header.statusCode();
         QUrl location = QUrl(response_header.value("location"));
         impl_->http_.get()->setHost(location.host(),80);
-        impl_->http_.get()->get(location.path());
+        impl_->http_.get()->get(location.toString());
     } else {
         qDebug() << "Received non-200 response code: "
-                 << response_header.statusCode();
+                 << statusCode;
     }
 }
 
 QByteArray FeedFetcher::xmlAtomValidator(const QByteArray& d)
 {
+    static QRegExp rx_encoding = QRegExp("<\?xml version=\"1.0\" encoding=\"([^\?>]+)\"");
+    QString xml_plain_text = QString::fromUtf8(d);
+    qDebug() << "before QRegExp";
+    if (rx_encoding.indexIn(xml_plain_text,0) != -1) {
+        // Handle non-utf8 QByteArray
+        QString encoding = rx_encoding.cap(1);
+        encoding = encoding.toUpper();
+        if (encoding.contains("GB")) {
+                encoding = "GB2312";
+        }
+        xml_plain_text.clear();
+        QTextCodec *codec = QTextCodec::codecForName(encoding.toLocal8Bit().constData());
+        xml_plain_text = codec->toUnicode(d);
+        xml_plain_text.replace(rx_encoding.cap(1), "UTF-8");
+    }
 
-    QString xml_plain_text = QString::fromLocal8Bit(d);
-    if (xml_plain_text.indexOf("<![CDATA[") ==-1) {
-    // If this is not well formed xml
+    if (!xml_plain_text.contains("<![CDATA[")) {
+        // Add CDATA mark if this is not well formed xml
         qDebug() << "No CDATA";
-        qDebug() << xml_plain_text;
         static QRegExp rx_summary_head = QRegExp("<summary([^<]*)>");
         static QRegExp rx_summary_end = QRegExp("(\\s*)</summary>");
         static QRegExp rx_content_head = QRegExp("<content([^<]*)>");
@@ -116,13 +132,13 @@ QByteArray FeedFetcher::xmlAtomValidator(const QByteArray& d)
         xml_plain_text.replace(rx_content_head, "<description><![CDATA[");
         xml_plain_text.replace(rx_content_end, "]]></description>");
         xml_plain_text.replace(rx_link, "<link \\1></link>");
-        xml_plain_text.toLocal8Bit();
     }
-    return d;
+    return xml_plain_text.toUtf8();
 }
 
 void FeedFetcher::finishFetch(int connection_id, bool error) {
     // process data here, yeah, need a better way
+    if (bytes_.isEmpty()) return;
     QByteArray bytes = xmlAtomValidator(bytes_);
     if (!impl_->parser_->append(bytes)) {
         qDebug() << "Error parsing feed: "
