@@ -138,6 +138,11 @@ void RssFeedParser::handleEndElement() {
         if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
             || *(tag_stack_.top()) == "entry") && current_article_.get()
             /*&& current_article_->text().isEmpty()*/) {
+            //Add Link at head
+            if (!current_article_->url().isEmpty()) {
+                current_text_ = "Link: <a href =\"" + current_article_->url()+
+                "\">" + current_article_->url() + "</a><br/><br/>" +current_text_;
+            }
             current_article_->set_text(current_text_);
         }
     } else if (xml_reader_.name() == "pubDate"

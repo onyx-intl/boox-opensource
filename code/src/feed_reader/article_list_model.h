@@ -27,7 +27,7 @@ class ArticleListModel : public QAbstractTableModel {
     virtual ~ArticleListModel();
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const {return 2;}
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const {return 1;}
     virtual QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex& index, const QVariant& Value, int role);
     Qt::ItemFlags flags(const QModelIndex& index) const;

@@ -57,7 +57,7 @@ QVariant ArticleListModel::data(const QModelIndex &index, int role) const {
                 return QVariant::fromValue(QFont("Mono", 14, QFont::Bold));
             }
         }
-    } else if (index.column() == 1) {
+    }/* else if (index.column() == 1) {
         if (role == Qt::EditRole){
             if(article->read()) {
                 return true;
@@ -71,7 +71,7 @@ QVariant ArticleListModel::data(const QModelIndex &index, int role) const {
                 return Qt::Unchecked;
             }
         }
-    }
+    }*/
     return QVariant();
 }
 

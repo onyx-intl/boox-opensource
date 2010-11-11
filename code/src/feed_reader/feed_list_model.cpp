@@ -98,6 +98,8 @@ void FeedListModel::addFeed(const QUrl& url) {
     shared_ptr<Feed> feed(new Feed);
     feed->set_feed_url(url);
     feed_fetcher_->scheduleFetch(feed);
+    //TODO
+    //check if added successfully, in case of invalid url or network issue
     addFeed(feed);
 }
 

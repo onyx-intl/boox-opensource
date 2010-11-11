@@ -6,9 +6,9 @@
 #include <QHttp>
 #include <QXmlStreamReader>
 #include <QTextCodec>
-
 #include "onyx/base/base.h"
 #include "onyx/base/shared_ptr.h"
+#include "onyx/ui/message_dialog.h"
 #include "feed.h"
 #include "feed_fetcher.h"
 #include "feed_parser.h"
@@ -47,10 +47,11 @@ FeedFetcher::~FeedFetcher() {}
 void FeedFetcher::startFetch() {
     // Do nothing if the queue is empty, or we haven't done with the
     // current feed.
+    qDebug() << "To check whether the queue is empty";
     if (impl_->pending_feeds_.empty() || impl_->current_feed_.get()) {
         return;
     }
-
+    qDebug() << "To check whether the program is being closed";
     // When the program is being closed, QHttp may emit a
     // requestFinished signal that triggers this function.
     if (!impl_->parser_.get()) {
@@ -63,7 +64,7 @@ void FeedFetcher::startFetch() {
     assert(impl_->current_feed_.get());
     impl_->parser_->startNewFeed(impl_->current_feed_);
     const QUrl& url(impl_->current_feed_->feed_url());
-    int port = url.port() == -1 ? 80 : url.port();
+    int port = (url.port() == -1 ? 80 : url.port());
     init();
     CHECK(impl_->http_.get());
 
@@ -83,21 +84,29 @@ void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
     if(!impl_->current_feed_.get())
         return;
     int statusCode =  response_header.statusCode();
-
+    qDebug() << statusCode;
     if (statusCode == 200) {
         //TODO in order to insert CDATA to invalid XML atom,
         //we need capture data of full page
         bytes_.append(impl_->http_->readAll());
 //         qDebug() << bytes_.size() << " bytes received.";
         // insert CDATA FLAG if not exists
-    } else if ((statusCode >300 || statusCode <300) && response_header.hasKey("location")) {
+    } else if ((statusCode >300 || statusCode <300)
+        && (response_header.hasKey("location") || response_header.hasKey("Location"))) {
         qDebug()<<response_header.statusCode();
         QUrl location = QUrl(response_header.value("location"));
+        if (location.isEmpty()) {
+            location = QUrl(response_header.value("Location"));
+        }
+        qDebug() << location;
         impl_->http_.get()->setHost(location.host(),80);
-        impl_->http_.get()->get(location.toString());
+        impl_->connection_id_ = impl_->http_.get()->get(location.toString());
+    } else if (statusCode == 404) {
+       //NOTE: Do Nothing
+       qDebug() << "404 !!";
     } else {
         qDebug() << "Received non-200 response code: "
-                 << statusCode;
+                 << statusCode << response_header.toString();
     }
 }
 
@@ -140,6 +149,7 @@ void FeedFetcher::finishFetch(int connection_id, bool error) {
     // process data here, yeah, need a better way
     if (bytes_.isEmpty()) return;
     QByteArray bytes = xmlAtomValidator(bytes_);
+    //TODO emit signal to caller that whether the request is finished
     if (!impl_->parser_->append(bytes)) {
         qDebug() << "Error parsing feed: "
                     << impl_->parser_->errorString();

@@ -9,7 +9,7 @@
 #include "article.h"
 #include "feed.h"
 #include "main_widget.h"
-
+#include "feed_action.h"
 namespace onyx {
 namespace feed_reader {
 
@@ -30,6 +30,7 @@ class MainWidget : public QWidget
     virtual ~MainWidget();
 
     void fitToScreen();
+    void addFeedlist(QStringList& string_list);
     protected:
         void keyPressEvent(QKeyEvent *e);
   private slots:
@@ -47,7 +48,6 @@ class MainWidget : public QWidget
     FeedsPage* feeds_page_;
     ArticleListPage* article_list_page_;
     ArticlePage* article_page_;
-
     NO_COPY_AND_ASSIGN(MainWidget);
 };
 

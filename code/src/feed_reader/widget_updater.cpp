@@ -61,7 +61,7 @@ bool WidgetUpdater::eventFilter(QObject* obj, QEvent* event) {
     } else if (event->type() == QEvent::UpdateRequest) {
         if (ignore_next_update_ && !force_next_update_) {
             ignore_next_update_ = false;
-            qDebug() << "UpdateRequest ignored";
+//             qDebug() << "UpdateRequest ignored";
             return QObject::eventFilter(obj, event);
         }
         force_next_update_= false;
