@@ -93,7 +93,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY|SCREEN_REFRESH);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
     }
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
@@ -484,6 +484,7 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (reading_tool_actions_.selectedTool() == CLOCK_TOOL)
         {
+            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
             status_bar_->onClockClicked();
         }
         else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)
