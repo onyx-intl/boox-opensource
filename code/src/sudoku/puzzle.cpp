@@ -29,8 +29,7 @@ namespace simsu {
 
 /*****************************************************************************/
 
-Puzzle::Puzzle()
-                : m_pattern ( 0 )
+Puzzle::Puzzle(): m_pattern ( 0 )
 {
 }
 
