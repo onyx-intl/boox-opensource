@@ -33,32 +33,29 @@ Frame::Frame ( QWidget* parent )
 void Frame::paintEvent ( QPaintEvent* event ) {
     QWidget::paintEvent ( event );
 
+    static QRadialGradient gradient_hb(25, 25, 50, 50, 50);
+    gradient_hb.setColorAt(0, QColor::fromRgbF(0.7, 0.7, 0.7, 1));
+    gradient_hb.setColorAt(1, QColor::fromRgbF(0.3, 0.3, 0.3, 1));
+    static QRadialGradient gradient_h(25, 25, 50, 50, 50);
+    gradient_h.setColorAt(1, QColor::fromRgbF(0.6, 0.6, 0.6, 1));
+    gradient_h.setColorAt(0, QColor::fromRgbF(0.2, 0.2, 0.2, 1));
+
     QPainter painter ( this );
     painter.setRenderHint ( QPainter::Antialiasing, true );
-
-    painter.setPen ( Qt::black);
+    painter.setPen (QPen(Qt::black, 3));
     painter.setBrush (Qt::NoBrush);
-    painter.drawRoundedRect ( QRectF ( 0.5, 0.5, width() - 1, height() - 1 ), 3, 3);
+    painter.drawRoundedRect ( QRectF ( 0.5, 0.5, width() - 1, height() - 1 ), 5, 5);
 
     if ( m_highlight ) {
-        QRadialGradient gradient(25, 25, 100, 100, 100);
-        gradient.setColorAt(0, QColor::fromRgbF(0, 0, 0, 1));
-        gradient.setColorAt(1, QColor::fromRgbF(1, 1, 1, 1));
-        QBrush brush(gradient);
+        QBrush brush(gradient_h);
         painter.setBrush ( brush );
-        painter.setPen ( Qt::black);
-        painter.drawRoundedRect ( QRectF ( 0, 0, width(), height()), 3, 3);
+        painter.drawRoundedRect ( QRectF ( 0, 0, width() , height() ), 5, 5);
     }
 
     if ( m_highlight_border ) {
-        QRadialGradient gradient(25, 25, 100, 100, 100);
-        gradient.setColorAt(1, QColor::fromRgbF(0, 0, 0, 1));
-        gradient.setColorAt(0, QColor::fromRgbF(1, 1, 1, 1));
-        QBrush brush(gradient);
+        QBrush brush(gradient_hb);
         painter.setBrush ( brush );
-        painter.setPen ( Qt::black);
-        painter.setBrush ( Qt::NoBrush );
-        painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() - 3, height() - 3 ), 3, 3 );
+        painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() - 3, height() - 3 ), 5, 5 );
     }
 }
 

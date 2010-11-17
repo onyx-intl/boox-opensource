@@ -183,9 +183,9 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     int degree = sys::SysStatus::instance().screenTransformation();
 
     if (degree == 90 || degree == 270) {
-        toggleWidescreen(1);
+        toggleWidescreen(true);
     } else {
-        toggleWidescreen(0);
+        toggleWidescreen(false);
     }
 #ifndef BUILD_FOR_ARM
     toggleWidescreen(1);

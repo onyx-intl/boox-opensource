@@ -102,12 +102,12 @@ void Cell::setPuzzle ( Puzzle* puzzle ) {
 
     QFont f = font();
     if ( m_given ) {
-        setBackgroundRole ( QPalette::Text );
+        //setBackgroundRole ( QPalette::Dark );
         f.setBold ( true );
         f.setFamily("Serif");
         f.setItalic(false);
     } else {
-        setBackgroundRole ( QPalette::Base );
+        //setBackgroundRole ( QPalette::Base );
         f.setBold ( false );
         f.setFamily("Sans");
         f.setItalic(true);
