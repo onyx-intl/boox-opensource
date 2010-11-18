@@ -366,7 +366,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools
     std::vector<ReadingToolsType> tools;
     tools.push_back(SEARCH_TOOL);
-    if (has_touch || isTTSAndDictEnabled())
+    if (isTTSAndDictEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
@@ -380,7 +380,7 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-    if (has_touch || isTTSAndDictEnabled())
+    if (isTTSAndDictEnabled())
     {
         tools.clear();
         tools.push_back(TEXT_TO_SPEECH);
