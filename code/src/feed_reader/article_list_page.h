@@ -5,15 +5,13 @@
 
 #include <vector>
 #include <QWidget>
-
 #include "onyx/base/base.h"
-
 #include "article.h"
 
 class QAbstractItemModel;
 class QTableView;
 class QModelIndex;
-
+class QPainter;
 namespace onyx {
 namespace feed_reader {
 
@@ -31,13 +29,12 @@ class ArticleListPage : public QWidget {
     void showEvent(QShowEvent* event);
   signals:
     void articleActivated(shared_ptr<Article> article);
-
+    void reset_read(QModelIndex& index);
   private slots:
     void handleActivated(const QModelIndex& index);
 
-  private:
+private:
     QTableView* article_list_view_;
-
     NO_COPY_AND_ASSIGN(ArticleListPage);
 };
 

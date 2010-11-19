@@ -5,7 +5,7 @@
 
 #include <stack>
 #include <QXmlStreamReader>
-
+#include <QStringList>
 #include "feed_parser.h"
 
 namespace onyx {
@@ -26,12 +26,10 @@ class RssFeedParser : public FeedParser {
     virtual bool finishedInternal() const;
     virtual const shared_ptr<Feed> feedInternal() const;
     virtual void finalizeInternal();
-
     void handleStartElement();
     void handleEndElement();
 
     bool parseMore();
-
     shared_ptr<Feed> feed_;
     QXmlStreamReader xml_reader_;
     // TODO(hjiang): Does QString do ref-counting? perhaps shared_ptr
@@ -41,7 +39,6 @@ class RssFeedParser : public FeedParser {
     QString current_text_;  // Text content of the current element.
     QString pudate_;
     vector<shared_ptr<Article> > new_articles_;
-
     NO_COPY_AND_ASSIGN(RssFeedParser);
 };
 

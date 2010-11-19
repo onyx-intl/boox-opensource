@@ -5,13 +5,16 @@
 #include <QDebug>
 #include <QHttp>
 #include <QXmlStreamReader>
-
+#include <QTextCodec>
 #include "onyx/base/base.h"
 #include "onyx/base/shared_ptr.h"
+#include "onyx/ui/message_dialog.h"
 #include "feed.h"
 #include "feed_fetcher.h"
 #include "feed_parser.h"
 
+#include <QDir>
+#include <QFile>
 namespace onyx {
 namespace feed_reader {
 
@@ -26,6 +29,7 @@ struct FeedFetcher::Impl {
 
 FeedFetcher::FeedFetcher(FeedParser* parser) : impl_(new Impl) {
     impl_->parser_.reset(parser);
+    bytes_.clear();
     init();
 }
 
@@ -43,10 +47,11 @@ FeedFetcher::~FeedFetcher() {}
 void FeedFetcher::startFetch() {
     // Do nothing if the queue is empty, or we haven't done with the
     // current feed.
+    qDebug() << "To check whether the queue is empty";
     if (impl_->pending_feeds_.empty() || impl_->current_feed_.get()) {
         return;
     }
-
+    qDebug() << "To check whether the program is being closed";
     // When the program is being closed, QHttp may emit a
     // requestFinished signal that triggers this function.
     if (!impl_->parser_.get()) {
@@ -59,13 +64,12 @@ void FeedFetcher::startFetch() {
     assert(impl_->current_feed_.get());
     impl_->parser_->startNewFeed(impl_->current_feed_);
     const QUrl& url(impl_->current_feed_->feed_url());
-    int port = url.port() == -1 ? 80 : url.port();
+    int port = (url.port() == -1 ? 80 : url.port());
     init();
     CHECK(impl_->http_.get());
-    qDebug() << "Fetching '" << url.path() << "' from host " << url.host()
-             << " and port " << port;
+
     impl_->http_->setHost(url.host(), port);
-    impl_->connection_id_ = impl_->http_->get(url.path());
+    impl_->connection_id_ = impl_->http_->get(url.toString());
 }
 
 void FeedFetcher::scheduleFetch(shared_ptr<Feed> feed) {
@@ -77,26 +81,80 @@ void FeedFetcher::scheduleFetch(shared_ptr<Feed> feed) {
 }
 
 void FeedFetcher::readData(const QHttpResponseHeader& response_header) {
-    DCHECK(impl_->current_feed_.get());
-    if (response_header.statusCode() == 200) {
-        QByteArray bytes(impl_->http_->readAll());
-        qDebug() << bytes.size() << " bytes received.";
-        if (!impl_->parser_->append(bytes)) {
-            qDebug() << "Error parsing feed: "
-                     << impl_->parser_->errorString();
-        }
-    } else if ((response_header.statusCode() >300 || response_header.statusCode() <300) && response_header.hasKey("location")) {
+    if(!impl_->current_feed_.get())
+        return;
+    int statusCode =  response_header.statusCode();
+    qDebug() << statusCode;
+    if (statusCode == 200) {
+        //TODO in order to insert CDATA to invalid XML atom,
+        //we need capture data of full page
+        bytes_.append(impl_->http_->readAll());
+//         qDebug() << bytes_.size() << " bytes received.";
+        // insert CDATA FLAG if not exists
+    } else if ((statusCode >300 || statusCode <300)
+        && (response_header.hasKey("location") || response_header.hasKey("Location"))) {
         qDebug()<<response_header.statusCode();
         QUrl location = QUrl(response_header.value("location"));
+        if (location.isEmpty()) {
+            location = QUrl(response_header.value("Location"));
+        }
+        qDebug() << location;
         impl_->http_.get()->setHost(location.host(),80);
-        impl_->http_.get()->get(location.path());
+        impl_->connection_id_ = impl_->http_.get()->get(location.toString());
+    } else if (statusCode == 404) {
+       //NOTE: Do Nothing
+       qDebug() << "404 !!";
     } else {
         qDebug() << "Received non-200 response code: "
-                 << response_header.statusCode();
+                 << statusCode << response_header.toString();
     }
 }
 
+QByteArray FeedFetcher::xmlAtomValidator(const QByteArray& d)
+{
+    static QRegExp rx_encoding = QRegExp("<\?xml version=\"1.0\" encoding=\"([^\?>]+)\"");
+    QString xml_plain_text = QString::fromUtf8(d);
+    qDebug() << "before QRegExp";
+    if (rx_encoding.indexIn(xml_plain_text,0) != -1) {
+        // Handle non-utf8 QByteArray
+        QString encoding = rx_encoding.cap(1);
+        encoding = encoding.toUpper();
+        if (encoding.contains("GB")) {
+                encoding = "GB2312";
+        }
+        xml_plain_text.clear();
+        QTextCodec *codec = QTextCodec::codecForName(encoding.toLocal8Bit().constData());
+        xml_plain_text = codec->toUnicode(d);
+        xml_plain_text.replace(rx_encoding.cap(1), "UTF-8");
+    }
+
+    if (!xml_plain_text.contains("<![CDATA[")) {
+        // Add CDATA mark if this is not well formed xml
+        qDebug() << "No CDATA";
+        static QRegExp rx_summary_head = QRegExp("<summary([^<]*)>");
+        static QRegExp rx_summary_end = QRegExp("(\\s*)</summary>");
+        static QRegExp rx_content_head = QRegExp("<content([^<]*)>");
+        static QRegExp rx_link = QRegExp("<link([^<]*)/>");
+        static QRegExp rx_content_end = QRegExp("(\\s*)</content>");
+        xml_plain_text.replace(rx_summary_head, "<description><![CDATA[");
+        xml_plain_text.replace(rx_summary_end, "]]></description>");
+        xml_plain_text.replace(rx_content_head, "<description><![CDATA[");
+        xml_plain_text.replace(rx_content_end, "]]></description>");
+        xml_plain_text.replace(rx_link, "<link \\1></link>");
+    }
+    return xml_plain_text.toUtf8();
+}
+
 void FeedFetcher::finishFetch(int connection_id, bool error) {
+    // process data here, yeah, need a better way
+    if (bytes_.isEmpty()) return;
+    QByteArray bytes = xmlAtomValidator(bytes_);
+    //TODO emit signal to caller that whether the request is finished
+    if (!impl_->parser_->append(bytes)) {
+        qDebug() << "Error parsing feed: "
+                    << impl_->parser_->errorString();
+    }
+    bytes_.clear();
     qDebug() << "Connection finished: " << connection_id;
     if (connection_id == impl_->connection_id_) {
         // Stop and clear all pending fetch ops if this is true

@@ -102,11 +102,15 @@ void Cell::setPuzzle ( Puzzle* puzzle ) {
 
     QFont f = font();
     if ( m_given ) {
-        setBackgroundRole ( QPalette::AlternateBase );
+        //setBackgroundRole ( QPalette::Dark );
         f.setBold ( true );
+        f.setFamily("Serif");
+        f.setItalic(false);
     } else {
-        setBackgroundRole ( QPalette::Base );
+        //setBackgroundRole ( QPalette::Base );
         f.setBold ( false );
+        f.setFamily("Sans");
+        f.setItalic(true);
     }
     setFont ( f );
 }
@@ -163,9 +167,9 @@ void Cell::focusInEvent ( QFocusEvent* event ) {
     if ( !m_given ) {
         setBackgroundRole ( QPalette::Highlight );
         setForegroundRole ( QPalette::HighlightedText );
-    } else {
+    } //else {
         setHighlightBorder ( true );
-    }
+    //}
     Frame::focusInEvent ( event );
 }
 
@@ -175,9 +179,9 @@ void Cell::focusOutEvent ( QFocusEvent* event ) {
     if ( !m_given ) {
         setBackgroundRole ( QPalette::Base );
         setForegroundRole ( QPalette::Text );
-    } else {
+    }// else {
         setHighlightBorder ( false );
-    }
+    //}
     Frame::focusOutEvent ( event );
 }
 
@@ -335,26 +339,6 @@ void Cell::updateFont() {
 }
 
 /*****************************************************************************/
-bool Cell::event ( QEvent *event ) {
-        bool ret = QWidget::event ( event );
-    if ( event->type() == QEvent::UpdateRequest )  {
-        if ( onyx::screen::instance().isUpdateEnabled() ) {
-            static int count = 0;
-
-            if ( onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW ) {
-                qDebug ( "Explorer screen ScreenProxy::DW update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::DW, true );
-                onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
-
-            } else  {
-                qDebug ( "Explorer screen full update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::GC );
-            }
-        }
-    }
-
-    return ret;
-}
 
 }
 }

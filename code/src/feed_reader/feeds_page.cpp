@@ -32,7 +32,6 @@ FeedsPage::FeedsPage(FeedListModel* feed_list_model, QWidget* parent)
     feed_list_view_->verticalHeader()->hide();
     feed_list_view_->setModel(feed_list_model_);
     feed_list_view_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     // The feeds page has a list of subscribed feeds and three
     // buttons.
     ui::OnyxPushButton* add_feed_button(new ui::OnyxPushButton("",this));
@@ -95,10 +94,10 @@ FeedsPage::~FeedsPage() {
 }
 
 void FeedsPage::showEvent(QShowEvent* event) {
-    feed_list_view_->setColumnWidth(0,32);
-    feed_list_view_->setColumnWidth(1, 64);
+    feed_list_view_->setColumnWidth(0,24);
+    feed_list_view_->setColumnWidth(1, 36);
     feed_list_view_->setWordWrap(true);
-    feed_list_view_->setColumnWidth(2, parentWidget()->width() - 96);
+    feed_list_view_->setColumnWidth(2, parentWidget()->width() - 72);
     QWidget::showEvent(event);
 }
 

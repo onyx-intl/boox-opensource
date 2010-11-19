@@ -76,4 +76,3 @@ private:
 }
 }
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 8; 

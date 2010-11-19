@@ -47,6 +47,11 @@ static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 static bool has_touch = true;
 
+static bool isTTSAndDictEnabled()
+{
+    return (qgetenv("ENABLE_TTS_DICT").toInt() > 0);
+}
+
 class MyQScrollBar : public QScrollBar {
 
 public:
@@ -88,7 +93,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY|SCREEN_REFRESH);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
     }
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
@@ -361,7 +366,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools
     std::vector<ReadingToolsType> tools;
     tools.push_back(SEARCH_TOOL);
-    if (has_touch)
+    if (has_touch || isTTSAndDictEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
@@ -375,10 +380,12 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-
-    tools.clear();
-    tools.push_back(TEXT_TO_SPEECH);
-    reading_tool_actions_.generateActions(tools, true);
+    if (has_touch || isTTSAndDictEnabled())
+    {
+        tools.clear();
+        tools.push_back(TEXT_TO_SPEECH);
+        reading_tool_actions_.generateActions(tools, true);
+    }
 
     // Reading tools of bookmark.
     tools.clear();
@@ -477,6 +484,7 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (reading_tool_actions_.selectedTool() == CLOCK_TOOL)
         {
+            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
             status_bar_->onClockClicked();
         }
         else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)

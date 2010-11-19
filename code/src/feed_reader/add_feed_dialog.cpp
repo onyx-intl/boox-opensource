@@ -69,6 +69,7 @@ void AddFeedDialog::addClicked() {
         QMessageBox::information(this, tr("Unsupported protocol"),
                                  tr("Only http and https are supported."));
         url_edit_->setFocus();
+    // TODO Simply validate the url
     } else {
         accept();
         url_edit_->setFocus();
