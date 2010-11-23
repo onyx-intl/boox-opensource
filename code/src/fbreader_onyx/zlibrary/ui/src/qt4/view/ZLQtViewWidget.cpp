@@ -88,7 +88,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|CLOCK|BATTERY);
     }
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
