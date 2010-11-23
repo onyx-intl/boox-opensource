@@ -29,32 +29,46 @@
 #include <onyx/sys/sys.h>
 
 static bool global_update = true;
+
+static void setDefaultWaveform(onyx::screen::ScreenProxy::Waveform w)
+{
+    onyx::screen::instance().setDefaultWaveform(w);
+}
+
 namespace onyx {
 namespace simsu {
 
 
 /*****************************************************************************/
 
-namespace {
-    class SidebarButton : public QToolButton {
-public:
-    SidebarButton (const QString &text, QWidget *parent = 0 );
-protected:
-    virtual void keyPressEvent(QKeyEvent* e) {
-        if (e->key()==Qt::Key_Return) {
-            click();
-        }
-        QToolButton::keyPressEvent(e);
-    }
-    bool event(QEvent *e) {
-        bool ret = QToolButton::event(e);
-        if (e->type() == QEvent::UpdateRequest)
+namespace
+{
+    class SidebarButton : public QToolButton
+    {
+    public:
+        SidebarButton (const QString &text, QWidget *parent = 0 );
+
+    protected:
+        virtual void keyPressEvent(QKeyEvent* e)
         {
-            qDebug() << "SidebarButton::event";
-            onyx::screen::instance().updateWidget(this);
+            if (e->key()==Qt::Key_Return)
+            {
+                click();
+            }
+            setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+            QToolButton::keyPressEvent(e);
         }
-        return ret;
-    }
+
+        bool event(QEvent *e)
+        {
+            bool ret = QToolButton::event(e);
+            if (e->type() == QEvent::UpdateRequest)
+            {
+                qDebug() << "SidebarButton::event";
+                onyx::screen::instance().updateWidget(this);
+            }
+            return ret;
+        }
 };
 
 SidebarButton::SidebarButton (const QString &text, QWidget *parent )
@@ -301,10 +315,6 @@ void Simsu::toggleWidescreen ( bool checked ) {
     }
 }
 
-static void setDefaultWaveform(onyx::screen::ScreenProxy::Waveform w)
-{
-    onyx::screen::instance().setDefaultWaveform(w);
-}
 
 /*****************************************************************************/
 bool Simsu::event ( QEvent *event )
