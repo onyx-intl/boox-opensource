@@ -557,6 +557,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
                 {
                     m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
                 }
+                setDefaultWaveform(onyx::screen::ScreenProxy::GU);
             }
             QWidget::keyPressEvent(event);
         }
