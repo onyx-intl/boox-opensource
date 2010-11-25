@@ -344,7 +344,10 @@ bool FBReader::isViewFinal() const {
 }
 
 void FBReader::setMode(ViewMode mode) {
-    if (mode == myMode) {
+
+    // To solve toc issue.
+    if (mode == myMode && mode != BOOK_TEXT_MODE)
+    {
         return;
     }
 
@@ -357,13 +360,11 @@ void FBReader::setMode(ViewMode mode) {
 
     switch (myMode) {
         case BOOK_TEXT_MODE:
-            qDebug("BOOK_TEXT_MODE");
             setHyperlinkCursor(false);
             ((ZLTextView&)*myBookTextView).forceScrollbarUpdate();
             setView(myBookTextView);
             break;
         case CONTENTS_MODE:
-            qDebug("CONTENTS_MODE");
             ((ContentsView&)*myContentsView).gotoReference();
             setView(myContentsView);
             break;
@@ -489,8 +490,7 @@ void FBReader::gotoParagraph(int pos)
 
     const ContentsModel &contentsModel = (const ContentsModel&)aaModel;
     int reference = contentsModel.reference(paragraph);
-    printf("referecne %d\n", reference);
 
-    ((BookTextView&)*myBookTextView).gotoParagraph(pos);
+    bookTextView().gotoParagraph(reference);
     showBookTextView();
 }

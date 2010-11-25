@@ -813,10 +813,6 @@ QStandardItem * ZLQtViewWidget::searchParent(const int index,
 
 void ZLQtViewWidget::showTableOfContents()
 {
-/*
-    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
-    myApplication->doAction("toc");
-*/
     std::vector<int> paragraphs;
     std::vector<std::string> titles; 
     myApplication->loadTreeModelData(paragraphs,titles);
@@ -827,7 +823,7 @@ void ZLQtViewWidget::showTableOfContents()
     QStandardItem *parent = model.invisibleRootItem();
     for (int i = 0;i < paragraphs.size();++i)
     {
-        QStandardItem *item = new QStandardItem(titles[i].c_str());
+        QStandardItem *item = new QStandardItem(QString::fromUtf8(titles[i].c_str()));
         item->setData(i,Qt::UserRole+100);
         item->setEditable(false);
         ptrs.push_back(item);
@@ -857,9 +853,7 @@ void ZLQtViewWidget::showTableOfContents()
         return;
     }
     int pos = model.data(index, Qt::UserRole + 100).toInt();
-    //sys::SysStatus::instance().setSystemBusy(true, false);
-    // fbreader().bookTextView().gotoPargraph(pos);
-    // myApplication->gotoParagraph(pos);
+    myApplication->gotoParagraph(pos);
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
