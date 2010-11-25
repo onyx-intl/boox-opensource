@@ -21,11 +21,12 @@
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QUndoStack>
-#include <QToolButton>
+
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <onyx/ui/base_thumbnail.h>
+#include "onyx/ui/ui.h"
 #include <onyx/sys/sys.h>
 
 static bool global_update = true;
@@ -35,6 +36,8 @@ static void setDefaultWaveform(onyx::screen::ScreenProxy::Waveform w)
     onyx::screen::instance().setDefaultWaveform(w);
 }
 
+using namespace ui;
+
 namespace onyx {
 namespace simsu {
 
@@ -43,7 +46,7 @@ namespace simsu {
 
 namespace
 {
-    class SidebarButton : public QToolButton
+    class SidebarButton : public OnyxPushButton
     {
     public:
         SidebarButton (const QString &text, QWidget *parent = 0 );
@@ -56,27 +59,15 @@ namespace
                 click();
             }
             setDefaultWaveform(onyx::screen::ScreenProxy::DW);
-            QToolButton::keyPressEvent(e);
-        }
-
-        bool event(QEvent *e)
-        {
-            bool ret = QToolButton::event(e);
-            if (e->type() == QEvent::UpdateRequest)
-            {
-                qDebug() << "SidebarButton::event";
-                onyx::screen::instance().updateWidget(this);
-            }
-            return ret;
+            OnyxPushButton::keyPressEvent(e);
         }
 };
 
 SidebarButton::SidebarButton (const QString &text, QWidget *parent )
-    : QToolButton ( parent ) {
-    setText ( text );
+    : OnyxPushButton ( text, parent ) {
     setIconSize ( QSize ( 16, 16 ) );
     setIcon ( QIcon () );
-    setToolButtonStyle ( Qt::ToolButtonTextOnly );
+    //setToolButtonStyle ( Qt::ToolButtonTextOnly );
     setCheckable ( true );
     setFont(QFont("Serif",20, QFont::Bold));
     resize(40,40);
@@ -106,19 +97,19 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     new_button = new SidebarButton (tr ( "New" ), this );
     new_button->setCheckable ( 0 );
     connect ( new_button, SIGNAL ( pressed()) , this, SLOT ( newGame() ) );
-    QToolButton *undo_button = new SidebarButton (tr ( "Undo" ), this );
+    OnyxPushButton *undo_button = new SidebarButton (tr ( "Undo" ), this );
     undo_button->setCheckable ( 0 );
     connect ( undo_button, SIGNAL ( clicked ( bool ) ), m_board->moves(), SLOT ( undo() ) );
-    QToolButton *redo_button = new SidebarButton (tr ( "Redo" ),  this);
+    OnyxPushButton *redo_button = new SidebarButton (tr ( "Redo" ),  this);
     redo_button->setCheckable ( 0 );
     connect ( redo_button, SIGNAL ( clicked ( bool ) ), m_board->moves(), SLOT ( redo() ) );
-    QToolButton *check_button = new SidebarButton (tr ( "Check" ), this );
+    OnyxPushButton *check_button = new SidebarButton (tr ( "Check" ), this );
     check_button->setCheckable ( 0 );
     connect ( check_button, SIGNAL ( clicked ( bool ) ), m_board, SLOT ( showWrong ( bool ) ) );
-    QToolButton *about_button = new SidebarButton (tr ( "About" ), this );
+    OnyxPushButton *about_button = new SidebarButton (tr ( "About" ), this );
     about_button->setCheckable ( 0 );
     connect ( about_button, SIGNAL ( clicked ( bool ) ), this, SLOT ( about() ) );
-    QToolButton *quit_button = new SidebarButton (tr ( "Quit" ), this );
+    OnyxPushButton *quit_button = new SidebarButton (tr ( "Quit" ), this );
     quit_button->setCheckable ( 0 );
     connect ( quit_button, SIGNAL ( clicked ( bool ) ), qApp, SLOT ( quit() ) );
 
@@ -157,7 +148,7 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     m_keys_layout->addWidget ( key_button, 0, 0);
     m_keys_list_buttons.append (key_button);
     for ( int i = 2; i < 10; ++i ) {
-        QToolButton *key = new SidebarButton (QString::number(i), this );
+        OnyxPushButton *key = new SidebarButton (QString::number(i), this );
         key->resize(40,40);
         m_keys_list_buttons.append (key);
         m_key_buttons->addButton ( key, i );
@@ -383,11 +374,11 @@ void Simsu::keyPressEvent(QKeyEvent* event)
             }
             else
             {
-                if (m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget())) != -1)
+                if (m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
                 {
                     m_keys_list_buttons.at(0)->setFocus();
                 }
-                if (m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget())) != -1)
+                if (m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
                 {
                     dialog_button->setFocus();
                 }
@@ -415,7 +406,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
             }
             else
             {
-                if (m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget())) != -1)
+                if (m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
                 {
                     if ( m_board->getColumn()>0)
                     {
@@ -431,7 +422,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
                         m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
                     }
                 }
-                if (m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget())) != -1)
+                if (m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
                 {
                     new_button->setFocus();
                 }
@@ -441,12 +432,12 @@ void Simsu::keyPressEvent(QKeyEvent* event)
         break;
     case Qt::Key_Up:
         {
-            int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 m_act_list_buttons.at((index+3)%6)->setFocus();
             }
-            index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 if (1<(index+6)%9<10)
@@ -464,12 +455,12 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 
     case Qt::Key_Down:
         {
-            int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 m_act_list_buttons.at((index+3)%6)->setFocus();
             }
-            index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 if (1<(index+3)%9<10)
@@ -487,12 +478,12 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 
     case Qt::Key_Left:
         {
-            int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 m_act_list_buttons.at((index+2)%6)->setFocus();
             }
-            index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 if (1<(index+8)%9<10)
@@ -510,12 +501,12 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 
     case Qt::Key_Right:
         {
-            int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 m_act_list_buttons.at((index+4)%6)->setFocus();
             }
-            index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>(QApplication::focusWidget()));
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
             if (index != -1)
             {
                 if (1<(index+1)%9<10)
