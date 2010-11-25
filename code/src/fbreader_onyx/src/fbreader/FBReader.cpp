@@ -494,3 +494,4 @@ void FBReader::gotoParagraph(int pos)
     bookTextView().gotoParagraph(reference);
     showBookTextView();
 }
+

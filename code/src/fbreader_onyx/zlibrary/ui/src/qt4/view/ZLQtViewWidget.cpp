@@ -836,7 +836,8 @@ void ZLQtViewWidget::showTableOfContents()
     TreeViewDialog dialog( widget() );
     dialog.setModel( &model);
 
-    int ret = dialog.popup( tr("Table of Content") );
+    int ret = dialog.popup( tr("Table of Contents") );
+
     // Returned from the TOC view
     onyx::screen::instance().enableUpdate( false );
     QApplication::processEvents();
@@ -844,6 +845,7 @@ void ZLQtViewWidget::showTableOfContents()
 
     if (ret != QDialog::Accepted)
     {
+        onyx::screen::instance().flush(widget(), onyx::screen::ScreenProxy::GC);
         return;
     }
 
@@ -853,7 +855,9 @@ void ZLQtViewWidget::showTableOfContents()
         return;
     }
     int pos = model.data(index, Qt::UserRole + 100).toInt();
+  
     myApplication->gotoParagraph(pos);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
