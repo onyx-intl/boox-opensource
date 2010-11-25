@@ -152,7 +152,9 @@ void Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
         QSettings settings;
 
         if ( seed <= 0 ) {
+#ifndef _WINDOWS
                 srand ( time ( 0 ) );
+#endif
                 seed = rand();
         }
 
