@@ -800,10 +800,71 @@ void ZLQtViewWidget::showGotoPageDialog()
     status_bar_->onMessageAreaClicked();
 }
 
+QStandardItem * ZLQtViewWidget::searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model)
+{
+    int indent = entries[index];
+    for(int i = index - 1; i >= 0; --i)
+    {
+        if (entries[i] < indent)
+        {
+            return ptrs[i];
+        }
+    }
+    return model.invisibleRootItem();
+}
+
 void ZLQtViewWidget::showTableOfContents()
 {
+/*
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
     myApplication->doAction("toc");
+*/
+    std::vector<int> paragraphs;
+    std::vector<std::string> titles; 
+    myApplication->loadTreeModelData(paragraphs,titles);
+    qDebug("paragraphs:%d",paragraphs.size());
+
+    std::vector<QStandardItem *> ptrs;
+    QStandardItemModel model;
+    QStandardItem *parent = model.invisibleRootItem();
+    for (int i = 0;i < paragraphs.size();++i)
+    {
+        QStandardItem *item = new QStandardItem(titles[i].c_str());
+        item->setData(i,Qt::UserRole+100);
+        item->setEditable(false);
+        ptrs.push_back(item);
+
+        // Get parent.
+        parent = searchParent(i, paragraphs, ptrs, model);
+        parent->appendRow(item);
+    }
+
+    TreeViewDialog dialog( widget() );
+    dialog.setModel( &model);
+
+    int ret = dialog.popup( tr("Table of Content") );
+    // Returned from the TOC view
+    onyx::screen::instance().enableUpdate( false );
+    QApplication::processEvents();
+    onyx::screen::instance().enableUpdate( true );
+
+    if (ret != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QModelIndex index = dialog.selectedItem();
+    if ( !index.isValid() )
+    {
+        return;
+    }
+    int pos = model.data(index, Qt::UserRole + 100).toInt();
+    //sys::SysStatus::instance().setSystemBusy(true, false);
+    // fbreader().bookTextView().gotoPargraph(pos);
+    // myApplication->gotoParagraph(pos);
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
