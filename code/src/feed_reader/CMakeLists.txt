@@ -13,7 +13,7 @@ qt4_wrap_cpp(MOC_SRCS
   widget_updater.h
 )
 
-add_library(feed_reader_lib
+add_library(feed_reader_lib feed_action.cpp
   add_feed_dialog.cpp
   article.cpp
   article_list_model.cpp

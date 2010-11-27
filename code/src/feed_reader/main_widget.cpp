@@ -204,10 +204,7 @@ void MainWidget::updateTab(int index) {
 void MainWidget::fitToScreen() {
     // SCREEN_WIDTH and SCREEN_HEIGHT are set to proper values by the
     // build environment.
-    #ifdef BUILD_FOR_ARM
-        #define SCREEN_WIDTH -1
-        #define SCREEN_HEIGHT -1
-    #else
+    #ifndef BUILD_FOR_ARM
         #define SCREEN_WIDTH 600
         #define SCREEN_HEIGHT 800
     #endif
@@ -219,6 +216,14 @@ void MainWidget::fitToScreen() {
         height = screen_rect.height();
     }
     resize(width, height);
+}
+
+void MainWidget::addFeedlist(QStringList& string_list)
+{
+    foreach(QString string, string_list) {
+        qDebug ()<< string_list;
+        feed_list_model_->addFeed(QUrl(string));
+    }
 }
 
 void MainWidget::displayItemListForUrl(int id) {
@@ -241,29 +246,59 @@ void MainWidget::keyPressEvent (QKeyEvent* e) {
 void MainWidget::showContextMenu() {
     using namespace ui;
     PopupMenu menu(this);
+    ui::FeedAction feed_actions;
+    feed_actions.generateActions();
     SystemActions sy;
     sy.generateActions();
+    menu.addGroup(&feed_actions);
     menu.setSystemAction(&sy);
     if (menu.popup() != QDialog::Accepted) {
       QApplication::processEvents();
-      return;;
+      return;
     }
     QAction * group = menu.selectedCategory();
     if( group == sy.category()) {
-	SystemAction sy_tmp = sy.selected();
-	switch (sy_tmp) {
-	  case RETURN_TO_LIBRARY: {
-	      qApp->quit();
-	      break;
-	  }
-	  case ROTATE_SCREEN: {
-	      onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::INVALID);
-	      sys::SysStatus::instance().rotateScreen();
-	      break;
-	  }
-	  default:
-	    break;
-	}
+        SystemAction sy_tmp = sy.selected();
+        switch (sy_tmp) {
+        case RETURN_TO_LIBRARY: {
+            qApp->quit();
+            break;
+        }
+        case ROTATE_SCREEN: {
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::INVALID);
+            sys::SysStatus::instance().rotateScreen();
+            break;
+        }
+        default:
+            break;
+        }
+    } else if (group == feed_actions.category()) {
+        FEED_ACTION_TYPE feed_action_tmp = feed_actions.selectedAction();
+        qDebug() <<  feed_action_tmp;
+        switch (feed_action_tmp) {
+            //TODO When we finish the functionalities of ADD and DELET, remove
+            // button from feed page
+            case ADD_FEED: {
+                qDebug() << "showAddFeedDialog ";
+                feeds_page_->showAddFeedDialog();
+            }
+            break;
+            case DELETE_FEED: {
+                return;
+                //TODO Provide an Edit mode
+            }
+            break;
+            case EDIT_FEED: {
+                //TODO Provide a view mode.
+                return;
+            }
+            break;
+            default:
+                break;
+        }
+    } else {
+        //Nothing
+        return;
     }
 }
 

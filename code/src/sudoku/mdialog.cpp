@@ -8,12 +8,12 @@
 
 MDialog::MDialog(QWidget* parent): QDialog(parent) {
     onyx::screen::instance().enableUpdate ( true );
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
     setWindowModality(Qt::ApplicationModal);
     setWindowFlags(Qt::FramelessWindowHint);
     QGridLayout *layout = new QGridLayout(this);
     QButtonGroup *group = new QButtonGroup(this);
-    QList<MToolButton*> list;
+
     for ( int i = 1; i < 10; ++i ) {
         MToolButton *key = new MToolButton(this);
         key->setText(QString::number(i));
@@ -28,62 +28,42 @@ MDialog::MDialog(QWidget* parent): QDialog(parent) {
     group->button ( qBound ( 1, QSettings().value ( "Key", 1 ).toInt(), 10 ) )->click();
     connect ( group, SIGNAL (buttonClicked(int)), this, SLOT ( setActiveKey ( int ) ) ); ///<will change keypad
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    //TODO set current_button_ to selected one
+    current_button_ = 0;
     list.at(0)->setFocus();
     setLayout(layout);
 }
 
 void MDialog::keyPressEvent(QKeyEvent* event) {
+    current_button_ =  list.indexOf(static_cast<MToolButton*> (focusWidget()));
     switch (event->key()){
-    case Qt::Key_Up:
-        foreach(MToolButton *tmp_button, list)
-        if (focusWidget() == tmp_button) {
-            if (1<(list.indexOf(tmp_button)+6)%9<10) {
-                list.at((list.indexOf(tmp_button)+6)%9)->setFocus();
-            } else {
-                list.at(0)->setFocus();
+        case Qt::Key_Escape:
+            close();
+            break;
+        case Qt::Key_Up:
+            if (0<(current_button_+6)%9<9) {
+                current_button_ = (current_button_+6)%9;
             }
-            return;
-        }
-        break;
-    case Qt::Key_Down:
-        foreach(MToolButton *tmp_button, list)
-        if (focusWidget() == tmp_button) {
-            if (1<(list.indexOf(tmp_button)+3)%9<10) {
-                list.at((list.indexOf(tmp_button)+3)%9)->setFocus();
-            } else {
-                list.at(0)->setFocus();
+            break;
+        case Qt::Key_Down:
+            if (0<(current_button_+3)%9<9) {
+                current_button_ = (current_button_+3)%9;
             }
-            return;
-        }
-        break;
-    case Qt::Key_Left:
-        qDebug()<<__LINE__<<"Key_Left";
-        foreach(MToolButton *tmp_button, list)
-        if (focusWidget() == tmp_button) {
-            if (1<(list.indexOf(tmp_button)+8)%9<10) {
-                list.at((list.indexOf(tmp_button)+8)%9)->setFocus();
-            } else {
-                list.at(0)->setFocus();
+            break;
+        case Qt::Key_Left:
+            if (0<(current_button_+8)%9<9) {
+                current_button_ = (current_button_+8)%9;
             }
-            return;
-        }
-        break;
-    case Qt::Key_Right:
-        foreach(MToolButton *tmp_button, list)
-        if (focusWidget() == tmp_button) {
-            if (1<(list.indexOf(tmp_button)+1)%9<10) {
-                list.at((list.indexOf(tmp_button)+1)%9)->setFocus();
-            } else {
-                list.at(0)->setFocus();
+            break;
+        case Qt::Key_Right:
+            if (0<(current_button_+1)%9<9) {
+                current_button_ = (current_button_+1)%9;
             }
-            return;
-        }
-          break;
-    default:
-        break;
+            break;
+        default:
+            break;
     }
     update();
-    QDialog::keyPressEvent(event);
 }
 
 void MDialog::mouseMoveEvent(QMouseEvent* event) {
@@ -97,19 +77,13 @@ void MDialog::setActiveKey(int k) {
 
 bool MDialog::event(QEvent* e) {
     bool ret = QDialog::event ( e );
-        if ( e->type() == QEvent::UpdateRequest )  {
-        if ( onyx::screen::instance().isUpdateEnabled() ) {
-            static int count = 0;
-
-            if ( onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW ) {
-                qDebug ( "Explorer screen ScreenProxy::DW update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::DW, true );
-                onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GU );
-
-            } else  {
-                qDebug ( "Explorer screen full update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::GU );
-            }
+    //TODO just the buttons
+    if (e->type() == QEvent::UpdateRequest)
+    {
+        if (list.size()<9) {
+            onyx::screen::instance().updateWidget(this);
+        } else {
+            onyx::screen::instance().updateWidget(focusWidget());
         }
     }
     return ret;

@@ -19,6 +19,7 @@ class MDialog : public QDialog
         virtual bool event(QEvent *e);
     private:
         QList<MToolButton*> list;
+        int current_button_;
 };
 
 #endif // MDIALOG_H

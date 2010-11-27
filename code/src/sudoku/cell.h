@@ -49,7 +49,6 @@ protected:
         virtual void mousePressEvent ( QMouseEvent* event );
         virtual void paintEvent ( QPaintEvent* event );
         virtual void resizeEvent ( QResizeEvent* event );
-        virtual bool event ( QEvent *event );
 private:
         struct State {
                 int value;

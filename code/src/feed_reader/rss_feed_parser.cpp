@@ -120,14 +120,12 @@ void RssFeedParser::handleEndElement() {
             || *(tag_stack_.top()) == "entry") && current_article_.get() &&
             current_article_->title().isEmpty()) {
             current_article_->set_title(current_text_);
-            qDebug() << "Title " << current_text_;
         }
     } else if (xml_reader_.name() == "link" ||
                xml_reader_.name() == "id") {
         if (tag_stack_.size() && *(tag_stack_.top()) == "channel" &&
             feed_->site_url().isEmpty()) {
             feed_->set_site_url(current_text_);
-            qDebug() << "site url " << current_text_;
         }
         if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
             || *(tag_stack_.top()) == "entry") && current_article_.get() &&
@@ -140,8 +138,12 @@ void RssFeedParser::handleEndElement() {
         if (tag_stack_.size() && (*(tag_stack_.top()) == "item"
             || *(tag_stack_.top()) == "entry") && current_article_.get()
             /*&& current_article_->text().isEmpty()*/) {
+            //Add Link at head
+            if (!current_article_->url().isEmpty()) {
+                current_text_ = "Link: <a href =\"" + current_article_->url()+
+                "\">" + current_article_->url() + "</a><br/><br/>" +current_text_;
+            }
             current_article_->set_text(current_text_);
-            qDebug() << "Text: "<< current_text_;
         }
     } else if (xml_reader_.name() == "pubDate"
             || xml_reader_.name() == "updated"
@@ -167,8 +169,6 @@ void RssFeedParser::handleEndElement() {
 
 bool RssFeedParser::parseMore() {
     DCHECK(feed_.get());
-    //shoudl let content nested in the tag `content' or `summary'
-    //nestes in a CDATA section and call pass more again.
     while (!xml_reader_.atEnd()) {
         xml_reader_.readNext();
         if (xml_reader_.isStartElement()) {

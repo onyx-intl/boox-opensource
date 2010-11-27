@@ -69,12 +69,9 @@ void AddFeedDialog::addClicked() {
         QMessageBox::information(this, tr("Unsupported protocol"),
                                  tr("Only http and https are supported."));
         url_edit_->setFocus();
-    } else if ( !url_.host().contains(QRegExp("(\\.com|\\.net|\\.org|\\.co|\\.edu|\\.gov)"))) {
-        QMessageBox::information(this, tr("Invalid URL"),
-                                          tr("Please enter a valid URL."));
+    // TODO Simply validate the url
     } else {
         accept();
-        qDebug() << url_.host();
         url_edit_->setFocus();
         url_edit_->setText("http://");
     }

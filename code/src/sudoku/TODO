@@ -1,2 +1,1 @@
-Add setmode_button to switch modes
-Save current game
+Move `m_act_buttons' to menu and and accessories

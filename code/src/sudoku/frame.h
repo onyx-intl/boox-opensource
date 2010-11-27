@@ -21,30 +21,37 @@
 #define  ONYX_SIMSU_FRAME_H
 
 #include <QWidget>
-namespace onyx
-{
+#include <onyx/sys/sys.h>
+#include "onyx/base/base.h"
+#include "onyx/screen/screen_proxy.h"
+namespace onyx {
 namespace simsu {
-class Frame : public QWidget
-{
+class Frame : public QWidget {
 public:
-        Frame ( QWidget* parent = 0 );
+    Frame ( QWidget* parent = 0 );
 
 protected:
-        virtual void paintEvent ( QPaintEvent* event );
+    virtual void paintEvent ( QPaintEvent* event );
 
-        void setHighlight ( bool highlight ) {
-                m_highlight = highlight;
+    void setHighlight ( bool highlight ) {
+        m_highlight = highlight;
+    }
+
+    void setHighlightBorder ( bool highlight ) {
+        m_highlight_border = highlight;
+    }
+    virtual bool event ( QEvent *e ) {
+        bool ret = QWidget::event ( e );
+        if ( e->type() == QEvent::UpdateRequest ) {
+            qDebug() << "Frame::event";
+            onyx::screen::instance().updateWidget ( this );
         }
-
-        void setHighlightBorder ( bool highlight ) {
-                m_highlight_border = highlight;
-        }
-
+        return ret;
+    }
 private:
-        bool m_highlight;
-        bool m_highlight_border;
+    bool m_highlight;
+    bool m_highlight_border;
 };
 }
 }
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 8; 
