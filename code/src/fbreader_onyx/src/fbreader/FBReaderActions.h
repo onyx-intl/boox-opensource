@@ -74,6 +74,8 @@ public:
 	static const std::string ADVANCED_SEARCH_ON_NETWORK;
 	static const std::string ORGANIZE_BOOKS_BY_AUTHOR;
 	static const std::string ORGANIZE_BOOKS_BY_TAG;
+    static const std::string FULL_SCREEN;
+    static const std::string EXIT_FULL_SCREEN;
 
 private:
 	ActionCode();

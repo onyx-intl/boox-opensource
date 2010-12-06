@@ -402,7 +402,20 @@ void ZLQtViewWidget::updateActions()
     int total = (full_ >> shift(page_step_));
     reading_tool_actions_.action(GOTO_PAGE)->setEnabled(total > 1);
 
-    system_actions_.generateActions();
+    std::vector<int> all = std::vector<int>();
+    all.push_back(ROTATE_SCREEN);
+    all.push_back(SCREEN_UPDATE_TYPE);
+    if (this->status_bar_->isHidden())
+    {
+        all.push_back(EXIT_FULL_SCREEN);
+    }
+    else
+    {
+        all.push_back(FULL_SCREEN);
+    }
+    all.push_back(MUSIC);
+    all.push_back(RETURN_TO_LIBRARY);
+    system_actions_.generateActions(all);
 }
 
 void ZLQtViewWidget::popupMenu()
@@ -432,6 +445,16 @@ void ZLQtViewWidget::popupMenu()
         {
             onyx::screen::instance().updateWidget(widget(), onyx::screen::ScreenProxy::GU);
             onyx::screen::instance().toggleWaveform();
+        }
+        else if (system == FULL_SCREEN)
+        {
+            status_bar_->hide();
+            myApplication->refreshWindow();
+        }
+        else if (system == EXIT_FULL_SCREEN)
+        {
+            status_bar_->show();
+            myApplication->refreshWindow();
         }
         else if (system == MUSIC)
         {
@@ -1135,6 +1158,7 @@ void ZLQtViewWidget::onDictClosed()
 {
     myApplication->doAction("clearSelection");
     enableTextSelection(false);
+    dict_widget_.reset(0);
 }
 
 void ZLQtViewWidget::onSearchClosed()
