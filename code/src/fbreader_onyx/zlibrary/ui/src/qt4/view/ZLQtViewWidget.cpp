@@ -47,11 +47,6 @@ static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 static bool has_touch = true;
 
-static bool isTTSAndDictEnabled()
-{
-    return (qgetenv("ENABLE_TTS_DICT").toInt() > 0);
-}
-
 class MyQScrollBar : public QScrollBar {
 
 public:
@@ -93,7 +88,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|CLOCK|BATTERY);
     }
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
@@ -366,7 +361,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools
     std::vector<ReadingToolsType> tools;
     tools.push_back(SEARCH_TOOL);
-    if (has_touch || isTTSAndDictEnabled())
+    if (has_touch || sys::SysStatus::instance().isDictionaryEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
@@ -380,7 +375,7 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-    if (has_touch || isTTSAndDictEnabled())
+    if (has_touch || sys::SysStatus::instance().isTTSEnabled())
     {
         tools.clear();
         tools.push_back(TEXT_TO_SPEECH);
@@ -800,10 +795,69 @@ void ZLQtViewWidget::showGotoPageDialog()
     status_bar_->onMessageAreaClicked();
 }
 
+QStandardItem * ZLQtViewWidget::searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model)
+{
+    int indent = entries[index];
+    for(int i = index - 1; i >= 0; --i)
+    {
+        if (entries[i] < indent)
+        {
+            return ptrs[i];
+        }
+    }
+    return model.invisibleRootItem();
+}
+
 void ZLQtViewWidget::showTableOfContents()
 {
-    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
-    myApplication->doAction("toc");
+    std::vector<int> paragraphs;
+    std::vector<std::string> titles; 
+    myApplication->loadTreeModelData(paragraphs,titles);
+    qDebug("paragraphs:%d",paragraphs.size());
+
+    std::vector<QStandardItem *> ptrs;
+    QStandardItemModel model;
+    QStandardItem *parent = model.invisibleRootItem();
+    for (int i = 0;i < paragraphs.size();++i)
+    {
+        QStandardItem *item = new QStandardItem(QString::fromUtf8(titles[i].c_str()));
+        item->setData(i,Qt::UserRole+100);
+        item->setEditable(false);
+        ptrs.push_back(item);
+
+        // Get parent.
+        parent = searchParent(i, paragraphs, ptrs, model);
+        parent->appendRow(item);
+    }
+
+    TreeViewDialog dialog( widget() );
+    dialog.setModel( &model);
+
+    int ret = dialog.popup( tr("Table of Contents") );
+
+    // Returned from the TOC view
+    onyx::screen::instance().enableUpdate( false );
+    QApplication::processEvents();
+    onyx::screen::instance().enableUpdate( true );
+
+    if (ret != QDialog::Accepted)
+    {
+        onyx::screen::instance().flush(widget(), onyx::screen::ScreenProxy::GC);
+        return;
+    }
+
+    QModelIndex index = dialog.selectedItem();
+    if ( !index.isValid() )
+    {
+        return;
+    }
+    int pos = model.data(index, Qt::UserRole + 100).toInt();
+  
+    myApplication->gotoParagraph(pos);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)

@@ -344,7 +344,10 @@ bool FBReader::isViewFinal() const {
 }
 
 void FBReader::setMode(ViewMode mode) {
-    if (mode == myMode) {
+
+    // To solve toc issue.
+    if (mode == myMode && mode != BOOK_TEXT_MODE)
+    {
         return;
     }
 
@@ -443,3 +446,52 @@ bool FBReader::isDictionarySupported() const {
 
 void FBReader::openInDictionary(const std::string &word) {
 }
+
+void FBReader::loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::string> & titles)
+{
+    ZLTextModel & aaModel = *myModel->contentsModel();
+    if (aaModel.kind()  != ZLTextModel::TREE_MODEL)
+    {
+        return ;
+    }
+
+    for(int i=0;i < aaModel.paragraphsNumber();++i)
+    {
+        ZLTextParagraph * textP = aaModel[i];
+        if ( textP->kind() == ZLTextParagraph::TREE_PARAGRAPH)
+        {
+            ZLTextTreeParagraph * tree = (ZLTextTreeParagraph *)textP;
+
+            std::string title;
+            ZLTextParagraph::Iterator  zit( *tree );
+            for ( ;!zit.isEnd();zit.next())
+            { 
+                if( zit.entryKind() == ZLTextParagraphEntry::TEXT_ENTRY )
+                {
+                    const shared_ptr<ZLTextParagraphEntry>  entry = zit.entry() ;
+                    const ZLTextEntry & text = (const ZLTextEntry&) *entry;
+                    title += std::string(text.data(),text.dataLength()); 
+                }
+
+            }
+
+            paragraphs.push_back(tree->depth());
+            titles.push_back(title);
+
+        }
+
+    }
+}
+
+void FBReader::gotoParagraph(int pos)
+{
+    ZLTextModel & aaModel = *myModel->contentsModel();
+    const ZLTextTreeParagraph *paragraph = (const ZLTextTreeParagraph*) aaModel[pos];
+
+    const ContentsModel &contentsModel = (const ContentsModel&)aaModel;
+    int reference = contentsModel.reference(paragraph);
+
+    bookTextView().gotoParagraph(reference);
+    showBookTextView();
+}
+

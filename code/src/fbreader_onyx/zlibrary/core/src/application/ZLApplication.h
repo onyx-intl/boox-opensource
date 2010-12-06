@@ -198,6 +198,9 @@ public:
     void setParameterValueList(const std::string &id, const std::vector<std::string> &values);
     const std::string &visualParameter(const std::string &id);
 
+    virtual void loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::string> & titles){};
+    virtual void gotoParagraph(int pos){};
+
   private:
     void createToolbar(int index);
 

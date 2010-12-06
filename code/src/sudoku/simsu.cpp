@@ -21,48 +21,53 @@
 #include <QSpinBox>
 #include <QStackedWidget>
 #include <QUndoStack>
-#include <QToolButton>
+
 #include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <onyx/ui/base_thumbnail.h>
+#include "onyx/ui/ui.h"
 #include <onyx/sys/sys.h>
 
 static bool global_update = true;
+
+static void setDefaultWaveform(onyx::screen::ScreenProxy::Waveform w)
+{
+    onyx::screen::instance().setDefaultWaveform(w);
+}
+
+using namespace ui;
+
 namespace onyx {
 namespace simsu {
 
 
 /*****************************************************************************/
 
-namespace {
-    class SidebarButton : public QToolButton {
-public:
-    SidebarButton (const QString &text, QWidget *parent = 0 );
-protected:
-    virtual void keyPressEvent(QKeyEvent* e) {
-        if (e->key()==Qt::Key_Return) {
-            click();
-        }
-        QToolButton::keyPressEvent(e);
-    }
-    bool event(QEvent *e) {
-        bool ret = QToolButton::event(e);
-        if (e->type() == QEvent::UpdateRequest)
+namespace
+{
+    class SidebarButton : public OnyxPushButton
+    {
+    public:
+        SidebarButton (const QString &text, QWidget *parent = 0 );
+
+    protected:
+        virtual void keyPressEvent(QKeyEvent* e)
         {
-            qDebug() << "SidebarButton::event";
-            onyx::screen::instance().updateWidget(this);
+            if (e->key()==Qt::Key_Return)
+            {
+                click();
+            }
+            setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+            OnyxPushButton::keyPressEvent(e);
         }
-        return ret;
-    }
 };
 
 SidebarButton::SidebarButton (const QString &text, QWidget *parent )
-    : QToolButton ( parent ) {
-    setText ( text );
+    : OnyxPushButton ( text, parent ) {
     setIconSize ( QSize ( 16, 16 ) );
     setIcon ( QIcon () );
-    setToolButtonStyle ( Qt::ToolButtonTextOnly );
+    //setToolButtonStyle ( Qt::ToolButtonTextOnly );
     setCheckable ( true );
     setFont(QFont("Serif",20, QFont::Bold));
     resize(40,40);
@@ -92,19 +97,19 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     new_button = new SidebarButton (tr ( "New" ), this );
     new_button->setCheckable ( 0 );
     connect ( new_button, SIGNAL ( pressed()) , this, SLOT ( newGame() ) );
-    QToolButton *undo_button = new SidebarButton (tr ( "Undo" ), this );
+    OnyxPushButton *undo_button = new SidebarButton (tr ( "Undo" ), this );
     undo_button->setCheckable ( 0 );
     connect ( undo_button, SIGNAL ( clicked ( bool ) ), m_board->moves(), SLOT ( undo() ) );
-    QToolButton *redo_button = new SidebarButton (tr ( "Redo" ),  this);
+    OnyxPushButton *redo_button = new SidebarButton (tr ( "Redo" ),  this);
     redo_button->setCheckable ( 0 );
     connect ( redo_button, SIGNAL ( clicked ( bool ) ), m_board->moves(), SLOT ( redo() ) );
-    QToolButton *check_button = new SidebarButton (tr ( "Check" ), this );
+    OnyxPushButton *check_button = new SidebarButton (tr ( "Check" ), this );
     check_button->setCheckable ( 0 );
     connect ( check_button, SIGNAL ( clicked ( bool ) ), m_board, SLOT ( showWrong ( bool ) ) );
-    QToolButton *about_button = new SidebarButton (tr ( "About" ), this );
+    OnyxPushButton *about_button = new SidebarButton (tr ( "About" ), this );
     about_button->setCheckable ( 0 );
     connect ( about_button, SIGNAL ( clicked ( bool ) ), this, SLOT ( about() ) );
-    QToolButton *quit_button = new SidebarButton (tr ( "Quit" ), this );
+    OnyxPushButton *quit_button = new SidebarButton (tr ( "Quit" ), this );
     quit_button->setCheckable ( 0 );
     connect ( quit_button, SIGNAL ( clicked ( bool ) ), qApp, SLOT ( quit() ) );
 
@@ -143,7 +148,7 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     m_keys_layout->addWidget ( key_button, 0, 0);
     m_keys_list_buttons.append (key_button);
     for ( int i = 2; i < 10; ++i ) {
-        QToolButton *key = new SidebarButton (QString::number(i), this );
+        OnyxPushButton *key = new SidebarButton (QString::number(i), this );
         key->resize(40,40);
         m_keys_list_buttons.append (key);
         m_key_buttons->addButton ( key, i );
@@ -301,15 +306,20 @@ void Simsu::toggleWidescreen ( bool checked ) {
     }
 }
 
+
 /*****************************************************************************/
-bool Simsu::event ( QEvent *event ) {
+bool Simsu::event ( QEvent *event )
+{
     bool ret = QWidget::event ( event );
     if (event->type() == QEvent::UpdateRequest /*&& global_update*/)
     {
-       onyx::screen::instance().updateWidget(focusWidget(), onyx::screen::ScreenProxy::GC);
+       onyx::screen::instance().updateWidget(0);
+       setDefaultWaveform(onyx::screen::ScreenProxy::GC);
     }
     return ret;
 }
+
+
 
 /*****************************************************************************/
 void Simsu::keyPressEvent(QKeyEvent* event)
@@ -326,184 +336,232 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     OK  Qt::Key_Return
     */
     //TODO encapsulate each part as functions
-    switch (event->key()) {
+    switch (event->key())
+    {
     case Qt::Key_Escape:
         qApp->quit();
         break;
 
-    case Qt::Key_PageUp: {
-        //Go to mode_button if m_board is focused;
-        if (QApplication::focusWidget() == m_board->focusWidget()) {
-            new_button->setFocus();
-            return;
-        } else if (QApplication::focusWidget() == mode_button) {
-            if ( m_board->getColumn()>0) {
-                m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
-                } else if (m_board->getRow()>0) {
-                    m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
-                } else {
-                    m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
-                }
-                return;
-        } else if (QApplication::focusWidget() == highlight_button) {
-            mode_button->setFocus();
-            return;
-        } else if (QApplication::focusWidget() == dialog_button) {
-            highlight_button->setFocus();
-            return;
-        } else {
-            if (m_act_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget())) != -1) {
-                m_keys_list_buttons.at(0)->setFocus();
-                return;
-            }
-            if (m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget())) != -1) {
-                dialog_button->setFocus();
-                return;
-            }
-        }
-    }
-        break;
-    case Qt::Key_PageDown:{
-        if (QApplication::focusWidget() == m_board->focusWidget()) {
-            mode_button->setFocus();
-            return;
-        } else if (QApplication::focusWidget() == mode_button) {
-            highlight_button->setFocus();
-            return;
-        } else if (QApplication::focusWidget() == highlight_button) {
-             dialog_button->setFocus();
-             return;
-        } else if (QApplication::focusWidget() == dialog_button) {
-             m_keys_list_buttons.at(0)->setFocus();
-             return;
-        } else {
-            if (m_act_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget())) != -1) {
-                if ( m_board->getColumn()>0) {
-                    qDebug()<<m_board->getColumn();
-                    m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
-                } else if (m_board->getRow()>0) {
-                    m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
-                } else {
-                    m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
-                }
-                return;
-            }
-            if (m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget())) != -1) {
+    case Qt::Key_PageUp:
+        {
+            //Go to mode_button if m_board is focused;
+            if (QApplication::focusWidget() == m_board->focusWidget())
+            {
                 new_button->setFocus();
-                return;
+            }
+            else if (QApplication::focusWidget() == mode_button)
+            {
+                if ( m_board->getColumn()>0)
+                {
+                    m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
+                }
+                else if (m_board->getRow()>0)
+                {
+                    m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
+                }
+                else
+                {
+                    m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
+                }
+            }
+            else if (QApplication::focusWidget() == highlight_button)
+            {
+                mode_button->setFocus();
+            }
+            else if (QApplication::focusWidget() == dialog_button)
+            {
+                highlight_button->setFocus();
+            }
+            else
+            {
+                if (m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
+                {
+                    m_keys_list_buttons.at(0)->setFocus();
+                }
+                if (m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
+                {
+                    dialog_button->setFocus();
+                }
             }
         }
-    }
+        setDefaultWaveform(onyx::screen::ScreenProxy::GU);
         break;
-    case Qt::Key_Up:{
-        int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            m_act_list_buttons.at((index+3)%6)->setFocus();
-            return;
-        }
-        index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            if (1<(index+6)%9<10) {
-                m_keys_list_buttons.at((index+6)%9)->setFocus();
-            } else {
+    case Qt::Key_PageDown:
+        {
+            if (QApplication::focusWidget() == m_board->focusWidget())
+            {
+                mode_button->setFocus();
+            }
+            else if (QApplication::focusWidget() == mode_button)
+            {
+                highlight_button->setFocus();
+            }
+            else if (QApplication::focusWidget() == highlight_button)
+            {
+                dialog_button->setFocus();
+            }
+            else if (QApplication::focusWidget() == dialog_button)
+            {
                 m_keys_list_buttons.at(0)->setFocus();
             }
-            return;
-        }
-    }
-        break;
-
-    case Qt::Key_Down:{
-        int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            m_act_list_buttons.at((index+3)%6)->setFocus();
-            return;
-        }
-        index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            if (1<(index+3)%9<10) {
-                m_keys_list_buttons.at((index+12)%9)->setFocus();
-            } else {
-                m_keys_list_buttons.at(0)->setFocus();
-            }
-            return;
-        }
-    }
-        break;
-
-    case Qt::Key_Left:{
-        int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            m_act_list_buttons.at((index+2)%6)->setFocus();
-            return;
-        }
-        index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-                                        (QApplication::focusWidget()));
-        if (index != -1) {
-            if (1<(index+8)%9<10) {
-                m_keys_list_buttons.at((index+8)%9)->setFocus();
-            } else {
-                m_keys_list_buttons.at(0)->setFocus();
-            }
-            return;
-        }
-    }
-        break;
-
-    case Qt::Key_Right:{
-        int index = m_act_list_buttons.indexOf(static_cast<MToolButton*>
-        (QApplication::focusWidget()));
-        if (index != -1) {
-            m_act_list_buttons.at((index+4)%6)->setFocus();
-            return;
-        }
-        index = m_keys_list_buttons.indexOf(static_cast<MToolButton*>
-        (QApplication::focusWidget()));
-        if (index != -1) {
-            if (1<(index+1)%9<10) {
-                m_keys_list_buttons.at((index+1)%9)->setFocus();
-            } else {
-                m_keys_list_buttons.at(0)->setFocus();
-            }
-            return;
-        }
-    }
-        break;
-
-    case Qt::Key_Menu:{//set focus to m_board from everywhere
-        if ( m_board->getColumn()>0) {
-            m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
-        } else if (m_board->getRow()>0) {
-            m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
-        } else {
-            m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
-        }
-    }
-        break;
-
-    case Qt::Key_Return:{
-        if (getPopMode()){
-            if (QApplication::focusWidget() == m_board->focusWidget()) {
-            popUpdialog();
-            }
-        } else {
-            int column = m_board->getColumn();
-            int row = m_board->getRow();
-            if (!m_board->cell(column,row)->given()) {
-                m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
+            else
+            {
+                if (m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
+                {
+                    if ( m_board->getColumn()>0)
+                    {
+                        qDebug()<<m_board->getColumn();
+                        m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
+                    }
+                    else if (m_board->getRow()>0)
+                    {
+                        m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
+                    }
+                    else
+                    {
+                        m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
+                    }
+                }
+                if (m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget())) != -1)
+                {
+                    new_button->setFocus();
+                }
             }
         }
-        QWidget::keyPressEvent(event);
-    }
+        setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+        break;
+    case Qt::Key_Up:
+        {
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                m_act_list_buttons.at((index+3)%6)->setFocus();
+            }
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                if (1<(index+6)%9<10)
+                {
+                    m_keys_list_buttons.at((index+6)%9)->setFocus();
+                }
+                else
+                {
+                    m_keys_list_buttons.at(0)->setFocus();
+                }
+            }
+        }
+        setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+        break;
+
+    case Qt::Key_Down:
+        {
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                m_act_list_buttons.at((index+3)%6)->setFocus();
+            }
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                if (1<(index+3)%9<10)
+                {
+                    m_keys_list_buttons.at((index+12)%9)->setFocus();
+                }
+                else
+                {
+                    m_keys_list_buttons.at(0)->setFocus();
+                }
+            }
+        }
+        setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+        break;
+
+    case Qt::Key_Left:
+        {
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                m_act_list_buttons.at((index+2)%6)->setFocus();
+            }
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                if (1<(index+8)%9<10)
+                {
+                    m_keys_list_buttons.at((index+8)%9)->setFocus();
+                }
+                else
+                {
+                    m_keys_list_buttons.at(0)->setFocus();
+                }
+            }
+        }
+        setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+        break;
+
+    case Qt::Key_Right:
+        {
+            int index = m_act_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                m_act_list_buttons.at((index+4)%6)->setFocus();
+            }
+            index = m_keys_list_buttons.indexOf(static_cast<OnyxPushButton*>(QApplication::focusWidget()));
+            if (index != -1)
+            {
+                if (1<(index+1)%9<10)
+                {
+                    m_keys_list_buttons.at((index+1)%9)->setFocus();
+                }
+                else
+                {
+                    m_keys_list_buttons.at(0)->setFocus();
+                }
+            }
+        }
+        setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+        break;
+
+    case Qt::Key_Menu:
+        {
+            //set focus to m_board from everywhere
+            if ( m_board->getColumn()>0)
+            {
+                m_board->moveFocus(m_board->getColumn()-1,m_board->getRow(),1,0);
+            }
+            else if (m_board->getRow()>0)
+            {
+                m_board->moveFocus(m_board->getColumn(),m_board->getRow()-1,0,1);
+            }
+            else
+            {
+                m_board->moveFocus(m_board->getColumn()+1,m_board->getRow(),-1,0);
+            }
+        }
+        setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+        break;
+
+    case Qt::Key_Return:
+        {
+            if (getPopMode())
+            {
+                if (QApplication::focusWidget() == m_board->focusWidget())
+                {
+                    popUpdialog();
+                }
+            }
+            else
+            {
+                int column = m_board->getColumn();
+                int row = m_board->getRow();
+                if (!m_board->cell(column,row)->given())
+                {
+                    m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
+                }
+                setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+            }
+            QWidget::keyPressEvent(event);
+        }
         break;
 
     default:

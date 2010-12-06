@@ -159,6 +159,10 @@ private:
     void loadConf();
     void saveConf();
 
+    QStandardItem * searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model);
 private:
     QWidget *myFrame;
     Widget *myQWidget;

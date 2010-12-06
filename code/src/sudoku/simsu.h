@@ -6,10 +6,14 @@
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/ui/ui.h"
 #include "onyx/ui/message_dialog.h"
+
 class QBoxLayout;
 class QButtonGroup;
 class QToolButton;
 class QGridLayout;
+
+using namespace ui;
+
 namespace onyx {
 namespace simsu {
 class Board;
@@ -37,11 +41,11 @@ class Simsu : public QWidget {
         void popUpdialog();
     private:
         Board *m_board;
-        QToolButton *new_button;///<to get focus
-        QToolButton *key_button;///<to get focus
-        QToolButton *mode_button;
-        QToolButton *dialog_button;
-        QToolButton *highlight_button;
+        OnyxPushButton *new_button;///<to get focus
+        OnyxPushButton *key_button;///<to get focus
+        OnyxPushButton *mode_button;
+        OnyxPushButton *dialog_button;
+        OnyxPushButton *highlight_button;
         QButtonGroup *m_key_buttons;
         QButtonGroup *m_act_buttons;
         QGridLayout *m_keys_layout;
@@ -49,8 +53,8 @@ class Simsu : public QWidget {
         QBoxLayout *m_mode_layout;
         QBoxLayout *m_layout;
         QBoxLayout *m_hlayout;
-        QList<QToolButton *> m_act_list_buttons;
-        QList<QToolButton *> m_keys_list_buttons;
+        QList<OnyxPushButton *> m_act_list_buttons;
+        QList<OnyxPushButton *> m_keys_list_buttons;
         bool pop_;
 };
 }
