@@ -336,7 +336,10 @@ void ZLTextView::prepareTextLine(const ZLTextLineInfo &info, int y) {
 			x += (metrics.FullWidth - myStyle.textStyle()->rightIndent(metrics) - info.Width) / 2;
 			break;
 		case ALIGN_JUSTIFY:
-			if (!endOfParagraph && (info.End.element().kind() != ZLTextElement::AFTER_PARAGRAPH_ELEMENT)) {
+            if (myStyle.bidiLevel())
+            {
+            }
+            else if (!endOfParagraph && (info.End.element().kind() != ZLTextElement::AFTER_PARAGRAPH_ELEMENT)) {
 				fullCorrection = metrics.FullWidth - myStyle.textStyle()->rightIndent(metrics) - info.Width;
 			}
 			break;

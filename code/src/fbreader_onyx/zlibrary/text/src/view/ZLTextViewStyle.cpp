@@ -54,20 +54,6 @@ void ZLTextView::ViewStyle::setTextStyle(const ZLTextStylePtr style, unsigned ch
 		myContext->setFont(myTextStyle->fontFamily(), myTextStyle->fontSize(), myTextStyle->bold(), myTextStyle->italic());
 	}
 	myBidiLevel = bidiLevel;
-
-    if (myBidiLevel)
-    {
-       if (!myTextStyle->isDecorated())
-       {
-           ZLTextBaseStyle * baseStyle = ((ZLTextBaseStyle*) &(*myTextStyle));
-           baseStyle->AlignmentOption.setValue(ALIGN_RIGHT);
-       }
-       else
-       {
-          //  ZLTextBaseStyle * baseStyle = (ZLTextBaseStyle*) & ((ZLTextDecoratedStyle&)*myTextStyle).base();
-          // baseStyle->AlignmentOption.setValue(ALIGN_RIGHT);
-       }
-    }
 }
 
 void ZLTextView::ViewStyle::applyControl(const ZLTextControlElement &control) {
