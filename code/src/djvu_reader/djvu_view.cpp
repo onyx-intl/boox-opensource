@@ -1,5 +1,7 @@
 #include "djvu_view.h"
 #include "djvu_model.h"
+#include "djvu_thumbnail_view.h"
+#include "djvu_thumbnail.h"
 #ifdef BUILD_FOR_ARM
 #include <QtGui/qwsdisplay_qws.h>
 #include <QtGui/qscreen_qws.h>
@@ -37,8 +39,8 @@ DjvuView::DjvuView(QWidget *parent)
     connect(&sketch_proxy_, SIGNAL(requestUpdateScreen()), this, SLOT(onRequestUpdateScreen()));
 
     connect(&render_proxy_, SIGNAL(pageRenderReady(DjVuPagePtr)), this, SLOT(onPageRenderReady(DjVuPagePtr)));
-    connect(&render_proxy_, SIGNAL(contentAreaReady(const int, const QRect &)),
-            this, SLOT(onContentAreaReady(const int, const QRect &)));
+    connect(&render_proxy_, SIGNAL(contentAreaReady(DjVuPagePtr, const QRect &)),
+            this, SLOT(onContentAreaReady(DjVuPagePtr, const QRect &)));
 
     // set drawing area to sketch agent
     sketch_proxy_.setDrawingArea(this);
@@ -78,6 +80,31 @@ void DjvuView::deattachModel()
     disconnect(model_, SIGNAL(docThumbnailReady(int)), this, SLOT(onDocThumbnailReady(int)));
     disconnect(model_, SIGNAL(docIdle()), this, SLOT(onDocIdle()));
     model_ = 0;
+}
+
+void DjvuView::attachThumbnailView(ThumbnailView *thumb_view)
+{
+    thumb_view->setModel(model_);
+    connect(thumb_view, SIGNAL(needThumbnailForNewPage(const int, const QSize&)),
+            this, SLOT(onNeedThumbnailForNewPage(const int, const QSize&)));
+    connect(thumb_view, SIGNAL(needNextThumbnail(const int, const QSize&)),
+            this, SLOT(onNeedNextThumbnail(const int, const QSize&)));
+    connect(thumb_view, SIGNAL(needPreviousThumbnail(const int, const QSize&)),
+            this, SLOT(onNeedPreviousThumbnail(const int, const QSize&)));
+    connect(thumb_view, SIGNAL(returnToReading(const int)),
+            this, SLOT(onThumbnailReturnToReading(const int)));
+}
+
+void DjvuView::deattachThumbnailView(ThumbnailView *thumb_view)
+{
+    disconnect(thumb_view, SIGNAL(needThumbnailForNewPage(const int, const QSize&)),
+               this, SLOT(onNeedThumbnailForNewPage(const int, const QSize&)));
+    disconnect(thumb_view, SIGNAL(needNextThumbnail(const int, const QSize&)),
+               this, SLOT(onNeedNextThumbnail(const int, const QSize&)));
+    disconnect(thumb_view, SIGNAL(needPreviousThumbnail(const int, const QSize&)),
+               this, SLOT(onNeedPreviousThumbnail(const int, const QSize&)));
+    disconnect(thumb_view, SIGNAL(returnToReading(const int)),
+               this, SLOT(onThumbnailReturnToReading(const int)));
 }
 
 void DjvuView::onSaveAllOptions()
@@ -121,9 +148,9 @@ void DjvuView::initLayout()
     layout_->setWidgetArea(QRect(0, 0, size().width(), size().height()));
 }
 
-void DjvuView::onContentAreaReady(const int page_number, const QRect & content_area)
+void DjvuView::onContentAreaReady(DjVuPagePtr page, const QRect & content_area)
 {
-    layout_->setContentArea(page_number, content_area);
+    layout_->setContentArea(page->pageNum(), content_area);
 }
 
 bool DjvuView::generateRenderSetting(vbf::PagePtr page, RenderSettingPtr setting)
@@ -259,13 +286,6 @@ void DjvuView::onDocReady()
     initLayout();
     layout_->loadConfiguration(model_->getConf());
     resetLayout();
-
-    //QWidget* thumbnail_view = down_cast<MainWindow*>(parentWidget())->getView(THUMBNAIL_VIEW);
-    //if (thumbnail_view != 0)
-    //{
-    //    // attach the model with thumbnail view
-    //    down_cast<ThumbnailView*>(thumbnail_view)->setTotalNumber(model_->getPagesTotalNumber());
-    //}
 }
 
 void DjvuView::onDocError(QString msg, QString file_name, int line_no)
@@ -372,6 +392,18 @@ bool DjvuView::flip(int direction)
 
 void DjvuView::onPageRenderReady(DjVuPagePtr page)
 {
+    if (page->isThumbnail())
+    {
+        handleThumbnailReady(page);
+    }
+    else
+    {
+        handleNormalPageReady(page);
+    }
+}
+
+void DjvuView::handleNormalPageReady(DjVuPagePtr page)
+{
     if (restore_count_ > 1)
     {
         qDebug("Restore Left:%d", restore_count_);
@@ -442,6 +474,133 @@ void DjvuView::onPageRenderReady(DjVuPagePtr page)
     {
         onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::INVALID);
         onyx::screen::instance().setDefaultWaveform(current_waveform_);
+    }
+}
+
+void DjvuView::displayThumbnailView()
+{
+    QWidget* view = down_cast<MainWindow*>(parentWidget())->getView(THUMBNAIL_VIEW);
+    if (view == 0)
+    {
+        return;
+    }
+
+    // save reading context
+    saveReadingContext();
+
+    ThumbnailView * thumbnail_view = down_cast<ThumbnailView*>(view);
+    attachThumbnailView(thumbnail_view);
+    thumbnail_view->attachSketchProxy(&sketch_proxy_);
+    down_cast<MainWindow*>(parentWidget())->activateView(THUMBNAIL_VIEW);
+    down_cast<ThumbnailView*>(thumbnail_view)->setCurrentPage(cur_page_);
+}
+
+void DjvuView::handleThumbnailReady(DjVuPagePtr page)
+{
+    QWidget* view = down_cast<MainWindow*>(parentWidget())->getView(THUMBNAIL_VIEW);
+    if (view == 0)
+    {
+        return;
+    }
+    ThumbnailView * thumbnail_view = down_cast<ThumbnailView*>(view);
+
+    // calculate zoom value
+    ZoomFactor zoom_value;
+    QSize origin_size;
+    shared_ptr<ddjvu_pageinfo_t> page_info = model_->getPageInfo(page->pageNum());
+    if (page_info != 0)
+    {
+        origin_size.setWidth(page_info->width);
+        origin_size.setHeight(page_info->height);
+    }
+
+    if (origin_size.isValid())
+    {
+        ZoomFactor zoom_h = 0.0, zoom_v = 0.0;
+        QSize content_size = page->renderSetting().contentArea().size();
+        zoom_h = static_cast<ZoomFactor>(content_size.width()) /
+                 static_cast<ZoomFactor>(origin_size.width());
+        zoom_v = static_cast<ZoomFactor>(content_size.height()) /
+                 static_cast<ZoomFactor>(origin_size.height());
+        zoom_value = std::min(zoom_h, zoom_v);
+    }
+
+    shared_ptr< DjvuThumbnail > thumbnail(new DjvuThumbnail(page, zoom_value));
+    switch (page->thumbnailDirection())
+    {
+    case THUMBNAIL_RENDER_CURRENT_PAGE:
+        thumbnail_view->setThumbnail(thumbnail);
+        break;
+    case THUMBNAIL_RENDER_NEXT_PAGE:
+        thumbnail_view->setNextThumbnail(thumbnail);
+        break;
+    case THUMBNAIL_RENDER_PREVIOUS_PAGE:
+        thumbnail_view->setPreviousThumbnail(thumbnail);
+        break;
+    default:
+        break;
+    }
+}
+
+void DjvuView::onNeedThumbnailForNewPage(const int page_num, const QSize &size)
+{
+    RenderSetting render_setting;
+    render_setting.setContentArea(QRect(QPoint(0, 0), size));
+    render_setting.setClipImage(false);
+    render_proxy_.renderThumbnail(page_num, render_setting, THUMBNAIL_RENDER_CURRENT_PAGE, model_->document());
+}
+
+void DjvuView::onNeedNextThumbnail(const int page_num, const QSize &size)
+{
+    int next_page = page_num + 1;
+    if (next_page >= model_->getPagesTotalNumber())
+    {
+        return;
+    }
+    RenderSetting render_setting;
+    render_setting.setContentArea(QRect(QPoint(0, 0), size));
+    render_setting.setClipImage(false);
+    render_proxy_.renderThumbnail(next_page, render_setting, THUMBNAIL_RENDER_NEXT_PAGE, model_->document());
+}
+
+void DjvuView::onNeedPreviousThumbnail(const int page_num, const QSize &size)
+{
+    int prev_page = page_num - 1;
+    if (prev_page < 0)
+    {
+        return;
+    }
+    RenderSetting render_setting;
+    render_setting.setContentArea(QRect(QPoint(0, 0), size));
+    render_setting.setClipImage(false);
+    render_proxy_.renderThumbnail(prev_page, render_setting, THUMBNAIL_RENDER_PREVIOUS_PAGE, model_->document());
+}
+
+void DjvuView::onThumbnailReturnToReading(const int page_num)
+{
+    QWidget* view = down_cast<MainWindow*>(parentWidget())->getView(THUMBNAIL_VIEW);
+    if (view == 0)
+    {
+        return;
+    }
+    ThumbnailView * thumbnail_view = down_cast<ThumbnailView*>(view);
+    deattachThumbnailView(thumbnail_view);
+    down_cast<MainWindow*>(parentWidget())->activateView(DJVU_VIEW);
+
+    // reattach sketch proxy
+    sketch_proxy_.setDrawingArea(this);
+
+    // reset waveform
+    onyx::screen::instance().setDefaultWaveform(current_waveform_);
+
+    if (page_num >= 0 && page_num < model_->getPagesTotalNumber())
+    {
+        gotoPage(page_num);
+    }
+    else
+    {
+        // restore reading context
+        back();
     }
 }
 
@@ -926,6 +1085,11 @@ void DjvuView::keyReleaseEvent(QKeyEvent *ke)
         {
         }
         break;
+    case Qt::Key_T:
+        {
+            displayThumbnailView();
+        }
+        break;
     case Qt::Key_Escape:
         {
             if ( status_mgr_.isSlideShow() )
@@ -1057,6 +1221,7 @@ void DjvuView::updateSketchProxy()
             }
 
             // update zoom factor
+            // TODO. Do NOT multiply the ZOOM_ACTUAL factor, keep consistent with other readers
             sketch_proxy_.setZoom(page_layout->zoomValue() * ZOOM_ACTUAL);
             sketch_proxy_.setContentOrient(layout_->rotateDegree());
             sketch_proxy_.setWidgetOrient(getSystemRotateDegree());
@@ -1425,6 +1590,7 @@ void DjvuView::paintSketches( QPainter & painter, int page_no )
         }
     }
 
+    // TODO. Do NOT multiply the ZOOM_ACTUAL factor, keep consistent with other readers
     sketch_proxy_.setZoom(page_layout->zoomValue() * ZOOM_ACTUAL);
     sketch_proxy_.setContentOrient(layout_->rotateDegree());
     sketch_proxy_.setWidgetOrient(getSystemRotateDegree());

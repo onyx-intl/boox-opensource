@@ -1,4 +1,6 @@
 #include "djvu_application.h"
+#include "djvu_view.h"
+#include "djvu_thumbnail_view.h"
 
 namespace djvu_reader
 {
@@ -179,6 +181,7 @@ void DjvuApplication::onCreateView(int type, MainWindow* main_window, QWidget*& 
         view = new TreeViewDialog(main_window);
         break;
     case THUMBNAIL_VIEW:
+        view = new ThumbnailView(main_window);
         break;
     default:
         break;
@@ -209,6 +212,7 @@ void DjvuApplication::onAttachView(int type, QWidget* view, MainWindow* main_win
         }
         break;
     case THUMBNAIL_VIEW:
+        down_cast<ThumbnailView*>(view)->attachMainWindow(main_window);
         break;
     default:
         break;
@@ -236,6 +240,7 @@ void DjvuApplication::onDeattachView(int type, QWidget* view, MainWindow* main_w
         }
         break;
     case THUMBNAIL_VIEW:
+        down_cast<ThumbnailView*>(view)->deattachMainWindow(main_window);
         break;
     default:
         break;
