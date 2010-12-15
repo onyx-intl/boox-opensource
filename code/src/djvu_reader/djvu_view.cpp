@@ -805,15 +805,22 @@ void DjvuView::slideShowNextPage()
 
 void DjvuView::switchLayout(PageLayoutType mode)
 {
-    if (read_mode_ == mode)
+    if (mode == THUMBNAIL_LAYOUT)
     {
-        return;
+        displayThumbnailView();
     }
+    else
+    {
+        if (read_mode_ == mode)
+        {
+            return;
+        }
 
-    read_mode_ = mode;
-    initLayout();
-    gotoPage(cur_page_);
-    resetLayout();
+        read_mode_ = mode;
+        initLayout();
+        gotoPage(cur_page_);
+        resetLayout();
+    }
 }
 
 
@@ -1293,6 +1300,7 @@ bool DjvuView::updateActions()
         PageLayouts page_layouts;
         page_layouts.push_back(PAGE_LAYOUT);
         page_layouts.push_back(CONTINUOUS_LAYOUT);
+        page_layouts.push_back(THUMBNAIL_LAYOUT);
         view_actions_.generatePageLayoutActions(page_layouts, read_mode_);
 
         // set sketch mode
