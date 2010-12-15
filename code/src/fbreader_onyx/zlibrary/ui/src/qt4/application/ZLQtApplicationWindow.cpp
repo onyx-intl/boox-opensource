@@ -177,7 +177,13 @@ void ZLQtApplicationWindow::updateScreen()
         if (onyx::screen::instance().userData() == 2)
         {
             sys::SysStatus::instance().setSystemBusy(false);
+            onyx::screen::instance().updateWidget(
+                this,
+                onyx::screen::ScreenProxy::GC,
+                true,
+                onyx::screen::ScreenCommand::WAIT_ALL);
         }
+        return;
     }
 
     if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
@@ -190,8 +196,9 @@ void ZLQtApplicationWindow::updateScreen()
     }
     else
     {
-        onyx::screen::instance().updateWidget(
+        onyx::screen::instance().updateWidgetWithGCInterval(
             this,
+            NULL,
             onyx::screen::ScreenProxy::INVALID,
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);

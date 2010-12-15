@@ -404,7 +404,6 @@ void ZLQtViewWidget::updateActions()
 
     std::vector<int> all = std::vector<int>();
     all.push_back(ROTATE_SCREEN);
-    all.push_back(SCREEN_UPDATE_TYPE);
     if (this->status_bar_->isHidden())
     {
         all.push_back(EXIT_FULL_SCREEN);
@@ -1156,9 +1155,9 @@ bool ZLQtViewWidget::adjustDictWidget()
 
 void ZLQtViewWidget::onDictClosed()
 {
-    myApplication->doAction("clearSelection");
     enableTextSelection(false);
     dict_widget_.reset(0);
+    myApplication->doAction("clearSelection");
 }
 
 void ZLQtViewWidget::onSearchClosed()

@@ -43,6 +43,9 @@
 #include "../bookmodel/BookModel.h"
 #include "../formats/FormatPlugin.h"
 
+#include "onyx/screen/screen_proxy.h"
+#include "onyx/sys/sys_conf.h"
+
 static const std::string OPTIONS = "Options";
 static const std::string STATE = "State";
 static const std::string BOOK = "Book";
@@ -178,6 +181,8 @@ FBReader::FBReader(const std::string &bookToOpen)
     myOpenFileHandler.reset(new OpenFileHandler(*this));
     ZLCommunicationManager::instance().registerHandler("openFile",
                                                        myOpenFileHandler);
+    sys::SystemConfig conf;
+    onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
 }
 
 FBReader::~FBReader() {
