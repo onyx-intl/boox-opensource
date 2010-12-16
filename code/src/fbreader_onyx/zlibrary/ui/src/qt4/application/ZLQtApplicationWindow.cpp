@@ -103,10 +103,24 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         switch (event->key())
         {
         case Qt::Key_Up:
-            application().doAction("increaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("increaseFont");
+            }
             break;
         case Qt::Key_Down:
-            application().doAction("decreaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("decreaseFont");
+            }
             break;
         //case Qt::Key_Right:
         //    application().doAction("redo");

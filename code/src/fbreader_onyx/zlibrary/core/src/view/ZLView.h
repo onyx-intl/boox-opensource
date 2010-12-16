@@ -65,6 +65,9 @@ public:
     virtual bool openInternalLink(int x, int y);
     virtual void processKeyReleaseEvent(int);
 
+    virtual std::string getInternalHyperlinkId(int x, int y);
+    virtual std::string getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1);
+
 protected:
 	ZLApplication &application();
 	const ZLApplication &application() const;

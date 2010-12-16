@@ -112,6 +112,8 @@ public Q_SLOTS:
     void storeThumbnail(const QPixmap & pixmap);
     void onVolumeChanged(int new_volume, bool is_mute);
 
+    bool isHyperlinkSelected();
+
 private:
     bool isWidgetVisible(QWidget * wnd);
     void hideHelperWidget(QWidget * wnd);
@@ -129,6 +131,8 @@ private:
     bool hasBookmark();
     void bookmarkModel(QStandardItemModel & model, QModelIndex & selected);
     void processBookmarks(ReadingToolsActions & actions);
+
+    void findHyperlink(bool next);
 
 private:
     void repaint();
@@ -163,6 +167,9 @@ private:
                                            std::vector<int> & entries,
                                            std::vector<QStandardItem *> & ptrs,
                                            QStandardItemModel &model);
+public:
+    bool hyperlink_selected_;
+
 private:
     QWidget *myFrame;
     Widget *myQWidget;
@@ -200,6 +207,7 @@ private:
 
     ZLApplication *myApplication;
     bool conf_stored_;
+    QPoint point_;
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */
