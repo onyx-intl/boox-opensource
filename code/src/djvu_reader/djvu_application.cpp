@@ -167,6 +167,7 @@ void DjvuApplication::onScreenSizeChanged(int)
     main_window_.resize(qApp->desktop()->screenGeometry().size());
     QApplication::processEvents();
     onyx::screen::instance().enableUpdate(true);
+    onyx::screen::instance().updateWidget(&main_window_, onyx::screen::ScreenProxy::GC);
 }
 
 void DjvuApplication::onCreateView(int type, MainWindow* main_window, QWidget*& result)

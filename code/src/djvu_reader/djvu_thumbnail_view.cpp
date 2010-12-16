@@ -410,6 +410,7 @@ void ThumbnailView::mouseReleaseEvent(QMouseEvent *me)
             if (layout_.hitTest(me->pos(), thumb_idx) &&
                 thumb_idx < static_cast<int>(display_pages_.size()))
             {
+                sys::SysStatus::instance().setSystemBusy(true, false);
                 emit returnToReading(display_pages_.get_page(thumb_idx)->key());
             }
         }
@@ -493,11 +494,13 @@ void ThumbnailView::keyReleaseEvent(QKeyEvent *ke)
     case Qt::Key_Return:
     case Qt::Key_Enter:
         {
+            sys::SysStatus::instance().setSystemBusy(true, false);
             emit returnToReading(display_pages_.get_page(cur_thumb_index_)->key());
         }
         break;
     case Qt::Key_Escape:
         {
+            sys::SysStatus::instance().setSystemBusy(true, false);
             emit returnToReading();
         }
         break;
@@ -558,6 +561,7 @@ void ThumbnailView::popupMenu()
         switch (system_action)
         {
         case RETURN_TO_LIBRARY:
+            sys::SysStatus::instance().setSystemBusy(true, false);
             emit returnToReading();
             break;
         case SCREEN_UPDATE_TYPE:
