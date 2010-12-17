@@ -39,6 +39,7 @@ public:
 
     // Flipping
     bool flip(int direction);
+    void autoFlipMultiplePages();
 
 public Q_SLOTS:
     void onPageRenderReady(DjVuPagePtr page);
@@ -107,6 +108,7 @@ private:
     void mousePressEvent(QMouseEvent *me);
     void mouseReleaseEvent(QMouseEvent *me);
     void mouseMoveEvent(QMouseEvent *me);
+    void keyPressEvent(QKeyEvent *ke);
     void keyReleaseEvent(QKeyEvent *ke);
     void paintEvent(QPaintEvent *pe);
     void resizeEvent(QResizeEvent *re);
@@ -214,6 +216,11 @@ private:
     scoped_ptr<QImage>      bookmark_image_;
     QTimer                  update_bookmark_timer_;
     scoped_ptr<NotesDialog> notes_dialog_;
+
+    // auto flip
+    QTimer                  flip_page_timer_;
+    int                     auto_flip_current_page_;
+    int                     auto_flip_step_;
 
     // current waveform
     onyx::screen::ScreenProxy::Waveform  current_waveform_;

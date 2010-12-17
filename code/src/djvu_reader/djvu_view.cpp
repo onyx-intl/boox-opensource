@@ -12,6 +12,7 @@ namespace djvu_reader
 
 static const int OVERLAP_DISTANCE = 80;
 static const int SLIDE_TIME_INTERVAL = 5000;
+static const unsigned int AUTO_FLIP_INTERVAL = 1000;
 
 static RotateDegree getSystemRotateDegree()
 {
@@ -27,6 +28,8 @@ DjvuView::DjvuView(QWidget *parent)
     , model_(0)
     , restore_count_(0)
     , bookmark_image_(0)
+    , auto_flip_current_page_(1)
+    , auto_flip_step_(5)
     , current_waveform_(onyx::screen::instance().defaultWaveform())
 {
     connect(&slide_timer_, SIGNAL(timeout()), this, SLOT(slideShowNextPage()));
@@ -41,6 +44,9 @@ DjvuView::DjvuView(QWidget *parent)
     connect(&render_proxy_, SIGNAL(pageRenderReady(DjVuPagePtr)), this, SLOT(onPageRenderReady(DjVuPagePtr)));
     connect(&render_proxy_, SIGNAL(contentAreaReady(DjVuPagePtr, const QRect &)),
             this, SLOT(onContentAreaReady(DjVuPagePtr, const QRect &)));
+
+    flip_page_timer_.setInterval(AUTO_FLIP_INTERVAL);
+    connect(&flip_page_timer_, SIGNAL(timeout()), this, SLOT(autoFlipMultiplePages()));
 
     // set drawing area to sketch agent
     sketch_proxy_.setDrawingArea(this);
@@ -382,6 +388,24 @@ void DjvuView::onRequestUpdateScreen()
 void DjvuView::returnToLibrary()
 {
     qApp->exit();
+}
+
+void DjvuView::autoFlipMultiplePages()
+{
+    int last_page = model_->getPagesTotalNumber() - 1;
+    if (auto_flip_current_page_ < last_page)
+    {
+        auto_flip_current_page_ += auto_flip_step_;
+        if (auto_flip_current_page_ > last_page)
+        {
+            auto_flip_current_page_ = last_page;
+        }
+        if (auto_flip_current_page_ < 1)
+        {
+            auto_flip_current_page_ = 1;
+        }
+        emit currentPageChanged(auto_flip_current_page_, last_page + 1);
+    }
 }
 
 bool DjvuView::flip(int direction)
@@ -1000,6 +1024,29 @@ void DjvuView::scroll(int offset_x, int offset_y)
     layout_->scroll(x, y);
 }
 
+void DjvuView::keyPressEvent( QKeyEvent *ke )
+{
+    switch (ke->key())
+    {
+    case Qt::Key_PageUp:
+        {
+            auto_flip_current_page_ = cur_page_;
+            auto_flip_step_ = -5;
+            flip_page_timer_.start();
+        }
+        break;
+    case Qt::Key_PageDown:
+        {
+            auto_flip_current_page_ = cur_page_;
+            auto_flip_step_ = 5;
+            flip_page_timer_.start();
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 void DjvuView::keyReleaseEvent(QKeyEvent *ke)
 {
     int offset = 0;
@@ -1008,12 +1055,20 @@ void DjvuView::keyReleaseEvent(QKeyEvent *ke)
     case Qt::Key_PageDown:
     case Qt::Key_Down:
         {
-            offset = (height() - OVERLAP_DISTANCE);
-            if (isLandscape())
+            flip_page_timer_.stop();
+            if (cur_page_ != auto_flip_current_page_)
             {
-                offset = (width() - OVERLAP_DISTANCE);
+                gotoPage(auto_flip_current_page_);
             }
-            scroll(0, offset);
+            else
+            {
+                offset = (height() - OVERLAP_DISTANCE);
+                if (isLandscape())
+                {
+                    offset = (width() - OVERLAP_DISTANCE);
+                }
+                scroll(0, offset);
+            }
         }
         break;
     case Qt::Key_Right:
@@ -1029,12 +1084,20 @@ void DjvuView::keyReleaseEvent(QKeyEvent *ke)
     case Qt::Key_PageUp:
     case Qt::Key_Up:
         {
-            offset = -(height() - OVERLAP_DISTANCE);
-            if (isLandscape())
+            flip_page_timer_.stop();
+            if (cur_page_ != auto_flip_current_page_)
             {
-                offset = - (width() - OVERLAP_DISTANCE);
+                gotoPage(auto_flip_current_page_);
             }
-            scroll(0, offset);
+            else
+            {
+                offset = -(height() - OVERLAP_DISTANCE);
+                if (isLandscape())
+                {
+                    offset = - (width() - OVERLAP_DISTANCE);
+                }
+                scroll(0, offset);
+            }
         }
         break;
     case Qt::Key_Left:
