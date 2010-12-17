@@ -1381,7 +1381,7 @@ void ZLQtViewWidget::findHyperlink(bool next)
     bool b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord());
     if (!b)
     {
-        next ?  ptr->selectionModel().selectFirstWord() : ptr->selectionModel().selectLastWord();
+        b = next ?  ptr->selectionModel().selectFirstWord() : ptr->selectionModel().selectLastWord();
     }
     else
     {
