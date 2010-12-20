@@ -123,7 +123,25 @@ ZLTextLineInfoPtr ZLTextView::processTextLine(const ZLTextWordCursor &start, con
 	info.LeftIndent = myStyle.textStyle()->leftIndent(metrics);
 	if (isFirstLine) {
 		info.LeftIndent += myStyle.textStyle()->firstLineIndentDelta(metrics);
+
+        // test if chinese. TODO: Need a better way to check character width
+        bool is_cn = (paragraphCursor.getLanguage() == "zh" );
+        if (is_cn)
+        {
+            info.LeftIndent += (fontSize * metrics.FullWidth + 50) / 100;
+            if (metrics.FullWidth > metrics.FullHeight)  
+            {
+                info.LeftIndent = (int)(info.LeftIndent * 3.2 / 7 / 2);
+            }
+            else
+            {
+                info.LeftIndent = (int)(info.LeftIndent * 2.2 / 7);
+            }
+            
+        }
+
 	}
+
 	if (info.NodeInfo) {
 		info.LeftIndent += (myStyle.context().stringHeight() + 2) / 3 * 4 * (info.NodeInfo->VerticalLinesStack.size() + 1);
 	}

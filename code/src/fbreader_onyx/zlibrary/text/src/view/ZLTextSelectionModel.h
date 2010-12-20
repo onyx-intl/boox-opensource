@@ -61,6 +61,7 @@ public:
 	bool selectWord(int x, int y);
     bool selectWord(const ZLTextElementArea & area, int x, int y);
     bool selectFirstWord();
+    bool selectLastWord();
     bool selectNextWord();
     bool selectPrevWord();
     bool selectNextLineWord();

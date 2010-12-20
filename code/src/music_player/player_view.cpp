@@ -712,7 +712,7 @@ void PlayerView::next()
         }
         play();
     }
-    onyx::screen::instance().flush(&play_list_view_, onyx::screen::ScreenProxy::GU, false);
+    onyx::screen::instance().flush(&play_list_view_, onyx::screen::ScreenProxy::GC, false);
 }
 
 void PlayerView::previous()
@@ -731,7 +731,7 @@ void PlayerView::previous()
         }
         play();
     }
-    onyx::screen::instance().flush(&play_list_view_, onyx::screen::ScreenProxy::GU, false);
+    onyx::screen::instance().flush(&play_list_view_, onyx::screen::ScreenProxy::GC, false);
 }
 
 void PlayerView::pause()

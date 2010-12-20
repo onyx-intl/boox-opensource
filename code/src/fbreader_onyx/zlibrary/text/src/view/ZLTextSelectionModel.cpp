@@ -722,6 +722,19 @@ bool ZLTextSelectionModel::selectFirstWord()
     return selectWord(*it, it->XStart, it->YEnd);
 }
 
+bool ZLTextSelectionModel::selectLastWord()
+{
+    clear();
+
+    ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
+    if (it == myView.myTextElementMap.end())
+    {
+        return false;
+    }
+    const ZLTextElementArea & area = myView.myTextElementMap.back();
+    return selectWord(area, area.XStart, area.YEnd);
+}
+
 bool ZLTextSelectionModel::selectNextWord()
 {
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
@@ -745,6 +758,8 @@ bool ZLTextSelectionModel::selectNextWord()
 
 bool ZLTextSelectionModel::selectPrevWord()
 {
+    static int  is_already_first_word = 0;
+
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it)
     {
@@ -756,14 +771,26 @@ bool ZLTextSelectionModel::selectPrevWord()
     }
 
     // Reverse search.
-    if (it != myView.myTextElementMap.begin())
-    {
-        --it;
-    }
     if (it == myView.myTextElementMap.end())
     {
         return false;
     }
+
+    if (it != myView.myTextElementMap.begin())
+    {
+        is_already_first_word = 0;
+        --it;
+    }
+    else
+    {
+            if (is_already_first_word)
+            {
+                return false;
+            }
+
+            is_already_first_word = 1;
+    }
+
     clear();
     return selectWord(*it, it->XStart, it->YEnd);
 }

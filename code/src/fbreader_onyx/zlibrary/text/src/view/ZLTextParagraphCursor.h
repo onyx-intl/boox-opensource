@@ -94,6 +94,7 @@ public:
 	const ZLTextElement &operator [] (size_t index) const;
 	const ZLTextParagraph &paragraph() const;
 
+    const std::string getLanguage() const {  return myLanguage; };
 private:
 	void processControlParagraph(const ZLTextParagraph &paragraph);
 
