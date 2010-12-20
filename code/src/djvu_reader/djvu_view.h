@@ -159,6 +159,9 @@ private:
     bool isLandscape() { return (view_setting_.rotate_orient == ROTATE_90_DEGREE ||
                                  view_setting_.rotate_orient == ROTATE_270_DEGREE); }
 
+    // check if full screen
+    bool isFullScreenByWidgetSize();
+
 private:
     DjvuModel               *model_;                    ///< Djvu model
     scoped_ptr<PageLayout>  layout_;                    ///< pages layout

@@ -385,6 +385,11 @@ void DjvuView::onPageRenderReady(DjVuPagePtr page)
         sys::SysStatus::instance().setSystemBusy( false );
     }
 
+    if (onyx::screen::instance().userData() == 0)
+    {
+        ++onyx::screen::instance().userData();
+    }
+
     // remove the mapping page in layout pages
     bool found = false;
     VisiblePagesIter begin = layout_pages_.begin();
@@ -436,13 +441,6 @@ void DjvuView::onPageRenderReady(DjVuPagePtr page)
 
     // redraw the Qt image buffer and make sure mandatory update the view
     update();
-
-    // rollback to current default mode after update
-    if (layout_pages_.isEmpty())
-    {
-        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::INVALID);
-        onyx::screen::instance().setDefaultWaveform(current_waveform_);
-    }
 }
 
 void DjvuView::gotoPage(const int page_number)
@@ -615,6 +613,18 @@ void DjvuView::onPopupMenu()
             onyx::screen::instance().toggleWaveform();
             current_waveform_ = onyx::screen::instance().defaultWaveform();
             disable_update = false;
+            break;
+        case FULL_SCREEN:
+            {
+                emit fullScreen(true);
+                update();
+            }
+            break;
+        case EXIT_FULL_SCREEN:
+            {
+                emit fullScreen(false);
+                update();
+            }
             break;
         case MUSIC:
             openMusicPlayer();
@@ -1175,7 +1185,18 @@ bool DjvuView::updateActions()
         }
     }
 
-    system_actions_.generateActions();
+    std::vector<int> all;
+    all.push_back(ROTATE_SCREEN);
+    if (isFullScreenByWidgetSize())
+    {
+        all.push_back(EXIT_FULL_SCREEN);
+    } else
+    {
+        all.push_back(FULL_SCREEN);
+    }
+    all.push_back(MUSIC);
+    all.push_back(RETURN_TO_LIBRARY);
+    system_actions_.generateActions(all);
     return true;
 }
 
@@ -1621,6 +1642,19 @@ void DjvuView::rotate()
 
     RotateDegree degree = getSystemRotateDegree();
     sketch_proxy_.setWidgetOrient( degree );
+}
+
+bool DjvuView::isFullScreenByWidgetSize()
+{
+    if (parentWidget())
+    {
+        QSize parentSize = parentWidget()->size();
+        if (parentSize.height() == size().height())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 }
