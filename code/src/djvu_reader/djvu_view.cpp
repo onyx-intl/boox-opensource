@@ -617,13 +617,11 @@ void DjvuView::onPopupMenu()
         case FULL_SCREEN:
             {
                 emit fullScreen(true);
-                update();
             }
             break;
         case EXIT_FULL_SCREEN:
             {
                 emit fullScreen(false);
-                update();
             }
             break;
         case MUSIC:
@@ -1187,7 +1185,7 @@ bool DjvuView::updateActions()
 
     std::vector<int> all;
     all.push_back(ROTATE_SCREEN);
-    if (isFullScreenByWidgetSize())
+    if (isFullScreenCalculatedByWidgetSize())
     {
         all.push_back(EXIT_FULL_SCREEN);
     } else
@@ -1644,11 +1642,12 @@ void DjvuView::rotate()
     sketch_proxy_.setWidgetOrient( degree );
 }
 
-bool DjvuView::isFullScreenByWidgetSize()
+bool DjvuView::isFullScreenCalculatedByWidgetSize()
 {
     if (parentWidget())
     {
         QSize parentSize = parentWidget()->size();
+        // TODO find a better way to do this
         if (parentSize.height() == size().height())
         {
             return true;
