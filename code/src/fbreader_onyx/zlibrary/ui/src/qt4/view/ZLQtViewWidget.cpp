@@ -978,6 +978,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                        {
                            ptr->selectionModel().selectPrevWord();
                        }
+                       last_id_.clear();
                        findHyperlink(true);
                    }
                    else
@@ -1375,7 +1376,6 @@ void ZLQtViewWidget::onVolumeChanged(int new_volume, bool is_mute)
 
 void ZLQtViewWidget::findHyperlink(bool next)
 {
-    static std::string id;
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
 
     bool b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord());
@@ -1396,11 +1396,11 @@ void ZLQtViewWidget::findHyperlink(bool next)
         if (view()->onStylusMove(start_area.XStart, start_area.YStart))
         {
             std::string s = view()->getInternalHyperlinkId(start_area.XStart, start_area.YStart);
-            if (s.empty() || s == id)
+            if (s.empty() || s == last_id_)
             {
                 continue;
             }
-            id = s;
+            last_id_ = s;
 
             // find end area
             const  ZLTextElementArea * stop_area = & start_area;
@@ -1416,7 +1416,7 @@ void ZLQtViewWidget::findHyperlink(bool next)
                     break;
                 }
                 std::string s = view()->getInternalHyperlinkId(tmp.XStart, tmp.YStart);
-                if (s != id)
+                if (s != last_id_)
                 {
                     next ? ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
                     break;

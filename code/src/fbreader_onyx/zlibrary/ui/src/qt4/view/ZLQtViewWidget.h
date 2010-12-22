@@ -208,6 +208,8 @@ private:
     ZLApplication *myApplication;
     bool conf_stored_;
     QPoint point_;
+
+    std::string last_id_;
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */
