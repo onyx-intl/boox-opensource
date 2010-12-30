@@ -44,7 +44,7 @@ ZLLanguagePatternBasedMatcher::ZLLanguagePatternBasedMatcher(const std::string &
 		return;
 	}
 
-	const size_t BUFFER_SIZE = 20480;
+	const size_t BUFFER_SIZE = 65536;
 	char *buffer = new char[BUFFER_SIZE];
 	const char *start = buffer;
 	const char *end = start + dictionaryStream->read(buffer, BUFFER_SIZE);

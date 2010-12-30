@@ -621,7 +621,9 @@ bool ZLTextSelectionModel::selectWord(int x, int y) {
 
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it) {
-        if ((it->YStart > y) || ((it->YEnd > y) && (it->XEnd > x))) {
+        //if ((it->YStart > y) || ((it->YEnd > y) && (it->XEnd > x))) {
+        //fixed bug: for fb2 ,it is special case to have up notation hyperlink
+        if (((it->YStart > y) && it->XStart > x) || ((it->YEnd > y) && (it->XEnd > x))) {
             break;
         }
     }
@@ -740,14 +742,25 @@ bool ZLTextSelectionModel::selectNextWord()
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it)
     {
+        /*
         if ((it->Kind == ZLTextElement::WORD_ELEMENT) &&
             ((it->YEnd == myArea.YEnd) && (it->XStart > myArea.XStart) ||
              (it->YEnd > myArea.YEnd)))
+        */
+        if ((it->Kind == ZLTextElement::WORD_ELEMENT) &&
+            ((it->YEnd == myArea.YEnd) && (it->XStart == myArea.XStart)))
         {
             break;
         }
+
     }
 
+    if (it == myView.myTextElementMap.end())
+    {
+        return false;
+    }
+
+    ++it;
     if (it == myView.myTextElementMap.end())
     {
         return false;
@@ -758,8 +771,6 @@ bool ZLTextSelectionModel::selectNextWord()
 
 bool ZLTextSelectionModel::selectPrevWord()
 {
-    static int  is_already_first_word = 0;
-
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it)
     {
@@ -776,20 +787,11 @@ bool ZLTextSelectionModel::selectPrevWord()
         return false;
     }
 
-    if (it != myView.myTextElementMap.begin())
+    if (it == myView.myTextElementMap.begin())
     {
-        is_already_first_word = 0;
-        --it;
+       return false;
     }
-    else
-    {
-            if (is_already_first_word)
-            {
-                return false;
-            }
-
-            is_already_first_word = 1;
-    }
+    --it;
 
     clear();
     return selectWord(*it, it->XStart, it->YEnd);

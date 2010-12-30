@@ -125,6 +125,7 @@ PlayerView::PlayerView(QWidget *parent)
     , paused_(false)
     , progress_bar_enabled_(true)
     , skips_(0)
+    , previous_page_(1)
 {
 #ifndef Q_WS_QWS
     resize(500, 600);
@@ -150,6 +151,7 @@ PlayerView::PlayerView(QWidget *parent)
 
     createLayout();
     updateEQ();
+    previous_page_ = play_list_view_.currentPage();
 }
 
 PlayerView::~PlayerView()
@@ -369,6 +371,8 @@ void PlayerView::createLayout()
             this, SLOT(minimize(bool)), Qt::QueuedConnection);
     connect(&play_list_view_, SIGNAL(activated(const QModelIndex &)),
             this, SLOT(onItemActivated(const QModelIndex &)));
+    connect(&play_list_view_, SIGNAL(positionChanged(int, int)),
+                this, SLOT(refreshPlayListView(int, int)));
     connect(&status_bar_, SIGNAL(progressClicked(const int, const int)),
             this, SLOT(onProgressClicked(const int, const int)), Qt::QueuedConnection);
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
@@ -456,6 +460,17 @@ void PlayerView::setProgress(int p)
 {
     qDebug("Progress:%d", p);
     core_->seek(p);
+}
+
+void PlayerView::refreshPlayListView(int currentPage, int totalPage)
+{
+
+    if (previous_page_ != currentPage)
+    {
+        onyx::screen::instance().flush(&play_list_view_,
+                onyx::screen::ScreenProxy::GC, false);
+    }
+    previous_page_ = currentPage;
 }
 
 void PlayerView::onProgressClicked(const int percent, const int value)
@@ -548,13 +563,13 @@ void PlayerView::onStopClicked(bool)
 void PlayerView::onNextClicked(bool)
 {
     next();
-    onyx::screen::instance().flush(&next_button_, onyx::screen::ScreenProxy::GC, false);
+    onyx::screen::instance().flush(&toolbar_widget_, onyx::screen::ScreenProxy::GC, false);
 }
 
 void PlayerView::onPrevClicked(bool)
 {
     previous();
-    onyx::screen::instance().flush(&prev_button_, onyx::screen::ScreenProxy::GC, false);
+    onyx::screen::instance().flush(&toolbar_widget_, onyx::screen::ScreenProxy::GC, false);
 }
 
 void PlayerView::onRepeatClicked(bool r)
