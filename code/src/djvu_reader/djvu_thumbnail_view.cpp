@@ -353,14 +353,19 @@ void ThumbnailView::resizeEvent(QResizeEvent *re)
     RotateDegree degree = getSystemRotateDegree();
     sketch_proxy_->setWidgetOrient( degree );
     ThumbnailLayoutContext context = layout_.context();
-    if (degree == ROTATE_0_DEGREE || degree == ROTATE_180_DEGREE)
+
+    QSize desktop_size = re->size();
+#ifdef Q_WS_QWS
+    desktop_size = qApp->desktop()->screenGeometry().size();
+#endif
+    if (desktop_size.width() < desktop_size.height())
     {
         context.columns   = 2;
         context.rows      = 2;
         context.space     = 10;
         context.txt_ratio = 0.1f;
     }
-    else if (degree == ROTATE_90_DEGREE || degree == ROTATE_270_DEGREE)
+    else
     {
         context.columns   = 2;
         context.rows      = 1;
