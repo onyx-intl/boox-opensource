@@ -1,7 +1,0 @@
-#ifndef ONYX_CONFIG_LIBDJVU_H__
-#define ONYX_CONFIG_LIBDJVU_H__
-
-#cmakedefine HAVE_HEADER_NEW_H 1
-#cmakedefine HAVE_HEADER_NEW 1
-
-#endif  // ONYX_CONFIG_LIBDJVU_H__

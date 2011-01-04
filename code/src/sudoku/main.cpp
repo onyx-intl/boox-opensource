@@ -27,18 +27,19 @@
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/sys/sys_status.h"
 #include "simsu.h"
+
 int main(int argc, char **argv) {
     using namespace onyx::simsu;
-    sys::SysStatus::instance().setSystemBusy(false);
     QApplication app(argc, argv);
-    app.setApplicationName("Simsu");
-    app.setApplicationVersion("1.2.1");
-    app.setOrganizationDomain("gottcode.org");
-    app.setOrganizationName("GottCode");
+    app.setApplicationName("sudoku");
     QTranslator translator;
-    translator.load(":/simsu_" + QLocale::system().name());
+    translator.load(":/sudoku_" + QLocale::system().name());
     app.installTranslator(&translator);
     Simsu simsuwin;
     simsuwin.show();
+
+    sys::SysStatus::instance().setSystemBusy(false);
+    onyx::screen::instance().flush(&simsuwin, onyx::screen::ScreenProxy::GC);
+
     return app.exec();
 }

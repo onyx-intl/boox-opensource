@@ -85,7 +85,10 @@ public slots:
     void setAutoSwitch ( bool auto_switch );
     void setHighlightActive ( bool highlight );
     void setMode ( int mode );
-
+protected:
+    bool event(QEvent *e) {
+        return Frame::event ( e );
+    }
 private:
     Cell* m_cells[9][9];
     Puzzle* m_puzzle;

@@ -53,7 +53,11 @@ void Dialog::accept() {
 
 bool Dialog::event ( QEvent* event ) {
     bool ret= QDialog::event ( event );
-    onyx::screen::instance().updateWidget( this, onyx::screen::ScreenProxy::GU);
+    if (event->type() == QEvent::UpdateRequest)
+    {
+        qDebug() << "Dialog::event";
+        onyx::screen::instance().updateWidget(this);
+    }
     return ret;
 }
 

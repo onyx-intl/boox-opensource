@@ -44,6 +44,8 @@ public Q_SLOTS:
     void onItemActivated(const QModelIndex &);
     void setProgress(int);
 
+    void refreshPlayListView(int currentPage, int totalPage);
+
 Q_SIGNALS:
     void repeatableChanged(bool);
     void stateChanged(int);
@@ -131,6 +133,7 @@ private:
     bool                    paused_;
     bool                    progress_bar_enabled_;
     int                     skips_;
+    int                     previous_page_; ///< store the previous page in page view
 };
 
 };

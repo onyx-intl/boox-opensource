@@ -246,6 +246,17 @@ void ZLView::onScrollbarStep(Direction, int) {
 void ZLView::onScrollbarPageStep(Direction, int) {
 }
 
+std::string  ZLView::getInternalHyperlinkId(int x, int y)
+{ 
+    return std::string();
+}
+
+std::string ZLView::getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1)
+{
+    return std::string();
+}
+
+
 void ZLViewWidget::rotate(ZLView::Angle rotation) {
 	myRotation = rotation;
 	if (myView != 0) {
@@ -258,3 +269,4 @@ void ZLViewWidget::rotate(ZLView::Angle rotation) {
 ZLView::Angle ZLViewWidget::rotation() const {
 	return myRotation;
 }
+

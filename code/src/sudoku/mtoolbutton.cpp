@@ -16,7 +16,7 @@ void MToolButton::keyPressEvent(QKeyEvent* e)
     if (e->key() == Qt::Key_Return) {
         click();
     }
-QAbstractButton::keyPressEvent(e);
+    QAbstractButton::keyPressEvent(e);
 }
 
 
@@ -35,26 +35,17 @@ void MToolButton::focusOutEvent ( QFocusEvent* event ) {
 void MToolButton::mouseMoveEvent(QMouseEvent* event)
 {
     setFocus();
-QAbstractButton::mouseMoveEvent(event);
+    QToolButton::mouseMoveEvent(event);
 }
 
 bool MToolButton::event(QEvent* e)
 {
-    int ret = QToolButton::event(e);
-    if ( e->type() == QEvent::UpdateRequest )  {
-        if ( onyx::screen::instance().isUpdateEnabled() ) {
-            static int count = 0;
 
-            if ( onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW ) {
-                qDebug ( "Explorer screen ScreenProxy::DW update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::DW, true );
-                onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GU );
-
-            } else  {
-                qDebug ( "Explorer screen full update %d", count++ );
-                onyx::screen::instance().updateWidget ( this, onyx::screen::ScreenProxy::GU );
-            }
-        }
+    bool ret = QToolButton::event(e);
+    if (e->type() == QEvent::UpdateRequest)
+    {
+        qDebug() << "MToolButton::event";
+        onyx::screen::instance().updateWidget(this);
     }
     return ret;
 }
