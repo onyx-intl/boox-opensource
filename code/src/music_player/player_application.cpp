@@ -154,6 +154,7 @@ void PlayerApplication::onMountTreeSignal(bool inserted, const QString &mount_po
             inserted ? "inserted" : "disconnect" );
     if (!inserted && path_.startsWith(mount_point))
     {
+        emit stateChanged(STOP_PLAYER);
         qApp->exit();
     }
 }
@@ -163,6 +164,7 @@ void PlayerApplication::onSDChangedSignal(bool inserted)
     qDebug("SD %s", inserted ? "inserted" : "disconnect");
     if ( path_.startsWith( SDMMC_ROOT ) && !inserted )
     {
+        emit stateChanged(STOP_PLAYER);
         qApp->exit();
     }
 }
