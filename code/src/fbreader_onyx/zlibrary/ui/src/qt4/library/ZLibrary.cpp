@@ -30,6 +30,7 @@ void initLibrary() {
 
 void ZLQtLibraryImplementation::init(int &argc, char **&argv) {
     new QApplication(argc, argv);
+    qApp->setDoubleClickInterval(1000);
     adaptor_.reset(new OnyxReaderApplicationAdaptor(this));
     ui::loadTranslator(QLocale::system().name());
     Q_INIT_RESOURCE(vbf_icons);

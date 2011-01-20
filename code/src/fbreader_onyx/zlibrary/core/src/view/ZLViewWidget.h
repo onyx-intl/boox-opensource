@@ -51,6 +51,8 @@ public:
 	void onScrollbarStep(ZLView::Direction direction, int steps);
 	void onScrollbarPageStep(ZLView::Direction direction, int steps);
 
+    virtual bool  isHyperlinkSelected() { return false;};
+
 private:
 	void correctDirection(ZLView::Direction &direction, bool &invert);
 

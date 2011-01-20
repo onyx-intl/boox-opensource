@@ -28,7 +28,7 @@
 namespace onyx
 {
 namespace simsu {
-        
+
 class Pattern
 {
         Q_DECLARE_TR_FUNCTIONS ( Pattern );

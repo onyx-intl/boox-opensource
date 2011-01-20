@@ -36,6 +36,8 @@ QDjVuPage::QDjVuPage(QDjVuDocument *doc, int page_no, QObject *parent)
   , render_needed_(false)
   , content_area_needed_(false)
   , is_ready_(false)
+  , is_thumbnail_(false)
+  , thumbnail_direction_(THUMBNAIL_RENDER_INVALID)
 {
     initialColorTable();
     page_ = ddjvu_page_create_by_pageno(*doc, page_no_);
@@ -80,28 +82,28 @@ bool QDjVuPage::handle(ddjvu_message_t *msg)
         {
             is_ready_ = true;
             updateInfo();
-            emit pageInfo(page_no_);
+            emit pageInfo(this);
         }
         return true;
     case DDJVU_CHUNK:
         {
-            emit chunk(page_no_, QString::fromAscii(msg->m_chunk.chunkid));
+            emit chunk(this, QString::fromAscii(msg->m_chunk.chunkid));
         }
         return true;
     case DDJVU_RELAYOUT:
         {
             updateInfo();
-            emit relayout(page_no_);
+            emit relayout(this);
         }
         return true;
     case DDJVU_REDISPLAY:
         {
-            emit redisplay(page_no_);
+            emit redisplay(this);
         }
         return true;
     case DDJVU_ERROR:
         {
-            emit error(page_no_,
+            emit error(this,
                        QString::fromLocal8Bit(msg->m_error.message),
                        QString::fromLocal8Bit(msg->m_error.filename), 
                        msg->m_error.lineno);
@@ -109,7 +111,7 @@ bool QDjVuPage::handle(ddjvu_message_t *msg)
       return true;
     case DDJVU_INFO:
         {
-            emit info(page_no_, QString::fromLocal8Bit(msg->m_info.message));
+            emit info(this, QString::fromLocal8Bit(msg->m_info.message));
         }
         return true;
     default:

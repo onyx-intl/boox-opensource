@@ -47,11 +47,6 @@ static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 static bool has_touch = true;
 
-static bool isTTSAndDictEnabled()
-{
-    return (qgetenv("ENABLE_TTS_DICT").toInt() > 0);
-}
-
 class MyQScrollBar : public QScrollBar {
 
 public:
@@ -93,7 +88,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
     }
     else
     {
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|BATTERY);
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|CLOCK|BATTERY);
     }
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
@@ -105,10 +100,12 @@ QWidget * ZLQtViewWidget::addStatusBar()
 ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
 : ZLViewWidget((ZLView::Angle)application->AngleStateOption.value())
 , myApplication(application)
+, hyperlink_selected_(false)
 , status_bar_(0)
 , sys_status_(sys::SysStatus::instance())
 , enable_text_selection_(false)
 , conf_stored_(false)
+, point_(0,0)
 {
     has_touch = sys_status_.hasTouchScreen();
 
@@ -291,6 +288,13 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
     {
         myHolder.prevPage();
     }
+    else if (myHolder.view()->onStylusMove(now.x(), now.y()))
+    {
+        ZLTextView *ptr = static_cast<ZLTextView *>(myHolder.view().get());
+        ptr->selectionModel().clear();
+        myHolder.hyperlink_selected_ = false;    
+        myHolder.view()->openInternalLink(now.x(), now.y());
+    }
     else if (myHolder.isTextSelectionEnabled())
     {
         onyx::screen::ScreenProxy::Waveform w = onyx::screen::instance().defaultWaveform();
@@ -301,10 +305,6 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
         {
             myHolder.lookup();
         }
-    }
-    else
-    {
-        myHolder.view()->openInternalLink(now.x(), now.y());
     }
 }
 
@@ -366,7 +366,7 @@ void ZLQtViewWidget::updateActions()
     // Reading tools
     std::vector<ReadingToolsType> tools;
     tools.push_back(SEARCH_TOOL);
-    if (has_touch || isTTSAndDictEnabled())
+    if (has_touch || sys::SysStatus::instance().isDictionaryEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
@@ -380,7 +380,7 @@ void ZLQtViewWidget::updateActions()
     int index = STYLE_LINE_SPACING_10 + (option.value() - 100) / 10;
     reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 
-    if (has_touch || isTTSAndDictEnabled())
+    if (has_touch || sys::SysStatus::instance().isTTSEnabled())
     {
         tools.clear();
         tools.push_back(TEXT_TO_SPEECH);
@@ -407,7 +407,19 @@ void ZLQtViewWidget::updateActions()
     int total = (full_ >> shift(page_step_));
     reading_tool_actions_.action(GOTO_PAGE)->setEnabled(total > 1);
 
-    system_actions_.generateActions();
+    std::vector<int> all = std::vector<int>();
+    all.push_back(ROTATE_SCREEN);
+    if (this->status_bar_->isHidden())
+    {
+        all.push_back(EXIT_FULL_SCREEN);
+    }
+    else
+    {
+        all.push_back(FULL_SCREEN);
+    }
+    all.push_back(MUSIC);
+    all.push_back(RETURN_TO_LIBRARY);
+    system_actions_.generateActions(all);
 }
 
 void ZLQtViewWidget::popupMenu()
@@ -437,6 +449,16 @@ void ZLQtViewWidget::popupMenu()
         {
             onyx::screen::instance().updateWidget(widget(), onyx::screen::ScreenProxy::GU);
             onyx::screen::instance().toggleWaveform();
+        }
+        else if (system == FULL_SCREEN)
+        {
+            status_bar_->hide();
+            myApplication->refreshWindow();
+        }
+        else if (system == EXIT_FULL_SCREEN)
+        {
+            status_bar_->show();
+            myApplication->refreshWindow();
         }
         else if (system == MUSIC)
         {
@@ -800,10 +822,68 @@ void ZLQtViewWidget::showGotoPageDialog()
     status_bar_->onMessageAreaClicked();
 }
 
+QStandardItem * ZLQtViewWidget::searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model)
+{
+    int indent = entries[index];
+    for(int i = index - 1; i >= 0; --i)
+    {
+        if (entries[i] < indent)
+        {
+            return ptrs[i];
+        }
+    }
+    return model.invisibleRootItem();
+}
+
 void ZLQtViewWidget::showTableOfContents()
 {
-    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
-    myApplication->doAction("toc");
+    std::vector<int> paragraphs;
+    std::vector<std::string> titles; 
+    myApplication->loadTreeModelData(paragraphs,titles);
+
+    std::vector<QStandardItem *> ptrs;
+    QStandardItemModel model;
+    QStandardItem *parent = model.invisibleRootItem();
+    for (int i = 0;i < paragraphs.size();++i)
+    {
+        QStandardItem *item = new QStandardItem(QString::fromUtf8(titles[i].c_str()));
+        item->setData(i,Qt::UserRole+100);
+        item->setEditable(false);
+        ptrs.push_back(item);
+
+        // Get parent.
+        parent = searchParent(i, paragraphs, ptrs, model);
+        parent->appendRow(item);
+    }
+
+    TreeViewDialog dialog( widget() );
+    dialog.setModel( &model);
+
+    int ret = dialog.popup( tr("Table of Contents") );
+
+    // Returned from the TOC view
+    onyx::screen::instance().enableUpdate( false );
+    QApplication::processEvents();
+    onyx::screen::instance().enableUpdate( true );
+
+    if (ret != QDialog::Accepted)
+    {
+        onyx::screen::instance().flush(widget(), onyx::screen::ScreenProxy::GC);
+        return;
+    }
+
+    QModelIndex index = dialog.selectedItem();
+    if ( !index.isValid() )
+    {
+        return;
+    }
+    int pos = model.data(index, Qt::UserRole + 100).toInt();
+  
+    myApplication->gotoParagraph(pos);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
@@ -859,24 +939,101 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             {
             case Qt::Key_Return:
                 {
-                    showGotoPageDialog();
-                    break;
+                   int is_first = 0;
+                   if (hyperlink_selected_)
+                   {
+                        hyperlink_selected_ = false;    
+                        ptr->selectionModel().clear();
+                        view()->openInternalLink(point_.x(),point_.y());
+                        break;
+                   }
+
+                   if (!hyperlink_selected_)
+                   {
+                       std::string id;
+                       ZLTextElementArea  start_area =  ptr->selectionModel().wordArea();
+
+                       if ( start_area.XStart > 0 && start_area.XEnd >  0)
+                       {
+                            id = view()->getInternalHyperlinkId(start_area.XStart, start_area.YStart);
+                       }
+
+                       if (id.empty())
+                       {
+                           ptr->selectionModel().selectLastWord();
+                           ZLTextElementArea  stop_area = ptr->selectionModel().wordArea();
+                           ptr->selectionModel().selectFirstWord();
+                           start_area = ptr->selectionModel().wordArea();
+                           is_first = 1;
+
+                           id = view()->getFirstInternalHyperlinkId(start_area.XStart, start_area.YStart,stop_area.XStart, stop_area.YStart);
+                       }
+
+                       hyperlink_selected_ = !id.empty();
+                   }
+                
+                   if (hyperlink_selected_)
+                   {
+                       if (!is_first)
+                       {
+                           ptr->selectionModel().selectPrevWord();
+                       }
+                       last_id_.clear();
+                       findHyperlink(true);
+                   }
+                   else
+                   {
+                       showGotoPageDialog();
+                   }
+                   break;
                 }
             case Qt::Key_Escape:
+                if (hyperlink_selected_)
+                {
+                    hyperlink_selected_ = false;    
+                    ptr->selectionModel().clear();
+                    myApplication->refreshWindow();
+                }
+                else
                 {
                     myApplication->doAction("quit");
+                }
+                break;
+            case Qt::Key_Left:
+                if (hyperlink_selected_)
+                {
+                    findHyperlink(false);
                     break;
                 }
             case Qt::Key_PageUp:
-            case Qt::Key_Left:
                 {
+                    hyperlink_selected_ = false;    
+                    ptr->selectionModel().clear();
                     myApplication->doAction("largeScrollBackward");
+
+                    break;
+                }
+            case Qt::Key_Right:
+                if (hyperlink_selected_)
+                {
+                    findHyperlink(true);
                     break;
                 }
             case Qt::Key_PageDown:
-            case Qt::Key_Right:
                 {
+                    hyperlink_selected_ = false;    
+                    ptr->selectionModel().clear();
                     myApplication->doAction("largeScrollForward");
+
+                    break;
+                }
+            case Qt::Key_Up:
+            case Qt::Key_Down:
+                {
+                    if (hyperlink_selected_)
+                    {
+                        findHyperlink(key == Qt::Key_Down);
+                    }
                     break;
                 }
             }
@@ -1079,8 +1236,9 @@ bool ZLQtViewWidget::adjustDictWidget()
 
 void ZLQtViewWidget::onDictClosed()
 {
-    myApplication->doAction("clearSelection");
     enableTextSelection(false);
+    dict_widget_.reset(0);
+    myApplication->doAction("clearSelection");
 }
 
 void ZLQtViewWidget::onSearchClosed()
@@ -1216,3 +1374,90 @@ void ZLQtViewWidget::onVolumeChanged(int new_volume, bool is_mute)
     }
 }
 
+void ZLQtViewWidget::findHyperlink(bool next)
+{
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+
+    bool b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord());
+    if (!b)
+    {
+        b = next ?  ptr->selectionModel().selectFirstWord() : ptr->selectionModel().selectLastWord();
+    }
+    else
+    {
+        next ?  ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+    }
+
+    for(; b; b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord()))
+    {
+        // find start area
+        ZLTextElementArea  start_area = ptr->selectionModel().wordArea();
+
+        if (view()->onStylusMove(start_area.XStart, start_area.YStart))
+        {
+            std::string s = view()->getInternalHyperlinkId(start_area.XStart, start_area.YStart);
+            if (s.empty() || s == last_id_)
+            {
+                continue;
+            }
+            last_id_ = s;
+
+            // find end area
+            const  ZLTextElementArea * stop_area = & start_area;
+            while((next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord()))
+            {
+
+                const  ZLTextElementArea  & tmp =  ptr->selectionModel().wordArea();
+                stop_area = & tmp;
+
+                if (!view()->onStylusMove(tmp.XStart, tmp.YStart))
+                {
+                    next ? ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+                    break;
+                }
+                std::string s = view()->getInternalHyperlinkId(tmp.XStart, tmp.YStart);
+                if (s != last_id_)
+                {
+                    next ? ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+                    break;
+                }
+
+            }
+
+            point_.rx() = start_area.XStart;
+            point_.ry() = start_area.YStart;
+
+            onyx::screen::ScreenProxy::Waveform w = onyx::screen::instance().defaultWaveform();
+            onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+
+            if (start_area.XStart == stop_area->XStart && start_area.YStart == stop_area->YStart)
+            {
+                view()->onStylusRelease(start_area.XStart ,start_area.YStart);
+            }
+            else 
+            {
+                if (start_area.XStart <= stop_area->XStart || start_area.YStart <= stop_area->YStart)
+                {
+                    ptr->selectionModel().activate(start_area.XStart ,start_area.YStart);
+                    ptr->selectionModel().extendTo(stop_area->XStart, stop_area->YStart);
+                }
+                else
+                {
+                    ptr->selectionModel().activate(stop_area->XStart, stop_area->XStart);
+                    ptr->selectionModel().extendTo(start_area.XStart,start_area.YStart);
+                }
+                myApplication->refreshWindow();
+            }
+            onyx::screen::instance().setDefaultWaveform(w);
+
+            break;
+        }
+
+    }
+
+}
+
+bool ZLQtViewWidget::isHyperlinkSelected()
+{
+    return hyperlink_selected_;
+}

@@ -103,10 +103,24 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         switch (event->key())
         {
         case Qt::Key_Up:
-            application().doAction("increaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("increaseFont");
+            }
             break;
         case Qt::Key_Down:
-            application().doAction("decreaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("decreaseFont");
+            }
             break;
         //case Qt::Key_Right:
         //    application().doAction("redo");
@@ -177,7 +191,13 @@ void ZLQtApplicationWindow::updateScreen()
         if (onyx::screen::instance().userData() == 2)
         {
             sys::SysStatus::instance().setSystemBusy(false);
+            onyx::screen::instance().updateWidget(
+                this,
+                onyx::screen::ScreenProxy::GC,
+                true,
+                onyx::screen::ScreenCommand::WAIT_ALL);
         }
+        return;
     }
 
     if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
@@ -190,8 +210,9 @@ void ZLQtApplicationWindow::updateScreen()
     }
     else
     {
-        onyx::screen::instance().updateWidget(
+        onyx::screen::instance().updateWidgetWithGCInterval(
             this,
+            NULL,
             onyx::screen::ScreenProxy::INVALID,
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);

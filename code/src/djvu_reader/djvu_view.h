@@ -11,6 +11,7 @@ namespace djvu_reader
 {
 
 class DjvuModel;
+class ThumbnailView;
 class DjvuView : public BaseView
 {
     Q_OBJECT
@@ -30,12 +31,15 @@ public:
     void deattachMainWindow(MainWindow *main_window);
     void attachTreeView(TreeViewDialog *tree_view);
     void deattachTreeView(TreeViewDialog *tree_view);
+    void attachThumbnailView(ThumbnailView *thumb_view);
+    void deattachThumbnailView(ThumbnailView *thumb_view);
 
     // Return
     void returnToLibrary();
 
     // Flipping
     bool flip(int direction);
+    void autoFlipMultiplePages();
 
 public Q_SLOTS:
     void onPageRenderReady(DjVuPagePtr page);
@@ -58,10 +62,16 @@ private Q_SLOTS:
     void onNeedPage(const int page_number);
     void onNeedContentArea(const int page_number);
 
-    void onContentAreaReady(const int page_number, const QRect & content_area);
+    void onContentAreaReady(DjVuPagePtr page, const QRect & content_area);
     void onSaveAllOptions();
 
     void onUpdateBookmark();
+
+    // thumbnail
+    void onNeedThumbnailForNewPage(const int page_num, const QSize &size);
+    void onNeedNextThumbnail(const int page_num, const QSize &size);
+    void onNeedPreviousThumbnail(const int page_num, const QSize &size);
+    void onThumbnailReturnToReading(const int page_num);
 
 Q_SIGNALS:
     void currentPageChanged(const int, const int);
@@ -86,6 +96,10 @@ private:
     bool hitTestBookmark(const QPoint &point);
     void paintPage(QPainter & painter, DjVuPagePtr page);
 
+    // handle page ready events
+    void handleNormalPageReady(DjVuPagePtr page);
+    void handleThumbnailReady(DjVuPagePtr page);
+
     // configurations
     bool loadConfiguration(Configuration & conf);
     bool saveConfiguration(Configuration & conf);
@@ -94,6 +108,7 @@ private:
     void mousePressEvent(QMouseEvent *me);
     void mouseReleaseEvent(QMouseEvent *me);
     void mouseMoveEvent(QMouseEvent *me);
+    void keyPressEvent(QKeyEvent *ke);
     void keyReleaseEvent(QKeyEvent *ke);
     void paintEvent(QPaintEvent *pe);
     void resizeEvent(QResizeEvent *re);
@@ -155,9 +170,15 @@ private:
     // rotate
     void rotate();
 
+    // thumbnail
+    void displayThumbnailView();
+
     // check the view mode: portrait or landscape
     bool isLandscape() { return (view_setting_.rotate_orient == ROTATE_90_DEGREE ||
                                  view_setting_.rotate_orient == ROTATE_270_DEGREE); }
+
+    // full screen
+    bool isFullScreenCalculatedByWidgetSize();
 
 private:
     DjvuModel               *model_;                    ///< Djvu model
@@ -198,6 +219,11 @@ private:
     scoped_ptr<QImage>      bookmark_image_;
     QTimer                  update_bookmark_timer_;
     scoped_ptr<NotesDialog> notes_dialog_;
+
+    // auto flip
+    QTimer                  flip_page_timer_;
+    int                     auto_flip_current_page_;
+    int                     auto_flip_step_;
 
     // current waveform
     onyx::screen::ScreenProxy::Waveform  current_waveform_;

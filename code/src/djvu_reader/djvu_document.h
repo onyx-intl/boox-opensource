@@ -21,7 +21,7 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
     void onRemove(QObject *p);
-    void onPageInfo(int);
+    void onPageInfo(QDjVuPage *page);
     void onEmitIdle();
 
 Q_SIGNALS:
