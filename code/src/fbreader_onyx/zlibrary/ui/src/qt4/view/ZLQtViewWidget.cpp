@@ -1115,7 +1115,7 @@ void ZLQtViewWidget::startDictLookup()
 
     if (!dict_widget_)
     {
-        dict_widget_.reset(new DictWidget(widget(), *dicts_, &tts()));
+        dict_widget_.reset(new DictWidget(myQWidget, *dicts_, &tts()));
         connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
         connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
     }
