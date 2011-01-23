@@ -301,4 +301,4 @@ void Board::setMode ( int mode )
 /*****************************************************************************/
 }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 8; 
+// kate: indent-mode cstyle; space-indent on; indent-width 8;

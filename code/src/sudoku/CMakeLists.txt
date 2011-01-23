@@ -1,5 +1,5 @@
 ENABLE_QT()
-
+SET(CMAKE_CXX_FLAGS "-g ")
 # Header files.
 FILE(GLOB HDRS *.h)
 QT4_WRAP_CPP(MOC_SRCS ${HDRS})
@@ -20,4 +20,3 @@ TARGET_LINK_LIBRARIES(sudoku
   ${QT_LIBRARIES}
   ${ADD_LIB}
 )
-

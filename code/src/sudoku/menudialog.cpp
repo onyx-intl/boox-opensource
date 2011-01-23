@@ -23,7 +23,6 @@ MenuDialog::MenuDialog(QWidget* parent): QDialog(parent),current_button_(0) {
     setWindowModality(Qt::ApplicationModal);
     setWindowFlags(Qt::FramelessWindowHint);
     setFocus();
-    QGridLayout *layout = new QGridLayout(this);
     SidebarButton *new_button = new SidebarButton (tr ( "New" ), this );
     new_button->setCheckable ( 0 );
     connect ( new_button, SIGNAL ( pressed()) , this, SLOT ( newGame() ) );
@@ -35,7 +34,7 @@ MenuDialog::MenuDialog(QWidget* parent): QDialog(parent),current_button_(0) {
     connect ( about_button, SIGNAL ( clicked ( bool ) ), this, SLOT ( about() ) );
     SidebarButton *quit_button = new SidebarButton (tr ( "Quit" ), this );
     quit_button->setCheckable ( 0 );
-    connect ( quit_button, SIGNAL ( clicked ( bool ) ), qApp, SLOT ( quit() ) );
+    connect ( quit_button, SIGNAL ( clicked ( bool ) ), this, SLOT ( toQuit() ) );//pass to parent
     act_buttons_ = new QButtonGroup ( this );
     act_buttons_->addButton(new_button,0);
     act_buttons_->addButton(check_button,1);
@@ -45,10 +44,12 @@ MenuDialog::MenuDialog(QWidget* parent): QDialog(parent),current_button_(0) {
     list_act_buttons.append(check_button);
     list_act_buttons.append(about_button);
     list_act_buttons.append(quit_button);
+    layout = new QGridLayout(this);
     layout->addWidget(new_button);
     layout->addWidget(check_button);
     layout->addWidget(about_button);
     layout->addWidget(quit_button);
+    new_button->setFocus();
     setLayout(layout);
 }
 
@@ -73,6 +74,7 @@ void MenuDialog::keyPressEvent(QKeyEvent* event) {
         default:
             break;
     }
+    if (current_button_ >=0 && current_button_ < 4)
     list_act_buttons.at(current_button_)->setFocus();
     QWidget::keyPressEvent ( event );
 }
@@ -113,6 +115,11 @@ void MenuDialog::about() {
 void MenuDialog::toCheck(bool)
 {
     emit toCheck();
+}
+void MenuDialog::toQuit()
+{
+    emit askQuit();
+    deleteLater();
 }
 
 bool MenuDialog::event(QEvent* e) {

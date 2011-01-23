@@ -30,15 +30,17 @@ class MenuDialog : public QDialog
     Q_OBJECT
 public:
     MenuDialog(QWidget* parent = 0);
-    virtual ~MenuDialog(){
-        list_act_buttons.clear();
-    }
+//     ~MenuDialog(){
+//        // list_act_buttons.clear();
+//     }
 signals:
     void toCheck();
+    void askQuit();
 private slots:
     void newGame();
     //TODO
    // void showDetails();
+    void toQuit();
     void about();
     void toCheck(bool);
 protected:
@@ -48,6 +50,7 @@ protected:
 private:
     int current_button_;
     QButtonGroup* act_buttons_;
+    QGridLayout *layout;
     QList<SidebarButton *> list_act_buttons;
 };
 

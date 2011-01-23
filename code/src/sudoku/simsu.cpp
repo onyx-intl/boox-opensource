@@ -1,17 +1,13 @@
 #include <QButtonGroup>
-#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QGridLayout>
-#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
 #include <QSpinBox>
-#include <QStackedWidget>
 #include <QUndoStack>
 
 #include <QVBoxLayout>
@@ -43,15 +39,12 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     // Create board
     Square *square = new Square ( this );
     m_board = new Board ( square );
-    square->setChild ( m_board );
-    m_layout = new QGridLayout ( this );
-    m_layout->addWidget ( square, 0, 0 );
-
-    setLayout(m_layout);
-    int degree = sys::SysStatus::instance().screenTransformation();
-
-    showMaximized();
     m_board->setAutoSwitch(false);
+    square->setChild ( m_board );
+    QGridLayout *m_layout = new QGridLayout ( this );
+    m_layout->addWidget(m_board,0,0);
+    setLayout(m_layout);
+    showMaximized();
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
 }
@@ -66,25 +59,7 @@ void Simsu::closeEvent ( QCloseEvent *event ) {
 /*****************************************************************************/
 
 void Simsu::wheelEvent ( QWheelEvent *event ) {
-//     int id = m_key_buttons->checkedId();
-//
-//     if ( event->delta() < 0 ) {
-//         id++;
-//
-//         if ( id > 9 ) {
-//             id = 1;
-//         }
-//
-//     } else {
-//         id--;
-//
-//         if ( id < 1 ) {
-//             id = 9;
-//         }
-//     }
-//
-//     m_key_buttons->button ( id )->click();
-//     QWidget::wheelEvent ( event );
+
 }
 
 
@@ -120,11 +95,10 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     switch (event->key())
     {
     case Qt::Key_Escape:
-        qApp->quit();
+        //use menudialog to quit
+       // qApp->quit();
         break;
-
     case Qt::Key_PageUp:
-
         break;
 
     case Qt::Key_Menu:
@@ -187,11 +161,16 @@ void Simsu::showMenu()
     MenuDialog* menudialog = new MenuDialog(parentWidget());
     int screenWidth = QApplication::desktop()->screenGeometry().width();
     int screenHeight = QApplication::desktop()->screenGeometry().height();
-    int bordersize = qMin(screenHeight, screenWidth)/2;
-    menudialog->setGeometry(bordersize-40,bordersize-40,bordersize,bordersize);
     connect(menudialog, SIGNAL(toCheck()),m_board,SLOT(showWrong()));
-    menudialog->exec();
+    connect(menudialog, SIGNAL(askQuit()),this,SLOT(quit()));
+    menudialog->move(screenWidth/2-20,screenHeight/2-40);
+    if (menudialog->exec())
     menudialog->deleteLater();
+}
+
+void Simsu::quit()
+{
+    qApp->quit();
 }
 
 }

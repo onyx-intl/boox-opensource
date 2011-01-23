@@ -22,18 +22,18 @@ class Simsu : public QWidget {
         Q_OBJECT
     public:
         Simsu ( QWidget *parent = 0, Qt::WindowFlags f = 0 );
-
+        ~Simsu(){};
     protected:
-        virtual void closeEvent ( QCloseEvent *event );
-        virtual void wheelEvent ( QWheelEvent *event );
-        virtual bool event ( QEvent *event );
-        virtual void keyPressEvent (QKeyEvent * event);
+        void closeEvent ( QCloseEvent *event );
+        void wheelEvent ( QWheelEvent *event );
+        bool event ( QEvent *event );
+        void keyPressEvent (QKeyEvent * event);
     private slots:
         void showBoard();
         void showMenu();
+        void quit();
     private:
         Board *m_board;
-        QGridLayout *m_layout;
         bool pop_;
 };
 }

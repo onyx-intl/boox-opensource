@@ -32,14 +32,14 @@ Frame::Frame ( QWidget* parent )
 
 void Frame::paintEvent ( QPaintEvent* event ) {
     QWidget::paintEvent ( event );
-/*
-    static QRadialGradient gradient_hb(25, 25, 50, 50, 50);
-    gradient_hb.setColorAt(0, QColor::fromRgbF(0.7, 0.7, 0.7, 1));
-    gradient_hb.setColorAt(1, QColor::fromRgbF(0.3, 0.3, 0.3, 1));
-    static QRadialGradient gradient_h(25, 25, 50, 50, 50);
-    gradient_h.setColorAt(1, QColor::fromRgbF(0.6, 0.6, 0.6, 1));
-    gradient_h.setColorAt(0, QColor::fromRgbF(0.2, 0.2, 0.2, 1));
-*/
+    /*
+        static QRadialGradient gradient_hb(25, 25, 50, 50, 50);
+        gradient_hb.setColorAt(0, QColor::fromRgbF(0.7, 0.7, 0.7, 1));
+        gradient_hb.setColorAt(1, QColor::fromRgbF(0.3, 0.3, 0.3, 1));
+        static QRadialGradient gradient_h(25, 25, 50, 50, 50);
+        gradient_h.setColorAt(1, QColor::fromRgbF(0.6, 0.6, 0.6, 1));
+        gradient_h.setColorAt(0, QColor::fromRgbF(0.2, 0.2, 0.2, 1));
+    */
     QPainter painter ( this );
     painter.setRenderHint ( QPainter::Antialiasing, true );
     painter.setPen (QPen(Qt::black, 5));
@@ -61,4 +61,4 @@ void Frame::paintEvent ( QPaintEvent* event ) {
 
 }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;
