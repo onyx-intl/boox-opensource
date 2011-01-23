@@ -43,7 +43,7 @@ protected:
     virtual bool event ( QEvent *e ) {
         bool ret = QWidget::event ( e );
         if ( e->type() == QEvent::UpdateRequest ) {
-            qDebug() << "Frame::event";
+        // qDebug() << "Frame::event";
             onyx::screen::instance().updateWidget ( this );
         }
         return ret;

@@ -216,9 +216,11 @@ void Cell::keyPressEvent ( QKeyEvent* event ) {
         m_board->moveFocus ( m_column, m_row, 0, 1 );
         break;
     default:
+
         break;
     }
-    Frame::keyPressEvent ( event );
+    QWidget::keyPressEvent ( event );
+
 }
 
 /*****************************************************************************/
