@@ -42,8 +42,8 @@ status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_
     QGridLayout *m_layout = new QGridLayout ( this );
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(m_board,0,0);
-    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),0,1);
-    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),1,0);
+    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Maximum,QSizePolicy::Minimum),0,1);
+    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Maximum),1,0);
     m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),1,1);
     m_layout->addWidget(&status_bar_,2,0,1,2);
     setLayout(m_layout);
@@ -67,8 +67,8 @@ bool Simsu::event ( QEvent *event )
     if (event->type() == QEvent::UpdateRequest /*&& global_update*/)
     {
         onyx::screen::instance().updateWidget(0);
-        onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
     }
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
     return ret;
 }
 

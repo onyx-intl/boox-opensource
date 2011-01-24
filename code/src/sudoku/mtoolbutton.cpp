@@ -1,14 +1,19 @@
 #include "mtoolbutton.h"
-#include "QKeyEvent"
+#include <QtGui/QKeyEvent>
 #include "onyx/screen/screen_proxy.h"
 
 MToolButton::MToolButton(QWidget* parent): QToolButton(parent)
 {
-    setStyleSheet("border: 2px solid black");
-    onyx::screen::instance().enableUpdate ( true );
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+    setStyleSheet("\
+    border-width: 3px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 3;                   \
+    padding: 0px;");
+    setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     setFont(QFont("Serif", 36, QFont::Bold));
-    setAutoRaise(true);
+    setMaximumSize(54,54);
+    setMinimumSize(54,54);
 }
 
 void MToolButton::keyPressEvent(QKeyEvent* e)
@@ -21,14 +26,25 @@ void MToolButton::keyPressEvent(QKeyEvent* e)
 
 
 void MToolButton::focusInEvent ( QFocusEvent* event ) {
-    setFont(QFont("Serif", 24, QFont::Light));
+    //TODO
+    setStyleSheet("\
+    border-width: 6px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 6;                   \
+    padding: 0px;");;
     QToolButton::focusInEvent ( event );
 }
 
 /*****************************************************************************/
 
 void MToolButton::focusOutEvent ( QFocusEvent* event ) {
-    setFont(QFont("Serif", 36, QFont::Bold));
+    setStyleSheet("\
+    border-width: 3px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 3;                   \
+    padding: 0px;");
     QToolButton::focusOutEvent ( event );
 }
 
@@ -42,10 +58,10 @@ bool MToolButton::event(QEvent* e)
 {
 
     bool ret = QToolButton::event(e);
-    if (e->type() == QEvent::UpdateRequest)
-    {
-        qDebug() << "MToolButton::event";
-        onyx::screen::instance().updateWidget(this);
-    }
+//     if (e->type() == QEvent::UpdateRequest)
+//     {
+//         qDebug() << "MToolButton::event";
+//         onyx::screen::instance().updateWidget(this);
+//     }
     return ret;
 }

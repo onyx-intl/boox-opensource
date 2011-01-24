@@ -84,7 +84,7 @@ Board::Board ( QWidget* parent )
                 painter.drawRoundedRect ( 0, 0, width + height, height * 2, 10, 10 );
 
                 painter.setFont ( QFont ( "Sans", 32 ) );
-                painter.setPen ( Qt::white );
+                painter.setPen ( Qt::gray );
                 painter.setRenderHint ( QPainter::TextAntialiasing, true );
                 painter.drawText ( height / 2, height / 2 + metrics.ascent(), tr ( "Success" ) );
         }

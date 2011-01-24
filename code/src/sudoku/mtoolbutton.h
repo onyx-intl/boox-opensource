@@ -1,7 +1,7 @@
 #ifndef MTOOLBUTTON_H
 #define MTOOLBUTTON_H
 
-#include <QToolButton>
+#include <QtGui/QToolButton>
 
 
 class MToolButton : public QToolButton

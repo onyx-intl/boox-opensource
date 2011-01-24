@@ -1,16 +1,20 @@
 #include "mdialog.h"
-#include "QKeyEvent"
-#include "QGridLayout"
-#include "QButtonGroup"
-#include "QSettings"
-#include "QDebug"
+#include <QtGui/QKeyEvent>
+#include <QtGui/QGridLayout>
+#include <QtGui/QWidget>
+#include <QtGui/QButtonGroup>
+#include <QtCore/QSettings>
+#include <QtCore/QDebug>
 #include "onyx/screen/screen_proxy.h"
 
-MDialog::MDialog(QWidget* parent): QDialog(parent) {
+
+MDialog::MDialog(QWidget* parent):QDialog(parent) {
     onyx::screen::instance().enableUpdate ( true );
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+    setBackgroundRole(QPalette::Light);
+    setAutoFillBackground(true);
     setWindowModality(Qt::ApplicationModal);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint);
     QGridLayout *layout = new QGridLayout(this);
     QButtonGroup *group = new QButtonGroup(this);
 
@@ -80,11 +84,29 @@ bool MDialog::event(QEvent* e) {
     //TODO just the buttons
     if (e->type() == QEvent::UpdateRequest)
     {
-        if (list.size()<9) {
-            onyx::screen::instance().updateWidget(this);
-        } else {
-            onyx::screen::instance().updateWidget(focusWidget());
-        }
+        onyx::screen::instance().updateWidget(this);
+//         if (list.size()<9) {
+//             onyx::screen::instance().updateWidget(this);
+//         } else {
+//             onyx::screen::instance().updateWidget(focusWidget());
+//         }
     }
     return ret;
 }
+
+void MDialog::paintEvent(QPaintEvent* )
+{
+    int h = frameGeometry().height();
+    int w = frameGeometry().width();
+    QRect rc_t(0,0,12,w);
+    QRect rc_l(0,0,h,12);
+    QRect rc_r(0,w-12,h,12);
+    QRect rc_b(h-12,0,12,w);
+    QBrush brush(Qt::black, Qt::Dense3Pattern);
+    QPainter painter(this);
+    painter.fillRect(rc_t, brush);
+    painter.fillRect(rc_l, brush);
+    painter.fillRect(rc_r, brush);
+    painter.fillRect(rc_b, brush);
+}
+

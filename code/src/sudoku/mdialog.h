@@ -1,9 +1,9 @@
 #ifndef MDIALOG_H
 #define MDIALOG_H
 
-#include <QDialog>
+#include <QtGui/QDialog>
+#include <QtGui/QPainter>
 #include "mtoolbutton.h"
-
 class MDialog : public QDialog
 {
     Q_OBJECT
@@ -17,6 +17,7 @@ class MDialog : public QDialog
         virtual void keyPressEvent(QKeyEvent* );
         virtual void mouseMoveEvent(QMouseEvent* );
         virtual bool event(QEvent *e);
+        virtual void paintEvent(QPaintEvent* );
     private:
         QList<MToolButton*> list;
         int current_button_;
