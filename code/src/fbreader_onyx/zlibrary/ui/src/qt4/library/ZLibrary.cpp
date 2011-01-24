@@ -38,6 +38,9 @@ void ZLQtLibraryImplementation::init(int &argc, char **&argv) {
     Q_INIT_RESOURCE(dictionary_images);
     Q_INIT_RESOURCE(tts_images);
 
+    QVector<int> fonts;
+    ui::FontFamilyActions::loadExternalFonts(&fonts);
+
     // Zlibrary.
     ZLibrary::parseArguments(argc, argv);
 
@@ -59,7 +62,7 @@ void ZLQtLibraryImplementation::init(int &argc, char **&argv) {
     // Before we open the document, make sure the external fonts
     // have been installed. It's necessary as user may use external
     // fonts, but by default, these fonts are not loaded.
-    ui::FontFamilyActions::loadExternalFonts();
+    // ui::FontFamilyActions::loadExternalFonts();
 }
 
 ZLPaintContext *ZLQtLibraryImplementation::createContext() {
