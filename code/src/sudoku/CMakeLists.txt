@@ -11,7 +11,7 @@ SET(SRCS ${HDRS} ${SRCS} ${MOC_SRCS})
 SET(READER_RES_SRC icons/icon.qrc symmetry/symmetry.qrc)
 QT4_ADD_RESOURCES(sudoku_RES ${READER_RES_SRC})
 
-ADD_EXECUTABLE(sudoku ${SRCS} ${sudoku_RES})
+ADD_EXECUTABLE(sudoku sudokuactions.cpp ${SRCS} ${sudoku_RES})
 TARGET_LINK_LIBRARIES(sudoku
   onyxapp
   onyx_data
