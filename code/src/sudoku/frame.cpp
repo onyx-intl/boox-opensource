@@ -42,20 +42,20 @@ void Frame::paintEvent ( QPaintEvent* event ) {
     */
     QPainter painter ( this );
     painter.setRenderHint ( QPainter::Antialiasing, true );
-    painter.setPen (QPen(Qt::black, 5));
-    painter.setBrush (Qt::NoBrush);
-    painter.drawRoundedRect ( QRectF ( 0.5, 0.5, width() - 1, height() - 1 ), 5, 5);
+    painter.setPen (QPen(Qt::black, 2));
+    painter.setBrush (Qt::white);
+    painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() - 3, height() - 3 ), 5, 5);
 
     if ( m_highlight ) {
         QBrush brush(Qt::black);
         painter.setBrush ( brush );
-        painter.drawRoundedRect ( QRectF ( 0, 0, width() , height() ), 5, 5);
+        painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() -3 , height() -3 ), 5, 5);
     }
 
     if ( m_highlight_border ) {
-        QBrush brush(Qt::white);
+        QBrush brush(Qt::gray);
         painter.setBrush ( brush );
-        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10 ), 5, 5 );
+        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10), 5, 5 );
     }
 }
 
