@@ -1,9 +1,10 @@
 #include "sudokuactions.h"
+namespace onyx{
 namespace simsu{
 SudokuActions::SudokuActions() : BaseActions()
 {
-    //TODO add icon
-    category()->setIcon(QIcon(QPixmap(":/images/sudoku.png")));
+    category()->setText(QCoreApplication::tr("Sudoku"));
+    category()->setIcon(QIcon(QPixmap(":/simsu.png")));
 }
 
 QAction* SudokuActions::action(const SudokuActionsType action)
@@ -20,28 +21,29 @@ QAction* SudokuActions::action(const SudokuActionsType action)
 
 void SudokuActions::generateActions()
 {
-    category()->setText(QCoreApplication::tr("Edit"));
+
     actions_.clear();
     shared_ptr<QAction> newgame(new QAction(exclusiveGroup()));
     newgame->setCheckable(true);
     newgame->setText(QCoreApplication::tr("New"));
-    newgame->setIcon(QIcon(QPixmap(":/images/newgame.png")));
+    newgame->setIcon(QIcon(QPixmap(":/none.png")));
     newgame->setData(NEW);
     actions_.push_back(newgame);
 
     shared_ptr<QAction> checkgame(new QAction(exclusiveGroup()));
     checkgame->setCheckable(true);
     checkgame->setText(QCoreApplication::tr("Check"));
-    checkgame->setIcon(QIcon(QPixmap(":/images/checkgame.png")));
+    checkgame->setIcon(QIcon(QPixmap(":/random.png")));
     checkgame->setData(CHECK);
     actions_.push_back(checkgame);
 
     shared_ptr<QAction> aboutgame(new QAction(exclusiveGroup()));
     aboutgame->setCheckable(true);
     aboutgame->setText(QCoreApplication::tr("About"));
-    aboutgame->setIcon(QIcon(QPixmap(":/images/checkgame.png")));
+    aboutgame->setIcon(QIcon(QPixmap(":/images/about.png")));
     aboutgame->setData(ABOUT);
     actions_.push_back(aboutgame);
+    //return_to_library for quit
 }
 
 SudokuActionsType SudokuActions::selected()
@@ -53,5 +55,5 @@ SudokuActionsType SudokuActions::selected()
     }
     return INVALID;
 }
-
+}
 }

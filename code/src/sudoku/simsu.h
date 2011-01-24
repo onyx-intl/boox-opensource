@@ -5,7 +5,8 @@
 #include "onyx/base/base.h"
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/ui/ui.h"
-#include "menudialog.h"
+//#include "menudialog.h"
+#include "sudokuactions.h"
 
 class QBoxLayout;
 class QButtonGroup;
@@ -25,15 +26,20 @@ class Simsu : public QWidget {
         ~Simsu(){};
     protected:
         void closeEvent ( QCloseEvent *event );
-        void wheelEvent ( QWheelEvent *event );
         bool event ( QEvent *event );
         void keyPressEvent (QKeyEvent * event);
     private slots:
         void showBoard();
         void showMenu();
+        void newGame();
+        void checkGame();
+        void about();
         void quit();
     private:
         Board *m_board;
+        StatusBar status_bar_;
+        SystemActions system_actions_;
+        SudokuActions sudoku_actions_;
         bool pop_;
 };
 }

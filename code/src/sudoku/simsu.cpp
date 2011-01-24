@@ -1,14 +1,10 @@
 #include <QButtonGroup>
 #include <QDialog>
-#include <QDialogButtonBox>
-#include <QFormLayout>
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QSettings>
-#include <QSpinBox>
-#include <QUndoStack>
 
 #include <QVBoxLayout>
 #include <QWheelEvent>
@@ -30,7 +26,9 @@ using namespace ui;
 namespace onyx {
 namespace simsu {
 
-Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
+Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
+status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
+    connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     int screenWidth = QApplication::desktop()->screenGeometry().width();
     int screenHeight = QApplication::desktop()->screenGeometry().height();
     setWindowFlags(Qt::FramelessWindowHint);
@@ -42,11 +40,17 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ) {
     m_board->setAutoSwitch(false);
     square->setChild ( m_board );
     QGridLayout *m_layout = new QGridLayout ( this );
+    m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(m_board,0,0);
+    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),0,1);
+    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),1,0);
+    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),1,1);
+    m_layout->addWidget(&status_bar_,2,0,1,2);
     setLayout(m_layout);
     showMaximized();
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
+
 }
 
 /*****************************************************************************/
@@ -55,13 +59,6 @@ void Simsu::closeEvent ( QCloseEvent *event ) {
     QSettings().setValue ( "Geometry", saveGeometry() );
     QWidget::closeEvent ( event );
 }
-
-/*****************************************************************************/
-
-void Simsu::wheelEvent ( QWheelEvent *event ) {
-
-}
-
 
 
 bool Simsu::event ( QEvent *event )
@@ -145,32 +142,106 @@ void Simsu::showBoard() {
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         if (dialog->exec() == QDialog::Accepted) {
             m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
-            delete dialog;
-            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
-        } else {
-            //if rejected
-            delete dialog;
-            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
         }
-        //onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
+        delete dialog;
+        onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
     }
     return;
 }
+//TODO standard onyx UI menu
 void Simsu::showMenu()
 {
-    MenuDialog* menudialog = new MenuDialog(parentWidget());
-    int screenWidth = QApplication::desktop()->screenGeometry().width();
-    int screenHeight = QApplication::desktop()->screenGeometry().height();
-    connect(menudialog, SIGNAL(toCheck()),m_board,SLOT(showWrong()));
-    connect(menudialog, SIGNAL(askQuit()),this,SLOT(quit()));
-    menudialog->move(screenWidth/2-20,screenHeight/2-40);
-    if (menudialog->exec())
-    menudialog->deleteLater();
+    PopupMenu menu(this);
+    sudoku_actions_.generateActions();
+    menu.addGroup(&sudoku_actions_);
+    std::vector<int> all;
+    all.push_back(ROTATE_SCREEN);
+    all.push_back(MUSIC);
+    all.push_back(RETURN_TO_LIBRARY);
+    system_actions_.generateActions(all);
+    menu.setSystemAction(&system_actions_);
+    if (menu.popup() != QDialog::Accepted)
+    {
+        QApplication::processEvents();
+        return;
+    }
+
+    QAction * group = menu.selectedCategory();
+    if (group == sudoku_actions_.category())
+    {
+        int index = sudoku_actions_.selected();
+        switch(index) {
+            case NEW:
+                newGame();
+                break;
+            case CHECK:
+                checkGame();
+                break;
+            case ABOUT:
+                about();
+                break;
+            default:
+                break;
+        }
+    }
+    else if (group == system_actions_.category())
+    {
+        SystemAction system_action = system_actions_.selected();
+        switch (system_action)
+        {
+            case RETURN_TO_LIBRARY:
+            {
+                close();
+            }
+            break;
+            case ROTATE_SCREEN:
+            {
+                sys::SysStatus::instance().rotateScreen();
+            }
+            break;
+            case SCREEN_UPDATE_TYPE:
+            {
+                onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+                onyx::screen::instance().toggleWaveform();
+            }
+            break;
+            case MUSIC:
+            {
+                // Start or show music player.
+                onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+                sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
+            }
+            break;
+            default:
+                break;
+        }
+    }
 }
 
 void Simsu::quit()
 {
     qApp->quit();
+}
+
+void Simsu::about()
+{
+    MessageDialog about ( QMessageBox::Icon ( QMessageBox::Information ) , tr ( "About Sudoku" ),
+                          tr ( "<center>A basic Sudoku game based on <b>Simsu 1.2.1</b><br/>\
+                          <small>Copyright &copy; 2010-2011, onyx-international, Inc</small><br/>\
+                          <small>Copyright &copy; 2009 Graeme Gott, author of Simsu 1.2.1</small></center><br/>" ));
+    about.exec();
+}
+
+void Simsu::checkGame()
+{
+    m_board->showWrong();
+}
+
+void Simsu::newGame()
+{
+    // Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
+    //TODO show game configuration dialog
+    m_board->newPuzzle();
 }
 
 }

@@ -3,6 +3,7 @@
 #include "onyx/base/base.h"
 #include "onyx/ui/context_dialog_base.h"
 using namespace ui;
+namespace onyx{
 namespace simsu{
 enum SudokuActionsType{
     INVALID=-1,
@@ -21,5 +22,6 @@ public:
     QAction * action(const SudokuActionsType action);
     SudokuActionsType selected();
 };
+}
 }
 #endif // SUDOKUACTIONS_H
