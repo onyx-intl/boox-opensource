@@ -66,7 +66,7 @@ bool Simsu::event ( QEvent *event )
     {
         onyx::screen::instance().updateWidget(0);
     }
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
     return ret;
 }
 
@@ -94,8 +94,11 @@ void Simsu::keyPressEvent(QKeyEvent* event)
        // qApp->quit();
         break;
     case Qt::Key_PageUp:
+        m_board->moves()->undo();
         break;
-
+    case Qt::Key_PageDown:
+        m_board->moves()->redo();
+        break;
     case Qt::Key_Menu:
     {
         //TODO open menudialog

@@ -10,6 +10,7 @@ class MDialog : public QDialog
     Q_OBJECT
     public:
         MDialog(QWidget* parent = 0);
+    virtual ~MDialog(){list_key.clear();}
     signals:
         void ActiveKey(int);
         void ActiveModeKey(int);
@@ -24,7 +25,6 @@ class MDialog : public QDialog
     private:
         QList<MToolButton*> list_key;
         QGridLayout *layout_key;
-        int current_button_;
 };
 
 #endif // MDIALOG_H

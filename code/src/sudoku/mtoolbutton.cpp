@@ -14,8 +14,8 @@ MToolButton::MToolButton(QWidget* parent): QToolButton(parent)
     padding: 0px;");
     setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     setFont(QFont("Serif", 44, QFont::Bold));
-    setMaximumSize(54,54);
-    setMinimumSize(54,54);
+    setMaximumSize(50,50);
+    setMinimumSize(50,50);
 }
 
 void MToolButton::keyPressEvent(QKeyEvent* e)

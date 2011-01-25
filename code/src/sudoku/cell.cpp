@@ -55,7 +55,6 @@ Cell::Cell ( int column, int row, Board* board, QWidget* parent )
     }
     m_states.append ( state );
     setFocusPolicy ( Qt::StrongFocus );
-    setForegroundRole ( QPalette::Text );
     setMinimumSize ( 20, 20 );
     setMouseTracking ( true );
 }
