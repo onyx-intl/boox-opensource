@@ -69,6 +69,7 @@ void MDialog::keyPressEvent(QKeyEvent* event) {
         default:
             break;
     }
+    QDialog::keyPressEvent(event);
 }
 
 void MDialog::mouseMoveEvent(QMouseEvent* event) {

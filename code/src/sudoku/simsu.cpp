@@ -124,6 +124,8 @@ void Simsu::showBoard() {
 
     int screenWidth = QApplication::desktop()->screenGeometry().width();
     int screenHeight = QApplication::desktop()->screenGeometry().height();
+    int cell_hight = m_board->cell(0,0)->height();
+    int cell_width = m_board->cell(0,0)->width();
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
 
@@ -142,7 +144,7 @@ void Simsu::showBoard() {
         // guess the topleft point
         QPoint point = m_board->cell(column,row)->pos();
         // get the size
-        dialog->setGeometry(point.x(),point.y(), m_board->cell(1,1)->height(),m_board->cell(1,1)->width());
+        dialog->setGeometry(point.x(),point.y(), 350, 250);
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
         if (dialog->exec() == QDialog::Accepted) {
