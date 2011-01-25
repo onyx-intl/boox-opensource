@@ -122,28 +122,23 @@ void Simsu::showBoard() {
     int column = m_board->getColumn();
     int row = m_board->getRow();
 
-    int screenWidth = QApplication::desktop()->screenGeometry().width();
-    int screenHeight = QApplication::desktop()->screenGeometry().height();
     int cell_hight = m_board->cell(0,0)->height();
     int cell_width = m_board->cell(0,0)->width();
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
-
-        int bordersize = qMin(screenHeight, screenWidth);
-        if (column < 4) {
-            column += 1;
-        } else if (column >= 4) {
-            column -= 2;
-        }
-        if (row < 4) {
-            row += 1;
-        } else if (row > 4) {
-            row -= 3;
-        }
         //TODO set position correctly
-        // guess the topleft point
         QPoint point = m_board->cell(column,row)->pos();
-        // get the size
+        if (QApplication::desktop()->geometry().width() - point.x() < 450 ) {
+            point.setX(point.x() - 300);
+        } else {
+            point.setX(point.x() + cell_width);
+        }
+        if (QApplication::desktop()->geometry().height() - point.y() < 450 ) {
+            point.setY(point.y() - 250);
+        }
+        else {
+            point.setY(point.y() + cell_hight);
+        }
         dialog->setGeometry(point.x(),point.y(), 350, 250);
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));

@@ -66,10 +66,12 @@ void MDialog::keyPressEvent(QKeyEvent* event) {
                 list_key.at(current_button_)->setFocus();
             }
             break;
+        case Qt::Key_Escape:
+            close();
         default:
             break;
     }
-    QDialog::keyPressEvent(event);
+    //QDialog::keyPressEvent(event);
 }
 
 void MDialog::mouseMoveEvent(QMouseEvent* event) {
