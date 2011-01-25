@@ -39,7 +39,7 @@ namespace simsu {
 Board::Board ( QWidget* parent )
                 : Frame ( parent ), m_puzzle ( 0 ), m_active_key ( 1 ), m_auto_switch ( true ), m_highlight_active ( false ), m_notes_mode ( false ), m_finished ( false ), m_column(0),  m_row(0)
 {
-        setBackgroundRole ( QPalette::Mid );
+        setBackgroundRole ( QPalette::Light );
 
         m_moves = new QUndoStack ( this );
 
@@ -55,7 +55,7 @@ Board::Board ( QWidget* parent )
                 int max_row = row + 3;
 
                 QGridLayout* box = new QGridLayout;
-                box->setMargin ( 2 );
+                box->setMargin ( 3 );
                 box->setSpacing ( 1 );
                 layout->addLayout ( box, row / 3, col / 3 );
 
@@ -67,7 +67,7 @@ Board::Board ( QWidget* parent )
                         }
                 }
         }
-
+//TODO :: fix appearance
         // Create success message
         m_message = new QLabel ( this );
         QFontMetrics metrics ( QFont ( "Sans", 24 ) );
@@ -79,12 +79,12 @@ Board::Board ( QWidget* parent )
                 QPainter painter ( &success );
 
                 painter.setPen ( Qt::NoPen );
-                painter.setBrush ( QColor ( 0, 0, 0, 255 ) );
+                painter.setBrush ( QColor ( 0, 0, 0 ) );
                 painter.setRenderHint ( QPainter::Antialiasing, true );
                 painter.drawRoundedRect ( 0, 0, width + height, height * 2, 10, 10 );
 
-                painter.setFont ( QFont ( "Sans", 32 ) );
-                painter.setPen ( Qt::gray );
+                painter.setFont ( QFont ( "Sans", 64, QFont::Bold) );
+                painter.setPen ( QColor ( 127, 127, 127 ));
                 painter.setRenderHint ( QPainter::TextAntialiasing, true );
                 painter.drawText ( height / 2, height / 2 + metrics.ascent(), tr ( "Success" ) );
         }
@@ -266,6 +266,15 @@ void Board::moveFocus ( int column, int row, int xdelta, int ydelta )
 
 void Board::setActiveKey ( int key )
 {
+        setMode(0);
+        m_active_key = qBound ( 1, key, 10 );
+        QSettings().setValue ( "Key", m_active_key );
+        update();
+        emit activeKeyChanged ( m_active_key );
+}
+void Board::setActiveModeKey ( int key )
+{
+        setMode(1);
         m_active_key = qBound ( 1, key, 10 );
         QSettings().setValue ( "Key", m_active_key );
         update();

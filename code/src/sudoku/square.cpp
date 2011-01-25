@@ -27,7 +27,7 @@ namespace simsu {
 Square::Square ( QWidget* parent )
         : QWidget ( parent ), m_child ( 0 ) {
     setMinimumSize (450, 450 );
-    setSizePolicy ( QSizePolicy::Expanding, QSizePolicy::Expanding);
+//     setSizePolicy ( QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 /*****************************************************************************/
@@ -53,4 +53,4 @@ void Square::resizeEvent ( QResizeEvent* event ) {
 /*****************************************************************************/
 }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

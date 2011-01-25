@@ -8,10 +8,12 @@ MToolButton::MToolButton(QWidget* parent): QToolButton(parent)
     border-width: 3px;                  \
     border-color: black;                \
     border-style: solid;                \
-    border-radius: 3;                   \
+    border-radius: 5;                   \
+    background-color: white;\
+    color: black;\
     padding: 0px;");
     setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    setFont(QFont("Serif", 36, QFont::Bold));
+    setFont(QFont("Serif", 44, QFont::Bold));
     setMaximumSize(54,54);
     setMinimumSize(54,54);
 }
@@ -32,7 +34,9 @@ void MToolButton::focusInEvent ( QFocusEvent* event ) {
     border-color: black;                \
     border-style: solid;                \
     border-radius: 6;                   \
-    padding: 0px;");;
+    background-color: black;\
+    color: white;\
+    padding: 0px;");
     QToolButton::focusInEvent ( event );
 }
 
@@ -43,7 +47,9 @@ void MToolButton::focusOutEvent ( QFocusEvent* event ) {
     border-width: 3px;                  \
     border-color: black;                \
     border-style: solid;                \
-    border-radius: 3;                   \
+    border-radius: 5;                   \
+    background-color: white;\
+    color: black;\
     padding: 0px;");
     QToolButton::focusOutEvent ( event );
 }

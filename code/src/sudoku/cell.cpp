@@ -102,12 +102,10 @@ void Cell::setPuzzle ( Puzzle* puzzle ) {
 
     QFont f = font();
     if ( m_given ) {
-        //setBackgroundRole ( QPalette::Dark );
         f.setBold ( true );
         f.setFamily("Serif");
         f.setItalic(false);
     } else {
-        //setBackgroundRole ( QPalette::Base );
         f.setBold ( false );
         f.setFamily("Sans");
         f.setItalic(true);
@@ -164,24 +162,35 @@ void Cell::showWrong ( bool show ) {
 
 void Cell::focusInEvent ( QFocusEvent* event ) {
     QSettings().setValue ( "Current/Active", QString ( "%1x%2" ).arg ( m_column ).arg ( m_row ) );
-    if ( !m_given ) {
-        setBackgroundRole ( QPalette::Highlight );
-        setForegroundRole ( QPalette::HighlightedText );
-    } //else {
-        setHighlightBorder ( true );
-    //}
+//     if ( !m_given ) {
+//         setStyleSheet("\
+//         border-width: 6px;                  \
+//         border-color: black;                \
+//         border-style: solid;                \
+//         border-radius: 6;                   \
+//         background-color: black;\
+//         color: white;\
+//         padding: 0px;");
+//     }
+    setHighlightBorder ( true );
     Frame::focusInEvent ( event );
 }
 
 /*****************************************************************************/
 
 void Cell::focusOutEvent ( QFocusEvent* event ) {
-    if ( !m_given ) {
-        setBackgroundRole ( QPalette::Base );
-        setForegroundRole ( QPalette::Text );
-    }// else {
-        setHighlightBorder ( false );
-    //}
+//     if ( !m_given ) {
+//         setStyleSheet("\
+//         border-width: 3px;                  \
+//         border-color: black;                \
+//         border-style: solid;                \
+//         border-radius: 5;                   \
+//         background-color: white;\
+//         color: black;\
+//         padding: 0px;");
+//     }
+    setHighlightBorder ( false );
+
     Frame::focusOutEvent ( event );
 }
 
@@ -255,22 +264,25 @@ void Cell::paintEvent ( QPaintEvent* event ) {
     Frame::paintEvent ( event );
 
     QPainter painter ( this );
-
     const State& state = m_states[m_current_state];
-
+    QBrush brush(Qt::white);
     if ( state.value ) {
-        QColor color = palette().color ( foregroundRole() );
+        QColor color(0,0,0);
         if ( m_wrong ) {
-            color = Qt::darkGray;
+            color = QColor(64,64,64);
         } else if ( !m_conflicts.isEmpty() ) {
-            color = Qt::lightGray;
+            brush = QBrush( color);
+            color = QColor(127,127,127);
         }
         painter.setPen ( color );
-
+        painter.setBrush(brush);
         painter.drawText ( rect(), Qt::AlignCenter, QString::number ( state.value ) );
+        if (m_given) {
+            painter.drawText ( rect(), Qt::AlignCenter, QString::number ( state.value ));
+        }
     } else {
-        painter.setPen ( palette().color ( foregroundRole() ) );
-
+        painter.setPen ( QColor(0,0,0));
+        painter.setBrush(QColor(255,255,255));
         int w = ( width() - 8 ) / 3;
         int h = ( height() - 8 ) / 3;
         for ( int i = 0; i < 9; ++i ) {
@@ -281,6 +293,7 @@ void Cell::paintEvent ( QPaintEvent* event ) {
             }
         }
     }
+
 }
 
 /*****************************************************************************/

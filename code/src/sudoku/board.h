@@ -82,6 +82,7 @@ signals:
 public slots:
     void showWrong ( bool show = true );
     void setActiveKey ( int key );
+    void setActiveModeKey ( int key );
     void setAutoSwitch ( bool auto_switch );
     void setHighlightActive ( bool highlight );
     void setMode ( int mode );
@@ -105,4 +106,4 @@ private:
 }
 }
 #endif
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

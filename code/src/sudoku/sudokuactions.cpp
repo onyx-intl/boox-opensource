@@ -3,7 +3,7 @@ namespace onyx{
 namespace simsu{
 SudokuActions::SudokuActions() : BaseActions()
 {
-    category()->setText(QCoreApplication::tr("Sudoku"));
+    category()->setText(QCoreApplication::tr("Game"));
     category()->setIcon(QIcon(QPixmap(":/simsu.png")));
 }
 

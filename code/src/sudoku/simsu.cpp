@@ -32,7 +32,7 @@ status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_
     int screenWidth = QApplication::desktop()->screenGeometry().width();
     int screenHeight = QApplication::desktop()->screenGeometry().height();
     setWindowFlags(Qt::FramelessWindowHint);
-    setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+//     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     QSettings settings;
     // Create board
     Square *square = new Square ( this );
@@ -41,11 +41,9 @@ status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_
     square->setChild ( m_board );
     QGridLayout *m_layout = new QGridLayout ( this );
     m_layout->setContentsMargins(0, 0, 0, 0);
-    m_layout->addWidget(m_board,0,0);
-    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Maximum,QSizePolicy::Minimum),0,1);
-    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Maximum),1,0);
-    m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Minimum),1,1);
-    m_layout->addWidget(&status_bar_,2,0,1,2);
+    m_layout->addWidget(m_board);
+//     m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Expanding),1,1);
+    m_layout->addWidget(&status_bar_);
     setLayout(m_layout);
     showMaximized();
     onyx::screen::instance().enableUpdate ( true );
@@ -68,7 +66,7 @@ bool Simsu::event ( QEvent *event )
     {
         onyx::screen::instance().updateWidget(0);
     }
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
     return ret;
 }
 
@@ -120,26 +118,30 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 void Simsu::showBoard() {
     int column = m_board->getColumn();
     int row = m_board->getRow();
-    QPoint point = m_board->pos();
+
+    int screenWidth = QApplication::desktop()->screenGeometry().width();
+    int screenHeight = QApplication::desktop()->screenGeometry().height();
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
-        int screenWidth = QApplication::desktop()->screenGeometry().width();
-        int screenHeight = QApplication::desktop()->screenGeometry().height();
-        int bordersize = qMin(screenHeight, screenWidth);
-        if (column < 4.5) {
-            column += 1;
-        } else if (column > 4.5) {
-            column -= 3;
-        }
 
-        if (row < 4.5) {
+        int bordersize = qMin(screenHeight, screenWidth);
+        if (column < 4) {
+            column += 1;
+        } else if (column >= 4) {
+            column -= 2;
+        }
+        if (row < 4) {
             row += 1;
-        } else if (row > 4.5) {
+        } else if (row > 4) {
             row -= 3;
         }
-        dialog->setGeometry(point.x() + (column)*(bordersize)/9,
-                            point.y() + (row)*(bordersize)/9,bordersize/3,bordersize/3);
+        //TODO set position correctly
+        // guess the topleft point
+        QPoint point = m_board->cell(column,row)->pos();
+        // get the size
+        dialog->setGeometry(point.x(),point.y(), m_board->cell(1,1)->height(),m_board->cell(1,1)->width());
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
+        connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
         if (dialog->exec() == QDialog::Accepted) {
             m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
         }
