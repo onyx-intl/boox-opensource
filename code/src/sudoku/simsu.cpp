@@ -127,19 +127,21 @@ void Simsu::showBoard() {
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
         //TODO set position correctly
-        QPoint point = m_board->cell(column,row)->pos();
-        if (QApplication::desktop()->geometry().width() - point.x() < 450 ) {
-            point.setX(point.x() - 300);
+        if (column < 3) {
+            column++;
+        }
+        if (column > 4){
+            column -=  5;
+        } else if (column == 4) {
+            column--;
+        }
+        if (row < 4) {
+            row++;
         } else {
-            point.setX(point.x() + cell_width);
+            row -= (row > column? 3 : 1);
         }
-        if (QApplication::desktop()->geometry().height() - point.y() < 450 ) {
-            point.setY(point.y() - 250);
-        }
-        else {
-            point.setY(point.y() + cell_hight);
-        }
-        dialog->setGeometry(point.x(),point.y(), 350, 250);
+            QPoint point = m_board->cell(column,row)->pos();
+        dialog->setGeometry(point.x(),point.y(), 210, 190);
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
         if (dialog->exec() == QDialog::Accepted) {

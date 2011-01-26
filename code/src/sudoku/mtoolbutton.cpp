@@ -13,9 +13,9 @@ MToolButton::MToolButton(QWidget* parent): QToolButton(parent)
     color: black;\
     padding: 0px;");
     setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    setFont(QFont("Serif", 44, QFont::Bold));
-    setMaximumSize(50,50);
-    setMinimumSize(50,50);
+    setFont(QFont("Serif", 36, QFont::Bold));
+    setMaximumSize(44,44);
+    setMinimumSize(44,44);
 }
 
 void MToolButton::keyPressEvent(QKeyEvent* e)
@@ -57,7 +57,7 @@ void MToolButton::focusOutEvent ( QFocusEvent* event ) {
 void MToolButton::mouseMoveEvent(QMouseEvent* event)
 {
     setFocus();
-    QToolButton::mouseMoveEvent(event);
+//     QToolButton::mouseMoveEvent(event);
 }
 
 bool MToolButton::event(QEvent* e)
