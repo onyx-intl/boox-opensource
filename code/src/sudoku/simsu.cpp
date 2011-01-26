@@ -31,7 +31,7 @@ status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
     m_board = new Board ( square );
     m_board->setAutoSwitch(false);
     square->setChild ( m_board );
-    QGridLayout *m_layout = new QGridLayout ( this );
+    m_layout = new QGridLayout ( this );
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(m_board);
     m_layout->addWidget(&status_bar_);
@@ -119,21 +119,40 @@ void Simsu::showBoard() {
         //TODO set position correctly
         //paitn rect
         m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected( true );
-        if (column < 3) {
-            column++;
+        int res_c = column%3;
+        int group_c = column/3;
+        int res_r = row%3;
+        int group_r = row/3;
+
+        switch (group_c) {
+            case 0:
+                column++;
+                break;
+            case 1:
+                column -= res_c;
+                break;
+            case 2:
+                column -= 3;
+                column -= res_c;
+                break;
+            default:
+                break;
         }
-        if (column > 4){
-            column -=  5;
-        } else if (column == 4) {
-            column--;
+        switch (group_r) {
+            case 0:
+                row++;
+                break;
+            case 1:
+                row -= (res_r -1);
+            case 2:
+                row -= 3;
+                break;
+            default:
+                break;
         }
-        if (row < 4) {
-            row++;
-        } else {
-            row -= (row > column? 3 : 1);
-        }
+
         QPoint point = m_board->cell(column,row)->pos();
-        dialog->setGeometry(point.x(),point.y(), 210, 190);
+        dialog->move(point.x(),point.y());
 
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
@@ -189,7 +208,7 @@ void Simsu::showMenu()
         {
             case RETURN_TO_LIBRARY:
             {
-                close();
+               qApp->quit();
             }
             break;
             case ROTATE_SCREEN:
@@ -215,11 +234,6 @@ void Simsu::showMenu()
                 break;
         }
     }
-}
-
-void Simsu::quit()
-{
-    qApp->quit();
 }
 
 void Simsu::about()

@@ -142,6 +142,7 @@ Board::~Board()
         } else {
                 QSettings().remove ( "Current" );
         }
+        if (m_puzzle)
         delete m_puzzle;
 }
 

@@ -11,7 +11,7 @@ class MDialog : public QDialog
     Q_OBJECT
     public:
         MDialog(QWidget* parent = 0);
-    virtual ~MDialog(){list_key.clear();}
+    //virtual ~MDialog(){/*list_key.clear();*/}
     signals:
         void ActiveKey(int);
         void ActiveModeKey(int);

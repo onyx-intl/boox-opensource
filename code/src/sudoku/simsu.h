@@ -22,7 +22,6 @@ class Simsu : public QWidget {
         Q_OBJECT
     public:
         Simsu ( QWidget *parent = 0, Qt::WindowFlags f = 0 );
-        ~Simsu(){};
     protected:
         void closeEvent ( QCloseEvent *event );
         bool event ( QEvent *event );
@@ -33,9 +32,9 @@ class Simsu : public QWidget {
         void newGame();
         void checkGame();
         void about();
-        void quit();
     private:
         Board *m_board;
+        QGridLayout *m_layout;
         StatusBar status_bar_;
         SystemActions system_actions_;
         SudokuActions sudoku_actions_;
