@@ -1,4 +1,4 @@
-#ifndef DIALOG_H
+/*#ifndef DIALOG_H
 #define DIALOG_H
 
 #include <QDialog>
@@ -43,4 +43,5 @@ private:
 }
 
 #endif // DIALOG_H
+*/
 // kate: indent-mode cstyle; space-indent on; indent-width 0;

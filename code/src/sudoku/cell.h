@@ -42,7 +42,7 @@ public:
         void showWrong ( bool show );
         const bool given() {return m_given;}
         void setSelected(bool val) {
-        selected = val;
+            selected = val;
         }
 
 protected:

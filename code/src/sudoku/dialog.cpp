@@ -1,4 +1,4 @@
-#include "dialog.h"
+/*#include "dialog.h"
 
 #include "dialog.h"
 #include "pattern.h"
@@ -68,5 +68,5 @@ void Dialog::mouseMoveEvent ( QMouseEvent* event )
 
 
 }
-}
-// kate: indent-mode cstyle; space-indent on; indent-width 4; 
+}*/
+// kate: indent-mode cstyle; space-indent on; indent-width 4;

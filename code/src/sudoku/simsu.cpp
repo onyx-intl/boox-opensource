@@ -22,7 +22,7 @@ namespace onyx {
 namespace simsu {
 
 Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
-status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
+        status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH) {
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
     QSettings settings;
@@ -44,7 +44,7 @@ status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
 }
 
 void Simsu::closeEvent ( QCloseEvent *event ) {
-    QSettings().setValue ( "Geometry", saveGeometry() );
+    //QSettings().setValue ( "Geometry", saveGeometry() );
     QWidget::closeEvent ( event );
 }
 
@@ -83,7 +83,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     {
     case Qt::Key_Escape:
         //use menudialog to quit
-       // qApp->quit();
+        qApp->quit();
         break;
     case Qt::Key_PageUp:
         m_board->moves()->undo();
@@ -125,30 +125,30 @@ void Simsu::showBoard() {
         int group_r = row/3;
 
         switch (group_c) {
-            case 0:
-                column++;
-                break;
-            case 1:
-                column -= res_c;
-                break;
-            case 2:
-                column -= 3;
-                column -= res_c;
-                break;
-            default:
-                break;
+        case 0:
+            column++;
+            break;
+        case 1:
+            column -= res_c;
+            break;
+        case 2:
+            column -= 3;
+            column -= res_c;
+            break;
+        default:
+            break;
         }
         switch (group_r) {
-            case 0:
-                row++;
-                break;
-            case 1:
-                row -= (res_r -1);
-            case 2:
-                row -= 3;
-                break;
-            default:
-                break;
+        case 0:
+            row++;
+            break;
+        case 1:
+            row -= (res_r -1);
+        case 2:
+            row -= 3;
+            break;
+        default:
+            break;
         }
 
         QPoint point = m_board->cell(column,row)->pos();
@@ -187,51 +187,49 @@ void Simsu::showMenu()
     if (group == sudoku_actions_.category())
     {
         int index = sudoku_actions_.selected();
-        switch(index) {
-            case NEW:
-                newGame();
-                break;
-            case CHECK:
-                checkGame();
-                break;
-            case ABOUT:
-                about();
-                break;
-            default:
-                break;
+        switch (index) {
+        case NEW:
+            newGame();
+            break;
+        case CHECK:
+            checkGame();
+            break;
+        case ABOUT:
+            about();
+            break;
+        default:
+            break;
         }
-    }
-    else if (group == system_actions_.category())
-    {
+    } else if (group == system_actions_.category()) {
         SystemAction system_action = system_actions_.selected();
         switch (system_action)
         {
-            case RETURN_TO_LIBRARY:
-            {
-               qApp->quit();
-            }
+        case RETURN_TO_LIBRARY:
+        {
+            qApp->quit();
+        }
+        break;
+        case ROTATE_SCREEN:
+        {
+            sys::SysStatus::instance().rotateScreen();
+            update();
+        }
+        break;
+        case SCREEN_UPDATE_TYPE:
+        {
+            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+            onyx::screen::instance().toggleWaveform();
+        }
+        break;
+        case MUSIC:
+        {
+            // Start or show music player.
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+            sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
+        }
+        break;
+        default:
             break;
-            case ROTATE_SCREEN:
-            {
-                sys::SysStatus::instance().rotateScreen();
-                update();
-            }
-            break;
-            case SCREEN_UPDATE_TYPE:
-            {
-                onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
-                onyx::screen::instance().toggleWaveform();
-            }
-            break;
-            case MUSIC:
-            {
-                // Start or show music player.
-                onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
-                sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
-            }
-            break;
-            default:
-                break;
         }
     }
 }

@@ -45,7 +45,7 @@ Puzzle::~Puzzle()
 void Puzzle::generate ( unsigned int seed, int symmetry )
 {
         srand ( seed );
-
+        if (m_pattern)
         delete m_pattern;
         switch ( symmetry ) {
         case Pattern::FullDihedral:
@@ -298,4 +298,4 @@ bool PuzzleSliceAndDice::isUnique()
 /*****************************************************************************/
 }
 }
-// kate: indent-mode cstyle; space-indent on; indent-width 8; 
+// kate: indent-mode cstyle; space-indent on; indent-width 8;
