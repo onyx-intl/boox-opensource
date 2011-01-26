@@ -54,9 +54,11 @@ bool Simsu::event ( QEvent *event )
     bool ret = QWidget::event ( event );
     if (event->type() == QEvent::UpdateRequest /*&& global_update*/)
     {
+        QApplication::processEvents();
         onyx::screen::instance().updateWidget(0);
+        onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
     }
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+
     return ret;
 }
 
@@ -193,6 +195,7 @@ void Simsu::showMenu()
             case ROTATE_SCREEN:
             {
                 sys::SysStatus::instance().rotateScreen();
+                update();
             }
             break;
             case SCREEN_UPDATE_TYPE:
