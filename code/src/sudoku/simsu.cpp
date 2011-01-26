@@ -117,11 +117,13 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void Simsu::showBoard() {
+void Simsu::showBoard() 
+{
     int column = m_board->getColumn();
     int row = m_board->getRow();
 
-    if (!m_board->cell(column,row)->given()) {
+    if (!m_board->cell(column,row)->given())
+    {
         MDialog *dialog = new MDialog(parentWidget());
         //TODO set position correctly
         //paitn rect
@@ -131,7 +133,8 @@ void Simsu::showBoard() {
         int res_r = row%3;
         int group_r = row/3;
 
-        switch (group_c) {
+        switch (group_c) 
+        {
         case 0:
             column++;
             break;
@@ -144,7 +147,7 @@ void Simsu::showBoard() {
             column -= res_c;
             if (res_c == 2 ) {
                 column++;
-            } else { if (res_c == 0 ) {
+            } else if (res_c == 0 ) {
                 column--;
             }
         }
@@ -191,6 +194,7 @@ void Simsu::showBoard() {
     }
     return;
 }
+
 //TODO standard onyx UI menu
 void Simsu::showMenu()
 {
