@@ -43,9 +43,15 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
 
 }
 
+Simsu::~Simsu()
+{
+    if (m_board)
+        delete m_board;
+}
+
 void Simsu::closeEvent ( QCloseEvent *event ) {
     //QSettings().setValue ( "Geometry", saveGeometry() );
-    QWidget::closeEvent ( event );
+    //QWidget::closeEvent ( event );
 }
 
 
@@ -78,6 +84,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     Down    Qt::Key_Down
     OK  Qt::Key_Return
     */
+    QApplication::processEvents();
     //TODO encapsulate each part as functions
     switch (event->key())
     {
@@ -105,7 +112,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     break;
 
     default:
-        QWidget::keyPressEvent(event);
+    //    QWidget::keyPressEvent(event);
         break;
     }
 }
@@ -132,9 +139,16 @@ void Simsu::showBoard() {
             column -= res_c;
             break;
         case 2:
-            column -= 3;
+        {
+            column -= 4;
             column -= res_c;
-            break;
+            if (res_c == 2 ) {
+                column++;
+            } else { if (res_c == 0 ) {
+                column--;
+            }
+        }
+        break;
         default:
             break;
         }
@@ -143,9 +157,21 @@ void Simsu::showBoard() {
             row++;
             break;
         case 1:
-            row -= (res_r -1);
+        {
+            if (group_c == 1) {
+                if (res_r) {
+                    row -=4;
+                } else {
+                    row++;
+                }
+            } else {
+                row -= res_r;
+                row--;
+            }
+        }
+        break;
         case 2:
-            row -= 3;
+            row -= 4;
             break;
         default:
             break;
@@ -168,7 +194,7 @@ void Simsu::showBoard() {
 //TODO standard onyx UI menu
 void Simsu::showMenu()
 {
-    PopupMenu menu(this);
+    PopupMenu menu(parentWidget());
     sudoku_actions_.generateActions();
     menu.addGroup(&sudoku_actions_);
     std::vector<int> all;
@@ -186,7 +212,7 @@ void Simsu::showMenu()
     QAction * group = menu.selectedCategory();
     if (group == sudoku_actions_.category())
     {
-        int index = sudoku_actions_.selected();
+        SudokuActionsType index = sudoku_actions_.selected();
         switch (index) {
         case NEW:
             newGame();

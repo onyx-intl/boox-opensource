@@ -57,7 +57,6 @@ void MToolButton::focusOutEvent ( QFocusEvent* event ) {
 void MToolButton::mouseMoveEvent(QMouseEvent* event)
 {
     setFocus();
-//     QToolButton::mouseMoveEvent(event);
 }
 
 bool MToolButton::event(QEvent* e)

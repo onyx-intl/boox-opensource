@@ -103,15 +103,14 @@ bool MDialog::event(QEvent* e) {
 
 void MDialog::paintEvent(QPaintEvent* e)
 {
-//     QDialog::paintEvent(e);
     int h = height();
     int w = width();
     QRect rc_t(0,0,w,6);
     QRect rc_l(0,0,6,h);
-    QRect rc_r(w-10,0,10,h);
-    QRect rc_b(0,h-12,w,12);
+    QRect rc_r(w-6,0,6,h);
+    QRect rc_b(0,h-6,w,6);
     QPainter painter(this);
-    painter.setBrush(QColor(32,32,32));
+    painter.setBrush(QColor(96,96,96));
     painter.fillRect(rc_t,Qt::SolidPattern);
     painter.fillRect(rc_l,Qt::SolidPattern);
     painter.fillRect(rc_r,Qt::SolidPattern);
