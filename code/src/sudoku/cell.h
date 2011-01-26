@@ -22,6 +22,7 @@
 
 #include "frame.h"
 
+
 namespace onyx
 {
 namespace simsu {
@@ -40,6 +41,9 @@ public:
         void setState ( int state );
         void showWrong ( bool show );
         const bool given() {return m_given;}
+        void setSelected(bool val) {
+        selected = val;
+        }
 
 protected:
         virtual void focusInEvent ( QFocusEvent* event );
@@ -68,6 +72,7 @@ private:
         QList<Cell*> m_conflicts;
         bool m_wrong;
         bool m_given;
+        bool selected;
         Board* m_board;
         Puzzle* m_puzzle;
 };

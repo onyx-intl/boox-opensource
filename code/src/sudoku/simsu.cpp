@@ -22,7 +22,7 @@ namespace onyx {
 namespace simsu {
 
 Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
-status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
+status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
     QSettings settings;
@@ -115,6 +115,8 @@ void Simsu::showBoard() {
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
         //TODO set position correctly
+        //paitn rect
+        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected( true );
         if (column < 3) {
             column++;
         }
@@ -128,14 +130,16 @@ void Simsu::showBoard() {
         } else {
             row -= (row > column? 3 : 1);
         }
-            QPoint point = m_board->cell(column,row)->pos();
+        QPoint point = m_board->cell(column,row)->pos();
         dialog->setGeometry(point.x(),point.y(), 210, 190);
+
         connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
         connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
         if (dialog->exec() == QDialog::Accepted) {
             m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
         }
         delete dialog;
+        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected( false );
         onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
     }
     return;
