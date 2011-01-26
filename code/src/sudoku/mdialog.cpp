@@ -1,5 +1,6 @@
 #include "mdialog.h"
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPainter>
 #include <QtGui/QGridLayout>
 #include <QtGui/QWidget>
 #include <QtGui/QButtonGroup>
@@ -75,7 +76,7 @@ void MDialog::keyPressEvent(QKeyEvent* event) {
 }
 
 void MDialog::mouseMoveEvent(QMouseEvent* event) {
-    QDialog::mouseMoveEvent(event);
+ //   QDialog::mouseMoveEvent(event);
 }
 
 
@@ -117,7 +118,6 @@ void MDialog::paintEvent(QPaintEvent* e)
     painter.fillRect(rc_l, brush);
     painter.fillRect(rc_r, brush);
     painter.fillRect(rc_b, brush);
-    QDialog::paintEvent(e);
-
+    //QDialog::paintEvent(e);
 }
 

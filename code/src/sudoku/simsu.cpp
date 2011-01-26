@@ -1,12 +1,7 @@
 #include <QButtonGroup>
-#include <QDialog>
 #include <QGridLayout>
 #include <QKeyEvent>
-#include <QLabel>
-#include <QMessageBox>
 #include <QSettings>
-
-#include <QVBoxLayout>
 #include <QWheelEvent>
 #include <QKeyEvent>
 
@@ -29,10 +24,7 @@ namespace simsu {
 Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
 status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH){
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
-    int screenWidth = QApplication::desktop()->screenGeometry().width();
-    int screenHeight = QApplication::desktop()->screenGeometry().height();
     setWindowFlags(Qt::FramelessWindowHint);
-//     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     QSettings settings;
     // Create board
     Square *square = new Square ( this );
@@ -42,16 +34,14 @@ status_bar_(0,  MENU | PROGRESS|CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_
     QGridLayout *m_layout = new QGridLayout ( this );
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(m_board);
-//     m_layout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Expanding),1,1);
     m_layout->addWidget(&status_bar_);
     setLayout(m_layout);
+    m_board->setAutoSwitch(false);
     showMaximized();
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
 
 }
-
-/*****************************************************************************/
 
 void Simsu::closeEvent ( QCloseEvent *event ) {
     QSettings().setValue ( "Geometry", saveGeometry() );
@@ -122,8 +112,6 @@ void Simsu::showBoard() {
     int column = m_board->getColumn();
     int row = m_board->getRow();
 
-    int cell_hight = m_board->cell(0,0)->height();
-    int cell_width = m_board->cell(0,0)->width();
     if (!m_board->cell(column,row)->given()) {
         MDialog *dialog = new MDialog(parentWidget());
         //TODO set position correctly

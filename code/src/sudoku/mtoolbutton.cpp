@@ -37,7 +37,7 @@ void MToolButton::focusInEvent ( QFocusEvent* event ) {
     background-color: black;\
     color: white;\
     padding: 0px;");
-    QToolButton::focusInEvent ( event );
+    //QToolButton::focusInEvent ( event );
 }
 
 /*****************************************************************************/
@@ -51,7 +51,7 @@ void MToolButton::focusOutEvent ( QFocusEvent* event ) {
     background-color: white;\
     color: black;\
     padding: 0px;");
-    QToolButton::focusOutEvent ( event );
+   // QToolButton::focusOutEvent ( event );
 }
 
 void MToolButton::mouseMoveEvent(QMouseEvent* event)

@@ -2,8 +2,9 @@
 #define MDIALOG_H
 
 #include <QtGui/QDialog>
-#include <QtGui/QPainter>
+
 #include "mtoolbutton.h"
+class QPainter;
 class QGridLayout;
 class MDialog : public QDialog
 {

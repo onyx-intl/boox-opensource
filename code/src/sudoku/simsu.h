@@ -5,7 +5,6 @@
 #include "onyx/base/base.h"
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/ui/ui.h"
-//#include "menudialog.h"
 #include "sudokuactions.h"
 
 class QBoxLayout;
@@ -40,7 +39,6 @@ class Simsu : public QWidget {
         StatusBar status_bar_;
         SystemActions system_actions_;
         SudokuActions sudoku_actions_;
-        bool pop_;
 };
 }
 }
