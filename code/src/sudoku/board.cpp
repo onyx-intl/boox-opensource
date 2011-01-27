@@ -44,7 +44,7 @@ Board::Board ( QWidget* parent )
         m_moves = new QUndoStack ( this );
 
         QGridLayout* layout = new QGridLayout ( this );
-        layout->setMargin ( 3 );
+        layout->setMargin ( 4 );
         layout->setSpacing ( 0 );
 
         // Create cells
