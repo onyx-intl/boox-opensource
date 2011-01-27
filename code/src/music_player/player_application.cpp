@@ -155,6 +155,7 @@ void PlayerApplication::onMountTreeSignal(bool inserted, const QString &mount_po
     if (!inserted && path_.startsWith(mount_point))
     {
         emit stateChanged(STOP_PLAYER);
+        QProcess::startDetached("unload_sound_module.sh");
         qApp->exit();
     }
 }
