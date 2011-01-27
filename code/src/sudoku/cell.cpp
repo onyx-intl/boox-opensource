@@ -227,7 +227,7 @@ void Cell::keyPressEvent ( QKeyEvent* event ) {
 
         break;
     }
-    QWidget::keyPressEvent ( event );
+    Frame::keyPressEvent ( event );
 
 }
 

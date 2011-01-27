@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     simsuwin.show();
 
     sys::SysStatus::instance().setSystemBusy(false);
-    onyx::screen::instance().flush(&simsuwin, onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().flush(&simsuwin, onyx::screen::ScreenProxy::GC,true, onyx::screen::ScreenCommand::WAIT_NONE);
 
     return app.exec();
 }

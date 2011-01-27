@@ -22,15 +22,15 @@ namespace onyx {
 namespace simsu {
 
 Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
-        status_bar_(0,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH) {
+    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH) {
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
     QSettings settings;
     // Create board
-    Square *square = new Square ( this );
-    m_board = new Board ( square );
+//     Square *square = new Square ( this );
+    m_board = new Board ( this );
     m_board->setAutoSwitch(false);
-    square->setChild ( m_board );
+//     square->setChild ( m_board );
     m_layout = new QGridLayout ( this );
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addWidget(m_board);
@@ -38,20 +38,18 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
     setLayout(m_layout);
     m_board->setAutoSwitch(false);
     showMaximized();
+    m_board->cell(0,0)->setFocus();
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
-
 }
 
 Simsu::~Simsu()
 {
-    if (m_board)
-        delete m_board;
 }
 
 void Simsu::closeEvent ( QCloseEvent *event ) {
-    //QSettings().setValue ( "Geometry", saveGeometry() );
-    //QWidget::closeEvent ( event );
+    QSettings().setValue ( "Geometry", saveGeometry() );
+    QWidget::closeEvent ( event );
 }
 
 
@@ -117,7 +115,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void Simsu::showBoard() 
+void Simsu::showBoard()
 {
     int column = m_board->getColumn();
     int row = m_board->getRow();
@@ -133,7 +131,7 @@ void Simsu::showBoard()
         int res_r = row%3;
         int group_r = row/3;
 
-        switch (group_c) 
+        switch (group_c)
         {
         case 0:
             column++;

@@ -22,7 +22,7 @@ class Simsu : public QWidget {
         Q_OBJECT
     public:
         Simsu ( QWidget *parent = 0, Qt::WindowFlags f = 0 );
-    virtual ~Simsu();
+        ~Simsu();
     protected:
         void closeEvent ( QCloseEvent *event );
         bool event ( QEvent *event );
