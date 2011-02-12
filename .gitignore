@@ -2,3 +2,5 @@ build/
 *~
 CMakeFiles
 *.swp
+*.directory
+.gitignore
