@@ -93,10 +93,9 @@ void MDialog::setActiveModeKey(int k)
 
 bool MDialog::event(QEvent* e) {
     bool ret = QDialog::event ( e );
-    //TODO just the buttons
     if (e->type() == QEvent::UpdateRequest)
     {
-        onyx::screen::instance().updateWidget(this);
+        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_NONE);
     }
     return ret;
 }

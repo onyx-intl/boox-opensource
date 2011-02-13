@@ -59,7 +59,7 @@ bool Simsu::event ( QEvent *event )
     if (event->type() == QEvent::UpdateRequest /*&& global_update*/)
     {
         QApplication::processEvents();
-        onyx::screen::instance().updateWidget(0);
+        onyx::screen::instance().updateWidget(0,onyx::screen::instance().defaultWaveform(),true, onyx::screen::ScreenCommand::WAIT_NONE);
         onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
     }
 
