@@ -7,10 +7,10 @@ namespace djvu_reader
 DjvuRenderProxy::DjvuRenderProxy()
     : render_format_(0)
 {
-    render_format_ = ddjvu_format_create(DDJVU_FORMAT_GREY8, 0, 0);
+    render_format_ = ddjvu_format_create(DDJVU_FORMAT_RGB24, 0, 0);
     ddjvu_format_set_row_order(render_format_, true);
     ddjvu_format_set_y_direction(render_format_, true);
-    ddjvu_format_set_ditherbits(render_format_, 8);
+//    ddjvu_format_set_ditherbits(render_format_, 8);
     ddjvu_format_set_gamma(render_format_, 2.2);
 }
 

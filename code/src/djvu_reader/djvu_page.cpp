@@ -127,10 +127,10 @@ bool QDjVuPage::implRender(const RenderSetting & setting, ddjvu_format_t * rende
         ddjvu_rect_t page_rect = {0, 0, setting.contentArea().width(), setting.contentArea().height()};
         ddjvu_rect_t render_rect = page_rect;
 
-        QImage image(setting.contentArea().size(), QImage::Format_Indexed8);
+        QImage image(setting.contentArea().size(), QImage::Format_RGB888);
         image.setColorTable(COLOR_TABLE);
         int ret = ddjvu_page_render(page_,
-                                    DDJVU_RENDER_BLACK,
+                                    DDJVU_RENDER_COLOR,
                                     &page_rect,
                                     &render_rect,
                                     render_format,
@@ -429,10 +429,10 @@ QRect QDjVuPage::getContentArea(ddjvu_format_t * render_format)
     ddjvu_rect_t page_rect = {0, 0, width, height};
     ddjvu_rect_t render_rect = page_rect;
 
-    QImage image(QSize(width, height), QImage::Format_Indexed8);
+    QImage image(QSize(width, height), QImage::Format_RGB888);
     image.setColorTable(COLOR_TABLE);
     int ret = ddjvu_page_render(page_,
-                                DDJVU_RENDER_BLACK,
+                                DDJVU_RENDER_COLOR,
                                 &page_rect,
                                 &render_rect,
                                 render_format,

@@ -39,7 +39,6 @@ public:
 
     // Flipping
     bool flip(int direction);
-    void autoFlipMultiplePages();
 
 public Q_SLOTS:
     void onPageRenderReady(DjVuPagePtr page);
@@ -49,6 +48,8 @@ public Q_SLOTS:
     void slideShowNextPage();
     void onStylusChanges(const int type);
     void onRequestUpdateScreen();
+
+    void autoFlipMultiplePages();
 
 private Q_SLOTS:
     void onDocReady();
