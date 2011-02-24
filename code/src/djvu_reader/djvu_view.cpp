@@ -1356,6 +1356,12 @@ bool DjvuView::updateActions()
         {
             zoom_settings.push_back(ZOOM_SELECTION);
         }
+        zoom_settings.push_back(10.0f);
+        zoom_settings.push_back(20.0f);
+        zoom_settings.push_back(30.0f);
+        zoom_settings.push_back(40.0f);
+        zoom_settings.push_back(50.0f);
+        zoom_settings.push_back(60.0f);
         zoom_settings.push_back(75.0f);
         zoom_settings.push_back(100.0f);
         zoom_settings.push_back(125.0f);
