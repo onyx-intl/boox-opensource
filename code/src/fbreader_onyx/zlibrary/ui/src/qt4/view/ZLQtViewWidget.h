@@ -114,6 +114,10 @@ public Q_SLOTS:
 
     bool isHyperlinkSelected();
 
+    void onMultiTouchPressDetected(QRect r1, QRect r2);
+    void onMultiTouchReleaseDetected(QRect r1, QRect r2);
+
+
 private:
     bool isWidgetVisible(QWidget * wnd);
     void hideHelperWidget(QWidget * wnd);
@@ -133,9 +137,6 @@ private:
     void processBookmarks(ReadingToolsActions & actions);
 
     void findHyperlink(bool next);
-
-    void onMultiTouchPressDetected(QRect r1, QRect r2);
-    void onMultiTouchReleaseDetected(QRect r1, QRect r2);
 
 private:
     void repaint();
