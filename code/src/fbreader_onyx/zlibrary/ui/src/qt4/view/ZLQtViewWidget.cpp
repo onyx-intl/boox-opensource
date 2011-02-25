@@ -1483,7 +1483,7 @@ void ZLQtViewWidget::onMultiTouchReleaseDetected(QRect r1, QRect r2)
 {
     QRect r = r1.united(r2);
 
-    float diagonal_length_changed = sqrt(r.width() * r.width() + r.height() * r.height() * 1.0) - sqrt(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height() * 1.0);
+    float diagonal_length_changed = sqrt(r.width() * r.width() + r.height() * r.height()) - sqrt(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height());
     float diagonal_length_per_fontsize = 100 / 2; // 100 pixel for 2 fontsize 
 
     ZLIntegerRangeOption &sizeOption = ZLTextStyleCollection::instance().baseStyle().FontSizeOption;
