@@ -114,6 +114,7 @@ public Q_SLOTS:
 
     bool isHyperlinkSelected();
 
+    void onMouseLongPress(QPoint, QSize);
     void onMultiTouchPressDetected(QRect r1, QRect r2);
     void onMultiTouchReleaseDetected(QRect r1, QRect r2);
 
