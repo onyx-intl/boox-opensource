@@ -127,6 +127,8 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
     connect(&sys_status_, SIGNAL(musicPlayerStateChanged(int)),
             this, SLOT(onMusicPlayerStateChanged(int)));
     connect(&sys_status_, SIGNAL(volumeChanged(int, bool)), this, SLOT(onVolumeChanged(int, bool)));
+    connect(&sys_status_, SIGNAL(multiTouchPressDetected(QRect, QRect)), this, SLOT(onMultiTouchPressDetected(QRect, QRect)));
+    connect(&sys_status_, SIGNAL(multiTouchReleaseDetected(QRect, QRect)), this, SLOT(onMultiTouchReleaseDetected(QRect, QRect)));
 
     // Load conf.
     loadConf();
@@ -1460,4 +1462,22 @@ void ZLQtViewWidget::findHyperlink(bool next)
 bool ZLQtViewWidget::isHyperlinkSelected()
 {
     return hyperlink_selected_;
+}
+
+void ZLQtViewWidget::onMultiTouchPressDetected(QRect r1, QRect r2)
+{
+    rect_pressed_ = r1.united(r2);
+}
+
+void ZLQtViewWidget::onMultiTouchReleaseDetected(QRect r1, QRect r2)
+{
+    QRect rect_released = r1.united(r2);
+
+    float zoomRate = rect_released.width() * 1.0 / rect_pressed_.width();
+
+    ZLIntegerRangeOption &sizeOption = ZLTextStyleCollection::instance().baseStyle().FontSizeOption;
+    long size = (long) (sizeOption.value() * zoomRate);
+    sizeOption.setValue(size);
+
+    myApplication->doAction("updateOptions");
 }

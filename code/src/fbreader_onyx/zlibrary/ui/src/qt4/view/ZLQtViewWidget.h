@@ -134,6 +134,9 @@ private:
 
     void findHyperlink(bool next);
 
+    void onMultiTouchPressDetected(QRect r1, QRect r2);
+    void onMultiTouchReleaseDetected(QRect r1, QRect r2);
+
 private:
     void repaint();
     void trackStylus(bool track);
@@ -210,6 +213,8 @@ private:
     QPoint point_;
 
     std::string last_id_;
+
+    QRect rect_pressed_;
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */
