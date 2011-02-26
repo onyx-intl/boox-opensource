@@ -41,6 +41,14 @@ bool DjvuApplication::open( const QString &path_name )
     connect( &sys_status, SIGNAL( aboutToShutdown() ), this, SLOT( onAboutToShutDown() ) );
     connect( &sys_status, SIGNAL( wakeup() ), this, SLOT( onWakeUp() ) );
 
+    // connect the long press and multi-point signals
+    connect(&sys_status, SIGNAL( mouseLongPress(QPoint, QSize) ), view,
+            SLOT( onMouseLongPress(QPoint, QSize) ));
+    connect(&sys_status, SIGNAL( multiTouchPressDetected(QRect, QRect) ), view,
+            SLOT( onMultiTouchPressDetected(QRect, QRect) ));
+    connect(&sys_status, SIGNAL( multiTouchReleaseDetected(QRect, QRect) ),
+            view, SLOT( onMultiTouchReleaseDetected(QRect, QRect) ));
+
 #ifdef Q_WS_QWS
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
 #endif

@@ -414,6 +414,92 @@ bool DjvuView::flip(int direction)
     return false;
 }
 
+void DjvuView::onMouseLongPress(QPoint point, QSize size)
+{
+    onPopupMenu();
+}
+
+void DjvuView::onMultiTouchPressDetected(QRect p_rec1, QRect p_rec2)
+{
+    origin_central_1_ = p_rec1.center();
+    origin_central_2_ = p_rec2.center();
+}
+
+float DjvuView::getRealZoomFactor(float current_factor)
+{
+    float real = current_factor;
+    if (current_factor <= 0)
+    {
+        if (layout_pages_.size() > 0)
+        {
+            VisiblePages::iterator idx = layout_pages_.begin();
+            PagePtr visible_page = *idx;
+            QRect actual_area = visible_page->actualArea();
+            float real_ratio = ((float)rect().height())/((float)actual_area.height());
+            real = real_ratio;
+        }
+        else
+        {
+            real = 30;
+        }
+    }
+    return real;
+}
+
+bool DjvuView::multiTouchZoom(float diagonal_changed)
+{
+    int diagonal_length_per_step = 100;
+    int zoom_ratio_per_step = 25;
+    int zoom_ratio_per_step_below_100 = 5;
+
+    float current_zoom_ratio = getRealZoomFactor(layout_->zoomSetting());
+    float changed_ratio;
+    if (current_zoom_ratio < 100)
+    {
+        changed_ratio = (diagonal_changed) / 100
+                * zoom_ratio_per_step_below_100;
+    } else
+    {
+        changed_ratio = (diagonal_changed) / 100 * zoom_ratio_per_step;
+    }
+    float new_zoom_ratio = current_zoom_ratio + changed_ratio;
+    qDebug() << "djvu view, old ratio: " << current_zoom_ratio;
+    qDebug() << "djvu view, new ratio: " << new_zoom_ratio;
+    bool ret = true;
+    if (abs((int) changed_ratio) > 5)
+    {
+        float max = 400;
+        float min = 10;
+        if (new_zoom_ratio > max)
+        {
+            new_zoom_ratio = max;
+        } else if (new_zoom_ratio < min)
+        {
+            new_zoom_ratio = min;
+        }
+        ret = zooming(new_zoom_ratio);
+    }
+    return ret;
+}
+
+void DjvuView::onMultiTouchReleaseDetected(QRect p_rec1, QRect p_rec2)
+{
+    QPoint dest_point_1 = p_rec1.center();
+    QPoint dest_point_2 = p_rec2.center();
+
+    float diagonal_origin = sqrt( pow(abs(origin_central_1_.x()-origin_central_2_.x()), 2)
+        + pow(abs(origin_central_1_.y()-origin_central_2_.y()), 2) );
+    float diagonal_dest = sqrt( pow(abs(dest_point_1.x()-dest_point_2.x()), 2)
+            + pow(abs(dest_point_1.y()-dest_point_2.y()), 2) );
+    float diagonal_changed = diagonal_dest - diagonal_origin;
+
+    bool ret = multiTouchZoom(diagonal_changed);
+    if (ret)
+    {
+        emit requestUpdateParent(true);
+    }
+}
+
 void DjvuView::onPageRenderReady(DjVuPagePtr page)
 {
     if (page->isThumbnail())

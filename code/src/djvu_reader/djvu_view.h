@@ -51,6 +51,11 @@ public Q_SLOTS:
 
     void autoFlipMultiplePages();
 
+    // long press and multi-point
+    void onMouseLongPress(QPoint, QSize);
+    void onMultiTouchPressDetected(QRect, QRect);
+    void onMultiTouchReleaseDetected(QRect, QRect);
+
 private Q_SLOTS:
     void onDocReady();
     void onDocError(QString msg, QString file_name, int line_no);
@@ -181,6 +186,10 @@ private:
     // full screen
     bool isFullScreenCalculatedByWidgetSize();
 
+    // multi-touch
+    float getRealZoomFactor(float current_factor);
+    bool multiTouchZoom(float diagonal_changed);
+
 private:
     DjvuModel               *model_;                    ///< Djvu model
     scoped_ptr<PageLayout>  layout_;                    ///< pages layout
@@ -228,6 +237,10 @@ private:
 
     // current waveform
     onyx::screen::ScreenProxy::Waveform  current_waveform_;
+
+    // multi-touch
+    QPoint origin_central_1_;
+    QPoint origin_central_2_;
 };
 
 /// clear all of the visible pages
