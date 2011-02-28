@@ -502,7 +502,7 @@ void PlayerView::setTime(qint64 t)
         {
             onyx::screen::instance().enableUpdate(false);
             //qDebug("Set Time:%d, %d", (int)t, int(core_->totalTime()));
-            status_bar_.setProgress(t, core_->totalTime());
+            status_bar_.setProgress(t, core_->totalTime(), false);
             onyx::screen::instance().enableUpdate(true);
             onyx::screen::instance().updateWidget(&status_bar_, onyx::screen::ScreenProxy::DW, false, onyx::screen::ScreenCommand::WAIT_COMMAND_FINISH);
         }
