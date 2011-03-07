@@ -40,6 +40,16 @@
 
 #include "onyx/screen/screen_proxy.h"
 
+static bool support16GrayScale()
+{
+    static int gray = 0;
+    if (gray <= 0)
+    {
+        gray = sys::SysStatus::instance().grayScale();
+    }
+    return (gray == 16);
+}
+
 void ZLQtDialogManager::createApplicationWindow(ZLApplication *application) const {
 	new ZLQtApplicationWindow(application);
 }
@@ -210,10 +220,15 @@ void ZLQtApplicationWindow::updateScreen()
     }
     else
     {
+        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::INVALID;
+        if (support16GrayScale())
+        {
+            w = onyx::screen::ScreenProxy::GC4;
+        }
         onyx::screen::instance().updateWidgetWithGCInterval(
             this,
             NULL,
-            onyx::screen::ScreenProxy::INVALID,
+            w,
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);
     }
