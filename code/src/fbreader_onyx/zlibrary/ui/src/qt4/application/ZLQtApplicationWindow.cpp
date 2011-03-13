@@ -220,7 +220,7 @@ void ZLQtApplicationWindow::updateScreen()
     }
     else
     {
-        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::INVALID;
+        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
         if (support16GrayScale())
         {
             w = onyx::screen::ScreenProxy::GC4;
