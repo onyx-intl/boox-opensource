@@ -150,8 +150,7 @@ void ThumbnailView::readyToShow()
 
     // update page bar
     emit positionChanged(display_pages_.front()->key(), model_->getPagesTotalNumber());
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
-    update();
+    update(onyx::screen::ScreenProxy::GU);
 }
 
 bool ThumbnailView::reachedFirstScreen(ThumbPtr page)
@@ -448,7 +447,7 @@ void ThumbnailView::moveCurrentPage(const int next_num)
         {
             cur_thumb_index_ = display_pages_.size() - 1;
         }
-        update();
+        update(onyx::screen::ScreenProxy::DW);
     }
 }
 
@@ -570,9 +569,8 @@ void ThumbnailView::popupMenu()
             emit returnToReading();
             break;
         case SCREEN_UPDATE_TYPE:
-            onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, true);
             onyx::screen::instance().toggleWaveform();
-            update();
+            update(onyx::screen::ScreenProxy::GU);
             break;
         case ROTATE_SCREEN:
             rotate();
@@ -602,6 +600,12 @@ void ThumbnailView::rotate()
     }
 #endif
     SysStatus::instance().rotateScreen();
+}
+
+void ThumbnailView::update(onyx::screen::ScreenProxy::Waveform waveform)
+{
+    onyx::screen::ScreenUpdateWatcher::instance().enqueue(this, waveform);
+    QWidget::update();
 }
 
 }

@@ -78,6 +78,9 @@ private:
     // get thumbnail layout page by key
     ThumbnailPage& getLayoutPage(const int key);
 
+    // screen update
+    void update(onyx::screen::ScreenProxy::Waveform waveform);
+
 private:
     DjvuModel*                  model_;
     ThumbnailLayout             layout_;
