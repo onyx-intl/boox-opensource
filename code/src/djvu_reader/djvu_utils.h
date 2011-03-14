@@ -31,6 +31,7 @@
 #include "onyx/sys/sys_conf.h"
 
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
 
 #include "libdjvu/ddjvuapi.h"
 #include "libdjvu/miniexp.h"

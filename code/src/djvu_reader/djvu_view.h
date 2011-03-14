@@ -190,6 +190,9 @@ private:
     float getRealZoomFactor(float current_factor);
     bool multiTouchZoom(float diagonal_changed);
 
+    // screen update
+    void update(onyx::screen::ScreenProxy::Waveform waveform);
+
 private:
     DjvuModel               *model_;                    ///< Djvu model
     scoped_ptr<PageLayout>  layout_;                    ///< pages layout
