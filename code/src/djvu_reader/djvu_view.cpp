@@ -1094,6 +1094,8 @@ void DjvuView::onUpdateBookmark()
     }
 
     int ret = notes_dialog_->popup(previous_title);
+    update(onyx::screen::ScreenProxy::GC);
+
     if (ret == QDialog::Accepted)
     {
         QString content = notes_dialog_->inputText();
@@ -1559,11 +1561,7 @@ void DjvuView::displayOutlines( bool )
     percentages.push_back(20);
     outline_view.tree().setColumnWidth(percentages);
     int ret = outline_view.popup( tr("Table of Contents") );
-
-    // Returned from the TOC view
-    onyx::screen::instance().enableUpdate( false );
-    QApplication::processEvents();
-    onyx::screen::instance().enableUpdate( true );
+    update(onyx::screen::ScreenProxy::GC);
 
     if (ret != QDialog::Accepted)
     {
@@ -1823,11 +1821,7 @@ void DjvuView::displayBookmarks()
     percentages.push_back(20);
     bookmarks_view.tree().setColumnWidth(percentages);
     int ret = bookmarks_view.popup( tr("Bookmarks") );
-
-    // Returned from the TOC view
-    onyx::screen::instance().enableUpdate( false );
-    QApplication::processEvents();
-    onyx::screen::instance().enableUpdate( true );
+    update(onyx::screen::ScreenProxy::GC);
 
     if (ret != QDialog::Accepted)
     {
