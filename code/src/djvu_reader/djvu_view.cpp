@@ -1979,7 +1979,8 @@ bool DjvuView::isFullScreenCalculatedByWidgetSize()
 
 void DjvuView::update(onyx::screen::ScreenProxy::Waveform waveform)
 {
-    onyx::screen::ScreenUpdateWatcher::instance().enqueue(this, waveform);
+
+    onyx::screen::ScreenUpdateWatcher::instance().enqueue(parentWidget() != 0 ? parentWidget() : this, waveform);
     QWidget::update();
 }
 

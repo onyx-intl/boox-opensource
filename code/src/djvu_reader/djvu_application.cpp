@@ -26,6 +26,11 @@ bool DjvuApplication::open( const QString &path_name )
 {
     main_window_.attachModel(&model_);
     main_window_.show();
+
+    sys::SystemConfig conf;
+    onyx::screen::watcher().addWatcher(&main_window_,
+            conf.screenUpdateGCInterval());
+
     DjvuView *view = down_cast<DjvuView*>(main_window_.activateView(DJVU_VIEW));
 
     // connect the signals with view
