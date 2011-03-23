@@ -851,7 +851,7 @@ void ZLQtViewWidget::showTableOfContents()
     std::vector<QStandardItem *> ptrs;
     QStandardItemModel model;
     QStandardItem *parent = model.invisibleRootItem();
-    for (int i = 0;i < paragraphs.size();++i)
+    for (size_t i = 0;i < paragraphs.size();++i)
     {
         QStandardItem *item = new QStandardItem(QString::fromUtf8(titles[i].c_str()));
         item->setData(i,Qt::UserRole+100);
@@ -1483,7 +1483,7 @@ void ZLQtViewWidget::onMultiTouchReleaseDetected(QRect r1, QRect r2)
 {
     QRect r = r1.united(r2);
 
-    float diagonal_length_changed = sqrt(r.width() * r.width() + r.height() * r.height()) - sqrt(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height());
+    float diagonal_length_changed = sqrt(static_cast<float>(r.width() * r.width() + r.height() * r.height())) - sqrt(static_cast<float>(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height()));
     float diagonal_length_per_fontsize = 100 / 2; // 100 pixel for 2 fontsize 
 
     ZLIntegerRangeOption &sizeOption = ZLTextStyleCollection::instance().baseStyle().FontSizeOption;
