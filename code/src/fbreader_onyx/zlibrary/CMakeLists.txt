@@ -146,4 +146,4 @@ add_library(zlibrary
   ${zlibrary_text_headers} ${zlibrary_text_srcs}
   ${zlibrary_ui_sys_headers} ${ZLIBRARY_ui_sys_srcs}
   ${moc_zlibrary_ui_srcs})
-target_link_libraries(zlibrary ${QT_LIBRARIES})
+target_link_libraries(zlibrary ${QT_LIBRARIES} )

@@ -179,7 +179,7 @@ private:
     QWidget *myFrame;
     Widget *myQWidget;
 
-    StatusBar  *status_bar_;
+    ui::StatusBar  *status_bar_;
     EncodingActions encoding_actions_;
     FontFamilyActions font_family_actions_;
     FontActions font_actions_;

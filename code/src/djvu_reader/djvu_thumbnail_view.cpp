@@ -604,7 +604,9 @@ void ThumbnailView::rotate()
 
 void ThumbnailView::update(onyx::screen::ScreenProxy::Waveform waveform)
 {
+
     onyx::screen::ScreenUpdateWatcher::instance().enqueue(parentWidget() != 0 ? parentWidget() : this, waveform);
+
     QWidget::update();
 }
 
