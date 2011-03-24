@@ -134,6 +134,7 @@ target_link_libraries(onyx_reader fb_reader zlibrary expat bz2 linebreak
   onyx_data
   onyx_cms
   onyx_ui
+  epd_utils
   dictionary
   tts
   sound
