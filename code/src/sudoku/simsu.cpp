@@ -39,6 +39,7 @@ Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
     m_board->setAutoSwitch(false);
     showMaximized();
     m_board->cell(0,0)->setFocus();
+    connect(m_board,SIGNAL(toShowBoard()),this, SLOT(showBoard()));
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
 }

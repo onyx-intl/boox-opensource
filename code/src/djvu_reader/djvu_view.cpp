@@ -487,10 +487,10 @@ void DjvuView::onMultiTouchReleaseDetected(QRect p_rec1, QRect p_rec2)
     QPoint dest_point_1 = p_rec1.center();
     QPoint dest_point_2 = p_rec2.center();
 
-    float diagonal_origin = sqrt( pow(abs(origin_central_1_.x()-origin_central_2_.x()), 2)
-        + pow(abs(origin_central_1_.y()-origin_central_2_.y()), 2) );
-    float diagonal_dest = sqrt( pow(abs(dest_point_1.x()-dest_point_2.x()), 2)
-            + pow(abs(dest_point_1.y()-dest_point_2.y()), 2) );
+    float diagonal_origin = sqrt( pow(static_cast<double>(abs(origin_central_1_.x()-origin_central_2_.x())), 2)
+        + pow(static_cast<double>(abs(origin_central_1_.y()-origin_central_2_.y())), 2) );
+    float diagonal_dest = sqrt( pow(static_cast<double>(abs(dest_point_1.x()-dest_point_2.x())), 2)
+        + pow(static_cast<double>(abs(dest_point_1.y()-dest_point_2.y())), 2) );
     float diagonal_changed = diagonal_dest - diagonal_origin;
 
     bool ret = multiTouchZoom(diagonal_changed);
@@ -582,7 +582,7 @@ void DjvuView::handleNormalPageReady(DjVuPagePtr page)
     }
 
     // redraw the Qt image buffer and make sure mandatory update the view
-    update();
+    update(onyx::screen::ScreenProxy::instance().defaultWaveform());
 }
 
 void DjvuView::displayThumbnailView()
@@ -1094,6 +1094,8 @@ void DjvuView::onUpdateBookmark()
     }
 
     int ret = notes_dialog_->popup(previous_title);
+    update(onyx::screen::ScreenProxy::GC);
+
     if (ret == QDialog::Accepted)
     {
         QString content = notes_dialog_->inputText();
@@ -1559,11 +1561,7 @@ void DjvuView::displayOutlines( bool )
     percentages.push_back(20);
     outline_view.tree().setColumnWidth(percentages);
     int ret = outline_view.popup( tr("Table of Contents") );
-
-    // Returned from the TOC view
-    onyx::screen::instance().enableUpdate( false );
-    QApplication::processEvents();
-    onyx::screen::instance().enableUpdate( true );
+    update(onyx::screen::ScreenProxy::GC);
 
     if (ret != QDialog::Accepted)
     {
@@ -1619,23 +1617,24 @@ bool DjvuView::zooming( double zoom_setting )
 
 void DjvuView::zoomInPress( QMouseEvent *me )
 {
-    current_waveform_ = onyx::screen::instance().defaultWaveform();
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
     stroke_area_.initArea(me->pos());
     if (rubber_band_ == 0)
     {
         rubber_band_.reset(new QRubberBand(QRubberBand::Rectangle, this));
     }
-    rubber_band_->setGeometry(QRect(stroke_area_.getOriginPosition(),
-                                    QSize()));
+
+    QRect rubber_rect(stroke_area_.getOriginPosition(), QSize());
+    onyx::screen::ScreenUpdateWatcher::instance().enqueue(this, rubber_rect, onyx::screen::ScreenProxy::DW);
+    rubber_band_->setGeometry(rubber_rect);
     rubber_band_->show();
 }
 
 void DjvuView::zoomInMove( QMouseEvent *me )
 {
     stroke_area_.expandArea(me->pos());
-    rubber_band_->setGeometry(QRect(stroke_area_.getOriginPosition(),
-                                    me->pos()).normalized());
+    QRect rubber_rect(QRect(stroke_area_.getOriginPosition(), me->pos()).normalized());
+    onyx::screen::ScreenUpdateWatcher::instance().enqueue(this, rubber_rect, onyx::screen::ScreenProxy::DW);
+    rubber_band_->setGeometry(rubber_rect);
 }
 
 void DjvuView::zoomIn(const QRect &zoom_rect)
@@ -1652,10 +1651,7 @@ void DjvuView::zoomInRelease( QMouseEvent *me )
     // clear the background
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
 
-    // return to previous waveform
-    onyx::screen::instance().setDefaultWaveform(current_waveform_);
-
-    sys::SysStatus::instance().setSystemBusy(true);
+    sys::SysStatus::instance().setSystemBusy(true, false);
     zoomIn(stroke_area_.getRect());
     status_mgr_.setStatus(ID_ZOOM_IN, FUNC_NORMAL);
 }
@@ -1825,11 +1821,7 @@ void DjvuView::displayBookmarks()
     percentages.push_back(20);
     bookmarks_view.tree().setColumnWidth(percentages);
     int ret = bookmarks_view.popup( tr("Bookmarks") );
-
-    // Returned from the TOC view
-    onyx::screen::instance().enableUpdate( false );
-    QApplication::processEvents();
-    onyx::screen::instance().enableUpdate( true );
+    update(onyx::screen::ScreenProxy::GC);
 
     if (ret != QDialog::Accepted)
     {
@@ -1858,7 +1850,7 @@ bool DjvuView::addBookmark()
         int end = visible_pages.back()->key();
         if (model_->addBookmark(start, end))
         {
-            update();
+            update(onyx::screen::ScreenProxy::GU);
             update_bookmark_timer_.start();
             return true;
         }
@@ -1877,7 +1869,7 @@ bool DjvuView::deleteBookmark()
         int end = visible_pages.back()->key();
         if (model_->deleteBookmark(start, end))
         {
-            update();
+            update(onyx::screen::ScreenProxy::GU);
             return true;
         }
     }
@@ -1983,6 +1975,13 @@ bool DjvuView::isFullScreenCalculatedByWidgetSize()
         }
     }
     return false;
+}
+
+void DjvuView::update(onyx::screen::ScreenProxy::Waveform waveform)
+{
+
+    onyx::screen::ScreenUpdateWatcher::instance().enqueue(parentWidget() != 0 ? parentWidget() : this, waveform);
+    QWidget::update();
 }
 
 }

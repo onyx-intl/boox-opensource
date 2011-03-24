@@ -60,7 +60,6 @@ private:
         };
         QList<State> m_states;
         int m_current_state;
-
 public slots:
         void updateValue();
 private:

@@ -1,5 +1,6 @@
 #include <model/playlistitem.h>
 #include <core/fileinfo.h>
+#include <QTime>
 
 #include "player_view.h"
 
@@ -224,6 +225,7 @@ void PlayerView::createLayout()
 {
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Base);
+
 
     vbox_.setSpacing(0);
     vbox_.setContentsMargins(0, 0, 0, 0);
@@ -495,6 +497,15 @@ void PlayerView::updateEQ()
 
 void PlayerView::setTime(qint64 t)
 {
+    QTime corrent_t(0, 0, 0);
+    QTime total_t(0, 0, 0);
+    corrent_t=corrent_t.addMSecs( (int)t );
+    total_t=total_t.addMSecs( (int)core_->totalTime() );
+    QString msg=corrent_t.toString()+"/"+total_t.toString();
+    
+    if( total_t.hour()<1 )
+        msg=corrent_t.toString(QString("mm:ss"))+" / "+total_t.toString(QString("mm:ss"));
+
     if (progress_bar_enabled_ && isVisible() && core_->totalTime() >= t)
     {
         static int count = 0;
@@ -502,7 +513,7 @@ void PlayerView::setTime(qint64 t)
         {
             onyx::screen::instance().enableUpdate(false);
             //qDebug("Set Time:%d, %d", (int)t, int(core_->totalTime()));
-            status_bar_.setProgress(t, core_->totalTime(), false);
+            status_bar_.setProgress(t, core_->totalTime(), true, msg);
             onyx::screen::instance().enableUpdate(true);
             onyx::screen::instance().updateWidget(&status_bar_, onyx::screen::ScreenProxy::DW, false, onyx::screen::ScreenCommand::WAIT_COMMAND_FINISH);
         }

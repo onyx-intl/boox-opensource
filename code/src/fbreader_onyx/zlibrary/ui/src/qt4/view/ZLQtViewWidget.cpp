@@ -36,6 +36,7 @@
 
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
@@ -851,7 +852,7 @@ void ZLQtViewWidget::showTableOfContents()
     std::vector<QStandardItem *> ptrs;
     QStandardItemModel model;
     QStandardItem *parent = model.invisibleRootItem();
-    for (int i = 0;i < paragraphs.size();++i)
+    for (size_t i = 0;i < paragraphs.size();++i)
     {
         QStandardItem *item = new QStandardItem(QString::fromUtf8(titles[i].c_str()));
         item->setData(i,Qt::UserRole+100);
@@ -1143,10 +1144,11 @@ void ZLQtViewWidget::showSearchWidget()
 {
     if (!search_widget_)
     {
-        search_widget_.reset(new SearchWidget(widget(), search_context_));
-        connect(search_widget_.get(), SIGNAL(search(BaseSearchContext &)),
-            this, SLOT(onSearch(BaseSearchContext &)));
+        search_widget_.reset(new OnyxSearchDialog(widget(), search_context_));
+        connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
+            this, SLOT(onSearch(OnyxSearchContext &)));
         connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
+        onyx::screen::watcher().addWatcher(search_widget_.get());
     }
 
     search_context_.userData() = BEFORE_SEARCH;
@@ -1160,7 +1162,7 @@ bool ZLQtViewWidget::updateSearchCriteria()
     return true;
 }
 
-void ZLQtViewWidget::onSearch(BaseSearchContext& context)
+void ZLQtViewWidget::onSearch(OnyxSearchContext& context)
 {
     if (search_context_.userData() <= BEFORE_SEARCH)
     {
@@ -1483,7 +1485,7 @@ void ZLQtViewWidget::onMultiTouchReleaseDetected(QRect r1, QRect r2)
 {
     QRect r = r1.united(r2);
 
-    float diagonal_length_changed = sqrt(r.width() * r.width() + r.height() * r.height()) - sqrt(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height());
+    float diagonal_length_changed = sqrt(static_cast<float>(r.width() * r.width() + r.height() * r.height())) - sqrt(static_cast<float>(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height()));
     float diagonal_length_per_fontsize = 100 / 2; // 100 pixel for 2 fontsize 
 
     ZLIntegerRangeOption &sizeOption = ZLTextStyleCollection::instance().baseStyle().FontSizeOption;

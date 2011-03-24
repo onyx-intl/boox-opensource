@@ -32,7 +32,7 @@
 #include "onyx/dictionary/dict_widget.h"
 #include "onyx/sound/sound.h"
 #include "onyx/tts/tts_widget.h"
-
+#include "onyx/ui/onyx_search_dialog.h"
 
 
 class QGridLayout;
@@ -84,7 +84,7 @@ public Q_SLOTS:
     void rotateScreen();
     void quit();
 
-    void onSearch(BaseSearchContext&);
+    void onSearch(OnyxSearchContext&);
     bool updateSearchWidget();
     void onSearchClosed();
 
@@ -179,7 +179,7 @@ private:
     QWidget *myFrame;
     Widget *myQWidget;
 
-    StatusBar  *status_bar_;
+    ui::StatusBar  *status_bar_;
     EncodingActions encoding_actions_;
     FontFamilyActions font_family_actions_;
     FontActions font_actions_;
@@ -207,8 +207,8 @@ private:
     QStringList text_to_speak_;
     int tts_paragraph_index_;
 
-    BaseSearchContext search_context_;
-    scoped_ptr<SearchWidget> search_widget_;
+    OnyxSearchContext search_context_;
+    scoped_ptr<OnyxSearchDialog> search_widget_;
 
     ZLApplication *myApplication;
     bool conf_stored_;

@@ -71,14 +71,16 @@ public:
         return m_moves;
     }
 
-    int getRow(){
-        return m_row;}
-    int getColumn(){
-        return m_column;}
+    int getRow() {
+        return m_row;
+    }
+    int getColumn() {
+        return m_column;
+    }
 signals:
     void activeKeyChanged ( int key );
     void notesModeChanged ( bool mode );
-
+    void toShowBoard();
 public slots:
     void showWrong ( bool show = true );
     void setActiveKey ( int key );
@@ -86,6 +88,10 @@ public slots:
     void setAutoSwitch ( bool auto_switch );
     void setHighlightActive ( bool highlight );
     void setMode ( int mode );
+    void showBoard()
+    {
+        emit toShowBoard();
+    }
 protected:
     bool event(QEvent *e) {
         return Frame::event ( e );

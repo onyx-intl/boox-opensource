@@ -243,17 +243,19 @@ void Cell::mouseMoveEvent ( QMouseEvent* event ) {
 /*****************************************************************************/
 
 void Cell::mousePressEvent ( QMouseEvent* event ) {
-    if ( !m_given && !m_board->isFinished() ) {
-        if ( m_board->autoSwitch() ) {
-            if ( event->button() == Qt::LeftButton ) {
-                m_board->setMode ( false );
-            } else if ( event->button() == Qt::RightButton ) {
-                m_board->setMode ( true );
-            }
-        }
-        updateValue();
-    }
-    Frame::mousePressEvent ( event );
+//     if ( !m_given && !m_board->isFinished() ) {
+//         if ( m_board->autoSwitch() ) {
+//             if ( event->button() == Qt::LeftButton ) {
+//                 m_board->setMode ( false );
+//             } else if ( event->button() == Qt::RightButton ) {
+//                 m_board->setMode ( true );
+//             }
+//         }
+//         updateValue();
+//     }
+//     Frame::mousePressEvent ( event );
+    m_board->moveFocus(m_column,m_row-1,0,1);
+    m_board->showBoard();
 }
 
 /*****************************************************************************/
