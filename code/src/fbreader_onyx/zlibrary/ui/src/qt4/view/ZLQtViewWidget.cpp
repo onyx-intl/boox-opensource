@@ -36,6 +36,7 @@
 
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
@@ -1143,10 +1144,11 @@ void ZLQtViewWidget::showSearchWidget()
 {
     if (!search_widget_)
     {
-        search_widget_.reset(new SearchWidget(widget(), search_context_));
-        connect(search_widget_.get(), SIGNAL(search(BaseSearchContext &)),
-            this, SLOT(onSearch(BaseSearchContext &)));
+        search_widget_.reset(new OnyxSearchDialog(widget(), search_context_));
+        connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
+            this, SLOT(onSearch(OnyxSearchContext &)));
         connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
+        onyx::screen::watcher().addWatcher(search_widget_.get());
     }
 
     search_context_.userData() = BEFORE_SEARCH;
@@ -1160,7 +1162,7 @@ bool ZLQtViewWidget::updateSearchCriteria()
     return true;
 }
 
-void ZLQtViewWidget::onSearch(BaseSearchContext& context)
+void ZLQtViewWidget::onSearch(OnyxSearchContext& context)
 {
     if (search_context_.userData() <= BEFORE_SEARCH)
     {
