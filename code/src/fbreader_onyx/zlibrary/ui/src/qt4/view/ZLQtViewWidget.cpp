@@ -1154,7 +1154,7 @@ void ZLQtViewWidget::showSearchWidget()
     search_context_.userData() = BEFORE_SEARCH;
     hideHelperWidget(dict_widget_.get());
     hideHelperWidget(tts_widget_.get());
-    search_widget_->ensureVisible();
+    search_widget_->showNormal();
 }
 
 bool ZLQtViewWidget::updateSearchCriteria()
