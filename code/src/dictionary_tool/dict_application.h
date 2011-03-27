@@ -1,7 +1,8 @@
 #ifndef DICT_APPLICATION_H_
 #define DICT_APPLICATION_H_
 
-#include "onyx/dictionary/dict_frame.h"
+//#include "onyx/dictionary/dict_frame.h"
+#include "onyx/dictionary/onyx_dict_frame.h"
 
 using namespace ui;
 
@@ -38,7 +39,7 @@ public Q_SLOTS:
 private:
     tts::TTS                tts_engine_;
     DictionaryManager       dict_mgr_;
-    scoped_ptr<DictFrame>   frame_;
+    scoped_ptr<OnyxDictFrame>   frame_;
     NO_COPY_AND_ASSIGN(DictApplication);
 };
 
