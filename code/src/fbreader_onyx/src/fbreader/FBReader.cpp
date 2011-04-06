@@ -488,6 +488,16 @@ void FBReader::loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::
     }
 }
 
+QString FBReader::filePath()
+{
+    QString filePath;
+    if (myModel)
+    {
+        filePath = myModel->description()->fileName().data();
+    }
+    return filePath;
+}
+
 void FBReader::gotoParagraph(int pos)
 {
     ZLTextModel & aaModel = *myModel->contentsModel();

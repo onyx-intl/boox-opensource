@@ -33,6 +33,7 @@
 #include "ZLQtPaintContext.h"
 #include "ZLTextStyle.h"
 #include "ZLTextView.h"
+#include "../dialogs/ZLFileListDialog.h"
 
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
@@ -107,6 +108,8 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
 , enable_text_selection_(false)
 , conf_stored_(false)
 , point_(0,0)
+, reach_page_up_boundary_(false)
+, reach_page_down_boundary_(false)
 {
     has_touch = sys_status_.hasTouchScreen();
 
@@ -891,6 +894,38 @@ void ZLQtViewWidget::showTableOfContents()
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
+void ZLQtViewWidget::triggerLargeScrollAction(const std::string &actionId)
+{
+    // for suggesting open next/previous text file
+    QString current_file_path = myApplication->filePath();
+    if (!current_file_path.isEmpty())
+    {
+        if ((reach_page_up_boundary_ && "largeScrollBackward" == actionId)
+                || (reach_page_down_boundary_ && "largeScrollForward" == actionId))
+        {
+            QRegExp reg_exp("\\.(txt)$", Qt::CaseInsensitive);
+            QFileInfo file(current_file_path);
+            QDir current_dir = file.dir();
+
+            QStringList file_list = dirList(current_dir, &reg_exp);
+            int index = file_list.indexOf(file.fileName());
+
+            ZLFileListDialog dialog(file_list, index, 0);
+            int ret = dialog.exec();
+            if (QDialog::Accepted == ret)
+            {
+                QString selected = file_list.at(dialog.selectedFile());
+                QString selected_path = current_dir.path() + "/" + selected;
+                myApplication->openFile(selected_path.toUtf8().data());
+                myFrame->update();
+                return;
+            }
+        }
+    }
+
+    myApplication->doAction(actionId);
+}
+
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
 {
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
@@ -929,10 +964,10 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             stopDictLookup();
             break;
         case Qt::Key_PageDown:
-            myApplication->doAction("largeScrollForward");
+            triggerLargeScrollAction("largeScrollForward");
             break;
         case Qt::Key_PageUp:
-            myApplication->doAction("largeScrollBackward");
+            triggerLargeScrollAction("largeScrollBackward");
             break;
         }
     }
@@ -1014,7 +1049,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 {
                     hyperlink_selected_ = false;    
                     ptr->selectionModel().clear();
-                    myApplication->doAction("largeScrollBackward");
+                    triggerLargeScrollAction("largeScrollBackward");
 
                     break;
                 }
@@ -1028,7 +1063,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 {
                     hyperlink_selected_ = false;    
                     ptr->selectionModel().clear();
-                    myApplication->doAction("largeScrollForward");
+                    triggerLargeScrollAction("largeScrollForward");
 
                     break;
                 }
@@ -1055,20 +1090,37 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             case Qt::Key_PageUp:
                 {
                     tts_engine_->stop();
-                    myApplication->doAction("largeScrollBackward");
+                    triggerLargeScrollAction("largeScrollBackward");
                     startTTS();
                     break;
                 }
             case Qt::Key_PageDown:
                 {
                     tts_engine_->stop();
-                    myApplication->doAction("largeScrollForward");
+                    triggerLargeScrollAction("largeScrollForward");
                     startTTS();
                     break;
                 }
             }
         }
     }
+}
+
+
+QStringList ZLQtViewWidget::dirList(QDir &qdir, QRegExp *filter,
+        QDir::Filters ftype)
+{
+    QStringList list;
+
+    qdir.setFilter(ftype);
+    qdir.setSorting(QDir::Name);
+
+    if (filter)
+        list = qdir.entryList().filter((*filter));
+    else
+        list = qdir.entryList();
+
+    return list;
 }
 
 void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
@@ -1089,6 +1141,31 @@ void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
     {
         current = total;
     }
+
+    if (!myApplication->filePath().isEmpty())
+    {
+        if (1 == total)
+        {
+            reach_page_up_boundary_ = true;
+            reach_page_down_boundary_ = true;
+        }
+        else if (to >= full)
+        {
+            reach_page_up_boundary_ = false;
+            reach_page_down_boundary_ = true;
+        }
+        else if (0 == from)
+        {
+            reach_page_up_boundary_ = true;
+            reach_page_down_boundary_ = false;
+        }
+        else
+        {
+            reach_page_up_boundary_ = false;
+            reach_page_down_boundary_ = false;
+        }
+    }
+
     status_bar_->setProgress(current, total);
 }
 
@@ -1256,13 +1333,13 @@ void ZLQtViewWidget::nextPage()
 {
     if (!isLastPage())
     {
-        myApplication->doAction("largeScrollForward");
+        triggerLargeScrollAction("largeScrollForward");
     }
 }
 
 void ZLQtViewWidget::prevPage()
 {
-    myApplication->doAction("largeScrollBackward");
+    triggerLargeScrollAction("largeScrollBackward");
 }
 
 bool ZLQtViewWidget::isLastPage()
