@@ -8,7 +8,7 @@ namespace player
 
 PlayerApplication::PlayerApplication(int &argc, char **argv)
     : QApplication(argc, argv)
-    , view_()
+    , view_(0)
     , current_time_(0)
     , hide_view_on_waking_up(false)
 {
@@ -116,6 +116,7 @@ bool PlayerApplication::open(const QString &path_name)
     //else
     {
         view_.show();
+        onyx::screen::watcher().addWatcher(&view_);
         sys::SysStatus::instance().setSystemBusy( false );
         onyx::screen::instance().enableUpdate(true);
         onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC);

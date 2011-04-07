@@ -9,6 +9,7 @@
 #include "onyx/ui/languages.h"
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 
 #include <QMainWindow>

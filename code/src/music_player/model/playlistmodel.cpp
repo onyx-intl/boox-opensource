@@ -904,7 +904,8 @@ QStandardItemModel* PlayListModel::standardItemModel()
     {
         play_list_model_.reset(new QStandardItemModel);
         int row = 0;
-        play_list_model_->setColumnCount(3);
+        play_list_model_->setColumnCount(4);
+        qDebug() << "in PlayListModel::standardItemModel, item size: " << items_.size();
         foreach(PlayListItem* item, items_)
         {
             //QString name_str = item->url().contains('/') ?
@@ -936,6 +937,12 @@ QStandardItemModel* PlayListModel::standardItemModel()
             artist->setEditable(false);
             artist->setTextAlignment(Qt::AlignCenter);
             play_list_model_->setItem(row, 2, artist);
+
+            QString album_str = item->album();
+            QStandardItem *album = new QStandardItem(album_str);
+            album->setEditable(false);
+            album->setTextAlignment(Qt::AlignCenter);
+            play_list_model_->setItem(row, 3, album);
             row++;
         }
     }
@@ -943,6 +950,7 @@ QStandardItemModel* PlayListModel::standardItemModel()
     play_list_model_->setHeaderData(0, Qt::Horizontal, QVariant::fromValue(tr("Song")), Qt::DisplayRole);
     play_list_model_->setHeaderData(1, Qt::Horizontal, QVariant::fromValue(tr("Title")), Qt::DisplayRole);
     play_list_model_->setHeaderData(2, Qt::Horizontal, QVariant::fromValue(tr("Artist")), Qt::DisplayRole);
+    play_list_model_->setHeaderData(3, Qt::Horizontal, QVariant::fromValue(tr("Album")), Qt::DisplayRole);
     return play_list_model_.get();
 }
 

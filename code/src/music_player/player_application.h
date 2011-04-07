@@ -2,7 +2,7 @@
 #define PLAYER_APPLICATION_H_
 
 #include <utils/player_utils.h>
-#include "player_view.h"
+#include "onyx_player_view.h"
 
 using namespace ui;
 
@@ -17,7 +17,7 @@ public:
     PlayerApplication(int &argc, char **argv);
     ~PlayerApplication(void);
 
-    PlayerView* view() { return &view_; }
+    OnyxPlayerView* view() { return &view_; }
 
 Q_SIGNALS:
     void stateChanged(int curr);
@@ -38,7 +38,7 @@ private Q_SLOTS:
     void onResetTime();
 
 private:
-    PlayerView                  view_;
+    OnyxPlayerView              view_;
     scoped_ptr<PlayListModel>   model_;
     QString                     path_;          // path of the document
     qint64                      current_time_;
