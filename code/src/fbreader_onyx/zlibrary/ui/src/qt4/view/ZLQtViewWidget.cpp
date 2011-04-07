@@ -898,7 +898,7 @@ void ZLQtViewWidget::triggerLargeScrollAction(const std::string &actionId)
 {
     // for suggesting open next/previous text file
     QString current_file_path = myApplication->filePath();
-    if (!current_file_path.isEmpty())
+    if (!current_file_path.isEmpty() && current_file_path.endsWith(".txt"))
     {
         if ((reach_page_up_boundary_ && "largeScrollBackward" == actionId)
                 || (reach_page_down_boundary_ && "largeScrollForward" == actionId))
@@ -1142,7 +1142,8 @@ void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
         current = total;
     }
 
-    if (!myApplication->filePath().isEmpty())
+    QString file_path = myApplication->filePath();
+    if (!file_path.isEmpty() && file_path.endsWith(".txt"))
     {
         if (1 == total)
         {
