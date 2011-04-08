@@ -76,6 +76,8 @@ private:
     void createMenuView();
     void connectWithChildren();
 
+    void keyReleaseEvent(QKeyEvent * ke);
+
 private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;
@@ -97,6 +99,7 @@ private:
     OnyxLabel total_time_label_;
 
     CatalogView song_list_view_;
+    QProgressBar progress_bar_;
     CatalogView menu_view_;
 
     StatusBar status_bar_;

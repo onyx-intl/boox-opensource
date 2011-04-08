@@ -180,6 +180,8 @@ void OnyxPlayerView::createLayout()
     big_layout_.addLayout(&artist_layout_);
     big_layout_.addLayout(&album_layout_);
 
+    big_layout_.addWidget(&progress_bar_, 0, Qt::AlignBottom);
+
     big_layout_.addWidget(&menu_view_, 0, Qt::AlignBottom);
     big_layout_.addWidget(&status_bar_, 0, Qt::AlignBottom);
 }
@@ -205,7 +207,13 @@ void OnyxPlayerView::createSongListView()
     }
 
     song_list_view_.setSpacing(2);
+
+    if (rows < 10)
+    {
+        rows = 10;
+    }
     song_list_view_.setFixedGrid(rows, 1);
+
     int single_height = defaultItemHeight()+6*SPACING;
     song_list_view_.setFixedHeight(single_height*rows);
     song_list_view_.setData(ds);
@@ -269,6 +277,16 @@ void OnyxPlayerView::connectWithChildren()
             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
 }
 
+void OnyxPlayerView::keyReleaseEvent(QKeyEvent * ke)
+{
+    if (ke->key() == Qt::Key_Escape)
+    {
+        minimize(true);
+        ke->accept();
+        return;
+    }
+    OnyxDialog::keyReleaseEvent(ke);
+}
 
 void OnyxPlayerView::showState(PlayerUtils::State state)
 {
@@ -335,11 +353,10 @@ void OnyxPlayerView::setTime(qint64 t)
         if (count == 0)
         {
             onyx::screen::instance().enableUpdate(false);
-            qDebug() << "Set Time: " << msg;
-//            status_bar_.setProgress(t, core_->totalTime(), true, msg);
+            progress_bar_.setValue(t/1000);
             onyx::screen::instance().enableUpdate(true);
-            onyx::screen::instance().updateWidget(&status_bar_,
-                    onyx::screen::ScreenProxy::DW, false,
+            onyx::screen::watcher().enqueue(&progress_bar_,
+                    onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_COMMAND_FINISH);
         }
         if (count >= 8)
@@ -533,13 +550,13 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
 void OnyxPlayerView::onNextClicked(bool)
 {
     next();
-    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
 void OnyxPlayerView::onPrevClicked(bool)
 {
     previous();
-    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
 void OnyxPlayerView::onSystemVolumeChanged(int value, bool muted)
@@ -574,6 +591,10 @@ void OnyxPlayerView::onCurrentChanged()
                 }
             }
         }
+
+        // init progress bar
+        progress_bar_.setMinimum(0);
+        progress_bar_.setMaximum(core_->totalTime()/1000);
     }
 }
 
@@ -652,6 +673,8 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
         {
             model_->setCurrent(row);
             play();
+            update();
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
     }
 }

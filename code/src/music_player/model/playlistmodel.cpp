@@ -905,7 +905,6 @@ QStandardItemModel* PlayListModel::standardItemModel()
         play_list_model_.reset(new QStandardItemModel);
         int row = 0;
         play_list_model_->setColumnCount(4);
-        qDebug() << "in PlayListModel::standardItemModel, item size: " << items_.size();
         foreach(PlayListItem* item, items_)
         {
             //QString name_str = item->url().contains('/') ?
