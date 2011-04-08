@@ -78,6 +78,8 @@ private:
 
     void keyReleaseEvent(QKeyEvent * ke);
 
+    QString timeMessage(qint64 time);
+
 private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;
@@ -85,16 +87,20 @@ private:
     QVBoxLayout big_layout_;
     QHBoxLayout window_title_layout_;
     QHBoxLayout artist_layout_;
+    QHBoxLayout title_layout_;
     QHBoxLayout album_layout_;
+    QHBoxLayout time_layout_;
 
     OnyxLabel window_icon_label_;
     OnyxLabel window_title_label_;
 
+    OnyxLabel title_title_label_;
     OnyxLabel title_label_;
     OnyxLabel artist_title_label_;
     OnyxLabel artist_label_;
     OnyxLabel album_title_label_;
     OnyxLabel album_label_;
+
     OnyxLabel current_time_label_;
     OnyxLabel total_time_label_;
 

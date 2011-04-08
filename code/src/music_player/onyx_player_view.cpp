@@ -28,6 +28,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , core_(new SoundCore(this))
     , big_layout_(&content_widget_)
     , window_title_layout_(0)
+    , title_layout_(0)
     , artist_layout_(0)
     , album_layout_(0)
     , song_list_view_(0, this)
@@ -147,9 +148,10 @@ void OnyxPlayerView::createLayout()
 
     createMenuView();
 
-    title_label_.setText("");
-    title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    title_label_.setFixedHeight(defaultItemHeight());
+    title_title_label_.setText(QCoreApplication::tr("Title: "));
+    title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    title_title_label_.setFixedHeight(defaultItemHeight());
+    title_title_label_.setFixedWidth(100);
 
     artist_title_label_.setText(QCoreApplication::tr("Artist: "));
     artist_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
@@ -161,6 +163,14 @@ void OnyxPlayerView::createLayout()
     album_title_label_.setFixedHeight(defaultItemHeight());
     album_title_label_.setFixedWidth(100);
 
+    current_time_label_.setText("00:00");
+    current_time_label_.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    current_time_label_.setFixedHeight(defaultItemHeight());
+
+    total_time_label_.setText("00:00");
+    total_time_label_.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    total_time_label_.setFixedHeight(defaultItemHeight());
+
     window_title_layout_.setContentsMargins(SPACING, 0, SPACING, 0);
     window_title_layout_.addWidget(&window_icon_label_);
     window_title_layout_.addSpacing(SPACING*4);
@@ -171,14 +181,26 @@ void OnyxPlayerView::createLayout()
     big_layout_.addLayout(&window_title_layout_);
     big_layout_.addWidget(&song_list_view_, 1, Qt::AlignTop);
 
-    // add audio title, artist, album
-    big_layout_.addWidget(&title_label_);
+    // add title info
+    title_layout_.addWidget(&title_title_label_);
+    title_layout_.addWidget(&title_label_);
+    big_layout_.addLayout(&title_layout_);
+
+    // add artist info
     artist_layout_.addWidget(&artist_title_label_);
     artist_layout_.addWidget(&artist_label_);
+    big_layout_.addLayout(&artist_layout_);
+
+    // add album info
     album_layout_.addWidget(&album_title_label_);
     album_layout_.addWidget(&album_label_);
-    big_layout_.addLayout(&artist_layout_);
     big_layout_.addLayout(&album_layout_);
+
+    time_layout_.addSpacing(SPACING*2);
+    time_layout_.addWidget(&current_time_label_, 0, Qt::AlignLeft);
+    time_layout_.addWidget(&total_time_label_, 0, Qt::AlignRight);
+    time_layout_.addSpacing(SPACING*2);
+    big_layout_.addLayout(&time_layout_);
 
     big_layout_.addWidget(&progress_bar_, 0, Qt::AlignBottom);
 
@@ -189,7 +211,7 @@ void OnyxPlayerView::createLayout()
 void OnyxPlayerView::createSongListView()
 {
     const int height = defaultItemHeight()+4*SPACING;
-    song_list_view_.setPreferItemSize(QSize(height, height));
+    song_list_view_.setPreferItemSize(QSize(-1, height));
     ODatas ds;
 
     QStandardItemModel * item_model = model_->standardItemModel();
@@ -207,15 +229,9 @@ void OnyxPlayerView::createSongListView()
     }
 
     song_list_view_.setSpacing(2);
-
-    if (rows < 10)
-    {
-        rows = 10;
-    }
-    song_list_view_.setFixedGrid(rows, 1);
-
+    song_list_view_.setFixedGrid(10, 1);
     int single_height = defaultItemHeight()+6*SPACING;
-    song_list_view_.setFixedHeight(single_height*rows);
+    song_list_view_.setFixedHeight(single_height*10);
     song_list_view_.setData(ds);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::RECYCLE_DOWN);
@@ -336,17 +352,24 @@ void OnyxPlayerView::setProgress(int p)
     core_->seek(p);
 }
 
+QString OnyxPlayerView::timeMessage(qint64 time)
+{
+    QTime qtime(0, 0, 0);
+    qtime = qtime.addMSecs((int)time);
+    QString msg;
+    if (qtime.hour() < 1)
+    {
+        msg = qtime.toString("mm:ss");
+    }
+    else
+    {
+        msg = qtime.toString();
+    }
+    return msg;
+}
+
 void OnyxPlayerView::setTime(qint64 t)
 {
-    QTime corrent_t(0, 0, 0);
-    QTime total_t(0, 0, 0);
-    corrent_t=corrent_t.addMSecs( (int)t );
-    total_t=total_t.addMSecs( (int)core_->totalTime() );
-    QString msg=corrent_t.toString()+"/"+total_t.toString();
-
-    if( total_t.hour()<1 )
-        msg=corrent_t.toString(QString("mm:ss"))+" / "+total_t.toString(QString("mm:ss"));
-
     if (progress_bar_enabled_ && isVisible() && core_->totalTime() >= t)
     {
         static int count = 0;
@@ -354,7 +377,10 @@ void OnyxPlayerView::setTime(qint64 t)
         {
             onyx::screen::instance().enableUpdate(false);
             progress_bar_.setValue(t/1000);
+            current_time_label_.setText(timeMessage(t));
             onyx::screen::instance().enableUpdate(true);
+            onyx::screen::watcher().enqueue(&current_time_label_,
+                    onyx::screen::ScreenProxy::GU);
             onyx::screen::watcher().enqueue(&progress_bar_,
                     onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_COMMAND_FINISH);
@@ -499,7 +525,7 @@ void OnyxPlayerView::close(bool)
     saveSettings();
 
     emit stateChanged(STOP_PLAYER);
-    qApp->exit();
+    onCloseClicked();
 }
 
 void OnyxPlayerView::minimize(bool)
@@ -595,6 +621,12 @@ void OnyxPlayerView::onCurrentChanged()
         // init progress bar
         progress_bar_.setMinimum(0);
         progress_bar_.setMaximum(core_->totalTime()/1000);
+
+        // set total time
+        total_time_label_.setText(timeMessage(core_->totalTime()));
+        total_time_label_.update();
+        onyx::screen::watcher().enqueue(&total_time_label_,
+                onyx::screen::ScreenProxy::GU);
     }
 }
 

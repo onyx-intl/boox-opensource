@@ -18,7 +18,7 @@ ZLFileListDialog::ZLFileListDialog(const QStringList &file_list,
     , selected_file_(0)
 {
     createLayout();
-    resize(300, 100 + file_list_.size()*defaultItemHeight());
+    resize(bestDialogSize());
     onyx::screen::watcher().addWatcher(this);
 }
 
@@ -49,7 +49,7 @@ void ZLFileListDialog::createLayout()
 
 void ZLFileListDialog::createFileList()
 {
-    file_list_view_.setPreferItemSize(QSize(120, defaultItemHeight()));
+    file_list_view_.setPreferItemSize(QSize(-1, defaultItemHeight()));
 
     ODatas ds;
     int size = file_list_.size();
@@ -58,11 +58,13 @@ void ZLFileListDialog::createFileList()
         OData *dd = new OData;
         dd->insert(TAG_TITLE, file_list_.at(i));
         dd->insert(TAG_FILE_INDEX, i);
+        int alignment = Qt::AlignLeft | Qt::AlignVCenter;
+        dd->insert(TAG_ALIGN, alignment);
         ds.push_back(dd);
     }
     file_list_view_.setData(ds);
 
-    file_list_view_.setFixedGrid(size, 1);
+    file_list_view_.setFixedGrid(bestDialogSize().height() / defaultItemHeight() - 2 , 1);
     file_list_view_.setSearchPolicy(CatalogView::AutoVerRecycle);
 }
 
