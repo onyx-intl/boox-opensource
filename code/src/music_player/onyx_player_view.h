@@ -42,12 +42,12 @@ public Q_SLOTS:
     void close(bool);
     void minimize(bool);
 
+    void playModeClicked();
     void onPlayPauseClicked(bool);
     void onNextClicked(bool);
     void onPrevClicked(bool);
 
 Q_SIGNALS:
-    void repeatableChanged(bool);
     void stateChanged(int);
     void testReload();
 
@@ -64,8 +64,6 @@ private Q_SLOTS:
     void onSystemVolumeChanged(int value, bool muted);
     void onCurrentChanged();
     void onProgressClicked(const int percent, const int value);
-    void onShuffleStatusChanged(bool yes);
-    void onRepeatListChanged(bool yes);
 
 private:
     void loadSettings();
@@ -77,6 +75,7 @@ private:
     void connectWithChildren();
 
     void keyReleaseEvent(QKeyEvent * ke);
+    void mouseReleaseEvent(QMouseEvent *me);
 
     QString timeMessage(qint64 time);
 
@@ -111,7 +110,7 @@ private:
     StatusBar status_bar_;
 
     QPixmap normal_mode_pixmap_;
-    QPixmap repeat_mode_pixmap_;
+    QPixmap single_repeat_mode_pixmap_;
     QPixmap shuffle_mode_pixmap_;
     QPixmap play_pixmap_;
     QPixmap pause_pixmap_;
@@ -120,7 +119,8 @@ private:
     SystemActions system_actions_;
 
     // flags
-    bool repeat_;
+    bool single_repeat_mode_;
+    bool shuffle_mode_;
     bool seeking_;
     bool paused_;
     bool progress_bar_enabled_;

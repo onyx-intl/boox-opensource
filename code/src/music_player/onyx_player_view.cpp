@@ -34,7 +34,8 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , song_list_view_(0, this)
     , menu_view_(0, this)
     , status_bar_(this, MENU | PROGRESS | BATTERY)
-    , repeat_(false)
+    , single_repeat_mode_(false)
+    , shuffle_mode_(false)
     , seeking_(false)
     , paused_(false)
     , progress_bar_enabled_(true)
@@ -141,7 +142,7 @@ void OnyxPlayerView::createLayout()
     window_title_label_.setFixedHeight(defaultItemHeight());
 
     normal_mode_pixmap_ = QPixmap(":/player_icons/normal.png");
-    repeat_mode_pixmap_ = QPixmap(":/player_icons/repeat.png");
+    single_repeat_mode_pixmap_ = QPixmap(":/player_icons/repeat.png");
     shuffle_mode_pixmap_ = QPixmap(":/player_icons/shuffle.png");
     play_pixmap_ = QPixmap(":/player_icons/play.png");
     pause_pixmap_ = QPixmap(":/player_icons/pause.png");
@@ -304,6 +305,20 @@ void OnyxPlayerView::keyReleaseEvent(QKeyEvent * ke)
     OnyxDialog::keyReleaseEvent(ke);
 }
 
+void OnyxPlayerView::mouseReleaseEvent(QMouseEvent *me)
+{
+    QPoint pt = progress_bar_.mapFrom(this, me->pos());
+    if (progress_bar_.rect().contains(pt))
+    {
+        double x = (double)pt.x();
+        double width = (double)progress_bar_.width();
+        double percentage = x / width;
+        int value = (int)(core_->totalTime()*percentage);
+        core_->seek(value);
+        progress_bar_.setValue(value/1000);
+    }
+}
+
 void OnyxPlayerView::showState(PlayerUtils::State state)
 {
     int current_state = MUSIC_PLAYING;
@@ -312,21 +327,18 @@ void OnyxPlayerView::showState(PlayerUtils::State state)
         case PlayerUtils::Playing:
         {
             qDebug("Playing");
-//            play_pause_button_.setIcon(pause_icon_);
             break;
         }
         case PlayerUtils::Paused:
         {
             qDebug("Paused");
             current_state = MUSIC_PAUSED;
-//            play_pause_button_.setIcon(play_icon_);
             break;
         }
         case PlayerUtils::Stopped:
         {
             qDebug("Stopped");
             current_state = MUSIC_STOPPED;
-//            play_pause_button_.setIcon(play_icon_);
             break;
         }
     }
@@ -378,12 +390,30 @@ void OnyxPlayerView::setTime(qint64 t)
             onyx::screen::instance().enableUpdate(false);
             progress_bar_.setValue(t/1000);
             current_time_label_.setText(timeMessage(t));
+
+            // update total time
+            bool update_total = false;
+            QString total_time_msg = timeMessage(core_->totalTime());
+            if (total_time_label_.text() != total_time_msg)
+            {
+                progress_bar_.setMaximum(core_->totalTime()/1000);
+                total_time_label_.setText(timeMessage(core_->totalTime()));
+                update_total = true;
+            }
+
             onyx::screen::instance().enableUpdate(true);
+
+            if (update_total)
+            {
+                total_time_label_.update();
+                onyx::screen::watcher().enqueue(&total_time_label_,
+                        onyx::screen::ScreenProxy::GU);
+            }
+            current_time_label_.update();
             onyx::screen::watcher().enqueue(&current_time_label_,
                     onyx::screen::ScreenProxy::GU);
             onyx::screen::watcher().enqueue(&progress_bar_,
-                    onyx::screen::ScreenProxy::GU,
-                    onyx::screen::ScreenCommand::WAIT_COMMAND_FINISH);
+                    onyx::screen::ScreenProxy::GU);
         }
         if (count >= 8)
         {
@@ -541,6 +571,59 @@ void OnyxPlayerView::minimize(bool)
     }
 }
 
+void OnyxPlayerView::playModeClicked()
+{
+    ContentView *mode_button_ = menu_view_.visibleSubItems().front();
+    if (single_repeat_mode_)
+    {
+        if (mode_button_->data() && mode_button_->data()->contains(TAG_COVER))
+        {
+            mode_button_->data()->insert(TAG_COVER, shuffle_mode_pixmap_);
+        }
+
+        single_repeat_mode_ = false;
+        shuffle_mode_ = true;
+    }
+    else if (shuffle_mode_)
+    {
+        if (mode_button_->data() && mode_button_->data()->contains(TAG_COVER))
+        {
+            mode_button_->data()->insert(TAG_COVER, normal_mode_pixmap_);
+        }
+
+        single_repeat_mode_ = false;
+        shuffle_mode_ = false;
+    }
+    else
+    {
+        // normal mode
+        if (mode_button_->data() && mode_button_->data()->contains(TAG_COVER))
+        {
+            mode_button_->data()->insert(TAG_COVER, single_repeat_mode_pixmap_);
+        }
+
+        single_repeat_mode_ = true;
+        shuffle_mode_ = false;
+    }
+
+    model_->prepareForRepeatablePlaying(true);
+    model_->prepareForShufflePlaying(shuffle_mode_);
+
+    // for single song repeat
+    if (!single_repeat_mode_)
+    {
+        disconnect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
+        connect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
+    }
+    else
+    {
+        disconnect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
+        connect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
+    }
+    menu_view_.update();
+    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
+}
+
 void OnyxPlayerView::onPlayPauseClicked(bool)
 {
     if (core_->state() == PlayerUtils::Playing)
@@ -569,7 +652,6 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
         }
     }
     menu_view_.update();
-    update();
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
 }
 
@@ -635,20 +717,6 @@ void OnyxPlayerView::onProgressClicked(const int percent, const int value)
     core_->seek(value);
 }
 
-void OnyxPlayerView::onShuffleStatusChanged(bool yes)
-{
-//    shuffle_button_.setIcon(yes ? normal_icon_ : shuffle_icon_);
-//    shuffle_button_.setChecked(yes);
-    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
-}
-
-void OnyxPlayerView::onRepeatListChanged(bool yes)
-{
-//    cycle_button_.setIcon(yes ? cycle_selected_icon_ : cycle_icon_);
-//    cycle_button_.setChecked(yes);
-    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
-}
-
 void OnyxPlayerView::onLoadingFinished()
 {
     createSongListView();
@@ -673,8 +741,7 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
         int menu_type = item_data->value(TAG_MENU_TYPE).toInt();
         if (MENU_MODE == menu_type)
         {
-            // TODO change mode
-            qDebug() << "mode clicked.";
+            playModeClicked();
         }
         else if (MENU_PREVIOUS == menu_type)
         {
