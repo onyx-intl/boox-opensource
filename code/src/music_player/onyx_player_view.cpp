@@ -22,6 +22,20 @@ enum MusicPlayerMenuType
 const static QSize MENU_ITEM_SIZE = QSize(60, 60);
 const static QString TAG_ROW = "row";
 
+const static QString PROGRESS_BAR_STYLE = " \
+QProgressBar:horizontal                     \
+{                                           \
+    border: 2px solid gray;                 \
+    border-radius: 3px;                     \
+    background: white;                      \
+    padding: 1px;                           \
+}                                           \
+QProgressBar::chunk:horizontal              \
+{                                           \
+    background: black;                      \
+}";
+
+
 OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     : OnyxDialog(parent)
     , model_(0)
@@ -98,8 +112,8 @@ void OnyxPlayerView::saveSettings()
     PlayerUtils::setRightVolume(core_->rightVolume());
 
     // save status of shuffle and repeatable playing
-//    PlayerUtils::setShuffled(shuffle_button_.isChecked());
-//    PlayerUtils::setRepeatableList(cycle_button_.isChecked());
+    PlayerUtils::setShuffled(shuffle_mode_);
+    PlayerUtils::setRepeatableList(true);
 }
 
 void OnyxPlayerView::attachModel(PlayListModel *m)
@@ -147,8 +161,6 @@ void OnyxPlayerView::createLayout()
     play_pixmap_ = QPixmap(":/player_icons/play.png");
     pause_pixmap_ = QPixmap(":/player_icons/pause.png");
 
-    createMenuView();
-
     title_title_label_.setText(QCoreApplication::tr("Title: "));
     title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     title_title_label_.setFixedHeight(defaultItemHeight());
@@ -171,6 +183,12 @@ void OnyxPlayerView::createLayout()
     total_time_label_.setText("00:00");
     total_time_label_.setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     total_time_label_.setFixedHeight(defaultItemHeight());
+
+    progress_bar_.setStyleSheet(PROGRESS_BAR_STYLE);
+    progress_bar_.setTextVisible(false);
+
+
+    createMenuView();
 
     window_title_layout_.setContentsMargins(SPACING, 0, SPACING, 0);
     window_title_layout_.addWidget(&window_icon_label_);
