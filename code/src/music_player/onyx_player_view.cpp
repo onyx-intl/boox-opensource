@@ -186,7 +186,7 @@ void OnyxPlayerView::createLayout()
 
 void OnyxPlayerView::createSongListView()
 {
-    const int height = defaultItemHeight();
+    const int height = defaultItemHeight()+4*SPACING;
     song_list_view_.setPreferItemSize(QSize(height, height));
     ODatas ds;
 
@@ -197,13 +197,16 @@ void OnyxPlayerView::createSongListView()
         QStandardItem *item = item_model->item(i);
         OData *dd = new OData;
         dd->insert(TAG_TITLE, item->text());
+        dd->insert(TAG_FONT_SIZE, 22);
+        int alignment = Qt::AlignLeft | Qt::AlignVCenter;
+        dd->insert(TAG_ALIGN, alignment);
         dd->insert(TAG_ROW, i);
         ds.push_back(dd);
     }
 
     song_list_view_.setSpacing(2);
     song_list_view_.setFixedGrid(rows, 1);
-    int single_height = defaultItemHeight()+2*SPACING;
+    int single_height = defaultItemHeight()+6*SPACING;
     song_list_view_.setFixedHeight(single_height*rows);
     song_list_view_.setData(ds);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
@@ -512,8 +515,9 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
     {
         if (item->data()->contains(TAG_MENU_TYPE))
         {
-            int menu_type = item->data()->value(TAG_MENU_TYPE).toInt();
-            if (MENU_PLAY == menu_type)
+            bool ok;
+            int menu_type = item->data()->value(TAG_MENU_TYPE).toInt(&ok);
+            if (ok && MENU_PLAY == menu_type)
             {
                 item->data()->insert(TAG_COVER,
                         paused_? pause_pixmap_: play_pixmap_);
@@ -521,6 +525,8 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
             }
         }
     }
+    menu_view_.update();
+    update();
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
 }
 
@@ -559,8 +565,9 @@ void OnyxPlayerView::onCurrentChanged()
         {
             if (item->data()->contains(TAG_ROW))
             {
-                int row = item->data()->value(TAG_ROW).toInt();
-                if (current_row == row)
+                bool ok;
+                int row = item->data()->value(TAG_ROW).toInt(&ok);
+                if (ok && current_row == row)
                 {
                     item->setFocus();
                     break;
