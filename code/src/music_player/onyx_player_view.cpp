@@ -147,7 +147,7 @@ void OnyxPlayerView::createLayout()
     vbox_.removeWidget(&title_widget_);
     content_widget_.setBackgroundRole(QPalette::Button);
 
-    window_icon_label_.setPixmap(QPixmap(":/player_icons/music_player_small.png"));
+    window_icon_label_.setPixmap(QPixmap(":/player_icons2/music_player_small.png"));
     window_icon_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     window_icon_label_.setFixedHeight(defaultItemHeight());
 
@@ -155,11 +155,11 @@ void OnyxPlayerView::createLayout()
     window_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     window_title_label_.setFixedHeight(defaultItemHeight());
 
-    normal_mode_pixmap_ = QPixmap(":/player_icons/normal.png");
-    single_repeat_mode_pixmap_ = QPixmap(":/player_icons/repeat.png");
-    shuffle_mode_pixmap_ = QPixmap(":/player_icons/shuffle.png");
-    play_pixmap_ = QPixmap(":/player_icons/play.png");
-    pause_pixmap_ = QPixmap(":/player_icons/pause.png");
+    normal_mode_pixmap_ = QPixmap(":/player_icons2/normal.png");
+    single_repeat_mode_pixmap_ = QPixmap(":/player_icons2/repeat.png");
+    shuffle_mode_pixmap_ = QPixmap(":/player_icons2/shuffle.png");
+    play_pixmap_ = QPixmap(":/player_icons2/play.png");
+    pause_pixmap_ = QPixmap(":/player_icons2/pause.png");
 
     title_title_label_.setText(QCoreApplication::tr("Title: "));
     title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
