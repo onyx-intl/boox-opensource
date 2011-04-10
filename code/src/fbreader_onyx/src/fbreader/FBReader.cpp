@@ -215,6 +215,8 @@ bool FBReader::initWindow() {
         {
             desc.encoding() = conf().options[CONFIG_ENCODING].toString().toStdString();
         }
+        conf().info.mutable_authors() = QString::fromLocal8Bit(desc.author()->displayName().c_str());
+        conf().info.mutable_title() = QString::fromLocal8Bit(desc.title().c_str());
         ZLApplication::EncodingOption.setValue(desc.encoding());
         openBook(description);
     }
