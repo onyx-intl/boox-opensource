@@ -139,6 +139,7 @@ private:
 
     void findHyperlink(bool next);
 
+    bool suggestTextFiles(const QString &file_path, bool forward);
     void triggerLargeScrollAction(const std::string &actionId);
 
 private:
@@ -222,9 +223,6 @@ private:
 
     QRect rect_pressed_;
 
-    // for opening previous/next text (.txt) file in current diretory
-    bool reach_page_up_boundary_;
-    bool reach_page_down_boundary_;
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */

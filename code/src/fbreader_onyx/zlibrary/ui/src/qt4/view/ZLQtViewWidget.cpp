@@ -108,8 +108,6 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
 , enable_text_selection_(false)
 , conf_stored_(false)
 , point_(0,0)
-, reach_page_up_boundary_(false)
-, reach_page_down_boundary_(false)
 {
     has_touch = sys_status_.hasTouchScreen();
 
@@ -894,32 +892,67 @@ void ZLQtViewWidget::showTableOfContents()
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
+bool ZLQtViewWidget::suggestTextFiles(const QString &file_path, bool forward)
+{
+    QRegExp reg_exp("\\.(txt)$", Qt::CaseInsensitive);
+    QFileInfo file(file_path);
+    QDir current_dir = file.dir();
+
+    QStringList file_list = dirList(current_dir, &reg_exp);
+    int index = file_list.indexOf(file.fileName());
+
+    // don't suggest when only one file exists
+    if (file_list.size() < 2)
+    {
+        return false;
+    }
+
+    if ( (forward && index == file_list.size()-1)
+            || (!forward && 0 == index))
+    {
+        return false;
+    }
+
+    ZLFileListDialog dialog(file_list, index, 0);
+    int ret = dialog.exec();
+    if (QDialog::Accepted == ret)
+    {
+        QString selected = file_list.at(dialog.selectedFile());
+        QString selected_path = current_dir.path() + "/" + selected;
+        myApplication->openFile(selected_path.toUtf8().data());
+        myFrame->update();
+        return true;
+    }
+    return false;
+}
+
 void ZLQtViewWidget::triggerLargeScrollAction(const std::string &actionId)
 {
     // for suggesting open next/previous text file
     QString current_file_path = myApplication->filePath();
-    if (!current_file_path.isEmpty() && current_file_path.endsWith(".txt"))
+    if (!current_file_path.isEmpty() && current_file_path.endsWith(".txt")
+            && 0 != full_)
     {
-        if ((reach_page_up_boundary_ && "largeScrollBackward" == actionId)
-                || (reach_page_down_boundary_ && "largeScrollForward" == actionId))
+        bool suggested = false;
+        if ("largeScrollBackward" == actionId)
         {
-            QRegExp reg_exp("\\.(txt)$", Qt::CaseInsensitive);
-            QFileInfo file(current_file_path);
-            QDir current_dir = file.dir();
-
-            QStringList file_list = dirList(current_dir, &reg_exp);
-            int index = file_list.indexOf(file.fileName());
-
-            ZLFileListDialog dialog(file_list, index, 0);
-            int ret = dialog.exec();
-            if (QDialog::Accepted == ret)
+            if (0 == from_)
             {
-                QString selected = file_list.at(dialog.selectedFile());
-                QString selected_path = current_dir.path() + "/" + selected;
-                myApplication->openFile(selected_path.toUtf8().data());
-                myFrame->update();
-                return;
+                suggested = suggestTextFiles(current_file_path, false);
             }
+        }
+        else if ("largeScrollForward" == actionId)
+        {
+            if (to_ >= full_)
+            {
+                suggested = suggestTextFiles(current_file_path, true);
+            }
+        }
+
+        if (suggested)
+        {
+            // don't do the scroll action if suggested
+            return;
         }
     }
 
@@ -1140,31 +1173,6 @@ void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
     if (to >= full)
     {
         current = total;
-    }
-
-    QString file_path = myApplication->filePath();
-    if (!file_path.isEmpty() && file_path.endsWith(".txt"))
-    {
-        if (1 == total)
-        {
-            reach_page_up_boundary_ = true;
-            reach_page_down_boundary_ = true;
-        }
-        else if (to >= full)
-        {
-            reach_page_up_boundary_ = false;
-            reach_page_down_boundary_ = true;
-        }
-        else if (0 == from)
-        {
-            reach_page_up_boundary_ = true;
-            reach_page_down_boundary_ = false;
-        }
-        else
-        {
-            reach_page_up_boundary_ = false;
-            reach_page_down_boundary_ = false;
-        }
     }
 
     status_bar_->setProgress(current, total);
