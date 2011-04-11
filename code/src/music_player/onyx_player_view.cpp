@@ -77,6 +77,12 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     SysStatus & sys_status = SysStatus::instance();
     connect(&sys_status, SIGNAL(volumeChanged(int, bool)), this, SLOT(onSystemVolumeChanged(int, bool)));
 
+    // show page info in status bar
+    connect(&song_list_view_, SIGNAL(positionChanged(const int, const int)),
+            &status_bar_, SLOT(setProgress(const int, const int)));
+    connect(&status_bar_,  SIGNAL(progressClicked(const int, const int)),
+            &song_list_view_, SLOT(onPagebarClicked(const int, const int)));
+
     createLayout();
     connectWithChildren();
 }
@@ -267,7 +273,7 @@ void OnyxPlayerView::createMenuView()
     ds.push_back(dd);
 
     dd = new OData;
-    QPixmap prev_pixmap(":/player_icons/previous.png");
+    QPixmap prev_pixmap(":/player_icons2/previous.png");
     dd->insert(TAG_COVER, prev_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_PREVIOUS);
     ds.push_back(dd);
@@ -278,19 +284,19 @@ void OnyxPlayerView::createMenuView()
     ds.push_back(dd);
 
     dd = new OData;
-    QPixmap next_pixmap(":/player_icons/next.png");
+    QPixmap next_pixmap(":/player_icons2/next.png");
     dd->insert(TAG_COVER, next_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_NEXT);
     ds.push_back(dd);
 
     dd = new OData;
-    QPixmap min_pixmap(":/player_icons/minimize.png");
+    QPixmap min_pixmap(":/player_icons2/minimize.png");
     dd->insert(TAG_COVER, min_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
     ds.push_back(dd);
 
     dd = new OData;
-    QPixmap exit_pixmap(":/player_icons/exit.png");
+    QPixmap exit_pixmap(":/player_icons2/exit.png");
     dd->insert(TAG_COVER, exit_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_EXIT);
     ds.push_back(dd);
@@ -693,10 +699,12 @@ void OnyxPlayerView::onSystemVolumeChanged(int value, bool muted)
 
 void OnyxPlayerView::onCurrentChanged()
 {
+    qDebug("in OnyxPlayerView::onCurrentChanged begin");
     int current_row = model_->currentRow();
     QModelIndex idx = model_->standardItemModel()->index(current_row, 0);
     if (idx.isValid())
     {
+        qDebug("in OnyxPlayerView::onCurrentChanged, is valid.");
         QStandardItem *info_item = model_->standardItemModel()->item(current_row, 1);
         title_label_.setText(info_item->text());
         info_item = model_->standardItemModel()->item(current_row, 2);
