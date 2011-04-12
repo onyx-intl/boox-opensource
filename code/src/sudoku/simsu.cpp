@@ -14,56 +14,79 @@
 #include "pattern.h"
 #include "square.h"
 #include "cell.h"
-#include "mdialog.h"
+
 
 using namespace ui;
 
-namespace onyx {
-namespace simsu {
+namespace onyx
+{
+namespace simsu
+{
 
-Simsu::Simsu ( QWidget *parent , Qt::WindowFlags f ) : QWidget ( parent, f ),
-    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH) {
+Simsu::Simsu(QWidget *parent , Qt::WindowFlags f) : QWidget(parent, f),
+    dialog_(new MDialog(parentWidget())),
+    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH)
+{
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
     QSettings settings;
     // Create board
-//     Square *square = new Square ( this );
-    m_board = new Board ( this );
+    QWidget *contents = new QWidget ( this );
+    Square *square = new Square(contents );
+    n_layout = new QHBoxLayout;
+    n_layout->setMargin(0);
+    m_board = new Board(square);
     m_board->setAutoSwitch(false);
-//     square->setChild ( m_board );
-    m_layout = new QGridLayout ( this );
-    m_layout->setContentsMargins(0, 0, 0, 0);
-    m_layout->addWidget(m_board);
+    square->setChild(m_board);
+    m_layout = new QVBoxLayout(contents);
+    m_layout->addSpacing(3);
+    m_layout->setContentsMargins(2, 2, 2, 2);
+    n_layout->addWidget(square,1);
+    m_layout->addSpacing(3);
+    m_layout->addSpacerItem(new QSpacerItem(5, 5, QSizePolicy::Minimum, QSizePolicy::Minimum));
+
+    m_layout->addLayout(n_layout);
     m_layout->addWidget(&status_bar_);
+    m_layout->setDirection(QBoxLayout::TopToBottom);
     setLayout(m_layout);
-    m_board->setAutoSwitch(false);
-    showMaximized();
     m_board->cell(0,0)->setFocus();
+
     connect(m_board,SIGNAL(toShowBoard()),this, SLOT(showBoard()));
-    onyx::screen::instance().enableUpdate ( true );
-    onyx::screen::instance().setDefaultWaveform ( onyx::screen::ScreenProxy::GC );
+    connect(dialog_, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
+    connect(dialog_, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
+    dialog_->setModal(true);
+    showMaximized();
+
+#ifndef BUILD_FOR_FB
+    onyx::screen::instance().enableUpdate(true);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
+#endif
 }
 
 Simsu::~Simsu()
 {
+    delete m_board;
+    delete dialog_;
 }
 
-void Simsu::closeEvent ( QCloseEvent *event ) {
-    QSettings().setValue ( "Geometry", saveGeometry() );
-    QWidget::closeEvent ( event );
-}
-
-
-bool Simsu::event ( QEvent *event )
+void Simsu::closeEvent(QCloseEvent *event)
 {
-    bool ret = QWidget::event ( event );
-    if (event->type() == QEvent::UpdateRequest /*&& global_update*/)
+    QSettings().setValue("Geometry", saveGeometry());
+    QWidget::closeEvent(event);
+}
+
+
+bool Simsu::event(QEvent *event)
+{
+    bool ret = QWidget::event(event);
+#ifndef BUILD_FOR_FB
+    if(event->type() == QEvent::UpdateRequest /*&& global_update*/)
     {
         QApplication::processEvents();
         onyx::screen::instance().updateWidget(0,onyx::screen::instance().defaultWaveform(),true, onyx::screen::ScreenCommand::WAIT_NONE);
         onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
     }
-
+#endif
     return ret;
 }
 
@@ -84,8 +107,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     OK  Qt::Key_Return
     */
     QApplication::processEvents();
-    //TODO encapsulate each part as functions
-    switch (event->key())
+    switch(event->key())
     {
     case Qt::Key_Escape:
         //use menudialog to quit
@@ -98,20 +120,20 @@ void Simsu::keyPressEvent(QKeyEvent* event)
         m_board->moves()->redo();
         break;
     case Qt::Key_Menu:
-    {
-        //TODO open menudialog
-        showMenu();
-    }
-    break;
+        {
+            //TODO open menudialog
+            showMenu();
+        }
+        break;
 
     case Qt::Key_Return:
-    {
-        showBoard();
-    }
-    break;
+        {
+            showBoard();
+        }
+        break;
 
     default:
-    //    QWidget::keyPressEvent(event);
+        QWidget::keyPressEvent(event);
         break;
     }
 }
@@ -121,75 +143,44 @@ void Simsu::showBoard()
     int column = m_board->getColumn();
     int row = m_board->getRow();
 
-    if (!m_board->cell(column,row)->given())
+    if(!m_board->cell(column,row)->given())
     {
-        MDialog *dialog = new MDialog(parentWidget());
+
         //TODO set position correctly
         //paitn rect
-        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected( true );
-        int res_c = column%3;
+        dialog_->hide();
+        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected(true);
         int group_c = column/3;
-        int res_r = row%3;
         int group_r = row/3;
 
-        switch (group_c)
+        //if column 1, moves to (3,3)
+        //esle if (group_r,group_c) = (1,1), moves to (6,3)
+        //else moves to  (3,0)
+        //
+        if (group_c == 0)
         {
-        case 0:
-            column++;
-            break;
-        case 1:
-            column -= res_c;
-            break;
-        case 2:
+            column = 3;
+            row = 3;
+        } else if (group_r ==1 && group_c == 1)
         {
-            column -= 4;
-            column -= res_c;
-            if (res_c == 2 ) {
-                column++;
-            } else if (res_c == 0 ) {
-                column--;
-            }
+            column = 3;
+            row = 6;
+        } else {
+            column = 0;
+            row = 3;
         }
-        break;
-        default:
-            break;
-        }
-        switch (group_r) {
-        case 0:
-            row++;
-            break;
-        case 1:
-        {
-            if (group_c == 1) {
-                if (res_r) {
-                    row -=4;
-                } else {
-                    row++;
-                }
-            } else {
-                row -= res_r;
-                row--;
-            }
-        }
-        break;
-        case 2:
-            row -= 4;
-            break;
-        default:
-            break;
-        }
-
         QPoint point = m_board->cell(column,row)->pos();
-        dialog->move(point.x(),point.y());
-
-        connect(dialog, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
-        connect(dialog, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
-        if (dialog->exec() == QDialog::Accepted) {
+        dialog_->move(point.x(),point.y());
+        dialog_->show();
+        if(dialog_->exec() == QDialog::Accepted)
+        {
             m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
         }
-        delete dialog;
-        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected( false );
+        dialog_->hide();
+        m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected(false);
+#ifndef BUILD_FOR_FB
         onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
+#endif
     }
     return;
 }
@@ -206,17 +197,18 @@ void Simsu::showMenu()
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     menu.setSystemAction(&system_actions_);
-    if (menu.popup() != QDialog::Accepted)
+    if(menu.popup() != QDialog::Accepted)
     {
         QApplication::processEvents();
         return;
     }
 
     QAction * group = menu.selectedCategory();
-    if (group == sudoku_actions_.category())
+    if(group == sudoku_actions_.category())
     {
         SudokuActionsType index = sudoku_actions_.selected();
-        switch (index) {
+        switch(index)
+        {
         case NEW:
             newGame();
             break;
@@ -229,34 +221,40 @@ void Simsu::showMenu()
         default:
             break;
         }
-    } else if (group == system_actions_.category()) {
+    }
+    else if(group == system_actions_.category())
+    {
         SystemAction system_action = system_actions_.selected();
-        switch (system_action)
+        switch(system_action)
         {
         case RETURN_TO_LIBRARY:
-        {
-            qApp->quit();
-        }
-        break;
+            {
+                qApp->quit();
+            }
+            break;
         case ROTATE_SCREEN:
-        {
-            sys::SysStatus::instance().rotateScreen();
-            update();
-        }
-        break;
+            {
+                sys::SysStatus::instance().rotateScreen();
+                update();
+            }
+            break;
         case SCREEN_UPDATE_TYPE:
-        {
-            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
-            onyx::screen::instance().toggleWaveform();
-        }
-        break;
+            {
+#ifndef BUILD_FOR_FB
+                onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+                onyx::screen::instance().toggleWaveform();
+#endif
+            }
+            break;
         case MUSIC:
-        {
-            // Start or show music player.
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
-            sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
-        }
-        break;
+            {
+                // Start or show music player.
+#ifndef BUILD_FOR_FB
+                onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+#endif
+                sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
+            }
+            break;
         default:
             break;
         }
@@ -265,10 +263,10 @@ void Simsu::showMenu()
 
 void Simsu::about()
 {
-    MessageDialog about ( QMessageBox::Icon ( QMessageBox::Information ) , tr ( "About Sudoku" ),
-                          tr ( "<center>A basic Sudoku game based on <b>Simsu 1.2.1</b><br/>\
+    MessageDialog about(QMessageBox::Icon(QMessageBox::Information) , tr("About Sudoku"),
+                        tr("<center>A basic Sudoku game based on <b>Simsu 1.2.1</b><br/>\
                           <small>Copyright &copy; 2010-2011, onyx-international, Inc</small><br/>\
-                          <small>Copyright &copy; 2009 Graeme Gott, author of Simsu 1.2.1</small></center><br/>" ));
+                          <small>Copyright &copy; 2009 Graeme Gott, author of Simsu 1.2.1</small></center><br/>"));
     about.exec();
 }
 
