@@ -81,7 +81,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     connect(&song_list_view_, SIGNAL(positionChanged(const int, const int)),
             &status_bar_, SLOT(setProgress(const int, const int)));
     connect(&status_bar_,  SIGNAL(progressClicked(const int, const int)),
-            &song_list_view_, SLOT(onPagebarClicked(const int, const int)));
+            this, SLOT(onPagebarClicked(const int, const int)));
 
     createLayout();
     connectWithChildren();
@@ -689,6 +689,11 @@ void OnyxPlayerView::onPrevClicked(bool)
 {
     previous();
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+}
+
+void OnyxPlayerView::onPagebarClicked(const int percentage, const int value)
+{
+    song_list_view_.gotoPage(value);
 }
 
 void OnyxPlayerView::onSystemVolumeChanged(int value, bool muted)

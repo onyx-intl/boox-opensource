@@ -47,6 +47,8 @@ public Q_SLOTS:
     void onNextClicked(bool);
     void onPrevClicked(bool);
 
+    void onPagebarClicked(const int percentage, const int value);
+
 Q_SIGNALS:
     void stateChanged(int);
     void testReload();
