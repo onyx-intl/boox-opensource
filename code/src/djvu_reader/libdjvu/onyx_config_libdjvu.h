@@ -1,0 +1,7 @@
+#ifndef ONYX_CONFIG_LIBDJVU_H__
+#define ONYX_CONFIG_LIBDJVU_H__
+
+/* #undef HAVE_HEADER_NEW_H */
+/* #undef HAVE_HEADER_NEW */
+
+#endif  // ONYX_CONFIG_LIBDJVU_H__

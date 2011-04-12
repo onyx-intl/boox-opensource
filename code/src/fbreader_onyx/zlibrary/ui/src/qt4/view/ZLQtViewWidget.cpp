@@ -33,6 +33,7 @@
 #include "ZLQtPaintContext.h"
 #include "ZLTextStyle.h"
 #include "ZLTextView.h"
+#include "../dialogs/ZLFileListDialog.h"
 
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
@@ -891,6 +892,73 @@ void ZLQtViewWidget::showTableOfContents()
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
+bool ZLQtViewWidget::suggestTextFiles(const QString &file_path, bool forward)
+{
+    QRegExp reg_exp("\\.(txt)$", Qt::CaseInsensitive);
+    QFileInfo file(file_path);
+    QDir current_dir = file.dir();
+
+    QStringList file_list = dirList(current_dir, &reg_exp);
+    int index = file_list.indexOf(file.fileName());
+
+    // don't suggest when only one file exists
+    if (file_list.size() < 2)
+    {
+        return false;
+    }
+
+    if ( (forward && index == file_list.size()-1)
+            || (!forward && 0 == index))
+    {
+        return false;
+    }
+
+    ZLFileListDialog dialog(file_list, index, 0);
+    int ret = dialog.exec();
+    if (QDialog::Accepted == ret)
+    {
+        QString selected = file_list.at(dialog.selectedFile());
+        QString selected_path = current_dir.path() + "/" + selected;
+        myApplication->openFile(selected_path.toUtf8().data());
+        myFrame->update();
+        return true;
+    }
+    return false;
+}
+
+void ZLQtViewWidget::triggerLargeScrollAction(const std::string &actionId)
+{
+    // for suggesting open next/previous text file
+    QString current_file_path = myApplication->filePath();
+    if (!current_file_path.isEmpty() && current_file_path.endsWith(".txt")
+            && 0 != full_)
+    {
+        bool suggested = false;
+        if ("largeScrollBackward" == actionId)
+        {
+            if (0 == from_)
+            {
+                suggested = suggestTextFiles(current_file_path, false);
+            }
+        }
+        else if ("largeScrollForward" == actionId)
+        {
+            if (to_ >= full_)
+            {
+                suggested = suggestTextFiles(current_file_path, true);
+            }
+        }
+
+        if (suggested)
+        {
+            // don't do the scroll action if suggested
+            return;
+        }
+    }
+
+    myApplication->doAction(actionId);
+}
+
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
 {
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
@@ -929,10 +997,10 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             stopDictLookup();
             break;
         case Qt::Key_PageDown:
-            myApplication->doAction("largeScrollForward");
+            triggerLargeScrollAction("largeScrollForward");
             break;
         case Qt::Key_PageUp:
-            myApplication->doAction("largeScrollBackward");
+            triggerLargeScrollAction("largeScrollBackward");
             break;
         }
     }
@@ -1014,7 +1082,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 {
                     hyperlink_selected_ = false;    
                     ptr->selectionModel().clear();
-                    myApplication->doAction("largeScrollBackward");
+                    triggerLargeScrollAction("largeScrollBackward");
 
                     break;
                 }
@@ -1028,7 +1096,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 {
                     hyperlink_selected_ = false;    
                     ptr->selectionModel().clear();
-                    myApplication->doAction("largeScrollForward");
+                    triggerLargeScrollAction("largeScrollForward");
 
                     break;
                 }
@@ -1055,20 +1123,37 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             case Qt::Key_PageUp:
                 {
                     tts_engine_->stop();
-                    myApplication->doAction("largeScrollBackward");
+                    triggerLargeScrollAction("largeScrollBackward");
                     startTTS();
                     break;
                 }
             case Qt::Key_PageDown:
                 {
                     tts_engine_->stop();
-                    myApplication->doAction("largeScrollForward");
+                    triggerLargeScrollAction("largeScrollForward");
                     startTTS();
                     break;
                 }
             }
         }
     }
+}
+
+
+QStringList ZLQtViewWidget::dirList(QDir &qdir, QRegExp *filter,
+        QDir::Filters ftype)
+{
+    QStringList list;
+
+    qdir.setFilter(ftype);
+    qdir.setSorting(QDir::Name);
+
+    if (filter)
+        list = qdir.entryList().filter((*filter));
+    else
+        list = qdir.entryList();
+
+    return list;
 }
 
 void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
@@ -1089,6 +1174,7 @@ void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
     {
         current = total;
     }
+
     status_bar_->setProgress(current, total);
 }
 
@@ -1256,13 +1342,13 @@ void ZLQtViewWidget::nextPage()
 {
     if (!isLastPage())
     {
-        myApplication->doAction("largeScrollForward");
+        triggerLargeScrollAction("largeScrollForward");
     }
 }
 
 void ZLQtViewWidget::prevPage()
 {
-    myApplication->doAction("largeScrollBackward");
+    triggerLargeScrollAction("largeScrollBackward");
 }
 
 bool ZLQtViewWidget::isLastPage()
@@ -1369,7 +1455,7 @@ void ZLQtViewWidget::storeThumbnail(const QPixmap & pixmap)
 {
     QFileInfo info(myApplication->document_path);
     cms::ContentThumbnail thumbdb(info.absolutePath());
-    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::KeepAspectRatio).toImage());
+    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::IgnoreAspectRatio).toImage());
 }
 
 void ZLQtViewWidget::onVolumeChanged(int new_volume, bool is_mute)
