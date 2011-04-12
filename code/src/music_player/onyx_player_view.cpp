@@ -596,6 +596,7 @@ void OnyxPlayerView::minimize(bool)
 void OnyxPlayerView::playModeClicked()
 {
     ContentView *mode_button_ = menu_view_.visibleSubItems().front();
+    bool origin_single_repeat = single_repeat_mode_;
     if (single_repeat_mode_)
     {
         if (mode_button_->data() && mode_button_->data()->contains(TAG_COVER))
@@ -632,15 +633,18 @@ void OnyxPlayerView::playModeClicked()
     model_->prepareForShufflePlaying(shuffle_mode_);
 
     // for single song repeat
-    if (!single_repeat_mode_)
+    if (origin_single_repeat != single_repeat_mode_)
     {
-        disconnect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
-        connect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
-    }
-    else
-    {
-        disconnect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
-        connect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
+        if (!single_repeat_mode_)
+        {
+            disconnect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
+            connect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
+        }
+        else
+        {
+            disconnect(core_.get(), SIGNAL(finished()), this, SLOT(next()));
+            connect(core_.get(), SIGNAL(finished()), this, SLOT(play()));
+        }
     }
     menu_view_.update();
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
