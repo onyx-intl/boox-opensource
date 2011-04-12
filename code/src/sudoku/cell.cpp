@@ -234,9 +234,6 @@ void Cell::keyPressEvent ( QKeyEvent* event ) {
 /*****************************************************************************/
 
 void Cell::mouseMoveEvent ( QMouseEvent* event ) {
-  //  if ( !hasFocus() ) {
-  //      setFocus();
-  //  }
     Frame::mouseMoveEvent ( event );
 }
 
