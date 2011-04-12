@@ -21,6 +21,7 @@ enum MusicPlayerMenuType
 
 const static QSize MENU_ITEM_SIZE = QSize(60, 60);
 const static QString TAG_ROW = "row";
+const static int AUDIO_INFO_SPACING = 40;
 
 const static QString PROGRESS_BAR_STYLE = " \
 QProgressBar:horizontal                     \
@@ -128,8 +129,6 @@ void OnyxPlayerView::attachModel(PlayListModel *m)
     connect(model_, SIGNAL(firstAdded()), this, SLOT(play()));
     connect(model_, SIGNAL(loadingFinished()), this, SLOT(onLoadingFinished()));
     connect(model_, SIGNAL(currentChanged()), this, SLOT(onCurrentChanged()));
-    connect(model_, SIGNAL(shuffleChanged(bool)), this, SLOT(onShuffleStatusChanged(bool)));
-    connect(model_, SIGNAL(repeatableListChanged(bool)), this, SLOT(onRepeatListChanged(bool)));
 
     model_->doCurrentVisibleRequest();
     loadSettings();
@@ -142,8 +141,7 @@ void OnyxPlayerView::deattachModel()
         disconnect(model_, SIGNAL(firstAdded()), this, SLOT(play()));
         disconnect(model_, SIGNAL(loadingFinished()), this, SLOT(onLoadingFinished()));
         disconnect(model_, SIGNAL(currentChanged()), this, SLOT(onCurrentChanged()));
-        disconnect(model_, SIGNAL(shuffleChanged(bool)), this, SLOT(onShuffleStatusChanged(bool)));
-        disconnect(model_, SIGNAL(repeatableListChanged(bool)), this, SLOT(onRepeatListChanged(bool)));
+
         model_ = 0;
     }
 }
@@ -167,20 +165,20 @@ void OnyxPlayerView::createLayout()
     play_pixmap_ = QPixmap(":/player_icons2/play.png");
     pause_pixmap_ = QPixmap(":/player_icons2/pause.png");
 
-    title_title_label_.setText(QCoreApplication::tr("Title: "));
+    title_title_label_.setPixmap(QPixmap(":/player_icons2/title.png"));
     title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     title_title_label_.setFixedHeight(defaultItemHeight());
-    title_title_label_.setFixedWidth(100);
+    title_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    artist_title_label_.setText(QCoreApplication::tr("Artist: "));
+    artist_title_label_.setPixmap(QPixmap(":/player_icons2/artist.png"));
     artist_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     artist_title_label_.setFixedHeight(defaultItemHeight());
-    artist_title_label_.setFixedWidth(100);
+    artist_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    album_title_label_.setText(QCoreApplication::tr("Album: "));
+    album_title_label_.setPixmap(QPixmap(":/player_icons2/album.png"));
     album_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     album_title_label_.setFixedHeight(defaultItemHeight());
-    album_title_label_.setFixedWidth(100);
+    album_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
     current_time_label_.setText("00:00");
     current_time_label_.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -254,9 +252,9 @@ void OnyxPlayerView::createSongListView()
     }
 
     song_list_view_.setSpacing(2);
-    song_list_view_.setFixedGrid(10, 1);
-    int single_height = defaultItemHeight()+6*SPACING;
-    song_list_view_.setFixedHeight(single_height*10);
+
+    setSongListViewFixedGrid();
+
     song_list_view_.setData(ds);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::RECYCLE_DOWN);
@@ -704,12 +702,10 @@ void OnyxPlayerView::onSystemVolumeChanged(int value, bool muted)
 
 void OnyxPlayerView::onCurrentChanged()
 {
-    qDebug("in OnyxPlayerView::onCurrentChanged begin");
     int current_row = model_->currentRow();
     QModelIndex idx = model_->standardItemModel()->index(current_row, 0);
     if (idx.isValid())
     {
-        qDebug("in OnyxPlayerView::onCurrentChanged, is valid.");
         QStandardItem *info_item = model_->standardItemModel()->item(current_row, 1);
         title_label_.setText(info_item->text());
         info_item = model_->standardItemModel()->item(current_row, 2);
@@ -746,6 +742,17 @@ void OnyxPlayerView::onCurrentChanged()
 void OnyxPlayerView::onProgressClicked(const int percent, const int value)
 {
     core_->seek(value);
+}
+
+void OnyxPlayerView::setSongListViewFixedGrid()
+{
+    int total_height = safeParentWidget(parentWidget())->height();
+    int height_left = total_height - 9 * defaultItemHeight();
+    int single_height = defaultItemHeight() + 5 * SPACING;
+    int max_item_size = height_left / single_height;
+
+    song_list_view_.setFixedGrid(max_item_size, 1);
+    song_list_view_.setFixedHeight(single_height * max_item_size);
 }
 
 void OnyxPlayerView::onLoadingFinished()

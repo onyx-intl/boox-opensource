@@ -80,6 +80,7 @@ private:
     void mouseReleaseEvent(QMouseEvent *me);
 
     QString timeMessage(qint64 time);
+    void setSongListViewFixedGrid();
 
 private:
     PlayListModel           *model_;

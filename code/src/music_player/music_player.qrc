@@ -33,5 +33,8 @@
         <file>player_icons2/repeat.png</file>
         <file>player_icons2/shuffle.png</file>
         <file>player_icons2/music_player_small.png</file>
+        <file>player_icons2/album.png</file>
+        <file>player_icons2/artist.png</file>
+        <file>player_icons2/title.png</file>
     </qresource>
 </RCC>
