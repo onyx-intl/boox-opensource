@@ -81,6 +81,7 @@ private:
 
     QString timeMessage(qint64 time);
     void setSongListViewFixedGrid();
+    OData * getCurrentData(int row);
 
 private:
     PlayListModel           *model_;
@@ -120,6 +121,8 @@ private:
 
     // menu actions
     SystemActions system_actions_;
+
+    ODatas song_list_data_;
 
     // flags
     bool single_repeat_mode_;

@@ -235,7 +235,6 @@ void OnyxPlayerView::createSongListView()
 {
     const int height = defaultItemHeight()+4*SPACING;
     song_list_view_.setPreferItemSize(QSize(-1, height));
-    ODatas ds;
 
     QStandardItemModel * item_model = model_->standardItemModel();
     int rows = item_model->rowCount();
@@ -248,14 +247,14 @@ void OnyxPlayerView::createSongListView()
         int alignment = Qt::AlignLeft | Qt::AlignVCenter;
         dd->insert(TAG_ALIGN, alignment);
         dd->insert(TAG_ROW, i);
-        ds.push_back(dd);
+        song_list_data_.push_back(dd);
     }
 
     song_list_view_.setSpacing(2);
 
     setSongListViewFixedGrid();
 
-    song_list_view_.setData(ds);
+    song_list_view_.setData(song_list_data_);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::RECYCLE_DOWN);
 }
@@ -704,6 +703,27 @@ void OnyxPlayerView::onSystemVolumeChanged(int value, bool muted)
     core_->setVolume(value, value);
 }
 
+OData * OnyxPlayerView::getCurrentData(int row)
+{
+    int size = song_list_data_.size();
+    OData *target;
+    for (int i=0; i<size; i++)
+    {
+        OData *dd = song_list_data_.at(i);
+        if (dd->contains(TAG_ROW))
+        {
+            bool ok = false;
+            int item_row = dd->value(TAG_ROW).toInt(&ok);
+            if (ok && item_row == row)
+            {
+                target = dd;
+                break;
+            }
+        }
+    }
+    return target;
+}
+
 void OnyxPlayerView::onCurrentChanged()
 {
     int current_row = model_->currentRow();
@@ -717,19 +737,8 @@ void OnyxPlayerView::onCurrentChanged()
         info_item = model_->standardItemModel()->item(current_row, 3);
         album_label_.setText(info_item->text());
 
-        foreach (ContentView * item, song_list_view_.visibleSubItems())
-        {
-            if (item->data()->contains(TAG_ROW))
-            {
-                bool ok;
-                int row = item->data()->value(TAG_ROW).toInt(&ok);
-                if (ok && current_row == row)
-                {
-                    item->setFocus();
-                    break;
-                }
-            }
-        }
+        OData *target_data = getCurrentData(current_row);
+        song_list_view_.select(target_data);
 
         // init progress bar
         progress_bar_.setMinimum(0);
