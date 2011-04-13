@@ -78,9 +78,10 @@ private:
 
     void keyReleaseEvent(QKeyEvent * ke);
     void mouseReleaseEvent(QMouseEvent *me);
+    void resizeEvent(QResizeEvent * event);
 
     QString timeMessage(qint64 time);
-    void setSongListViewFixedGrid();
+    void setSongListViewFixedGrid(int total_height);
     OData * getCurrentData(int row);
 
 private:

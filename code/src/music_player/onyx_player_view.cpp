@@ -252,7 +252,8 @@ void OnyxPlayerView::createSongListView()
 
     song_list_view_.setSpacing(2);
 
-    setSongListViewFixedGrid();
+    int total_height = safeParentWidget(parentWidget())->height();
+    setSongListViewFixedGrid(total_height);
 
     song_list_view_.setData(song_list_data_);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
@@ -338,6 +339,16 @@ void OnyxPlayerView::mouseReleaseEvent(QMouseEvent *me)
         core_->seek(value);
         progress_bar_.setValue(value/1000);
     }
+}
+
+void OnyxPlayerView::resizeEvent(QResizeEvent * event)
+{
+    QSize s = qApp->desktop()->screenGeometry().size();
+    if (song_list_view_.visibleSubItems().size() > 0)
+    {
+        setSongListViewFixedGrid(s.height());
+    }
+    setFixedSize(s);
 }
 
 void OnyxPlayerView::showState(PlayerUtils::State state)
@@ -757,9 +768,8 @@ void OnyxPlayerView::onProgressClicked(const int percent, const int value)
     core_->seek(value);
 }
 
-void OnyxPlayerView::setSongListViewFixedGrid()
+void OnyxPlayerView::setSongListViewFixedGrid(int total_height)
 {
-    int total_height = safeParentWidget(parentWidget())->height();
     int height_left = total_height - 9 * defaultItemHeight();
     int single_height = defaultItemHeight() + 5 * SPACING;
     int max_item_size = height_left / single_height;
