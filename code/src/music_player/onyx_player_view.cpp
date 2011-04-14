@@ -742,7 +742,15 @@ void OnyxPlayerView::onCurrentChanged()
     if (idx.isValid())
     {
         QStandardItem *info_item = model_->standardItemModel()->item(current_row, 1);
-        title_label_.setText(info_item->text());
+        QString title_info = info_item->text();
+        if (title_info.isEmpty())
+        {
+            info_item = model_->standardItemModel()->item(current_row, 0);
+            title_info = info_item->text();
+        }
+        title_label_.setText(title_info);
+
+        // set artist and album info
         info_item = model_->standardItemModel()->item(current_row, 2);
         artist_label_.setText(info_item->text());
         info_item = model_->standardItemModel()->item(current_row, 3);
@@ -754,6 +762,7 @@ void OnyxPlayerView::onCurrentChanged()
         // init progress bar
         progress_bar_.setMinimum(0);
         progress_bar_.setMaximum(core_->totalTime()/1000);
+        progress_bar_.setValue(0);
 
         // set total time
         total_time_label_.setText(timeMessage(core_->totalTime()));
