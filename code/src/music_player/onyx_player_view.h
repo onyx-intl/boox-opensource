@@ -84,6 +84,8 @@ private:
     void setSongListViewFixedGrid(int total_height);
     OData * getCurrentData(int row);
 
+    void setPlayPauseIcon();
+
 private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;

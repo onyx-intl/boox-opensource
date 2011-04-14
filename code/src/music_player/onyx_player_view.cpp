@@ -551,7 +551,9 @@ void OnyxPlayerView::next()
         {
             stop();
         }
+        paused_ = false;
         play();
+        setPlayPauseIcon();
     }
     onyx::screen::watcher().enqueue(&song_list_view_, onyx::screen::ScreenProxy::GC);
 }
@@ -570,7 +572,9 @@ void OnyxPlayerView::previous()
         {
             stop();
         }
+        paused_ = false;
         play();
+        setPlayPauseIcon();
     }
     onyx::screen::watcher().enqueue(&song_list_view_, onyx::screen::ScreenProxy::GC);
 }
@@ -660,6 +664,18 @@ void OnyxPlayerView::playModeClicked()
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
 }
 
+void OnyxPlayerView::setPlayPauseIcon()
+{
+    ContentView *play_pause = menu_view_.visibleSubItems().at(2);
+    OData * data = play_pause->data();
+    if (data && data->contains(TAG_COVER))
+    {
+        data->insert(TAG_COVER, paused_? pause_pixmap_: play_pixmap_);
+    }
+    menu_view_.update();
+    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
+}
+
 void OnyxPlayerView::onPlayPauseClicked(bool)
 {
     if (core_->state() == PlayerUtils::Playing)
@@ -673,22 +689,8 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
         paused_ = false;
         play();
     }
-    foreach (ContentView * item, menu_view_.visibleSubItems())
-    {
-        if (item->data()->contains(TAG_MENU_TYPE))
-        {
-            bool ok;
-            int menu_type = item->data()->value(TAG_MENU_TYPE).toInt(&ok);
-            if (ok && MENU_PLAY == menu_type)
-            {
-                item->data()->insert(TAG_COVER,
-                        paused_? pause_pixmap_: play_pixmap_);
-                break;
-            }
-        }
-    }
-    menu_view_.update();
-    onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
+
+    setPlayPauseIcon();
 }
 
 void OnyxPlayerView::onNextClicked(bool)

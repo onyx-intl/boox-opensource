@@ -5,3 +5,5 @@ CMakeFiles
 *.directory
 .gitignore
 code/src/djvu_reader/libdjvu/onyx_config_libdjvu.h
+.project
+.cproject
