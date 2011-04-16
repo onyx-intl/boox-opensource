@@ -135,6 +135,7 @@ private:
     bool progress_bar_enabled_;
     int skips_;
     int previous_page_; ///< store the previous page in page view
+    int fixed_grid_rows_;
 };
 
 }   // namespace player

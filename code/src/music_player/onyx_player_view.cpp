@@ -56,6 +56,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , progress_bar_enabled_(true)
     , skips_(0)
     , previous_page_(1)
+    , fixed_grid_rows_(0)
 {
 #ifndef Q_WS_QWS
     resize(600, 800);
@@ -760,6 +761,12 @@ void OnyxPlayerView::onCurrentChanged()
 
         OData *target_data = getCurrentData(current_row);
         song_list_view_.select(target_data);
+        int actual_rows = current_row;
+        if (0 != fixed_grid_rows_ && actual_rows >= fixed_grid_rows_)
+        {
+            actual_rows = current_row%fixed_grid_rows_;
+        }
+        song_list_view_.setCheckedTo(actual_rows, 0);
 
         // init progress bar
         progress_bar_.setMinimum(0);
@@ -783,10 +790,10 @@ void OnyxPlayerView::setSongListViewFixedGrid(int total_height)
 {
     int height_left = total_height - 9 * defaultItemHeight();
     int single_height = defaultItemHeight() + 5 * SPACING;
-    int max_item_size = height_left / single_height;
+    fixed_grid_rows_ = height_left / single_height;
 
-    song_list_view_.setFixedGrid(max_item_size, 1);
-    song_list_view_.setFixedHeight(single_height * max_item_size);
+    song_list_view_.setFixedGrid(fixed_grid_rows_, 1);
+    song_list_view_.setFixedHeight(single_height * fixed_grid_rows_);
 }
 
 void OnyxPlayerView::onLoadingFinished()
