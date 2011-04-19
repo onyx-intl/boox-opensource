@@ -28,7 +28,8 @@ FILE(GLOB MOC_HDRS core/*.h
                    player_utils.h
                    player_view.h
                    onyx_player_view.h
-                   player_application.h)
+                   player_application.h
+                   player_title_bar.h)
 QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 # Source files.
@@ -45,7 +46,8 @@ FILE(GLOB SRCS core/*.cpp
                libsr/*.c
                player_view.cpp
                onyx_player_view.cpp
-               player_application.cpp)
+               player_application.cpp
+               player_title_bar.cpp)
 SET(SRCS
   ${MOC_HDRS}
   ${SRCS}

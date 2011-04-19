@@ -41,8 +41,8 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     : OnyxDialog(parent)
     , model_(0)
     , core_(new SoundCore(this))
+    , player_title_bar_(this)
     , big_layout_(&content_widget_)
-    , window_title_layout_(0)
     , title_layout_(0)
     , artist_layout_(0)
     , album_layout_(0)
@@ -152,14 +152,6 @@ void OnyxPlayerView::createLayout()
     vbox_.removeWidget(&title_widget_);
     content_widget_.setBackgroundRole(QPalette::Button);
 
-    window_icon_label_.setPixmap(QPixmap(":/player_icons2/music_player_small.png"));
-    window_icon_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    window_icon_label_.setFixedHeight(defaultItemHeight());
-
-    window_title_label_.setText(QCoreApplication::tr("Music Player"));
-    window_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    window_title_label_.setFixedHeight(defaultItemHeight());
-
     normal_mode_pixmap_ = QPixmap(":/player_icons2/normal.png");
     single_repeat_mode_pixmap_ = QPixmap(":/player_icons2/repeat.png");
     shuffle_mode_pixmap_ = QPixmap(":/player_icons2/shuffle.png");
@@ -192,17 +184,11 @@ void OnyxPlayerView::createLayout()
     progress_bar_.setStyleSheet(PROGRESS_BAR_STYLE);
     progress_bar_.setTextVisible(false);
 
-
     createMenuView();
-
-    window_title_layout_.setContentsMargins(SPACING, 0, SPACING, 0);
-    window_title_layout_.addWidget(&window_icon_label_);
-    window_title_layout_.addSpacing(SPACING*4);
-    window_title_layout_.addWidget(&window_title_label_, 1, Qt::AlignLeft);
 
     big_layout_.setContentsMargins(2, 2, 2, 2);
     big_layout_.setSpacing(0);
-    big_layout_.addLayout(&window_title_layout_);
+    big_layout_.addWidget(&player_title_bar_, 0, Qt::AlignTop);
     big_layout_.addWidget(&song_list_view_, 1, Qt::AlignTop);
 
     // add title info

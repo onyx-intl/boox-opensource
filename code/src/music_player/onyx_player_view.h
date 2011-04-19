@@ -11,6 +11,7 @@
 #include "onyx/ui/onyx_dialog.h"
 #include "onyx/ui/content_view.h"
 #include "onyx/ui/catalog_view.h"
+#include "player_title_bar.h"
 
 using namespace ui;
 
@@ -90,15 +91,13 @@ private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;
 
+    PlayerTitleBar player_title_bar_;
+
     QVBoxLayout big_layout_;
-    QHBoxLayout window_title_layout_;
     QHBoxLayout artist_layout_;
     QHBoxLayout title_layout_;
     QHBoxLayout album_layout_;
     QHBoxLayout time_layout_;
-
-    OnyxLabel window_icon_label_;
-    OnyxLabel window_title_label_;
 
     OnyxLabel title_title_label_;
     OnyxLabel title_label_;
