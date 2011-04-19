@@ -81,7 +81,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
 
     // show page info in status bar
     connect(&song_list_view_, SIGNAL(positionChanged(const int, const int)),
-            &status_bar_, SLOT(setProgress(const int, const int)));
+            this, SLOT(onPositionChanged(const int, const int)));
     connect(&status_bar_,  SIGNAL(progressClicked(const int, const int)),
             this, SLOT(onPagebarClicked(const int, const int)));
 
@@ -663,6 +663,29 @@ void OnyxPlayerView::setPlayPauseIcon()
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
 }
 
+void OnyxPlayerView::setCheckedPlayingSong(const int current_page)
+{
+    int current_row = model_->currentRow();
+    QModelIndex idx = model_->standardItemModel()->index(current_row, 0);
+    if (idx.isValid())
+    {
+        if (0 != fixed_grid_rows_)
+        {
+            // page -> one base index
+            int page = current_row/fixed_grid_rows_ + 1;
+            if (page == current_page)
+            {
+                int actual_rows = current_row;
+                if (actual_rows >= fixed_grid_rows_)
+                {
+                    actual_rows = current_row%fixed_grid_rows_;
+                }
+                song_list_view_.setCheckedTo(actual_rows, 0);
+            }
+        }
+    }
+}
+
 void OnyxPlayerView::onPlayPauseClicked(bool)
 {
     if (core_->state() == PlayerUtils::Playing)
@@ -692,8 +715,15 @@ void OnyxPlayerView::onPrevClicked(bool)
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
+void OnyxPlayerView::onPositionChanged(const int current, const int total)
+{
+    setCheckedPlayingSong(current);
+    status_bar_.setProgress(current, total);
+}
+
 void OnyxPlayerView::onPagebarClicked(const int percentage, const int value)
 {
+    setCheckedPlayingSong(value);
     song_list_view_.gotoPage(value);
 }
 

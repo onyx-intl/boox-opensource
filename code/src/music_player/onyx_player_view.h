@@ -48,6 +48,7 @@ public Q_SLOTS:
     void onNextClicked(bool);
     void onPrevClicked(bool);
 
+    void onPositionChanged(const int current, const int total);
     void onPagebarClicked(const int percentage, const int value);
 
 Q_SIGNALS:
@@ -86,6 +87,8 @@ private:
     OData * getCurrentData(int row);
 
     void setPlayPauseIcon();
+
+    void setCheckedPlayingSong(const int current_page);
 
 private:
     PlayListModel           *model_;
