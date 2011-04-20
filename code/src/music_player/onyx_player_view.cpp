@@ -434,7 +434,8 @@ void OnyxPlayerView::setTime(qint64 t)
             onyx::screen::watcher().enqueue(&progress_bar_,
                     onyx::screen::ScreenProxy::GU);
         }
-        if (count >= 8)
+        // Wait some seconds to refresh time to save power
+        if (count >= 18)
         {
             count = 0;
         }

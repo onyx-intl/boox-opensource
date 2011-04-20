@@ -44,7 +44,7 @@ void PlayerTitleBar::paintEvent(QPaintEvent * event)
     painter.setRenderHint(QPainter::Antialiasing);
 
     QPainterPath roundRectPath;
-    QRect rc = rect().adjusted(1, 1, -1, -1);
+    QRect rc = rect();
     static const int radius = 15;
 
     roundRectPath.moveTo(rc.bottomRight());
