@@ -139,6 +139,10 @@ void OnyxPlayerView::deattachModel()
 {
     if (model_ != 0)
     {
+        // clear data
+        ODatas empty_data;
+        song_list_view_.setData(empty_data);
+
         disconnect(model_, SIGNAL(firstAdded()), this, SLOT(play()));
         disconnect(model_, SIGNAL(loadingFinished()), this, SLOT(onLoadingFinished()));
         disconnect(model_, SIGNAL(currentChanged()), this, SLOT(onCurrentChanged()));
@@ -225,6 +229,7 @@ void OnyxPlayerView::createSongListView()
 
     QStandardItemModel * item_model = model_->standardItemModel();
     int rows = item_model->rowCount();
+    song_list_data_.clear();
     for (int i=0; i<rows; i++)
     {
         QStandardItem *item = item_model->item(i);
@@ -789,6 +794,9 @@ void OnyxPlayerView::onCurrentChanged()
         progress_bar_.setMinimum(0);
         progress_bar_.setMaximum(core_->totalTime()/1000);
         progress_bar_.setValue(0);
+        progress_bar_.update();
+        onyx::screen::watcher().enqueue(&progress_bar_,
+                onyx::screen::ScreenProxy::DW);
 
         // set total time
         total_time_label_.setText(timeMessage(core_->totalTime()));
