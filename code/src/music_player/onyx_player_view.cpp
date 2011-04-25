@@ -92,7 +92,8 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
 
 OnyxPlayerView::~OnyxPlayerView()
 {
-
+    clearDatas(song_list_data_);
+    clearDatas(menu_view_datas_);
 }
 
 
@@ -256,46 +257,45 @@ void OnyxPlayerView::createSongListView()
 void OnyxPlayerView::createMenuView()
 {
     menu_view_.setPreferItemSize(MENU_ITEM_SIZE);
-    ODatas ds;
 
     OData *dd = new OData;
     dd->insert(TAG_COVER, normal_mode_pixmap_);
     dd->insert(TAG_MENU_TYPE, MENU_MODE);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     dd = new OData;
     QPixmap prev_pixmap(":/player_icons2/previous.png");
     dd->insert(TAG_COVER, prev_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_PREVIOUS);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     dd = new OData;
     dd->insert(TAG_COVER, play_pixmap_);
     dd->insert(TAG_MENU_TYPE, MENU_PLAY);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     dd = new OData;
     QPixmap next_pixmap(":/player_icons2/next.png");
     dd->insert(TAG_COVER, next_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_NEXT);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     dd = new OData;
     QPixmap min_pixmap(":/player_icons2/minimize.png");
     dd->insert(TAG_COVER, min_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     dd = new OData;
     QPixmap exit_pixmap(":/player_icons2/exit.png");
     dd->insert(TAG_COVER, exit_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_EXIT);
-    ds.push_back(dd);
+    menu_view_datas_.push_back(dd);
 
     menu_view_.setSpacing(2);
     menu_view_.setFixedGrid(1, 6);
     menu_view_.setFixedHeight(MENU_ITEM_SIZE.height() + 2 * SPACING);
-    menu_view_.setData(ds);
+    menu_view_.setData(menu_view_datas_);
     menu_view_.setSearchPolicy(CatalogView::NeighborFirst
             | CatalogView::AutoHorRecycle);
     menu_view_.setNeighbor(&song_list_view_, CatalogView::RECYCLE_UP);

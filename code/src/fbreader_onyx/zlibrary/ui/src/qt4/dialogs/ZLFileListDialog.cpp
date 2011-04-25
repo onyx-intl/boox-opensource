@@ -9,21 +9,23 @@
 static const QString TAG_FILE_INDEX = "file_index";
 
 ZLFileListDialog::ZLFileListDialog(const QStringList &file_list,
-        int current_file, QWidget *parent)
+        int current_file, bool forward, QWidget *parent)
     : OnyxDialog(parent)
     , layout_(&content_widget_)
     , file_list_view_(0, this)
     , file_list_(file_list)
     , current_file_(current_file)
     , selected_file_(0)
+    , forward_(forward)
 {
     createLayout();
-    resize(bestDialogSize());
-    onyx::screen::watcher().addWatcher(this);
+    setFixedSize(bestDialogSize());
+//    onyx::screen::watcher().addWatcher(this);
 }
 
 ZLFileListDialog::~ZLFileListDialog()
 {
+    clearDatas(file_list_datas_);
 }
 
 void ZLFileListDialog::createLayout()
@@ -51,7 +53,6 @@ void ZLFileListDialog::createFileList()
 {
     file_list_view_.setPreferItemSize(QSize(-1, defaultItemHeight()));
 
-    ODatas ds;
     int size = file_list_.size();
     for (int i=0; i<size; i++)
     {
@@ -60,12 +61,54 @@ void ZLFileListDialog::createFileList()
         dd->insert(TAG_FILE_INDEX, i);
         int alignment = Qt::AlignLeft | Qt::AlignVCenter;
         dd->insert(TAG_ALIGN, alignment);
-        ds.push_back(dd);
+        file_list_datas_.push_back(dd);
     }
-    file_list_view_.setData(ds);
+    file_list_view_.setData(file_list_datas_);
 
     file_list_view_.setFixedGrid(bestDialogSize().height() / defaultItemHeight() - 2 , 1);
     file_list_view_.setSearchPolicy(CatalogView::AutoVerRecycle);
+}
+
+int ZLFileListDialog::getFocusFile()
+{
+    int focus_file = current_file_;
+    if (forward_)
+    {
+        focus_file++;
+        if (focus_file >= file_list_.size())
+        {
+            focus_file = file_list_.size() - 1;
+        }
+    }
+    else
+    {
+        focus_file--;
+        if (focus_file < 0)
+        {
+            focus_file = 0;
+        }
+    }
+    return focus_file;
+}
+
+bool ZLFileListDialog::popup()
+{
+    if (isHidden())
+    {
+        show();
+    }
+
+    int focus_file = getFocusFile();
+    OData *focus = file_list_datas_.at(focus_file);
+    onyx::screen::watcher().addWatcher(this);
+    file_list_view_.select(focus);
+
+    // TODO calculate right rows here for multi-page.
+    file_list_view_.setCheckedTo(current_file_, 0);
+
+    bool ret = OnyxDialog::exec();
+    onyx::screen::watcher().removeWatcher(this);
+    return ret;
 }
 
 void ZLFileListDialog::onItemActivated(CatalogView *catalog,

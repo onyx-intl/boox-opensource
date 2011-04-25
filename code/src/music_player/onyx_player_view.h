@@ -128,6 +128,7 @@ private:
     SystemActions system_actions_;
 
     ODatas song_list_data_;
+    ODatas menu_view_datas_;
 
     // flags
     bool single_repeat_mode_;

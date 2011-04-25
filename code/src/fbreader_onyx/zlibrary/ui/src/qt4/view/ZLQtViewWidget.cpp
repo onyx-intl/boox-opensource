@@ -907,14 +907,8 @@ bool ZLQtViewWidget::suggestTextFiles(const QString &file_path, bool forward)
         return false;
     }
 
-    if ( (forward && index == file_list.size()-1)
-            || (!forward && 0 == index))
-    {
-        return false;
-    }
-
-    ZLFileListDialog dialog(file_list, index, 0);
-    int ret = dialog.exec();
+    ZLFileListDialog dialog(file_list, index, forward, 0);
+    int ret = dialog.popup();
     if (QDialog::Accepted == ret)
     {
         QString selected = file_list.at(dialog.selectedFile());
