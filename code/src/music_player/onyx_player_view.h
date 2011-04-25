@@ -138,6 +138,7 @@ private:
     int skips_;
     int previous_page_; ///< store the previous page in page view
     int fixed_grid_rows_;
+    bool need_refresh_immediately_;
 };
 
 }   // namespace player

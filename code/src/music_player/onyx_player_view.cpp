@@ -57,6 +57,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , skips_(0)
     , previous_page_(1)
     , fixed_grid_rows_(0)
+    , need_refresh_immediately_(true)
 {
 #ifndef Q_WS_QWS
     resize(600, 800);
@@ -409,8 +410,10 @@ void OnyxPlayerView::setTime(qint64 t)
     if (progress_bar_enabled_ && isVisible() && core_->totalTime() >= t)
     {
         static int count = 0;
-        if (count == 0)
+        if (count == 0 || need_refresh_immediately_)
         {
+            need_refresh_immediately_ = false;
+
             onyx::screen::instance().enableUpdate(false);
             progress_bar_.setValue(t/1000);
             current_time_label_.setText(timeMessage(t));
@@ -453,6 +456,8 @@ void OnyxPlayerView::setTime(qint64 t)
 
 void OnyxPlayerView::play()
 {
+    need_refresh_immediately_ = true;
+
     model_->doCurrentVisibleRequest();
     if (core_->state() == PlayerUtils::Paused)
     {
@@ -794,15 +799,19 @@ void OnyxPlayerView::onCurrentChanged()
         progress_bar_.setMinimum(0);
         progress_bar_.setMaximum(core_->totalTime()/1000);
         progress_bar_.setValue(0);
-        progress_bar_.update();
-        onyx::screen::watcher().enqueue(&progress_bar_,
-                onyx::screen::ScreenProxy::DW);
 
         // set total time
         total_time_label_.setText(timeMessage(core_->totalTime()));
-        total_time_label_.update();
-        onyx::screen::watcher().enqueue(&total_time_label_,
-                onyx::screen::ScreenProxy::GU);
+
+        if (isVisible())
+        {
+            progress_bar_.update();
+            onyx::screen::watcher().enqueue(&progress_bar_,
+                    onyx::screen::ScreenProxy::DW);
+            total_time_label_.update();
+            onyx::screen::watcher().enqueue(&total_time_label_,
+                    onyx::screen::ScreenProxy::GU);
+        }
     }
 }
 
