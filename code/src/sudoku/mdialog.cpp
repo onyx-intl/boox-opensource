@@ -12,24 +12,28 @@
 #include "onyx/screen/screen_proxy.h"
 
 MDialog::MDialog(QWidget* parent):QDialog(parent) {
+#ifndef BUILD_FOR_FB
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
+#endif
     setBackgroundRole(QPalette::Light);
     setAutoFillBackground(true);
     setWindowFlags(Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint);
     layout_key = new QGridLayout(this);
     QButtonGroup *group_key = new QButtonGroup(this);
-    layout_key->setColumnMinimumWidth(3,40);
+    layout_key->setColumnMinimumWidth(3,32);
     list_key.clear();
     for ( int i = 1; i < 10; ++i ) {
         MToolButton *key = new MToolButton(this);
         key->setText(QString::number(i));
+        key->setFont(QFont("sans",28,QFont::Black));
         list_key.insert (i-1, key);
         group_key->addButton ( key, i );
         layout_key->addWidget ( key, (i - 1) / 3, (i - 1) % 3 );
         connect(key, SIGNAL(clicked(bool)),this, SLOT(accept()));
         MToolButton *mode = new MToolButton(this);
         mode->setText(QString::number(i));
+        mode->setFont(QFont("mono",24,QFont::DemiBold));
         list_key.insert(8+i, mode);
         group_key->addButton ( mode, 9 + i );
         layout_key->addWidget ( mode, (i - 1) / 3, (i - 1) % 3+4 );
@@ -37,16 +41,6 @@ MDialog::MDialog(QWidget* parent):QDialog(parent) {
     }
     group_key->button ( qBound ( 1, QSettings().value ( "Key", 1 ).toInt(),18 ) )->click();
     connect ( group_key, SIGNAL (buttonClicked(int)), this, SLOT ( setActiveKey ( int ) ) ); ///<will change keypad
-    setStyleSheet("QLabel{ font: 32px;}");
-    QLabel *val = new QLabel(this);
-    val->setText(tr("<center><b>Value</b></center>"));
-    val->setTextFormat(Qt::RichText);
-    layout_key->addWidget(val,4,0,1,3);
-    QLabel *note = new QLabel(this);;
-    note->setText(tr("<center><b>Note</b></center>"));
-    note->setTextFormat(Qt::RichText);
-    layout_key->addWidget(note,4,4,1,3);
-
     setLayout(layout_key);
     list_key.at(0)->setFocus();
 }
@@ -93,26 +87,24 @@ void MDialog::setActiveModeKey(int k)
 
 bool MDialog::event(QEvent* e) {
     bool ret = QDialog::event ( e );
+#ifndef BUILD_FOR_FB
     if (e->type() == QEvent::UpdateRequest)
     {
         onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_NONE);
     }
+#endif
     return ret;
 }
 
 void MDialog::paintEvent(QPaintEvent* e)
 {
-    int h = height();
-    int w = width();
-    QRect rc_t(0,0,w,6);
-    QRect rc_l(0,0,6,h);
-    QRect rc_r(w-6,0,6,h);
-    QRect rc_b(0,h-6,w,6);
     QPainter painter(this);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing,true);
+    painter.setRenderHint(QPainter::Antialiasing,true);
+    painter.setRenderHint(QPainter::TextAntialiasing,true);
     painter.setBrush(QColor(96,96,96));
-    painter.fillRect(rc_t,Qt::SolidPattern);
-    painter.fillRect(rc_l,Qt::SolidPattern);
-    painter.fillRect(rc_r,Qt::SolidPattern);
-    painter.fillRect(rc_b,Qt::SolidPattern);
+    painter.drawRoundedRect(rect(),5,5);
+    painter.setBrush(QColor(255,255,255));
+    painter.drawRoundedRect(rect().adjusted(6,6,rect().x()-6,rect().y()-6),5,5);
 }
 

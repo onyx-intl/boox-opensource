@@ -221,10 +221,6 @@ void ZLQtApplicationWindow::updateScreen()
     else
     {
         onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
-        if (support16GrayScale())
-        {
-            w = onyx::screen::ScreenProxy::GC4;
-        }
         onyx::screen::instance().updateWidgetWithGCInterval(
             this,
             NULL,

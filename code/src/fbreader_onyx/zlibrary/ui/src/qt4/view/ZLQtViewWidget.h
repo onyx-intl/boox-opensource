@@ -139,6 +139,9 @@ private:
 
     void findHyperlink(bool next);
 
+    bool suggestTextFiles(const QString &file_path, bool forward);
+    void triggerLargeScrollAction(const std::string &actionId);
+
 private:
     void repaint();
     void trackStylus(bool track);
@@ -148,6 +151,8 @@ private:
     void setScrollbarParameters(ZLView::Direction direction, size_t full, size_t from, size_t to);
 
     QWidget * addStatusBar();
+    QStringList dirList(QDir &qdir, QRegExp *filter, QDir::Filters ftype =
+                QDir::Files);
     void updateProgress(size_t full, size_t from, size_t to);
     void updateActions();
 
@@ -217,6 +222,7 @@ private:
     std::string last_id_;
 
     QRect rect_pressed_;
+
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */

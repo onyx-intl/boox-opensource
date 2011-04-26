@@ -149,6 +149,9 @@ public:
         std::string myLastCaller;
     };
 
+  public:
+    virtual QString filePath() = 0;
+
   protected:
     ZLApplication(const std::string &name);
 

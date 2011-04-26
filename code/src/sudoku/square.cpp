@@ -26,7 +26,7 @@ namespace simsu {
 
 Square::Square ( QWidget* parent )
         : QWidget ( parent ), m_child ( 0 ) {
-    setMinimumSize (450, 450 );
+    setMinimumSize (430, 430 );
 //     setSizePolicy ( QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 

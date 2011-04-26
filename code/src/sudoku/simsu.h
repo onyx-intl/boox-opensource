@@ -6,7 +6,7 @@
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/ui/ui.h"
 #include "sudokuactions.h"
-
+#include "mdialog.h"
 class QBoxLayout;
 class QButtonGroup;
 class QToolButton;
@@ -18,6 +18,7 @@ namespace onyx {
 namespace simsu {
 class Board;
 class Cell;
+
 class Simsu : public QWidget {
         Q_OBJECT
     public:
@@ -36,7 +37,9 @@ class Simsu : public QWidget {
         void about();
     private:
         Board *m_board;
-        QGridLayout *m_layout;
+        QBoxLayout *m_layout;
+        QBoxLayout *n_layout;
+        MDialog *dialog_;
         StatusBar status_bar_;
         SystemActions system_actions_;
         SudokuActions sudoku_actions_;
