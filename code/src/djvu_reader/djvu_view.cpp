@@ -1089,7 +1089,7 @@ void DjvuView::onUpdateBookmark()
 
     if ( notes_dialog_ == 0 )
     {
-        notes_dialog_.reset( new NotesDialog( QString(), this ) );
+        notes_dialog_.reset( new OnyxNotesDialog(QString(), 0) );
         notes_dialog_->updateTitle(tr("Name Bookmark"));
     }
 

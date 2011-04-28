@@ -231,7 +231,7 @@ private:
     // bookmark
     scoped_ptr<QImage>      bookmark_image_;
     QTimer                  update_bookmark_timer_;
-    scoped_ptr<NotesDialog> notes_dialog_;
+    scoped_ptr<OnyxNotesDialog> notes_dialog_;
 
     // auto flip
     QTimer                  flip_page_timer_;

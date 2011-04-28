@@ -16,7 +16,7 @@
 #include "onyx/ui/page_layout.h"
 #include "onyx/ui/continuous_page_layout.h"
 #include "onyx/ui/single_page_layout.h"
-#include "onyx/ui/notes_dialog.h"
+#include "onyx/ui/onyx_notes_dialog.h"
 
 #include "onyx/cms/content_thumbnail.h"
 
