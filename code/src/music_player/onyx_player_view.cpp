@@ -405,6 +405,16 @@ QString OnyxPlayerView::timeMessage(qint64 time)
     return msg;
 }
 
+int OnyxPlayerView::getStep(qint64 total, qint64 current)
+{
+    int step = 18;
+    if ((total - current) / 1000 < 3)
+    {
+        step = 4;
+    }
+    return step;
+}
+
 void OnyxPlayerView::setTime(qint64 t)
 {
     if (progress_bar_enabled_ && isVisible() && core_->totalTime() >= t)
@@ -442,8 +452,10 @@ void OnyxPlayerView::setTime(qint64 t)
             onyx::screen::watcher().enqueue(&progress_bar_,
                     onyx::screen::ScreenProxy::GU);
         }
+
         // Wait some seconds to refresh time to save power
-        if (count >= 18)
+        int step = getStep(core_->totalTime(), t);
+        if (count >= step)
         {
             count = 0;
         }

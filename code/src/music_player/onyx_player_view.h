@@ -89,6 +89,7 @@ private:
     void setPlayPauseIcon();
 
     void setCheckedPlayingSong(const int current_page);
+    int getStep(qint64 total, qint64 current);
 
 private:
     PlayListModel           *model_;
