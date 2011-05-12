@@ -138,6 +138,7 @@ private:
     void processBookmarks(ReadingToolsActions & actions);
 
     void findHyperlink(bool next);
+    void findAllHyperlinkPositions(QVector<QPoint *> &link_positions);
 
     bool suggestTextFiles(const QString &file_path, bool forward);
     void triggerLargeScrollAction(const std::string &actionId);
@@ -177,6 +178,10 @@ private:
                                            std::vector<int> & entries,
                                            std::vector<QStandardItem *> & ptrs,
                                            QStandardItemModel &model);
+
+    void handleHyperlinks();
+    void popupLinkInfoDialog();
+
 public:
     bool hyperlink_selected_;
 

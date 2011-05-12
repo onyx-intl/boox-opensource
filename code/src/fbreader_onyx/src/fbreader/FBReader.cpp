@@ -342,6 +342,52 @@ void FBReader::tryShowFootnoteView(const std::string &id, const std::string &typ
     }
 }
 
+void FBReader::getFootnote(const std::string &id, const std::string &type,
+        std::string &foot_note)
+{
+    if (type == "external")
+    {
+    }
+    else if (type == "internal")
+    {
+        if ((myMode == BOOK_TEXT_MODE) && (myModel != 0))
+        {
+            BookModel::Label label = myModel->label(id);
+            if (label.Model)
+            {
+                if (label.Model == myModel->bookTextModel())
+                {
+                    // do nothing
+                }
+                else
+                {
+                    FootnoteView &view = ((FootnoteView&)*myFootnoteView);
+                    view.setModel(label.Model, myModel->description()->language());
+                    setMode(FOOTNOTE_MODE);
+                    view.gotoParagraph(label.ParagraphNumber);
+
+                    view.selectionModel().selectWord(0, 0);
+                    view.selectionModel().extendWordSelectionToParagraph();
+                    const char *header = view.selectionModel().text().data();
+                    foot_note.append(header);
+                    foot_note.append(" ");
+                    if (view.selectionModel().selectNextWord())
+                    {
+                        view.selectionModel().extendWordSelectionToParagraph();
+                        const char *note_content = view.selectionModel().text().data();
+                        foot_note.append(note_content);
+                    }
+
+                    // quit from foot note view
+                    doAction("quit");
+                }
+                setHyperlinkCursor(false);
+                refreshWindow();
+            }
+        }
+    }
+}
+
 FBReader::ViewMode FBReader::mode() const {
     return myMode;
 }

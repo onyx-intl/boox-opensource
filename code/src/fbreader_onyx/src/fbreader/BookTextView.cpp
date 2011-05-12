@@ -346,8 +346,10 @@ std::string BookTextView::getFirstInternalHyperlinkId(int x0, int y0, int x1, in
         ZLTextKind hyperlinkKind = REGULAR;
         for ( ;!cursor.isEndOfParagraph();) {
             const ZLTextElement &element = cursor.element();
+
             if (element.kind() == ZLTextElement::CONTROL_ELEMENT) {
                 const ZLTextControlEntry &control = ((const ZLTextControlElement&)element).entry();
+
                 if (control.isHyperlink()) {
                     hyperlinkKind = control.kind();
                     id = ((const ZLTextHyperlinkControlEntry&)control).label();
@@ -365,6 +367,22 @@ std::string BookTextView::getFirstInternalHyperlinkId(int x0, int y0, int x1, in
 
     } while( ++paragraphs <= end_paragraphs &&  cursor.nextParagraph());
 
+    return std::string();
+}
+
+std::string BookTextView::getLinkInfo(int x, int y, std::string &link_info)
+{
+    const ZLTextElementArea *area = elementByCoordinates(x, y);
+    if (area != 0)
+    {
+        std::string id;
+        std::string type;
+        if (getHyperlinkInfo(*area, id, type))
+        {
+            fbreader().getFootnote(id, type, link_info);
+            return std::string(id);
+        }
+    }
     return std::string();
 }
 

@@ -57,6 +57,11 @@ bool ZLView::openInternalLink(int x, int y)
     return false;
 }
 
+std::string ZLView::getLinkInfo(int x, int y, std::string &link_info)
+{
+    return std::string();
+}
+
 void ZLView::processKeyReleaseEvent(int key)
 {
     if (myViewWidget)
@@ -255,7 +260,6 @@ std::string ZLView::getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1)
 {
     return std::string();
 }
-
 
 void ZLViewWidget::rotate(ZLView::Angle rotation) {
 	myRotation = rotation;

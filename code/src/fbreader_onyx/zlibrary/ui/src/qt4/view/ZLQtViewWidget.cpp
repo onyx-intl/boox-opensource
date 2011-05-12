@@ -953,6 +953,77 @@ void ZLQtViewWidget::triggerLargeScrollAction(const std::string &actionId)
     myApplication->doAction(actionId);
 }
 
+void ZLQtViewWidget::handleHyperlinks()
+{
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+
+    if (hyperlink_selected_)
+    {
+        hyperlink_selected_ = false;
+        ptr->selectionModel().clear();
+        view()->openInternalLink(point_.x(), point_.y());
+        return;
+    }
+
+    int is_first = 0;
+    if (!hyperlink_selected_)
+    {
+        std::string id;
+        ZLTextElementArea start_area = ptr->selectionModel().wordArea();
+
+        if (start_area.XStart > 0 && start_area.XEnd > 0)
+        {
+            id = view()->getInternalHyperlinkId(start_area.XStart,
+                    start_area.YStart);
+        }
+
+        if (id.empty())
+        {
+            ptr->selectionModel().selectLastWord();
+            ZLTextElementArea stop_area = ptr->selectionModel().wordArea();
+            ptr->selectionModel().selectFirstWord();
+            start_area = ptr->selectionModel().wordArea();
+            is_first = 1;
+
+            id = view()->getFirstInternalHyperlinkId(start_area.XStart,
+                    start_area.YStart, stop_area.XStart, stop_area.YStart);
+        }
+
+        hyperlink_selected_ = !id.empty();
+    }
+
+    if (hyperlink_selected_)
+    {
+        if (!is_first)
+        {
+            ptr->selectionModel().selectPrevWord();
+        }
+        last_id_.clear();
+        findHyperlink(true);
+    } else
+    {
+        showGotoPageDialog();
+    }
+}
+
+void ZLQtViewWidget::popupLinkInfoDialog()
+{
+    last_id_.clear();
+    QVector<QPoint *> link_positions;
+    findAllHyperlinkPositions(link_positions);
+    int size = link_positions.size();
+    for (int i = 0; i < size; i++)
+    {
+        QPoint *p = link_positions.at(i);
+        std::string link_info;
+        std::string link_id = view()->getLinkInfo(p->x(), p->y(), link_info);
+        qDebug("link id: %s", link_id.data());
+        qDebug("link info: %s", link_info.data());
+    }
+
+    // TODO show link info dialog
+}
+
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
 {
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
@@ -1006,53 +1077,9 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             {
             case Qt::Key_Return:
                 {
-                   int is_first = 0;
-                   if (hyperlink_selected_)
-                   {
-                        hyperlink_selected_ = false;    
-                        ptr->selectionModel().clear();
-                        view()->openInternalLink(point_.x(),point_.y());
-                        break;
-                   }
-
-                   if (!hyperlink_selected_)
-                   {
-                       std::string id;
-                       ZLTextElementArea  start_area =  ptr->selectionModel().wordArea();
-
-                       if ( start_area.XStart > 0 && start_area.XEnd >  0)
-                       {
-                            id = view()->getInternalHyperlinkId(start_area.XStart, start_area.YStart);
-                       }
-
-                       if (id.empty())
-                       {
-                           ptr->selectionModel().selectLastWord();
-                           ZLTextElementArea  stop_area = ptr->selectionModel().wordArea();
-                           ptr->selectionModel().selectFirstWord();
-                           start_area = ptr->selectionModel().wordArea();
-                           is_first = 1;
-
-                           id = view()->getFirstInternalHyperlinkId(start_area.XStart, start_area.YStart,stop_area.XStart, stop_area.YStart);
-                       }
-
-                       hyperlink_selected_ = !id.empty();
-                   }
-                
-                   if (hyperlink_selected_)
-                   {
-                       if (!is_first)
-                       {
-                           ptr->selectionModel().selectPrevWord();
-                       }
-                       last_id_.clear();
-                       findHyperlink(true);
-                   }
-                   else
-                   {
-                       showGotoPageDialog();
-                   }
-                   break;
+                    handleHyperlinks();
+//                    popupLinkInfoDialog();
+                    break;
                 }
             case Qt::Key_Escape:
                 if (hyperlink_selected_)
@@ -1539,6 +1566,65 @@ void ZLQtViewWidget::findHyperlink(bool next)
             break;
         }
 
+    }
+
+}
+
+void ZLQtViewWidget::findAllHyperlinkPositions(QVector<QPoint *> &link_positions)
+{
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    bool next = true;
+    bool b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord());
+    if (!b)
+    {
+        b = next ?  ptr->selectionModel().selectFirstWord() : ptr->selectionModel().selectLastWord();
+    }
+    else
+    {
+        next ?  ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+    }
+
+    for(; b; b = (next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord()))
+    {
+        // find start area
+        ZLTextElementArea  start_area = ptr->selectionModel().wordArea();
+
+        if (view()->onStylusMove(start_area.XStart, start_area.YStart))
+        {
+            std::string s = view()->getInternalHyperlinkId(start_area.XStart, start_area.YStart);
+            if (s.empty() || s == last_id_)
+            {
+                continue;
+            }
+            last_id_ = s;
+
+            // find end area
+            const  ZLTextElementArea * stop_area = & start_area;
+            while((next ? ptr->selectionModel().selectNextWord() : ptr->selectionModel().selectPrevWord()))
+            {
+
+                const  ZLTextElementArea  & tmp =  ptr->selectionModel().wordArea();
+                stop_area = & tmp;
+
+                if (!view()->onStylusMove(tmp.XStart, tmp.YStart))
+                {
+                    next ? ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+                    break;
+                }
+                std::string s = view()->getInternalHyperlinkId(tmp.XStart, tmp.YStart);
+                if (s != last_id_)
+                {
+                    next ? ptr->selectionModel().selectPrevWord() : ptr->selectionModel().selectNextWord();
+                    break;
+                }
+
+            }
+
+            QPoint *link_point = new QPoint;
+            link_point->rx() = start_area.XStart;
+            link_point->ry() = start_area.YStart;
+            link_positions.push_back(link_point);
+        }
     }
 
 }
