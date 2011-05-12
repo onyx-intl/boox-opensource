@@ -3,21 +3,21 @@
 #include "onyx/screen/screen_update_watcher.h"
 
 static const QString TAG_ROW = "row";
-static const int SUBSET_ITEM_HEIGHT = 36;
+static const int LINK_ITEM_HEIGHT = 60;
 
 ZLLinkInfoDialog::ZLLinkInfoDialog(QWidget *parent,
-        QVector<char *> list_of_links)
-    : QWidget(parent, Qt::FramelessWindowHint)
+        QVector<std::string> &list_of_links)
+    : QDialog(parent, Qt::FramelessWindowHint)
     , big_layout_(this)
     , links_(0, this)
     , list_of_links_(list_of_links)
+    , link_selected_(-1)
 {
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Button);
 
     createLayout();
     connectWithChildren();
-    onyx::screen::watcher().addWatcher(this);
 }
 
 ZLLinkInfoDialog::~ZLLinkInfoDialog()
@@ -36,24 +36,27 @@ void ZLLinkInfoDialog::createLayout()
 
 void ZLLinkInfoDialog::createLinks()
 {
-    links_.setFixedHeight(keyboardKeyHeight());
+    links_.setPreferItemSize(QSize(-1, LINK_ITEM_HEIGHT));
     links_.setSearchPolicy(CatalogView::NeighborFirst
             | CatalogView::AutoVerRecycle);
 
-    ODataPtr item(new OData);
-    if (list_of_links_.size() > 0)
+    int size = list_of_links_.size();
+    for (int i=0; i<size; i++)
     {
-        item->insert(TAG_TITLE, list_of_links_.first());
-    }
-    else
-    {
-        item->insert(TAG_TITLE, "Here is link item 1");
-    }
+        ODataPtr item(new OData);
+        item->insert(TAG_TITLE, QString::fromUtf8(list_of_links_.at(i).data()));
+        item->insert(TAG_ROW, i);
 
-    links_datas_.push_back(item);
+        int flag = Qt::AlignTop | Qt::AlignLeft;
+        item->insert(TAG_ALIGN, flag);
+
+        links_datas_.push_back(item);
+    }
 
     links_.setData(links_datas_);
-    links_.setFixedGrid(links_datas_.size(), 1);
+    int data_size = links_datas_.size();
+    links_.setFixedGrid(data_size, 1);
+    links_.setFixedHeight(data_size*LINK_ITEM_HEIGHT+10);
 }
 
 void ZLLinkInfoDialog::connectWithChildren()
@@ -62,19 +65,40 @@ void ZLLinkInfoDialog::connectWithChildren()
             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
 }
 
-void ZLLinkInfoDialog::popup()
+int ZLLinkInfoDialog::popup()
 {
     if (isHidden())
     {
         show();
     }
     QWidget * widget = safeParentWidget(parentWidget());
-        resize(widget->width(), 200);
+    setFixedWidth(widget->width());
+    move(0, widget->height()-height());
+
+    onyx::screen::watcher().addWatcher(this);
+    int ret = this->exec();
+    onyx::screen::watcher().removeWatcher(this);
+    return ret;
+}
+
+void ZLLinkInfoDialog::keyPressEvent(QKeyEvent *ke)
+{
+    if (ke->key() == Qt::Key_Escape)
+    {
+        ke->accept();
+        reject();
+        return;
+    }
+    QDialog::keyPressEvent(ke);
 }
 
 void ZLLinkInfoDialog::linkClicked(int row)
 {
-
+    if (row >= 0 && row < list_of_links_.size())
+    {
+        link_selected_ = row;
+        accept();
+    }
 }
 
 void ZLLinkInfoDialog::onItemActivated(CatalogView *catalog,

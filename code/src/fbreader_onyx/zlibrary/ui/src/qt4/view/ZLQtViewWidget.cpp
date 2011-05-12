@@ -34,6 +34,7 @@
 #include "ZLTextStyle.h"
 #include "ZLTextView.h"
 #include "../dialogs/ZLFileListDialog.h"
+#include "../dialogs/ZLLinkInfoDialog.h"
 
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
@@ -1011,17 +1012,35 @@ void ZLQtViewWidget::popupLinkInfoDialog()
     last_id_.clear();
     QVector<QPoint *> link_positions;
     findAllHyperlinkPositions(link_positions);
+
+    QVector<std::string> list_of_links;
+    QVector<std::string> list_of_ids;
     int size = link_positions.size();
     for (int i = 0; i < size; i++)
     {
         QPoint *p = link_positions.at(i);
         std::string link_info;
         std::string link_id = view()->getLinkInfo(p->x(), p->y(), link_info);
-        qDebug("link id: %s", link_id.data());
-        qDebug("link info: %s", link_info.data());
+        list_of_links.push_back(std::string(link_info));
+        list_of_ids.push_back(std::string(link_id));
     }
 
-    // TODO show link info dialog
+    if (size <= 0)
+    {
+        showGotoPageDialog();
+        return;
+    }
+
+    ZLLinkInfoDialog link_info_dialog(0, list_of_links);
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    ptr->selectionModel().clear();
+    int ret = link_info_dialog.popup();
+    if (ret == QDialog::Accepted)
+    {
+        int selected_link = link_info_dialog.selectedLink();
+        QPoint *p = link_positions.at(selected_link);
+        view()->openInternalLink(p->x(), p->y());
+    }
 }
 
 void ZLQtViewWidget::processKeyReleaseEvent(int key)

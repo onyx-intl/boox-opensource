@@ -8,19 +8,25 @@
 
 using namespace ui;
 
-class ZLLinkInfoDialog: public QWidget
+class ZLLinkInfoDialog: public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ZLLinkInfoDialog(QWidget *parent, QVector<char *> list_of_links);
+    explicit ZLLinkInfoDialog(QWidget *parent,
+            QVector<std::string> &list_of_links);
     ~ZLLinkInfoDialog();
 
-    void popup();
+    int popup();
+
+    inline int selectedLink() { return link_selected_; }
 
 protected Q_SLOTS:
     void onItemActivated(CatalogView *catalog, ContentView *item,
             int user_data);
+
+protected:
+    void keyPressEvent(QKeyEvent *ke);
 
 private:
     void createLayout();
@@ -35,7 +41,9 @@ private:
     CatalogView links_;
     ODatas links_datas_;
 
-    QVector<char *> list_of_links_;
+    QVector<std::string> list_of_links_;
+
+    int link_selected_;
 };
 
 #endif
