@@ -601,7 +601,7 @@ void OnyxPlayerView::close(bool)
     saveSettings();
 
     emit stateChanged(STOP_PLAYER);
-    onCloseClicked();
+    qApp->exit();
 }
 
 void OnyxPlayerView::minimize(bool)
