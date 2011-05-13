@@ -1011,6 +1011,7 @@ void ZLQtViewWidget::popupLinkInfoDialog()
 {
     last_id_.clear();
     QVector<QPoint *> link_positions;
+    onyx::screen::instance().enableUpdate(false);
     findAllHyperlinkPositions(link_positions);
 
     QVector<std::string> list_of_links;
@@ -1024,6 +1025,10 @@ void ZLQtViewWidget::popupLinkInfoDialog()
         list_of_links.push_back(std::string(link_info));
         list_of_ids.push_back(std::string(link_id));
     }
+    onyx::screen::instance().enableUpdate(true);
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    ptr->selectionModel().clear();
+    repaint();
 
     if (size <= 0)
     {
@@ -1032,14 +1037,17 @@ void ZLQtViewWidget::popupLinkInfoDialog()
     }
 
     ZLLinkInfoDialog link_info_dialog(0, list_of_links);
-    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
-    ptr->selectionModel().clear();
+
     int ret = link_info_dialog.popup();
     if (ret == QDialog::Accepted)
     {
         int selected_link = link_info_dialog.selectedLink();
         QPoint *p = link_positions.at(selected_link);
         view()->openInternalLink(p->x(), p->y());
+    }
+    else
+    {
+        myApplication->refreshWindow();
     }
 }
 
@@ -1096,8 +1104,8 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             {
             case Qt::Key_Return:
                 {
-                    handleHyperlinks();
-//                    popupLinkInfoDialog();
+//                    handleHyperlinks();
+                    popupLinkInfoDialog();
                     break;
                 }
             case Qt::Key_Escape:

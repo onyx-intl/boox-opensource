@@ -27,6 +27,7 @@ protected Q_SLOTS:
 
 protected:
     void keyPressEvent(QKeyEvent *ke);
+    void keyReleaseEvent(QKeyEvent *ke);
 
 private:
     void createLayout();
