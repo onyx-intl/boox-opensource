@@ -177,7 +177,7 @@
     display->repaint();
     display->update();
     update();
-    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
  }
 
  void Calculator::digitClicked()
