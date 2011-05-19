@@ -45,6 +45,7 @@ private:
     QVector<std::string> list_of_links_;
 
     int link_selected_;
+    int dialog_height_;
 };
 
 #endif

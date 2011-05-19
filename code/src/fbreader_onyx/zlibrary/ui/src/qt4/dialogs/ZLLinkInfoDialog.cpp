@@ -15,6 +15,7 @@ ZLLinkInfoDialog::ZLLinkInfoDialog(QWidget *parent,
     , links_(&text_wrap_view_factory, this)
     , list_of_links_(list_of_links)
     , link_selected_(-1)
+    , dialog_height_(0)
 {
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Button);
@@ -62,6 +63,7 @@ void ZLLinkInfoDialog::createLinks()
     int data_size = links_datas_.size();
     links_.setFixedGrid(data_size, 1);
     links_.setFixedHeight(data_size*LINK_ITEM_HEIGHT+10);
+    dialog_height_ = data_size*LINK_ITEM_HEIGHT+10+5;
 }
 
 void ZLLinkInfoDialog::connectWithChildren()
@@ -72,13 +74,13 @@ void ZLLinkInfoDialog::connectWithChildren()
 
 int ZLLinkInfoDialog::popup()
 {
+    QWidget * widget = safeParentWidget(parentWidget());
     if (isHidden())
     {
+        move(0, widget->height()-dialog_height_);
         show();
     }
-    QWidget * widget = safeParentWidget(parentWidget());
     setFixedWidth(widget->width());
-    move(0, widget->height()-height());
 
     onyx::screen::watcher().addWatcher(this);
     int ret = this->exec();
