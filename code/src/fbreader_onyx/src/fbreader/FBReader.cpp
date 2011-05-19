@@ -335,7 +335,6 @@ void FBReader::tryShowFootnoteView(const std::string &id, const std::string &typ
                     view.gotoParagraph(label.ParagraphNumber);
                 }
                 setHyperlinkCursor(false);
-                refreshWindow();
             }
         }
     } else if (type == "book") {
