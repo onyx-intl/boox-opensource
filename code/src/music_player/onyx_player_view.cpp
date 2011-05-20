@@ -158,23 +158,23 @@ void OnyxPlayerView::createLayout()
     vbox_.removeWidget(&title_widget_);
     content_widget_.setBackgroundRole(QPalette::Button);
 
-    normal_mode_pixmap_ = QPixmap(":/player_icons2/normal.png");
-    single_repeat_mode_pixmap_ = QPixmap(":/player_icons2/repeat.png");
-    shuffle_mode_pixmap_ = QPixmap(":/player_icons2/shuffle.png");
-    play_pixmap_ = QPixmap(":/player_icons2/play.png");
-    pause_pixmap_ = QPixmap(":/player_icons2/pause.png");
+    normal_mode_pixmap_ = QPixmap(":/player_icons/normal.png");
+    single_repeat_mode_pixmap_ = QPixmap(":/player_icons/repeat.png");
+    shuffle_mode_pixmap_ = QPixmap(":/player_icons/shuffle.png");
+    play_pixmap_ = QPixmap(":/player_icons/play.png");
+    pause_pixmap_ = QPixmap(":/player_icons/pause.png");
 
-    title_title_label_.setPixmap(QPixmap(":/player_icons2/title.png"));
+    title_title_label_.setPixmap(QPixmap(":/player_icons/title.png"));
     title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     title_title_label_.setFixedHeight(defaultItemHeight());
     title_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    artist_title_label_.setPixmap(QPixmap(":/player_icons2/artist.png"));
+    artist_title_label_.setPixmap(QPixmap(":/player_icons/artist.png"));
     artist_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     artist_title_label_.setFixedHeight(defaultItemHeight());
     artist_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    album_title_label_.setPixmap(QPixmap(":/player_icons2/album.png"));
+    album_title_label_.setPixmap(QPixmap(":/player_icons/album.png"));
     album_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     album_title_label_.setFixedHeight(defaultItemHeight());
     album_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
@@ -264,7 +264,7 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap prev_pixmap(":/player_icons2/previous.png");
+    QPixmap prev_pixmap(":/player_icons/previous.png");
     dd->insert(TAG_COVER, prev_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_PREVIOUS);
     menu_view_datas_.push_back(dd);
@@ -275,19 +275,19 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap next_pixmap(":/player_icons2/next.png");
+    QPixmap next_pixmap(":/player_icons/next.png");
     dd->insert(TAG_COVER, next_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_NEXT);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap min_pixmap(":/player_icons2/minimize.png");
+    QPixmap min_pixmap(":/player_icons/minimize.png");
     dd->insert(TAG_COVER, min_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap exit_pixmap(":/player_icons2/exit.png");
+    QPixmap exit_pixmap(":/player_icons/exit.png");
     dd->insert(TAG_COVER, exit_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_EXIT);
     menu_view_datas_.push_back(dd);
