@@ -536,6 +536,10 @@ void ZLQtViewWidget::popupMenu()
         {
             changePageMargins(s - STYLE_PAGE_MARGINS_SMALL);
         }
+        else if (STYLE_BLACK_BACKGROUND <= s && STYLE_WHITE_BACKGROUND >= s)
+        {
+            changeReadingScheme(s);
+        }
     }
 }
 
@@ -710,6 +714,26 @@ void ZLQtViewWidget::changeFont(QFont font)
 
     ZLBooleanOption &boldOption = ZLTextStyleCollection::instance().baseStyle().BoldOption;
     boldOption.setValue(font.bold());
+    myApplication->doAction("updateOptions");
+}
+
+void ZLQtViewWidget::changeReadingScheme(int type)
+{
+    if (type == STYLE_BLACK_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(0, 0, 0));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(255, 255, 255));
+    }
+    else if (type == STYLE_WHITE_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(255, 255, 255));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(0, 0, 0));
+    }
+
     myApplication->doAction("updateOptions");
 }
 

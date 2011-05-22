@@ -79,6 +79,7 @@ public Q_SLOTS:
     void onSetEncoding(std::string encoding);
     void changeFontFamily(const std::string & family);
     void changeFont(QFont font);
+    void changeReadingScheme(int type);
     void changeLineSpacing(int);
     void changePageMargins(int);
     void rotateScreen();
