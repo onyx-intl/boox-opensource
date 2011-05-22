@@ -41,6 +41,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
+#include "onyx/ui/brightness_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
 
 using namespace cms;
@@ -425,6 +426,9 @@ void ZLQtViewWidget::updateActions()
         all.push_back(FULL_SCREEN);
     }
     all.push_back(MUSIC);
+#ifdef BUILD_WITH_TFT
+    all.push_back(BACKLIGHT_BRIGHTNESS);
+#endif
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -476,6 +480,11 @@ void ZLQtViewWidget::popupMenu()
         else if (system == ROTATE_SCREEN)
         {
             rotateScreen();
+        }
+        else if (system == BACKLIGHT_BRIGHTNESS)
+        {
+            ui::BrightnessDialog dialog(widget());
+            dialog.exec();
         }
         return;
     }
