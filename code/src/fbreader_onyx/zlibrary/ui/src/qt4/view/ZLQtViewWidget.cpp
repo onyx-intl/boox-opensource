@@ -41,6 +41,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
+#include "onyx/ui/brightness_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
 
 using namespace cms;
@@ -425,6 +426,9 @@ void ZLQtViewWidget::updateActions()
         all.push_back(FULL_SCREEN);
     }
     all.push_back(MUSIC);
+#ifdef BUILD_WITH_TFT
+    all.push_back(BACKLIGHT_BRIGHTNESS);
+#endif
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -476,6 +480,11 @@ void ZLQtViewWidget::popupMenu()
         else if (system == ROTATE_SCREEN)
         {
             rotateScreen();
+        }
+        else if (system == BACKLIGHT_BRIGHTNESS)
+        {
+            ui::BrightnessDialog dialog(widget());
+            dialog.exec();
         }
         return;
     }
@@ -535,6 +544,10 @@ void ZLQtViewWidget::popupMenu()
         else if (STYLE_PAGE_MARGINS_SMALL <= s && STYLE_PAGE_MARGINS_LARGE >= s)
         {
             changePageMargins(s - STYLE_PAGE_MARGINS_SMALL);
+        }
+        else if (STYLE_BLACK_BACKGROUND <= s && STYLE_WHITE_BACKGROUND >= s)
+        {
+            changeReadingScheme(s);
         }
     }
 }
@@ -710,6 +723,26 @@ void ZLQtViewWidget::changeFont(QFont font)
 
     ZLBooleanOption &boldOption = ZLTextStyleCollection::instance().baseStyle().BoldOption;
     boldOption.setValue(font.bold());
+    myApplication->doAction("updateOptions");
+}
+
+void ZLQtViewWidget::changeReadingScheme(int type)
+{
+    if (type == STYLE_BLACK_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(0, 0, 0));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(255, 255, 255));
+    }
+    else if (type == STYLE_WHITE_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(255, 255, 255));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(0, 0, 0));
+    }
+
     myApplication->doAction("updateOptions");
 }
 
