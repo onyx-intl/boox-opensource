@@ -551,6 +551,12 @@ void OnyxPlayerView::next()
     }
     else if (!model_->next())
     {
+        qint64 total = core_->totalTime();
+        onyx::screen::instance().enableUpdate(false);
+        progress_bar_.setValue(total/1000);
+        current_time_label_.setText(timeMessage(total));
+        onyx::screen::instance().enableUpdate(true);
+
         stop();
         return;
     }
