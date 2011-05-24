@@ -177,7 +177,7 @@
     display->repaint();
     display->update();
     update();
-    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::DW);
  }
 
  void Calculator::digitClicked()
@@ -193,6 +193,7 @@
      }
      display->setText(display->text() + QString::number(digitValue));
 
+     clickedButton->setFocus();
      refreshScreen();
  }
 
