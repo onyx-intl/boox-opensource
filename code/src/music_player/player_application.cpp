@@ -115,11 +115,15 @@ bool PlayerApplication::open(const QString &path_name)
     //}
     //else
     {
-        view_.show();
-        onyx::screen::watcher().addWatcher(&view_);
         sys::SysStatus::instance().setSystemBusy( false );
         onyx::screen::instance().enableUpdate(true);
-        onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC);
+        // TODO (Jim) need to clean code. Check if it can only use screen update watcher.
+        view_.show();
+        view_.songListView()->repaint();
+        onyx::screen::instance().flush(&view_,
+                onyx::screen::ScreenProxy::GC, false,
+                onyx::screen::ScreenCommand::WAIT_ALL);
+        onyx::screen::watcher().addWatcher(&view_);
         qDebug("Flush player view");
         view_.enableProgressBar(true);
     }

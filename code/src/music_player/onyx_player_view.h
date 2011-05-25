@@ -33,6 +33,8 @@ public:
     qint64 elapsed() { return core_->elapsed(); }
     void enableProgressBar(bool enable) { progress_bar_enabled_ = enable; }
 
+    inline CatalogView * songListView() { return &song_list_view_; }
+
 public Q_SLOTS:
     void setProgress(int);
     void play();
