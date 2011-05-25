@@ -75,6 +75,7 @@ void ZLLinkInfoDialog::connectWithChildren()
 int ZLLinkInfoDialog::popup()
 {
     QWidget * widget = safeParentWidget(parentWidget());
+
     if (isHidden())
     {
         move(0, widget->height()-dialog_height_);
@@ -83,6 +84,8 @@ int ZLLinkInfoDialog::popup()
     setFixedWidth(widget->width());
 
     onyx::screen::watcher().addWatcher(this);
+    onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU,
+            false, onyx::screen::ScreenCommand::WAIT_ALL);
     int ret = this->exec();
     onyx::screen::watcher().removeWatcher(this);
     return ret;
