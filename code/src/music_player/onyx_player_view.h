@@ -35,6 +35,8 @@ public:
 
     inline CatalogView * songListView() { return &song_list_view_; }
 
+    void playFile(const QString & file_path);
+
 public Q_SLOTS:
     void setProgress(int);
     void play();

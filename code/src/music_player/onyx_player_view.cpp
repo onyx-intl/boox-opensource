@@ -412,6 +412,10 @@ int OnyxPlayerView::getStep(qint64 total, qint64 current)
     {
         step = 4;
     }
+    else if (current/1000 < 3)
+    {
+        step = 2;
+    }
     return step;
 }
 
@@ -825,7 +829,7 @@ void OnyxPlayerView::onCurrentChanged()
         {
             progress_bar_.update();
             onyx::screen::watcher().enqueue(&progress_bar_,
-                    onyx::screen::ScreenProxy::DW);
+                    onyx::screen::ScreenProxy::GU);
             total_time_label_.update();
             onyx::screen::watcher().enqueue(&total_time_label_,
                     onyx::screen::ScreenProxy::GU);
@@ -906,6 +910,34 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
             update();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
+    }
+}
+
+void OnyxPlayerView::playFile(const QString & file_path)
+{
+    QFileInfo file_info(file_path);
+    QString file_name = file_info.fileName();
+
+    int size = song_list_data_.size();
+    int target_row = -1;
+    for (int i=0; i<size; i++)
+    {
+        OData *dd = song_list_data_.at(i);
+        if (dd->contains(TAG_TITLE))
+        {
+            if (file_name == dd->value(TAG_TITLE).toString())
+            {
+                target_row = dd->value(TAG_ROW).toInt();
+                break;
+            }
+        }
+    }
+
+    if (target_row >= 0 && target_row < size)
+    {
+
+        model_->setCurrent(target_row);
+        play();
     }
 }
 
