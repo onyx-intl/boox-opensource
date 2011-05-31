@@ -41,6 +41,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
+#include "onyx/ui/brightness_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
 
 using namespace cms;
@@ -87,7 +88,11 @@ QWidget * ZLQtViewWidget::addStatusBar()
 {
     if (has_touch)
     {
+#ifdef BUILD_WITH_TFT
+        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|CLOCK|BATTERY);
+#else
         status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
+#endif
     }
     else
     {
@@ -425,6 +430,9 @@ void ZLQtViewWidget::updateActions()
         all.push_back(FULL_SCREEN);
     }
     all.push_back(MUSIC);
+#ifdef BUILD_WITH_TFT
+    all.push_back(BACKLIGHT_BRIGHTNESS);
+#endif
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -476,6 +484,11 @@ void ZLQtViewWidget::popupMenu()
         else if (system == ROTATE_SCREEN)
         {
             rotateScreen();
+        }
+        else if (system == BACKLIGHT_BRIGHTNESS)
+        {
+            ui::BrightnessDialog dialog(widget());
+            dialog.exec();
         }
         return;
     }
@@ -535,6 +548,10 @@ void ZLQtViewWidget::popupMenu()
         else if (STYLE_PAGE_MARGINS_SMALL <= s && STYLE_PAGE_MARGINS_LARGE >= s)
         {
             changePageMargins(s - STYLE_PAGE_MARGINS_SMALL);
+        }
+        else if (STYLE_BLACK_BACKGROUND <= s && STYLE_WHITE_BACKGROUND >= s)
+        {
+            changeReadingScheme(s);
         }
     }
 }
@@ -710,6 +727,26 @@ void ZLQtViewWidget::changeFont(QFont font)
 
     ZLBooleanOption &boldOption = ZLTextStyleCollection::instance().baseStyle().BoldOption;
     boldOption.setValue(font.bold());
+    myApplication->doAction("updateOptions");
+}
+
+void ZLQtViewWidget::changeReadingScheme(int type)
+{
+    if (type == STYLE_BLACK_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(0, 0, 0));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(255, 255, 255));
+    }
+    else if (type == STYLE_WHITE_BACKGROUND)
+    {
+        ZLColorOption &bk = ZLTextStyleCollection::instance().baseStyle().BackgroundColorOption;
+        bk.setValue(ZLColor(255, 255, 255));
+        ZLColorOption &fg = ZLTextStyleCollection::instance().baseStyle().RegularTextColorOption;
+        fg.setValue(ZLColor(0, 0, 0));
+    }
+
     myApplication->doAction("updateOptions");
 }
 
@@ -1011,6 +1048,7 @@ void ZLQtViewWidget::popupLinkInfoDialog()
 {
     last_id_.clear();
     QVector<QPoint *> link_positions;
+    onyx::screen::instance().enableUpdate(false);
     findAllHyperlinkPositions(link_positions);
 
     QVector<std::string> list_of_links;
@@ -1024,6 +1062,10 @@ void ZLQtViewWidget::popupLinkInfoDialog()
         list_of_links.push_back(std::string(link_info));
         list_of_ids.push_back(std::string(link_id));
     }
+    onyx::screen::instance().enableUpdate(true);
+    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+    ptr->selectionModel().clear();
+    repaint();
 
     if (size <= 0)
     {
@@ -1032,14 +1074,17 @@ void ZLQtViewWidget::popupLinkInfoDialog()
     }
 
     ZLLinkInfoDialog link_info_dialog(0, list_of_links);
-    ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
-    ptr->selectionModel().clear();
+
     int ret = link_info_dialog.popup();
     if (ret == QDialog::Accepted)
     {
         int selected_link = link_info_dialog.selectedLink();
         QPoint *p = link_positions.at(selected_link);
         view()->openInternalLink(p->x(), p->y());
+    }
+    else
+    {
+        myApplication->refreshWindow();
     }
 }
 
@@ -1096,8 +1141,8 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             {
             case Qt::Key_Return:
                 {
-                    handleHyperlinks();
-//                    popupLinkInfoDialog();
+//                    handleHyperlinks();
+                    popupLinkInfoDialog();
                     break;
                 }
             case Qt::Key_Escape:

@@ -27,6 +27,7 @@ protected Q_SLOTS:
 
 protected:
     void keyPressEvent(QKeyEvent *ke);
+    void keyReleaseEvent(QKeyEvent *ke);
 
 private:
     void createLayout();
@@ -44,6 +45,7 @@ private:
     QVector<std::string> list_of_links_;
 
     int link_selected_;
+    int dialog_height_;
 };
 
 #endif

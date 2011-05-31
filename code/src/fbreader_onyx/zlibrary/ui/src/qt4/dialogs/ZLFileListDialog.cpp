@@ -20,7 +20,6 @@ ZLFileListDialog::ZLFileListDialog(const QStringList &file_list,
 {
     createLayout();
     setFixedSize(bestDialogSize());
-//    onyx::screen::watcher().addWatcher(this);
 }
 
 ZLFileListDialog::~ZLFileListDialog()

@@ -73,6 +73,7 @@ bool PlayerApplication::open(const QString &path_name)
 {
     ui::loadTranslator(QLocale::system().name());
     bool need_reload = true;
+    QString selected_file;
     if (path_name.isEmpty() && path_.isEmpty())
     {
         path_ = PlayerUtils::lastSong();
@@ -83,14 +84,36 @@ bool PlayerApplication::open(const QString &path_name)
     }
     else //if (!path_name.isEmpty() && !path_.isEmpty())
     {
-        // reload
-        close(path_);
-        path_ = path_name;
+        // check if the path's directories are the same.
+        if (!path_.isEmpty())
+        {
+            QFileInfo src_info(path_);
+            QFileInfo dst_info(path_name);
+            if (src_info.dir().absolutePath() == dst_info.dir().absolutePath())
+            {
+                need_reload = false;
+                selected_file = path_name;
+                view_.stop();
+            }
+            else
+            {
+                // reload
+                close(path_);
+                path_ = path_name;
+            }
+        }
+        else
+        {
+            // reload
+            close(path_);
+            path_ = path_name;
+        }
     }
 
     if (need_reload)
     {
         model_.reset(new PlayListModel);
+
         view_.attachModel(model_.get());
 
         if (path_.contains("://"))
@@ -107,22 +130,21 @@ bool PlayerApplication::open(const QString &path_name)
         view_.activateWindow();
     }
 
-    // if it is the first time rendering, set busy to be false
-    //if (hide_view_on_waking_up)
-    //{
-    //    // reset the flag hide_view_on_waking_up for activating player view in normal cases.
-    //    hide_view_on_waking_up = false;
-    //}
-    //else
+    sys::SysStatus::instance().setSystemBusy( false );
+    onyx::screen::instance().enableUpdate(true);
+    // TODO (Jim) need to clean code. Check if it can only use screen update watcher.
+    view_.show();
+
+    if (!selected_file.isEmpty())
     {
-        view_.show();
-        onyx::screen::watcher().addWatcher(&view_);
-        sys::SysStatus::instance().setSystemBusy( false );
-        onyx::screen::instance().enableUpdate(true);
-        onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC);
-        qDebug("Flush player view");
-        view_.enableProgressBar(true);
+        view_.playFile(selected_file);
     }
+
+    view_.songListView()->repaint();
+    onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC,
+            false, onyx::screen::ScreenCommand::WAIT_ALL);
+    onyx::screen::watcher().addWatcher(&view_);
+    view_.enableProgressBar(true);
     return true;
 }
 

@@ -26,7 +26,6 @@ FILE(GLOB MOC_HDRS core/*.h
                    libsr/*.h
                    libtag/taglib/*.h
                    player_utils.h
-                   player_view.h
                    onyx_player_view.h
                    player_application.h
                    player_title_bar.h)
@@ -44,7 +43,6 @@ FILE(GLOB SRCS core/*.cpp
                libmad/*.c
                libbs2b/*.c
                libsr/*.c
-               player_view.cpp
                onyx_player_view.cpp
                player_application.cpp
                player_title_bar.cpp)

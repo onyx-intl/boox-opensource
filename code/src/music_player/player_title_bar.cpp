@@ -22,7 +22,7 @@ PlayerTitleBar::~PlayerTitleBar()
 
 void PlayerTitleBar::createLayout()
 {
-    window_icon_label_.setPixmap(QPixmap(":/player_icons2/music_player.png"));
+    window_icon_label_.setPixmap(QPixmap(":/player_icons/music_player.png"));
     window_icon_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     window_icon_label_.setFixedHeight(HEIGTH);
 
@@ -38,7 +38,7 @@ void PlayerTitleBar::paintEvent(QPaintEvent * event)
     font.setPointSize(22);
     ui::calculateSingleLineLayout(text_layout_, font, music_player_title,
                 Qt::AlignLeft | Qt::AlignVCenter,
-                rect().adjusted(MARGIN, 0, -MARGIN, 0), Qt::ElideLeft);
+                rect().adjusted(0, 0, 0, 0), Qt::ElideLeft);
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);

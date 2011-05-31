@@ -158,23 +158,23 @@ void OnyxPlayerView::createLayout()
     vbox_.removeWidget(&title_widget_);
     content_widget_.setBackgroundRole(QPalette::Button);
 
-    normal_mode_pixmap_ = QPixmap(":/player_icons2/normal.png");
-    single_repeat_mode_pixmap_ = QPixmap(":/player_icons2/repeat.png");
-    shuffle_mode_pixmap_ = QPixmap(":/player_icons2/shuffle.png");
-    play_pixmap_ = QPixmap(":/player_icons2/play.png");
-    pause_pixmap_ = QPixmap(":/player_icons2/pause.png");
+    normal_mode_pixmap_ = QPixmap(":/player_icons/normal.png");
+    single_repeat_mode_pixmap_ = QPixmap(":/player_icons/repeat.png");
+    shuffle_mode_pixmap_ = QPixmap(":/player_icons/shuffle.png");
+    play_pixmap_ = QPixmap(":/player_icons/play.png");
+    pause_pixmap_ = QPixmap(":/player_icons/pause.png");
 
-    title_title_label_.setPixmap(QPixmap(":/player_icons2/title.png"));
+    title_title_label_.setPixmap(QPixmap(":/player_icons/title.png"));
     title_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     title_title_label_.setFixedHeight(defaultItemHeight());
     title_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    artist_title_label_.setPixmap(QPixmap(":/player_icons2/artist.png"));
+    artist_title_label_.setPixmap(QPixmap(":/player_icons/artist.png"));
     artist_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     artist_title_label_.setFixedHeight(defaultItemHeight());
     artist_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
 
-    album_title_label_.setPixmap(QPixmap(":/player_icons2/album.png"));
+    album_title_label_.setPixmap(QPixmap(":/player_icons/album.png"));
     album_title_label_.setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     album_title_label_.setFixedHeight(defaultItemHeight());
     album_title_label_.setFixedWidth(AUDIO_INFO_SPACING);
@@ -192,7 +192,7 @@ void OnyxPlayerView::createLayout()
 
     createMenuView();
 
-    big_layout_.setContentsMargins(2, 2, 2, 2);
+    big_layout_.setContentsMargins(2, 2, 0, 2);
     big_layout_.setSpacing(0);
     big_layout_.addWidget(&player_title_bar_, 0, Qt::AlignTop);
     big_layout_.addWidget(&song_list_view_, 1, Qt::AlignTop);
@@ -224,7 +224,7 @@ void OnyxPlayerView::createLayout()
     big_layout_.addWidget(&status_bar_, 0, Qt::AlignBottom);
 }
 
-void OnyxPlayerView::createSongListView()
+void OnyxPlayerView::createSongListView(int view_width)
 {
     const int height = defaultItemHeight()+4*SPACING;
     song_list_view_.setPreferItemSize(QSize(-1, height));
@@ -249,6 +249,7 @@ void OnyxPlayerView::createSongListView()
     int total_height = safeParentWidget(parentWidget())->height();
     setSongListViewFixedGrid(total_height);
 
+    song_list_view_.setFixedWidth(view_width);
     song_list_view_.setData(song_list_data_);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::RECYCLE_DOWN);
@@ -264,7 +265,7 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap prev_pixmap(":/player_icons2/previous.png");
+    QPixmap prev_pixmap(":/player_icons/previous.png");
     dd->insert(TAG_COVER, prev_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_PREVIOUS);
     menu_view_datas_.push_back(dd);
@@ -275,19 +276,19 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap next_pixmap(":/player_icons2/next.png");
+    QPixmap next_pixmap(":/player_icons/next.png");
     dd->insert(TAG_COVER, next_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_NEXT);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap min_pixmap(":/player_icons2/minimize.png");
+    QPixmap min_pixmap(":/player_icons/minimize.png");
     dd->insert(TAG_COVER, min_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap exit_pixmap(":/player_icons2/exit.png");
+    QPixmap exit_pixmap(":/player_icons/exit.png");
     dd->insert(TAG_COVER, exit_pixmap);
     dd->insert(TAG_MENU_TYPE, MENU_EXIT);
     menu_view_datas_.push_back(dd);
@@ -411,6 +412,10 @@ int OnyxPlayerView::getStep(qint64 total, qint64 current)
     if ((total - current) / 1000 < 3)
     {
         step = 4;
+    }
+    else if (current/1000 < 3)
+    {
+        step = 2;
     }
     return step;
 }
@@ -551,6 +556,12 @@ void OnyxPlayerView::next()
     }
     else if (!model_->next())
     {
+        qint64 total = core_->totalTime();
+        onyx::screen::instance().enableUpdate(false);
+        progress_bar_.setValue(total/1000);
+        current_time_label_.setText(timeMessage(total));
+        onyx::screen::instance().enableUpdate(true);
+
         stop();
         return;
     }
@@ -819,7 +830,7 @@ void OnyxPlayerView::onCurrentChanged()
         {
             progress_bar_.update();
             onyx::screen::watcher().enqueue(&progress_bar_,
-                    onyx::screen::ScreenProxy::DW);
+                    onyx::screen::ScreenProxy::GU);
             total_time_label_.update();
             onyx::screen::watcher().enqueue(&total_time_label_,
                     onyx::screen::ScreenProxy::GU);
@@ -844,7 +855,8 @@ void OnyxPlayerView::setSongListViewFixedGrid(int total_height)
 
 void OnyxPlayerView::onLoadingFinished()
 {
-    createSongListView();
+    QWidget *pwidget = safeParentWidget(parentWidget());
+    createSongListView(pwidget->width()-8);
 
     onCurrentChanged();
     if ( sys::SysStatus::instance().isSystemBusy() )
@@ -900,6 +912,34 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
             update();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
+    }
+}
+
+void OnyxPlayerView::playFile(const QString & file_path)
+{
+    QFileInfo file_info(file_path);
+    QString file_name = file_info.fileName();
+
+    int size = song_list_data_.size();
+    int target_row = -1;
+    for (int i=0; i<size; i++)
+    {
+        OData *dd = song_list_data_.at(i);
+        if (dd->contains(TAG_TITLE))
+        {
+            if (file_name == dd->value(TAG_TITLE).toString())
+            {
+                target_row = dd->value(TAG_ROW).toInt();
+                break;
+            }
+        }
+    }
+
+    if (target_row >= 0 && target_row < size)
+    {
+
+        model_->setCurrent(target_row);
+        play();
     }
 }
 

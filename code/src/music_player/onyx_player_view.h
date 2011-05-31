@@ -33,6 +33,10 @@ public:
     qint64 elapsed() { return core_->elapsed(); }
     void enableProgressBar(bool enable) { progress_bar_enabled_ = enable; }
 
+    inline CatalogView * songListView() { return &song_list_view_; }
+
+    void playFile(const QString & file_path);
+
 public Q_SLOTS:
     void setProgress(int);
     void play();
@@ -74,7 +78,7 @@ private:
     void saveSettings();
 
     void createLayout();
-    void createSongListView();
+    void createSongListView(int view_width);
     void createMenuView();
     void connectWithChildren();
 
