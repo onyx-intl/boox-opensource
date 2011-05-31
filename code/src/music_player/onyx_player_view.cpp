@@ -192,7 +192,7 @@ void OnyxPlayerView::createLayout()
 
     createMenuView();
 
-    big_layout_.setContentsMargins(2, 2, 2, 2);
+    big_layout_.setContentsMargins(2, 2, 0, 2);
     big_layout_.setSpacing(0);
     big_layout_.addWidget(&player_title_bar_, 0, Qt::AlignTop);
     big_layout_.addWidget(&song_list_view_, 1, Qt::AlignTop);
@@ -224,7 +224,7 @@ void OnyxPlayerView::createLayout()
     big_layout_.addWidget(&status_bar_, 0, Qt::AlignBottom);
 }
 
-void OnyxPlayerView::createSongListView()
+void OnyxPlayerView::createSongListView(int view_width)
 {
     const int height = defaultItemHeight()+4*SPACING;
     song_list_view_.setPreferItemSize(QSize(-1, height));
@@ -249,6 +249,7 @@ void OnyxPlayerView::createSongListView()
     int total_height = safeParentWidget(parentWidget())->height();
     setSongListViewFixedGrid(total_height);
 
+    song_list_view_.setFixedWidth(view_width);
     song_list_view_.setData(song_list_data_);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::DOWN);
     song_list_view_.setNeighbor(&menu_view_, CatalogView::RECYCLE_DOWN);
@@ -854,7 +855,8 @@ void OnyxPlayerView::setSongListViewFixedGrid(int total_height)
 
 void OnyxPlayerView::onLoadingFinished()
 {
-    createSongListView();
+    QWidget *pwidget = safeParentWidget(parentWidget());
+    createSongListView(pwidget->width()-8);
 
     onCurrentChanged();
     if ( sys::SysStatus::instance().isSystemBusy() )

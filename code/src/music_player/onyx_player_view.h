@@ -78,7 +78,7 @@ private:
     void saveSettings();
 
     void createLayout();
-    void createSongListView();
+    void createSongListView(int view_width);
     void createMenuView();
     void connectWithChildren();
 
