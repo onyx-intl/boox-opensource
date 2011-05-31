@@ -19,16 +19,19 @@ bool isRussianCode(const std::string & strIn)
     unsigned char ch1;
     unsigned char ch2;
     int num = 0;
-    int i;
-    for (i = 0; i < strIn.size(); ++i)
+    if (strIn.size() >= 2)
     {
-        ch1 = (unsigned char)strIn.at(i);
-
-        if (ch1 >= 0x80)
+        int i;
+        for (i = 0; i < strIn.size(); ++i)
         {
-            num ++;
-        }
+            ch1 = (unsigned char)strIn.at(i);
 
+            if (ch1 >= 0x80)
+            {
+                num ++;
+            }
+
+        }
     }
     return  num > strIn.size() * 0.7;
 } 
@@ -46,15 +49,16 @@ bool isGB2312Code(const std::string & strIn)
             ch1 = (unsigned char)strIn.at(i);
             if (ch1 < 0x7f)
             {
+                num ++;
                 continue;
             }
 
-            if (ch1 > 0xF7)
+            if (ch1 > 0xd7)
             {
                 return false;
             }
 
-            if (ch1 >= 0xB0 && ch1 <= 0xF7 && i < strIn.size() - 1)
+            if (ch1 >= 0xB0 && ch1 <= 0xd7 && i < strIn.size() - 1)
             {
                 ch2 = (unsigned char)strIn.at(++i);
                 if (ch2 > 0xFe)
@@ -213,25 +217,65 @@ bool DecoderMADFactory::createPlayList(const QString &file_name,
             TagLib::String genre = tag->genre();
             TagLib::String title = tag->title();
 
-            if(isGB2312Code(title.to8Bit(false)))
+            std::string str = tag->album().to8Bit(false);
+
+            if(isGB2312Code(str))
             {
                 codec = QTextCodec::codecForName ("gb2312");
             }
-            else if (isRussianCode(title.to8Bit(false)))
+            else if (isRussianCode(str))
             {
                 codec = QTextCodec::codecForName ("windows-1251");
             }
-
+            else
+            {
+                codec = QTextCodec::codecForName ("UTF-8");
+            }
             bool utf = codec->name ().contains("UTF");
+            qDebug() << "codec->name " << codec->name ();
 
             info->setMetaData(PlayerUtils::ALBUM,
                               codec->toUnicode(album.toCString(utf)).trimmed());
+
+            str =  tag->artist().to8Bit(false);
+            if(isGB2312Code(str))
+            {
+                codec = QTextCodec::codecForName ("gb2312");
+            }
+            else if (isRussianCode(str))
+            {
+                codec = QTextCodec::codecForName ("windows-1251");
+            }
+            else
+            {
+                codec = QTextCodec::codecForName ("UTF-8");
+            }
+            utf = codec->name ().contains("UTF");
+            qDebug() << "codec->name " << codec->name ();
+
             info->setMetaData(PlayerUtils::ARTIST,
                               codec->toUnicode(artist.toCString(utf)).trimmed());
             info->setMetaData(PlayerUtils::COMMENT,
                               codec->toUnicode(comment.toCString(utf)).trimmed());
             info->setMetaData(PlayerUtils::GENRE,
                               codec->toUnicode(genre.toCString(utf)).trimmed());
+
+            str =  tag->title().to8Bit(false);
+            if(isGB2312Code(str))
+            {
+                codec = QTextCodec::codecForName ("gb2312");
+            }
+            else if (isRussianCode(str))
+            {
+                codec = QTextCodec::codecForName ("windows-1251");
+            }
+            else
+            {
+                codec = QTextCodec::codecForName ("UTF-8");
+            }
+            utf = codec->name ().contains("UTF");
+            qDebug() << "codec->name " << codec->name ();
+
             info->setMetaData(PlayerUtils::TITLE,
                               codec->toUnicode(title.toCString(utf)).trimmed());
             info->setMetaData(PlayerUtils::YEAR,
