@@ -14,6 +14,64 @@
 
 namespace player
 {
+bool isRussianCode(const std::string & strIn)
+{
+    unsigned char ch1;
+    unsigned char ch2;
+    int num = 0;
+    int i;
+    for (i = 0; i < strIn.size(); ++i)
+    {
+        ch1 = (unsigned char)strIn.at(i);
+
+        if (ch1 >= 0x80)
+        {
+            num ++;
+        }
+
+    }
+    return  num > strIn.size() * 0.7;
+} 
+
+bool isGB2312Code(const std::string & strIn)
+{
+    unsigned char ch1;
+    unsigned char ch2;
+    int num = 0;
+    if (strIn.size() >= 2)
+    {
+        int i;
+        for (i = 0; i < strIn.size(); ++i)
+        {
+            ch1 = (unsigned char)strIn.at(i);
+            if (ch1 < 0x7f)
+            {
+                continue;
+            }
+
+            if (ch1 > 0xF7)
+            {
+                return false;
+            }
+
+            if (ch1 >= 0xB0 && ch1 <= 0xF7 && i < strIn.size() - 1)
+            {
+                ch2 = (unsigned char)strIn.at(++i);
+                if (ch2 > 0xFe)
+                {
+                    return false;
+                }
+                if (ch2 >= 0xa0 && ch2 <= 0xfe)
+                {
+                    num += 2;
+                }
+            }
+
+        }
+    }
+    
+    return num > strIn.size() * 0.7;
+}
 
 DecoderMADFactory::DecoderMADFactory()
 {
@@ -149,12 +207,22 @@ bool DecoderMADFactory::createPlayList(const QString &file_name,
 
         if (tag && codec)
         {
-            bool utf = codec->name ().contains("UTF");
             TagLib::String album = tag->album();
             TagLib::String artist = tag->artist();
             TagLib::String comment = tag->comment();
             TagLib::String genre = tag->genre();
             TagLib::String title = tag->title();
+
+            if(isGB2312Code(title.to8Bit(false)))
+            {
+                codec = QTextCodec::codecForName ("gb2312");
+            }
+            else if (isRussianCode(title.to8Bit(false)))
+            {
+                codec = QTextCodec::codecForName ("windows-1251");
+            }
+
+            bool utf = codec->name ().contains("UTF");
 
             info->setMetaData(PlayerUtils::ALBUM,
                               codec->toUnicode(album.toCString(utf)).trimmed());
