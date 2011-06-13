@@ -28,6 +28,7 @@ class Simsu : public QWidget {
         void closeEvent ( QCloseEvent *event );
         bool event ( QEvent *event );
         void keyPressEvent (QKeyEvent * event);
+        void keyReleaseEvent (QKeyEvent * event);
 
     private slots:
         void showBoard();

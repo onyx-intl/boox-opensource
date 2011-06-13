@@ -110,8 +110,9 @@ void Simsu::keyPressEvent(QKeyEvent* event)
     switch(event->key())
     {
     case Qt::Key_Escape:
-        //use menudialog to quit
-        qApp->quit();
+    {
+        event->accept();
+    }
         break;
     case Qt::Key_PageUp:
         m_board->moves()->undo();
@@ -136,6 +137,19 @@ void Simsu::keyPressEvent(QKeyEvent* event)
         QWidget::keyPressEvent(event);
         break;
     }
+}
+
+void Simsu::keyReleaseEvent (QKeyEvent * event)
+{
+    int key = event->key();
+    if (key == Qt::Key_Escape)
+    {
+        event->accept();
+        //use menudialog to quit
+        qApp->quit();
+    }
+
+    QWidget::keyReleaseEvent(event);
 }
 
 void Simsu::showBoard()
