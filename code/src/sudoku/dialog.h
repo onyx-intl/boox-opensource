@@ -26,7 +26,7 @@ public:
 public slots:
     void accept();
 signals:
-    void setGameSignal ( int, int, int);
+    void setGameSignal ( qint32, qint32, qint32);
 protected:
     void mouseMoveEvent ( QMouseEvent* event );
     bool event ( QEvent * event );

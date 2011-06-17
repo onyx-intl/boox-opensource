@@ -25,7 +25,7 @@ namespace DLX {
 
 /*****************************************************************************/
 
-Matrix::Matrix ( unsigned int max_columns )
+Matrix::Matrix ( quint32 max_columns )
                 : m_max_columns ( max_columns ), m_columns ( max_columns ), m_output ( max_columns ), m_solutions ( 0 )
 {
         m_header = new HeaderNode;
@@ -33,7 +33,7 @@ Matrix::Matrix ( unsigned int max_columns )
 
         Node* node = m_header;
         HeaderNode* column = 0;
-        for ( unsigned int i = 0; i < m_max_columns; ++i ) {
+        for ( quint32 i = 0; i < m_max_columns; ++i ) {
                 column = &m_columns[i];
                 column->id = i;
                 column->up = column->down = column->column = column;
@@ -62,7 +62,7 @@ void Matrix::addRow()
 
 /*****************************************************************************/
 
-void Matrix::addElement ( unsigned int c )
+void Matrix::addElement ( quint32 c )
 {
         Q_ASSERT ( c < m_max_columns );
 
@@ -89,7 +89,7 @@ void Matrix::addElement ( unsigned int c )
 
 /*****************************************************************************/
 
-void Matrix::solve ( unsigned int k )
+void Matrix::solve ( quint32 k )
 {
         if ( m_header->right == m_header ) {
                 ++m_solutions;
@@ -98,7 +98,7 @@ void Matrix::solve ( unsigned int k )
         }
 
         HeaderNode* column = 0;
-        unsigned int s = 0xFFFFFFFF;
+        quint32 s = 0xFFFFFFFF;
         for ( HeaderNode* i = m_header->right->column; i != m_header; i = i->right->column ) {
                 if ( i->size < s ) {
                         column = i;
@@ -108,7 +108,7 @@ void Matrix::solve ( unsigned int k )
 
         cover ( column );
 
-        unsigned int next_k = k + 1;
+        quint32 next_k = k + 1;
 
         for ( Node* row = column->down; row != column; row = row->down ) {
                 m_output[k] = row;

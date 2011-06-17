@@ -36,6 +36,7 @@ class Simsu : public QWidget {
         void newGame();
         void checkGame();
         void about();
+        void onWin();
     private:
         Board *m_board;
         QBoxLayout *m_layout;

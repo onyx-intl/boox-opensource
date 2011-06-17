@@ -52,8 +52,9 @@ Simsu::Simsu(QWidget *parent , Qt::WindowFlags f) : QWidget(parent, f),
     m_board->cell(0,0)->setFocus();
 
     connect(m_board,SIGNAL(toShowBoard()),this, SLOT(showBoard()));
-    connect(dialog_, SIGNAL(ActiveKey(int)), m_board, SLOT(setActiveKey(int)));
-    connect(dialog_, SIGNAL(ActiveModeKey(int)), m_board, SLOT(setActiveModeKey(int)));
+    connect(m_board, SIGNAL(win()), this, SLOT(onWin()));
+    connect(dialog_, SIGNAL(ActiveKey(qint32)), m_board, SLOT(setActiveKey(qint32)));
+    connect(dialog_, SIGNAL(ActiveModeKey(qint32)), m_board, SLOT(setActiveModeKey(qint32)));
     dialog_->setModal(true);
     showMaximized();
 
@@ -141,7 +142,7 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 
 void Simsu::keyReleaseEvent (QKeyEvent * event)
 {
-    int key = event->key();
+    qint32 key = event->key();
     if (key == Qt::Key_Escape)
     {
         event->accept();
@@ -154,8 +155,8 @@ void Simsu::keyReleaseEvent (QKeyEvent * event)
 
 void Simsu::showBoard()
 {
-    int column = m_board->getColumn();
-    int row = m_board->getRow();
+    qint32 column = m_board->getColumn();
+    qint32 row = m_board->getRow();
 
     if(!m_board->cell(column,row)->given())
     {
@@ -164,8 +165,8 @@ void Simsu::showBoard()
         //paitn rect
         dialog_->hide();
         m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected(true);
-        int group_c = column/3;
-        int group_r = row/3;
+        qint32 group_c = column/3;
+        qint32 group_r = row/3;
 
         //if column 1, moves to (3,3)
         //esle if (group_r,group_c) = (1,1), moves to (6,3)
@@ -294,6 +295,13 @@ void Simsu::newGame()
     // Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
     //TODO show game configuration dialog
     m_board->newPuzzle();
+}
+
+void Simsu::onWin()
+{
+    MessageDialog congr(QMessageBox::Icon(QMessageBox::Information) , tr("You win"),
+                        tr("Thanks for playing Sudoku"));
+    congr.exec();
 }
 
 }

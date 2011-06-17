@@ -20,10 +20,10 @@ MDialog::MDialog(QWidget* parent):QDialog(parent) {
     setAutoFillBackground(true);
     setWindowFlags(Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint);
     layout_key = new QGridLayout(this);
-    QButtonGroup *group_key = new QButtonGroup(this);
+    group_key = new QButtonGroup(this);
     layout_key->setColumnMinimumWidth(3,32);
     list_key.clear();
-    for ( int i = 1; i < 10; ++i ) {
+    for ( qint32 i = 1; i < 10; ++i ) {
         MToolButton *key = new MToolButton(this);
         key->setText(QString::number(i));
         key->setFont(QFont("sans",28,QFont::Black));
@@ -47,7 +47,7 @@ MDialog::MDialog(QWidget* parent):QDialog(parent) {
 
 void MDialog::keyPressEvent(QKeyEvent* event) {
 //     update();
-    int current_button_ =  list_key.indexOf(static_cast<MToolButton*> (focusWidget()));
+    qint32 current_button_ =  list_key.indexOf(static_cast<MToolButton*> (focusWidget()));
     switch (event->key()) {
         case Qt::Key_Right:
             if ((current_button_ - 11) % 3 == 0 ) {
@@ -80,7 +80,7 @@ void MDialog::setActiveKey(int k) {
     }
 }
 
-void MDialog::setActiveModeKey(int k)
+void MDialog::setActiveModeKey(qint32 k)
 {
     emit ActiveModeKey(k);
 }

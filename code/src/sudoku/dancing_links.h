@@ -46,8 +46,8 @@ struct HeaderNode : public Node {
                         : size ( 0 ), id ( 0 ) {
         }
 
-        unsigned int size;
-        unsigned int id;
+        quint32 size;
+        quint32 id;
 };
 
 class Matrix
@@ -58,19 +58,19 @@ class Matrix
                 virtual ~Callback() {
                 }
 
-                virtual void operator() ( const QVector<Node*>&, unsigned int ) {
+                virtual void operator() ( const QVector<Node*>&, quint32 ) {
                 }
         };
 
         class GlobalCallback : public Callback
         {
         public:
-                typedef void ( *function ) ( const QVector<Node*>&, unsigned int );
+                typedef void ( *function ) ( const QVector<Node*>&, quint32 );
                 GlobalCallback ( function f )
                                 : m_function ( f ) {
                 }
 
-                virtual void operator() ( const QVector<Node*>& rows, unsigned int count ) {
+                virtual void operator() ( const QVector<Node*>& rows, quint32 count ) {
                         ( *m_function ) ( rows, count );
                 }
 
@@ -82,12 +82,12 @@ class Matrix
         class MemberCallback : public Callback
         {
         public:
-                typedef void ( T::*function ) ( const QVector<Node*>& rows, unsigned int count );
+                typedef void ( T::*function ) ( const QVector<Node*>& rows, quint32 count );
                 MemberCallback ( T* object, function f )
                                 : m_object ( object ), m_function ( f ) {
                 }
 
-                virtual void operator() ( const QVector<Node*>& rows, unsigned int count ) {
+                virtual void operator() ( const QVector<Node*>& rows, quint32 count ) {
                         ( *m_object.*m_function ) ( rows, count );
                 }
 
@@ -97,13 +97,13 @@ class Matrix
         };
 
 public:
-        Matrix ( unsigned int max_columns );
+        Matrix ( quint32 max_columns );
         ~Matrix();
 
         void addRow();
-        void addElement ( unsigned int column );
+        void addElement ( quint32 column );
 
-        unsigned int search ( unsigned int max_solutions = 0xFFFFFFFF ) {
+        quint32 search ( quint32 max_solutions = 0xFFFFFFFF ) {
                 m_max_solutions = max_solutions;
                 Callback solution;
                 m_solution = &solution;
@@ -111,7 +111,7 @@ public:
                 return m_solutions;
         }
 
-        unsigned int search ( void ( *function ) ( const QVector<Node*>& rows, unsigned int count ), unsigned int max_solutions = 0xFFFFFFFF ) {
+        quint32 search ( void ( *function ) ( const QVector<Node*>& rows, quint32 count ), quint32 max_solutions = 0xFFFFFFFF ) {
                 m_max_solutions = max_solutions;
                 GlobalCallback solution ( function );
                 m_solution = &solution;
@@ -120,7 +120,7 @@ public:
         }
 
         template <typename T>
-        unsigned int search ( T* object, void ( T::*function ) ( const QVector<Node*>& rows, unsigned int count ), unsigned int max_solutions = 0xFFFFFFFF ) {
+        quint32 search ( T* object, void ( T::*function ) ( const QVector<Node*>& rows, quint32 count ), quint32 max_solutions = 0xFFFFFFFF ) {
                 m_max_solutions = max_solutions;
                 MemberCallback<T> solution ( object, function );
                 m_solution = &solution;
@@ -129,11 +129,11 @@ public:
         }
 
 private:
-        void solve ( unsigned int k );
+        void solve ( quint32 k );
         void cover ( HeaderNode* column );
         void uncover ( HeaderNode* column );
 
-        unsigned int m_max_columns;
+        quint32 m_max_columns;
 
         HeaderNode* m_header;
         QVector<HeaderNode> m_columns;
@@ -142,8 +142,8 @@ private:
         QVector<Node*> m_output;
 
         Callback* m_solution;
-        unsigned int m_solutions;
-        unsigned int m_max_solutions;
+        quint32 m_solutions;
+        quint32 m_max_solutions;
 };
 }
 }

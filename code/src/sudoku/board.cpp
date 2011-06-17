@@ -48,19 +48,19 @@ Board::Board ( QWidget* parent )
         layout->setSpacing ( 0 );
 
         // Create cells
-        for ( int i = 0; i < 9; ++i ) {
-                int col = ( i % 3 ) * 3;
-                int max_col = col + 3;
-                int row = ( i / 3 ) * 3;
-                int max_row = row + 3;
+        for ( qint32 i = 0; i < 9; ++i ) {
+                qint32 col = ( i % 3 ) * 3;
+                qint32 max_col = col + 3;
+                qint32 row = ( i / 3 ) * 3;
+                qint32 max_row = row + 3;
 
                 QGridLayout* box = new QGridLayout;
                 box->setMargin ( 3 );
                 box->setSpacing ( 1 );
                 layout->addLayout ( box, row / 3, col / 3 );
 
-                for ( int r = row; r < max_row; ++r ) {
-                        for ( int c = col; c < max_col; ++c ) {
+                for ( qint32 r = row; r < max_row; ++r ) {
+                        for ( qint32 c = col; c < max_col; ++c ) {
                                 Cell* cell = new Cell ( c, r, this, this );
                                 box->addWidget ( cell, r - row, c - col );
                                 m_cells[c][r] = cell;
@@ -69,37 +69,38 @@ Board::Board ( QWidget* parent )
         }
 //TODO :: fix appearance
         // Create success message
-        m_message = new QLabel ( this );
-        QFontMetrics metrics ( QFont ( "Sans", 24 ) );
-        int width = metrics.width ( tr ( "Success" ) );
-        int height = metrics.height();
-        QPixmap success ( QSize ( width + height, height * 2 ) );
-        success.fill ( QColor ( 0, 0, 0, 0 ) );
-        {
-                QPainter painter ( &success );
-
-                painter.setPen ( Qt::NoPen );
-                painter.setBrush ( QColor ( 0, 0, 0 ) );
-                painter.setRenderHint ( QPainter::Antialiasing, true );
-                painter.drawRoundedRect ( 0, 0, width + height, height * 2, 10, 10 );
-
-                painter.setFont ( QFont ( "Sans", 64, QFont::Bold) );
-                painter.setPen ( QColor ( 127, 127, 127 ));
-                painter.setRenderHint ( QPainter::TextAntialiasing, true );
-                painter.drawText ( height / 2, height / 2 + metrics.ascent(), tr ( "Success" ) );
-        }
-        m_message->setPixmap ( success );
-        m_message->hide();
-        layout->addWidget ( m_message, 0, 0, 3, 3, Qt::AlignCenter );
+//         m_message = new QLabel ( this );
+//         QFontMetrics metrics ( QFont ( "Sans", 24 ) );
+//         qint32 width = metrics.width ( tr ( "Success" ) );
+//         qint32 height = metrics.height();
+//         QPixmap success ( QSize ( width + height, height * 2 ) );
+//         success.fill ( QColor ( 0, 0, 0, 0 ) );
+//         {
+//                 QPainter painter ( &success );
+//
+//                 painter.setPen ( Qt::NoPen );
+//                 painter.setBrush ( QColor ( 0, 0, 0 ) );
+//                 painter.setRenderHint ( QPainter::Antialiasing, true );
+//                 painter.drawRoundedRect ( 0, 0, width + height, height * 2, 10, 10 );
+//
+//                 painter.setFont ( QFont ( "Sans", 64, QFont::Bold) );
+//                 painter.setPen ( QColor ( 127, 127, 127 ));
+//                 painter.setRenderHint ( QPainter::TextAntialiasing, true );
+//                 painter.drawText ( height / 2, height / 2 + metrics.ascent(), tr ( "Success" ) );
+//         }
+//         m_message->setPixmap ( success );
+//         m_message->hide();
+//
+//         layout->addWidget ( m_message, 0, 0, 3, 3, Qt::AlignCenter );
 
         // Load current puzzle
         QSettings settings;
         if ( settings.value ( "Current/Version", 0 ).toInt() != 3 ) {
                 settings.remove ( "Current" );
         }
-        int seed = settings.value ( "Current/Seed", 0 ).toInt();
-        int symmetry = settings.value ( "Current/Symmetry", -1 ).toInt();
-        int algorithm = settings.value ( "Current/Algorithm", -1 ).toInt();
+        qint32 seed = settings.value ( "Current/Seed", 0 ).toInt();
+        qint32 symmetry = settings.value ( "Current/Symmetry", -1 ).toInt();
+        qint32 algorithm = settings.value ( "Current/Algorithm", -1 ).toInt();
         if ( seed > 0 ) {
                 QStringList moves = settings.value ( "Current/Moves" ).toStringList();
                 newPuzzle ( seed, symmetry, algorithm, true );
@@ -109,7 +110,7 @@ Board::Board ( QWidget* parent )
                         if ( move.length() == 4 ) {
                                 m_notes_mode = ( move[2] == 'n' );
                                 Cell* c = cell ( move[0].digitValue(), move[1].digitValue() );
-                                int key = move[3].digitValue();
+                                qint32 key = move[3].digitValue();
                                 QKeyEvent event ( QEvent::KeyPress, 0x30 + key, Qt::NoModifier );
                                 QApplication::sendEvent ( c, &event );
                         }
@@ -134,8 +135,8 @@ Board::~Board()
 {
         if ( !m_finished ) {
                 QStringList moves;
-                int count = m_moves->index();
-                for ( int i = 0; i < count; ++i ) {
+                qint32 count = m_moves->index();
+                for ( qint32 i = 0; i < count; ++i ) {
                         moves += m_moves->text ( i );
                 }
                 QSettings().setValue ( "Current/Moves", moves );
@@ -148,7 +149,7 @@ Board::~Board()
 
 /*****************************************************************************/
 
-void Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
+void Board::newPuzzle ( qint32 seed, qint32 symmetry, qint32 algorithm, bool load )
 {
         QSettings settings;
 
@@ -180,7 +181,7 @@ void Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
 
         showWrong ( false );
         m_finished = false;
-        m_message->hide();
+//         m_message->hide();
         m_moves->clear();
 
         delete m_puzzle;
@@ -194,8 +195,8 @@ void Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
                 break;
         }
         m_puzzle->generate ( seed, symmetry );
-        for ( int r = 0; r < 9; ++r ) {
-                for ( int c = 0; c < 9; ++c ) {
+        for ( qint32 r = 0; r < 9; ++r ) {
+                for ( qint32 c = 0; c < 9; ++c ) {
                         m_cells[c][r]->setPuzzle ( m_puzzle );
                 }
         }
@@ -206,20 +207,20 @@ void Board::newPuzzle ( int seed, int symmetry, int algorithm, bool load )
 void Board::checkFinished()
 {
         m_finished = true;
-        for ( int r = 0; r < 9; ++r ) {
-                for ( int c = 0; c < 9; ++c ) {
+        for ( qint32 r = 0; r < 9; ++r ) {
+                for ( qint32 c = 0; c < 9; ++c ) {
                         m_finished = m_finished && m_cells[c][r]->isCorrect();
                 }
         }
 
         if ( m_finished ) {
-                for ( int r = 0; r < 9; ++r ) {
-                        for ( int c = 0; c < 9; ++c ) {
+                for ( qint32 r = 0; r < 9; ++r ) {
+                        for ( qint32 c = 0; c < 9; ++c ) {
                                 m_cells[c][r]->clearFocus();
                                 m_cells[c][r]->setFocusPolicy ( Qt::NoFocus );
                         }
                 }
-                m_message->show();
+                emit win();
                 update();
         }
 }
@@ -228,8 +229,8 @@ void Board::checkFinished()
 
 void Board::showWrong ( bool show )
 {
-        for ( int r = 0; r < 9; ++r ) {
-                for ( int c = 0; c < 9; ++c ) {
+        for ( qint32 r = 0; r < 9; ++r ) {
+                for ( qint32 c = 0; c < 9; ++c ) {
                         m_cells[c][r]->showWrong ( show );
                 }
         }
@@ -237,7 +238,7 @@ void Board::showWrong ( bool show )
 
 /*****************************************************************************/
 
-void Board::moveFocus ( int column, int row, int xdelta, int ydelta )
+void Board::moveFocus ( qint32 column, qint32 row, qint32 xdelta, qint32 ydelta )
 {
         xdelta = qBound ( -1, xdelta, 2 );
         ydelta = qBound ( -1, ydelta, 2 );
@@ -265,7 +266,7 @@ void Board::moveFocus ( int column, int row, int xdelta, int ydelta )
 
 /*****************************************************************************/
 
-void Board::setActiveKey ( int key )
+void Board::setActiveKey ( qint32 key )
 {
         setMode(0);
         m_active_key = qBound ( 1, key, 10 );
@@ -273,7 +274,7 @@ void Board::setActiveKey ( int key )
         update();
         emit activeKeyChanged ( m_active_key );
 }
-void Board::setActiveModeKey ( int key )
+void Board::setActiveModeKey ( qint32 key )
 {
         setMode(1);
         m_active_key = qBound ( 1, key, 10 );
@@ -301,7 +302,7 @@ void Board::setHighlightActive ( bool highlight )
 
 /*****************************************************************************/
 
-void Board::setMode ( int mode )
+void Board::setMode ( qint32 mode )
 {
         m_notes_mode = mode;
         QSettings().setValue ( "Mode", ( m_notes_mode ? "Pencil" : "Pen" ) );

@@ -35,9 +35,9 @@ public:
     Board ( QWidget* parent = 0 );
     ~Board();
 
-    void newPuzzle ( int seed = 0, int symmetry = -1, int algorithm = -1, bool load = false );
+    void newPuzzle ( qint32 seed = 0, qint32 symmetry = -1, qint32 algorithm = -1, bool load = false );
 
-    int activeKey() const {
+    qint32 activeKey() const {
         return m_active_key;
     }
 
@@ -59,9 +59,9 @@ public:
 
     void checkFinished();
 
-    void moveFocus ( int column, int row, int deltax, int deltay );
+    void moveFocus ( qint32 column, qint32 row, qint32 deltax, qint32 deltay );
 
-    Cell* cell ( int column, int row ) const {
+    Cell* cell ( qint32 column, qint32 row ) const {
         column = qBound ( 0, column, 9 );
         row = qBound ( 0, row, 9 );
         return m_cells[column][row];
@@ -71,23 +71,24 @@ public:
         return m_moves;
     }
 
-    int getRow() {
+    qint32 getRow() {
         return m_row;
     }
-    int getColumn() {
+    qint32 getColumn() {
         return m_column;
     }
 signals:
-    void activeKeyChanged ( int key );
+    void activeKeyChanged ( qint32 key );
     void notesModeChanged ( bool mode );
     void toShowBoard();
+    void win();
 public slots:
     void showWrong ( bool show = true );
-    void setActiveKey ( int key );
-    void setActiveModeKey ( int key );
+    void setActiveKey ( qint32 key );
+    void setActiveModeKey ( qint32 key );
     void setAutoSwitch ( bool auto_switch );
     void setHighlightActive ( bool highlight );
-    void setMode ( int mode );
+    void setMode ( qint32 mode );
     void showBoard()
     {
         emit toShowBoard();
@@ -99,15 +100,15 @@ protected:
 private:
     Cell* m_cells[9][9];
     Puzzle* m_puzzle;
-    int m_active_key;
+    qint32 m_active_key;
     bool m_auto_switch;
     bool m_highlight_active;
     bool m_notes_mode;
     bool m_finished;
-    QLabel* m_message;
+//     QLabel* m_message;
     QUndoStack* m_moves;
-    int m_row;
-    int m_column;
+    qint32 m_row;
+    qint32 m_column;
 };
 }
 }

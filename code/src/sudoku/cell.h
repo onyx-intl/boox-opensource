@@ -33,12 +33,12 @@ class Cell : public Frame
 {
         Q_OBJECT
 public:
-        Cell ( int column, int row, Board* board, QWidget* parent = 0 );
+        Cell ( qint32 column, qint32 row, Board* board, QWidget* parent = 0 );
 
         bool isCorrect() const;
         void setHintVisible ( bool visible );
         void setPuzzle ( Puzzle* puzzle );
-        void setState ( int state );
+        void setState ( qint32 state );
         void showWrong ( bool show );
         const bool given() {return m_given;}
         void setSelected(bool val) {
@@ -55,19 +55,19 @@ protected:
         virtual void resizeEvent ( QResizeEvent* event );
 private:
         struct State {
-                int value;
+                qint32 value;
                 bool notes[9];
         };
         QList<State> m_states;
-        int m_current_state;
+        qint32 m_current_state;
 public slots:
         void updateValue();
 private:
         void checkConflict ( Cell* cell );
         void updateFont();
 private:
-        int m_column;
-        int m_row;
+        qint32 m_column;
+        qint32 m_row;
         QList<Cell*> m_conflicts;
         bool m_wrong;
         bool m_given;

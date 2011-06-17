@@ -39,18 +39,18 @@
 namespace onyx {
 namespace simsu {
 namespace {
-int cell_size = 0;
-int pen_size = 1;
-int pencil_size = 1;
+qint32 cell_size = 0;
+qint32 pen_size = 1;
+qint32 pencil_size = 1;
 }
 
 /*****************************************************************************/
 
-Cell::Cell ( int column, int row, Board* board, QWidget* parent )
+Cell::Cell ( qint32 column, qint32 row, Board* board, QWidget* parent )
         : Frame ( parent ), m_current_state ( 0 ), m_column ( column ), m_row ( row ), m_wrong ( false ), m_given ( false ), selected(false), m_board ( board ), m_puzzle ( 0 ) {
     State state;
     state.value = 0;
-    for ( int i = 0; i < 9; ++i ) {
+    for ( qint32 i = 0; i < 9; ++i ) {
         state.notes[i] = false;
     }
     m_states.append ( state );
@@ -114,7 +114,7 @@ void Cell::setPuzzle ( Puzzle* puzzle ) {
 
 /*****************************************************************************/
 
-void Cell::setState ( int state ) {
+void Cell::setState ( qint32 state ) {
     m_current_state = state;
 
     // Check for conflicts
@@ -124,20 +124,20 @@ void Cell::setState ( int state ) {
     }
     m_conflicts.clear();
 
-    for ( int c = 0; c < 9; ++c ) {
+    for ( qint32 c = 0; c < 9; ++c ) {
         checkConflict ( m_board->cell ( c, m_row ) );
     }
 
-    for ( int r = 0; r < 9; ++r ) {
+    for ( qint32 r = 0; r < 9; ++r ) {
         checkConflict ( m_board->cell ( m_column, r ) );
     }
 
-    int col = ( m_column / 3 ) * 3;
-    int max_col = col + 3;
-    int row = ( m_row / 3 ) * 3;
-    int max_row = row + 3;
-    for ( int r = row; r < max_row; ++r ) {
-        for ( int c = col; c < max_col; ++c ) {
+    qint32 col = ( m_column / 3 ) * 3;
+    qint32 max_col = col + 3;
+    qint32 row = ( m_row / 3 ) * 3;
+    qint32 max_row = row + 3;
+    for ( qint32 r = row; r < max_row; ++r ) {
+        for ( qint32 c = col; c < max_col; ++c ) {
             checkConflict ( m_board->cell ( c, r ) );
         }
     }
@@ -281,11 +281,11 @@ void Cell::paintEvent ( QPaintEvent* event ) {
     } else {
         painter.setPen ( QColor(0,0,0));
         painter.setBrush(QColor(255,255,255));
-        int w = ( width() - 8 ) / 3;
-        int h = ( height() - 8 ) / 3;
-        for ( int i = 0; i < 9; ++i ) {
-            int c = i % 3;
-            int r = i / 3;
+        qint32 w = ( width() - 8 ) / 3;
+        qint32 h = ( height() - 8 ) / 3;
+        for ( qint32 i = 0; i < 9; ++i ) {
+            qint32 c = i % 3;
+            qint32 r = i / 3;
             if ( state.notes[i] ) {
                 painter.drawText ( QRect ( c * w + 4, r * h + 4, w, h ), Qt::AlignCenter, QString::number ( i + 1 ) );
             }
@@ -297,7 +297,7 @@ void Cell::paintEvent ( QPaintEvent* event ) {
 /*****************************************************************************/
 
 void Cell::resizeEvent ( QResizeEvent* event ) {
-    int size = qMin ( event->size().width(), event->size().height() );
+    qint32 size = qMin ( event->size().width(), event->size().height() );
     if ( cell_size != size ) {
         cell_size = size;
         pen_size = size - 8;
@@ -322,7 +322,7 @@ void Cell::checkConflict ( Cell* cell ) {
 
 void Cell::updateValue() {
     // Find key pressed
-    int key = m_board->activeKey();
+    qint32 key = m_board->activeKey();
 
     State state = m_states[m_current_state];
     if ( m_board->notesMode() ) {
@@ -331,7 +331,7 @@ void Cell::updateValue() {
         state.value = 0;
     } else {
         // Toggle value
-        for ( int i = 0; i < 9; ++i ) {
+        for ( qint32 i = 0; i < 9; ++i ) {
             state.notes[i] = false;
         }
         state.value = ( key != state.value ) ? key : 0;

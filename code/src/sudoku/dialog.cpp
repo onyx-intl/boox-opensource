@@ -13,14 +13,14 @@ Dialog::Dialog ( QWidget* parent ) : QDialog ( parent ) {
     QStackedWidget* preview = new QStackedWidget ( this );
     QComboBox* symmetry_box = new QComboBox ( this );
 
-    for ( int i = Pattern::Rotational180; i <= Pattern::None; ++i ) {
+    for ( qint32 i = Pattern::Rotational180; i <= Pattern::None; ++i ) {
         symmetry_box->addItem ( Pattern::name ( i ), i );
         QLabel* image = new QLabel ( preview );
         image->setPixmap ( Pattern::icon ( i ) );
         preview->addWidget ( image );
     }
     preview->setCurrentIndex ( 0 );
-    connect ( symmetry_box, SIGNAL ( currentIndexChanged ( int ) ), preview, SLOT ( setCurrentIndex ( int ) ) );
+    connect ( symmetry_box, SIGNAL ( currentIndexChanged ( qint32 ) ), preview, SLOT ( setCurrentIndex ( qint32 ) ) );
     symmetry_box->setCurrentIndex ( symmetry_box->findData ( settings.value ( "Symmetry", Pattern::Rotational180 ).toInt() ) );
     QComboBox* algorithm_box = new QComboBox ( this );
     algorithm_box->addItem ( tr ( "Dancing Links" ), 0 );
@@ -45,7 +45,7 @@ Dialog::Dialog ( QWidget* parent ) : QDialog ( parent ) {
 
 void Dialog::accept() {
     QDialog::accept();
-    int seed=settings.value("Seed").toInt(),
+    qint32 seed=settings.value("Seed").toInt(),
              symmetry=settings.value("Symmetry").toInt(),
              algorithm=settings.value("Algorithm").toInt();
     emit setGameSignal ( seed, symmetry, algorithm );

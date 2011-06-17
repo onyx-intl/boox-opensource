@@ -6,6 +6,7 @@
 #include "mtoolbutton.h"
 class QPainter;
 class QGridLayout;
+class QButtonGroup;
 class MDialog : public QDialog
 {
     Q_OBJECT
@@ -13,11 +14,11 @@ class MDialog : public QDialog
         MDialog(QWidget* parent = 0);
     //virtual ~MDialog(){/*list_key.clear();*/}
     signals:
-        void ActiveKey(int);
-        void ActiveModeKey(int);
+        void ActiveKey(qint32);
+        void ActiveModeKey(qint32);
     private slots:
         void setActiveKey(int);
-        void setActiveModeKey(int);
+        void setActiveModeKey(qint32);
     protected:
         virtual void keyPressEvent(QKeyEvent* );
         virtual void mouseMoveEvent(QMouseEvent* );
@@ -26,6 +27,7 @@ class MDialog : public QDialog
     private:
         QList<MToolButton*> list_key;
         QGridLayout *layout_key;
+        QButtonGroup *group_key;
 };
 
 #endif // MDIALOG_H
