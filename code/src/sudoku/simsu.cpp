@@ -299,8 +299,8 @@ void Simsu::newGame()
 
 void Simsu::onWin()
 {
-    MessageDialog congr(QMessageBox::Icon(QMessageBox::Information) , tr("You win"),
-                        tr("Thanks for playing Sudoku"));
+    MessageDialog congr(QMessageBox::Icon(QMessageBox::Information) , tr("You win!"),
+                        tr("Thanks for playing Sudoku!"));
     congr.exec();
 }
 
