@@ -44,16 +44,15 @@ void QDjVuDocumentPrivate::onRemove(QObject *p)
 void QDjVuDocumentPrivate::add(QDjVuPage *p)
 {
     if (ddjvu_page_decoding_done(*p)) return;
-    connect(p, SIGNAL(pageInfo(int)), this, SLOT(onPageInfo(int)));
+    connect(p, SIGNAL(pageInfo(QDjVuPage*)), this, SLOT(onPageInfo(QDjVuPage*)));
     add((QObject*)(p));
 }
 
-void QDjVuDocumentPrivate::onPageInfo(int)
+void QDjVuDocumentPrivate::onPageInfo(QDjVuPage *page)
 {
-    QDjVuPage *p = qobject_cast<QDjVuPage*>(sender());
-    if (p && ddjvu_page_decoding_done(*p))
+    if (page != 0 && ddjvu_page_decoding_done(*page))
     {
-        onRemove(p);
+        onRemove(page);
     }
 }
 

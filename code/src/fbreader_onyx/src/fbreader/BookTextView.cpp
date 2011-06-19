@@ -298,8 +298,92 @@ bool BookTextView::onStylusMove(int x, int y) {
 	const ZLTextElementArea *area = elementByCoordinates(x, y);
 	std::string id;
 	std::string type;
-	fbreader().setHyperlinkCursor((area != 0) && getHyperlinkInfo(*area, id, type));
-	return true;
+    if ((area != 0) && getHyperlinkInfo(*area, id, type)) 
+    {
+        fbreader().setHyperlinkCursor(true);
+        return (type == "internal" ? true : false);
+    }
+
+	fbreader().setHyperlinkCursor(false);
+	return false;
+}
+
+std::string BookTextView::getInternalHyperlinkId(int x, int y) {
+	const ZLTextElementArea *area = elementByCoordinates(x, y);
+	std::string id;
+	std::string type;
+    if ((area != 0) && getHyperlinkInfo(*area, id, type)) 
+    {
+        if (type == "internal") 
+        {
+            return id;
+        } 
+    }
+	
+    return std::string();
+}
+
+std::string BookTextView::getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1) {
+
+	std::string id;
+	std::string type;
+
+	const ZLTextElementArea * area = elementByCoordinates(x0, y0);
+	const ZLTextElementArea * stop_area = elementByCoordinates(x1, y1);
+
+	if ( !area || ((area->Kind != ZLTextElement::WORD_ELEMENT) &&
+			(area->Kind != ZLTextElement::IMAGE_ELEMENT))) {
+		return id;
+	}
+	ZLTextWordCursor cursor = startCursor();
+	cursor.moveToParagraph(area->ParagraphIndex);
+    int paragraphs = area->ParagraphIndex;
+    int end_paragraphs = stop_area ? stop_area->ParagraphIndex : 0;
+
+    do
+    {
+        cursor.moveToParagraphStart();
+        ZLTextKind hyperlinkKind = REGULAR;
+        for ( ;!cursor.isEndOfParagraph();) {
+            const ZLTextElement &element = cursor.element();
+
+            if (element.kind() == ZLTextElement::CONTROL_ELEMENT) {
+                const ZLTextControlEntry &control = ((const ZLTextControlElement&)element).entry();
+
+                if (control.isHyperlink()) {
+                    hyperlinkKind = control.kind();
+                    id = ((const ZLTextHyperlinkControlEntry&)control).label();
+                    type = ((const ZLTextHyperlinkControlEntry&)control).hyperlinkType();
+                    if (type == "internal")
+                    {
+                        return id;
+                    }
+                } else if (!control.isStart() && (control.kind() == hyperlinkKind)) {
+                    hyperlinkKind = REGULAR;
+                }
+            }
+            cursor.nextWord();
+        }
+
+    } while( ++paragraphs <= end_paragraphs &&  cursor.nextParagraph());
+
+    return std::string();
+}
+
+std::string BookTextView::getLinkInfo(int x, int y, std::string &link_info)
+{
+    const ZLTextElementArea *area = elementByCoordinates(x, y);
+    if (area != 0)
+    {
+        std::string id;
+        std::string type;
+        if (getHyperlinkInfo(*area, id, type))
+        {
+            fbreader().getFootnote(id, type, link_info);
+            return std::string(id);
+        }
+    }
+    return std::string();
 }
 
 shared_ptr<ZLTextView::PositionIndicator> BookTextView::createPositionIndicator(const ZLTextPositionIndicatorInfo &info) {

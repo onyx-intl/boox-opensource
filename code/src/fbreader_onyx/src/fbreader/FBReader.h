@@ -112,6 +112,15 @@ class FBReader : public ZLApplication {
     void showBookTextView();
     void openBook(BookDescriptionPtr description);
 
+    void loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::string> & titles);
+    void gotoParagraph(int pos);
+
+    void getFootnote(const std::string &id, const std::string &type,
+            std::string &foot_note);
+
+  public:
+    virtual QString filePath();
+
   private:
     void openBookInternal(BookDescriptionPtr description);
     friend class OpenBookRunnable;

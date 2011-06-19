@@ -16,7 +16,9 @@
 #include "onyx/ui/page_layout.h"
 #include "onyx/ui/continuous_page_layout.h"
 #include "onyx/ui/single_page_layout.h"
-#include "onyx/ui/notes_dialog.h"
+#include "onyx/ui/onyx_notes_dialog.h"
+
+#include "onyx/cms/content_thumbnail.h"
 
 #include "onyx/data/bookmark.h"
 #include "onyx/data/reading_history.h"
@@ -29,6 +31,7 @@
 #include "onyx/sys/sys_conf.h"
 
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
 
 #include "libdjvu/ddjvuapi.h"
 #include "libdjvu/miniexp.h"
@@ -46,6 +49,14 @@ enum DjvuViewType
 enum OutlineProperty
 {
     OUTLINE_ITEM = Qt::UserRole + 1
+};
+
+enum ThumbnailRenderDirection
+{
+    THUMBNAIL_RENDER_INVALID = -1,
+    THUMBNAIL_RENDER_CURRENT_PAGE = 0,
+    THUMBNAIL_RENDER_NEXT_PAGE,
+    THUMBNAIL_RENDER_PREVIOUS_PAGE
 };
 
 struct ViewSetting

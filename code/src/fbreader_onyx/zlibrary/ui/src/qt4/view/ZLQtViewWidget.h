@@ -28,11 +28,11 @@
 #include "onyx/ui/ui.h"
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/sys/sys.h"
-#include "dictionary/dictionary_manager.h"
-#include "dictionary/dict_widget.h"
+#include "onyx/dictionary/dictionary_manager.h"
+#include "onyx/dictionary/dict_widget.h"
 #include "onyx/sound/sound.h"
 #include "onyx/tts/tts_widget.h"
-
+#include "onyx/ui/onyx_search_dialog.h"
 
 
 class QGridLayout;
@@ -79,12 +79,13 @@ public Q_SLOTS:
     void onSetEncoding(std::string encoding);
     void changeFontFamily(const std::string & family);
     void changeFont(QFont font);
+    void changeReadingScheme(int type);
     void changeLineSpacing(int);
     void changePageMargins(int);
     void rotateScreen();
     void quit();
 
-    void onSearch(BaseSearchContext&);
+    void onSearch(OnyxSearchContext&);
     bool updateSearchWidget();
     void onSearchClosed();
 
@@ -112,6 +113,13 @@ public Q_SLOTS:
     void storeThumbnail(const QPixmap & pixmap);
     void onVolumeChanged(int new_volume, bool is_mute);
 
+    bool isHyperlinkSelected();
+
+    void onMouseLongPress(QPoint, QSize);
+    void onMultiTouchPressDetected(QRect r1, QRect r2);
+    void onMultiTouchReleaseDetected(QRect r1, QRect r2);
+
+
 private:
     bool isWidgetVisible(QWidget * wnd);
     void hideHelperWidget(QWidget * wnd);
@@ -130,6 +138,12 @@ private:
     void bookmarkModel(QStandardItemModel & model, QModelIndex & selected);
     void processBookmarks(ReadingToolsActions & actions);
 
+    void findHyperlink(bool next);
+    void findAllHyperlinkPositions(QVector<QPoint *> &link_positions);
+
+    bool suggestTextFiles(const QString &file_path, bool forward);
+    void triggerLargeScrollAction(const std::string &actionId);
+
 private:
     void repaint();
     void trackStylus(bool track);
@@ -139,6 +153,8 @@ private:
     void setScrollbarParameters(ZLView::Direction direction, size_t full, size_t from, size_t to);
 
     QWidget * addStatusBar();
+    QStringList dirList(QDir &qdir, QRegExp *filter, QDir::Filters ftype =
+                QDir::Files);
     void updateProgress(size_t full, size_t from, size_t to);
     void updateActions();
 
@@ -154,15 +170,27 @@ private:
     TTSWidget & ttsWidget();
 
     void showGotoPageDialog();
+    void showTableOfContents();
 
     void loadConf();
     void saveConf();
+
+    QStandardItem * searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model);
+
+    void handleHyperlinks();
+    void popupLinkInfoDialog();
+
+public:
+    bool hyperlink_selected_;
 
 private:
     QWidget *myFrame;
     Widget *myQWidget;
 
-    StatusBar  *status_bar_;
+    ui::StatusBar  *status_bar_;
     EncodingActions encoding_actions_;
     FontFamilyActions font_family_actions_;
     FontActions font_actions_;
@@ -190,11 +218,17 @@ private:
     QStringList text_to_speak_;
     int tts_paragraph_index_;
 
-    BaseSearchContext search_context_;
-    scoped_ptr<SearchWidget> search_widget_;
+    OnyxSearchContext search_context_;
+    scoped_ptr<OnyxSearchDialog> search_widget_;
 
     ZLApplication *myApplication;
     bool conf_stored_;
+    QPoint point_;
+
+    std::string last_id_;
+
+    QRect rect_pressed_;
+
 };
 
 #endif /* __ZLQTVIEWWIDGET_H__ */

@@ -1,5 +1,6 @@
 #include "onyx/ui/languages.h"
 #include "dict_application.h"
+#include "onyx/screen/screen_update_watcher.h"
 
 namespace dict_tool
 {
@@ -10,7 +11,7 @@ DictApplication::DictApplication(int &argc, char **argv)
     , dict_mgr_()
 {
     ui::loadTranslator(QLocale::system().name());
-    frame_.reset(new DictFrame(0, dict_mgr_, &tts_engine_));
+    frame_.reset(new OnyxDictFrame(0, dict_mgr_, &tts_engine_));
     connect(frame_.get(), SIGNAL(closeClicked()), this, SLOT(close()));
 }
 
@@ -22,7 +23,10 @@ DictApplication::~DictApplication(void)
 bool DictApplication::open()
 {
     frame_->show();
-    return true;
+    onyx::screen::watcher().addWatcher(frame_.get());
+    frame_->setDefaultFocus();
+    sys::SysStatus::instance().setSystemBusy(false);
+;    return true;
 }
 
 bool DictApplication::close()

@@ -149,6 +149,9 @@ public:
         std::string myLastCaller;
     };
 
+  public:
+    virtual QString filePath() = 0;
+
   protected:
     ZLApplication(const std::string &name);
 
@@ -197,6 +200,9 @@ public:
     void setVisualParameter(const std::string &id, const std::string &value);
     void setParameterValueList(const std::string &id, const std::vector<std::string> &values);
     const std::string &visualParameter(const std::string &id);
+
+    virtual void loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::string> & titles){};
+    virtual void gotoParagraph(int pos){};
 
   private:
     void createToolbar(int index);

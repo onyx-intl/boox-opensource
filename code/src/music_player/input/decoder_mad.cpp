@@ -1,8 +1,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <id3v2header.h>
-#include <tbytevector.h>
+#include <taglib/id3v2header.h>
+#include <taglib/tbytevector.h>
 
 #include <core/constants.h>
 #include <core/buffer.h>

@@ -621,7 +621,9 @@ bool ZLTextSelectionModel::selectWord(int x, int y) {
 
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it) {
-        if ((it->YStart > y) || ((it->YEnd > y) && (it->XEnd > x))) {
+        //if ((it->YStart > y) || ((it->YEnd > y) && (it->XEnd > x))) {
+        //fixed bug: for fb2 ,it is special case to have up notation hyperlink
+        if (((it->YStart > y) && it->XStart > x) || ((it->YEnd > y) && (it->XEnd > x))) {
             break;
         }
     }
@@ -722,19 +724,43 @@ bool ZLTextSelectionModel::selectFirstWord()
     return selectWord(*it, it->XStart, it->YEnd);
 }
 
+bool ZLTextSelectionModel::selectLastWord()
+{
+    clear();
+
+    ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
+    if (it == myView.myTextElementMap.end())
+    {
+        return false;
+    }
+    const ZLTextElementArea & area = myView.myTextElementMap.back();
+    return selectWord(area, area.XStart, area.YEnd);
+}
+
 bool ZLTextSelectionModel::selectNextWord()
 {
     ZLTextElementMap::const_iterator it = myView.myTextElementMap.begin();
     for (; it != myView.myTextElementMap.end(); ++it)
     {
+        /*
         if ((it->Kind == ZLTextElement::WORD_ELEMENT) &&
             ((it->YEnd == myArea.YEnd) && (it->XStart > myArea.XStart) ||
              (it->YEnd > myArea.YEnd)))
+        */
+        if ((it->Kind == ZLTextElement::WORD_ELEMENT) &&
+            ((it->YEnd == myArea.YEnd) && (it->XStart == myArea.XStart)))
         {
             break;
         }
+
     }
 
+    if (it == myView.myTextElementMap.end())
+    {
+        return false;
+    }
+
+    ++it;
     if (it == myView.myTextElementMap.end())
     {
         return false;
@@ -756,14 +782,17 @@ bool ZLTextSelectionModel::selectPrevWord()
     }
 
     // Reverse search.
-    if (it != myView.myTextElementMap.begin())
-    {
-        --it;
-    }
     if (it == myView.myTextElementMap.end())
     {
         return false;
     }
+
+    if (it == myView.myTextElementMap.begin())
+    {
+       return false;
+    }
+    --it;
+
     clear();
     return selectWord(*it, it->XStart, it->YEnd);
 }

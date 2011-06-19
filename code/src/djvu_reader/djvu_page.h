@@ -105,13 +105,18 @@ class QDjVuPage : public QObject
 {
   Q_OBJECT
 public:
-    virtual ~QDjVuPage();
     QDjVuPage(QDjVuDocument *doc, int page_no, QObject *parent = 0);
+    virtual ~QDjVuPage();
+
     operator ddjvu_page_t*() { return page_; }
     bool isValid() { return page_ != 0; }
     bool isReady() { return is_ready_; }
     bool renderNeeded() { return render_needed_; }
     bool contentAreaNeeded() { return content_area_needed_; }
+    bool isThumbnail() { return is_thumbnail_; }
+    void setToBeThumbnail(bool is_thumbnail) { is_thumbnail_ = is_thumbnail; }
+    void setThumbnailDirection(ThumbnailRenderDirection direction) { thumbnail_direction_ = direction; }
+    ThumbnailRenderDirection thumbnailDirection() { return thumbnail_direction_; }
     QImage * image() { return &image_; }
 
     bool isDecodeDone();
@@ -131,12 +136,12 @@ protected:
     virtual bool handle(ddjvu_message_t*);
 
 Q_SIGNALS:
-    void error(int page_no, QString msg, QString filename, int lineno);
-    void info(int page_no, QString msg);
-    void chunk(int page_no, QString chunkid);
-    void pageInfo(int page_no);
-    void relayout(int page_no);
-    void redisplay(int page_no);
+    void error(QDjVuPage * from, QString msg, QString filename, int lineno);
+    void info(QDjVuPage * from, QString msg);
+    void chunk(QDjVuPage * from, QString chunkid);
+    void pageInfo(QDjVuPage * from);
+    void relayout(QDjVuPage * from);
+    void redisplay(QDjVuPage * from);
 
     void contentAreaReady(const QRect & content_area);
 
@@ -153,16 +158,18 @@ private:
     typedef QMap<int, PageTextEntities> PageTextEntityMap;
     typedef PageTextEntityMap::iterator PageTextEntityIter;
 private:
-    ddjvu_page_t     *page_;
-    int              page_no_;            // might become private pointer in the future
-    bool             render_needed_;
-    bool             content_area_needed_;
-    bool             is_ready_;
-    RenderSetting    render_setting_;
-    DjvuPageInfo     info_;
-    QImage           image_;
-    static ContentAreaMap content_areas_;
-    static PageTextEntityMap page_texts_;
+    ddjvu_page_t                *page_;
+    int                         page_no_;            // might become private pointer in the future
+    bool                        render_needed_;
+    bool                        content_area_needed_;
+    bool                        is_ready_;
+    bool                        is_thumbnail_;
+    ThumbnailRenderDirection    thumbnail_direction_;
+    RenderSetting               render_setting_;
+    DjvuPageInfo                info_;
+    QImage                      image_;
+    static ContentAreaMap       content_areas_;
+    static PageTextEntityMap    page_texts_;
 
 private:
     friend class QDjVuContext;

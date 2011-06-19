@@ -40,6 +40,16 @@
 
 #include "onyx/screen/screen_proxy.h"
 
+static bool support16GrayScale()
+{
+    static int gray = 0;
+    if (gray <= 0)
+    {
+        gray = sys::SysStatus::instance().grayScale();
+    }
+    return (gray == 16);
+}
+
 void ZLQtDialogManager::createApplicationWindow(ZLApplication *application) const {
 	new ZLQtApplicationWindow(application);
 }
@@ -103,17 +113,31 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         switch (event->key())
         {
         case Qt::Key_Up:
-            application().doAction("increaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("increaseFont");
+            }
             break;
         case Qt::Key_Down:
-            application().doAction("decreaseFont");
+            if (view_widget_->isHyperlinkSelected())
+            {
+                view_widget_->processKeyReleaseEvent(event->key());
+            }
+            else
+            {
+                application().doAction("decreaseFont");
+            }
             break;
-        case Qt::Key_Right:
-            application().doAction("redo");
-            break;
-        case Qt::Key_Left:
-            application().doAction("undo");
-            break;
+        //case Qt::Key_Right:
+        //    application().doAction("redo");
+        //    break;
+        //case Qt::Key_Left:
+        //    application().doAction("undo");
+        //    break;
         case ui::Device_Menu_Key:
             if (view_widget_)
             {
@@ -124,6 +148,8 @@ void ZLQtApplicationWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_Escape:
         case Qt::Key_PageDown:
         case Qt::Key_PageUp:
+        case Qt::Key_Right:
+        case Qt::Key_Left:
             if (view_widget_)
             {
                 view_widget_->processKeyReleaseEvent(event->key());
@@ -175,7 +201,13 @@ void ZLQtApplicationWindow::updateScreen()
         if (onyx::screen::instance().userData() == 2)
         {
             sys::SysStatus::instance().setSystemBusy(false);
+            onyx::screen::instance().updateWidget(
+                this,
+                onyx::screen::ScreenProxy::GC,
+                true,
+                onyx::screen::ScreenCommand::WAIT_ALL);
         }
+        return;
     }
 
     if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
@@ -188,9 +220,11 @@ void ZLQtApplicationWindow::updateScreen()
     }
     else
     {
-        onyx::screen::instance().updateWidget(
+        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
+        onyx::screen::instance().updateWidgetWithGCInterval(
             this,
-            onyx::screen::ScreenProxy::INVALID,
+            NULL,
+            w,
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);
     }

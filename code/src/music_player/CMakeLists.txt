@@ -5,31 +5,14 @@ ADD_DEFINITIONS(-DHAVE_CONFIG_H)
 ADD_DEFINITIONS(-DASO_ZEROCHECK)
 ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
 
-INCLUDE_DIRECTORIES(
-        BEFORE
-        ./)
+INCLUDE_DIRECTORIES(./)
 INCLUDE_DIRECTORIES(./libmad)
+INCLUDE_DIRECTORIES(./libtag)
 INCLUDE_DIRECTORIES(./libbs2b)
 INCLUDE_DIRECTORIES(./libsr)
-INCLUDE_DIRECTORIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/toolkit
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/mpeg
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/ogg
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/ogg/flac
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/flac
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/mpc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/ogg/vorbis
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/ogg/speex
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/mpeg/id3v2
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/mpeg/id3v1
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/ape
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/wavpack
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/trueaudio
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/taglib/
-    #    ${CMAKE_CURRENT_BINARY_DIR}/taglib
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/
-)
+INCLUDE_DIRECTORIES(./libtag/taglib)
 INCLUDE_DIRECTORIES(./libcurl)
+
 # Header files.
 FILE(GLOB MOC_HDRS core/*.h
                    core/equ/*.h
@@ -41,9 +24,11 @@ FILE(GLOB MOC_HDRS core/*.h
                    libmad/*.h
                    libbs2b/*.h
                    libsr/*.h
+                   libtag/taglib/*.h
                    player_utils.h
-                   player_view.h
-                   player_application.h)
+                   onyx_player_view.h
+                   player_application.h
+                   player_title_bar.h)
 QT4_WRAP_CPP(MOC_SRCS ${MOC_HDRS})
 
 # Source files.
@@ -54,11 +39,13 @@ FILE(GLOB SRCS core/*.cpp
                model/*.cpp
                effect/*.cpp
                utils/*.cpp
+               libtag/taglib/*.cpp
                libmad/*.c
                libbs2b/*.c
                libsr/*.c
-               player_view.cpp
-               player_application.cpp)
+               onyx_player_view.cpp
+               player_application.cpp
+               player_title_bar.cpp)
 SET(SRCS
   ${MOC_HDRS}
   ${SRCS}
@@ -70,7 +57,6 @@ ADD_LIBRARY(music_player_lib ${SRCS} ${MUSIC_PLAYER_RES})
 TARGET_LINK_LIBRARIES(music_player_lib
    onyx_screen
    sound
-   tag
    onyx_data
    onyx_ui
    onyx_sys

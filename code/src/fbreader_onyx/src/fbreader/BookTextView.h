@@ -52,6 +52,10 @@ public:
 	bool onStylusRelease(int x, int y);
     bool openInternalLink(int x, int y);
 
+    std::string getInternalHyperlinkId(int x, int y); 
+    std::string getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1);
+    std::string getLinkInfo(int x, int y, std::string &link_info);
+
 private:
 	typedef std::pair<int,int> Position;
 	Position cursorPosition(const ZLTextWordCursor &cursor) const;

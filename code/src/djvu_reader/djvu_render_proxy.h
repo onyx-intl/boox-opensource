@@ -18,21 +18,25 @@ public:
     ~DjvuRenderProxy();
 
     void render(PageRenderSettings & render_pages, QDjVuDocument * doc);
+    void renderThumbnail(int page_num,
+                         const RenderSetting & render_setting,
+                         ThumbnailRenderDirection direction,
+                         QDjVuDocument * doc);
     void requirePageContentArea(int page_no, QDjVuDocument * doc);
     bool getPageRenderSetting(int page_no, RenderSetting & render_setting);
 
 Q_SIGNALS:
     void pageRenderReady(DjVuPagePtr page);
     void relayout(DjVuPagePtr page);
-    void contentAreaReady(const int page_number, const QRect & content_area);
+    void contentAreaReady(DjVuPagePtr page, const QRect & content_area);
 
 private Q_SLOTS:
-    void onPageError(int page_no, QString msg, QString file_name, int line_no);
-    void onInfo(int page_no, QString msg);
-    void onPageChunk(int page_no, QString chunk_id);
-    void onPageInfo(int page_no);
-    void onRelayout(int page_no);
-    void onRedisplay(int page_no);
+    void onPageError(QDjVuPage * from, QString msg, QString file_name, int line_no);
+    void onInfo(QDjVuPage * from, QString msg);
+    void onPageChunk(QDjVuPage * from, QString chunk_id);
+    void onPageInfo(QDjVuPage * from);
+    void onRelayout(QDjVuPage * from);
+    void onRedisplay(QDjVuPage * from);
 
 private:
     DjVuPagePtr getPage(QDjVuDocument * doc, int page_no);

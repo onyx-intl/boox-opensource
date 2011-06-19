@@ -30,12 +30,16 @@ void initLibrary() {
 
 void ZLQtLibraryImplementation::init(int &argc, char **&argv) {
     new QApplication(argc, argv);
+    qApp->setDoubleClickInterval(1000);
     adaptor_.reset(new OnyxReaderApplicationAdaptor(this));
     ui::loadTranslator(QLocale::system().name());
     Q_INIT_RESOURCE(vbf_icons);
     Q_INIT_RESOURCE(onyx_ui_images);
     Q_INIT_RESOURCE(dictionary_images);
     Q_INIT_RESOURCE(tts_images);
+
+    QVector<int> fonts;
+    ui::FontFamilyActions::loadExternalFonts(&fonts);
 
     // Zlibrary.
     ZLibrary::parseArguments(argc, argv);
@@ -58,7 +62,7 @@ void ZLQtLibraryImplementation::init(int &argc, char **&argv) {
     // Before we open the document, make sure the external fonts
     // have been installed. It's necessary as user may use external
     // fonts, but by default, these fonts are not loaded.
-    ui::FontFamilyActions::loadExternalFonts();
+    // ui::FontFamilyActions::loadExternalFonts();
 }
 
 ZLPaintContext *ZLQtLibraryImplementation::createContext() {

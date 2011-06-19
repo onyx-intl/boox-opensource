@@ -36,6 +36,8 @@ QDjVuPage::QDjVuPage(QDjVuDocument *doc, int page_no, QObject *parent)
   , render_needed_(false)
   , content_area_needed_(false)
   , is_ready_(false)
+  , is_thumbnail_(false)
+  , thumbnail_direction_(THUMBNAIL_RENDER_INVALID)
 {
     initialColorTable();
     page_ = ddjvu_page_create_by_pageno(*doc, page_no_);
@@ -80,28 +82,28 @@ bool QDjVuPage::handle(ddjvu_message_t *msg)
         {
             is_ready_ = true;
             updateInfo();
-            emit pageInfo(page_no_);
+            emit pageInfo(this);
         }
         return true;
     case DDJVU_CHUNK:
         {
-            emit chunk(page_no_, QString::fromAscii(msg->m_chunk.chunkid));
+            emit chunk(this, QString::fromAscii(msg->m_chunk.chunkid));
         }
         return true;
     case DDJVU_RELAYOUT:
         {
             updateInfo();
-            emit relayout(page_no_);
+            emit relayout(this);
         }
         return true;
     case DDJVU_REDISPLAY:
         {
-            emit redisplay(page_no_);
+            emit redisplay(this);
         }
         return true;
     case DDJVU_ERROR:
         {
-            emit error(page_no_,
+            emit error(this,
                        QString::fromLocal8Bit(msg->m_error.message),
                        QString::fromLocal8Bit(msg->m_error.filename), 
                        msg->m_error.lineno);
@@ -109,7 +111,7 @@ bool QDjVuPage::handle(ddjvu_message_t *msg)
       return true;
     case DDJVU_INFO:
         {
-            emit info(page_no_, QString::fromLocal8Bit(msg->m_info.message));
+            emit info(this, QString::fromLocal8Bit(msg->m_info.message));
         }
         return true;
     default:
@@ -125,10 +127,10 @@ bool QDjVuPage::implRender(const RenderSetting & setting, ddjvu_format_t * rende
         ddjvu_rect_t page_rect = {0, 0, setting.contentArea().width(), setting.contentArea().height()};
         ddjvu_rect_t render_rect = page_rect;
 
-        QImage image(setting.contentArea().size(), QImage::Format_Indexed8);
+        QImage image(setting.contentArea().size(), QImage::Format_RGB888);
         image.setColorTable(COLOR_TABLE);
         int ret = ddjvu_page_render(page_,
-                                    DDJVU_RENDER_BLACK,
+                                    DDJVU_RENDER_COLOR,
                                     &page_rect,
                                     &render_rect,
                                     render_format,
@@ -427,10 +429,10 @@ QRect QDjVuPage::getContentArea(ddjvu_format_t * render_format)
     ddjvu_rect_t page_rect = {0, 0, width, height};
     ddjvu_rect_t render_rect = page_rect;
 
-    QImage image(QSize(width, height), QImage::Format_Indexed8);
+    QImage image(QSize(width, height), QImage::Format_RGB888);
     image.setColorTable(COLOR_TABLE);
     int ret = ddjvu_page_render(page_,
-                                DDJVU_RENDER_BLACK,
+                                DDJVU_RENDER_COLOR,
                                 &page_rect,
                                 &render_rect,
                                 render_format,

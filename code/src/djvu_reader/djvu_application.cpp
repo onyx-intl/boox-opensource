@@ -1,4 +1,6 @@
 #include "djvu_application.h"
+#include "djvu_view.h"
+#include "djvu_thumbnail_view.h"
 
 namespace djvu_reader
 {
@@ -24,6 +26,11 @@ bool DjvuApplication::open( const QString &path_name )
 {
     main_window_.attachModel(&model_);
     main_window_.show();
+
+    sys::SystemConfig conf;
+    onyx::screen::watcher().addWatcher(&main_window_,
+            conf.screenUpdateGCInterval());
+
     DjvuView *view = down_cast<DjvuView*>(main_window_.activateView(DJVU_VIEW));
 
     // connect the signals with view
@@ -38,6 +45,14 @@ bool DjvuApplication::open( const QString &path_name )
     connect( &sys_status, SIGNAL( sdCardChangedSignal( bool ) ), this, SLOT( onSDChangedSignal( bool ) ) );
     connect( &sys_status, SIGNAL( aboutToShutdown() ), this, SLOT( onAboutToShutDown() ) );
     connect( &sys_status, SIGNAL( wakeup() ), this, SLOT( onWakeUp() ) );
+
+    // connect the long press and multi-point signals
+    connect(&sys_status, SIGNAL( mouseLongPress(QPoint, QSize) ), view,
+            SLOT( onMouseLongPress(QPoint, QSize) ));
+    connect(&sys_status, SIGNAL( multiTouchPressDetected(QRect, QRect) ), view,
+            SLOT( onMultiTouchPressDetected(QRect, QRect) ));
+    connect(&sys_status, SIGNAL( multiTouchReleaseDetected(QRect, QRect) ),
+            view, SLOT( onMultiTouchReleaseDetected(QRect, QRect) ));
 
 #ifdef Q_WS_QWS
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
@@ -165,6 +180,7 @@ void DjvuApplication::onScreenSizeChanged(int)
     main_window_.resize(qApp->desktop()->screenGeometry().size());
     QApplication::processEvents();
     onyx::screen::instance().enableUpdate(true);
+    onyx::screen::instance().updateWidget(&main_window_, onyx::screen::ScreenProxy::GC);
 }
 
 void DjvuApplication::onCreateView(int type, MainWindow* main_window, QWidget*& result)
@@ -179,6 +195,7 @@ void DjvuApplication::onCreateView(int type, MainWindow* main_window, QWidget*& 
         view = new TreeViewDialog(main_window);
         break;
     case THUMBNAIL_VIEW:
+        view = new ThumbnailView(main_window);
         break;
     default:
         break;
@@ -209,6 +226,7 @@ void DjvuApplication::onAttachView(int type, QWidget* view, MainWindow* main_win
         }
         break;
     case THUMBNAIL_VIEW:
+        down_cast<ThumbnailView*>(view)->attachMainWindow(main_window);
         break;
     default:
         break;
@@ -236,6 +254,7 @@ void DjvuApplication::onDeattachView(int type, QWidget* view, MainWindow* main_w
         }
         break;
     case THUMBNAIL_VIEW:
+        down_cast<ThumbnailView*>(view)->deattachMainWindow(main_window);
         break;
     default:
         break;

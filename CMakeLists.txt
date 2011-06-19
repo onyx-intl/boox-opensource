@@ -32,7 +32,6 @@ include(${QT_USE_FILE})
 include_directories(BEFORE
   ${CMAKE_SOURCE_DIR}/sdk/include
   ${CMAKE_SOURCE_DIR}/code/
-  ${CMAKE_SOURCE_DIR}/code/lib/
   ${CMAKE_SOURCE_DIR}/third_party
   ${CMAKE_SOURCE_DIR}/third_party/gtest/include
   ${CMAKE_SOURCE_DIR}/third_party/gmock/include
@@ -63,6 +62,5 @@ ELSE (WIN32)
 ADD_DEFINITIONS(-DCONFIG_CTRL_IFACE_UNIX)
 ENDIF (WIN32)
 
-add_subdirectory(code/lib)
 add_subdirectory(code/src)
 add_subdirectory(third_party)

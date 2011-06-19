@@ -63,7 +63,12 @@ public:
 	virtual bool onFingerTap(int x, int y);
 
     virtual bool openInternalLink(int x, int y);
+    // link id will be returned as return value.
+    virtual std::string getLinkInfo(int x, int y, std::string &link_info);
     virtual void processKeyReleaseEvent(int);
+
+    virtual std::string getInternalHyperlinkId(int x, int y);
+    virtual std::string getFirstInternalHyperlinkId(int x0, int y0, int x1, int y1);
 
 protected:
 	ZLApplication &application();

@@ -43,6 +43,9 @@
 #include "../bookmodel/BookModel.h"
 #include "../formats/FormatPlugin.h"
 
+#include "onyx/screen/screen_proxy.h"
+#include "onyx/sys/sys_conf.h"
+
 static const std::string OPTIONS = "Options";
 static const std::string STATE = "State";
 static const std::string BOOK = "Book";
@@ -178,6 +181,8 @@ FBReader::FBReader(const std::string &bookToOpen)
     myOpenFileHandler.reset(new OpenFileHandler(*this));
     ZLCommunicationManager::instance().registerHandler("openFile",
                                                        myOpenFileHandler);
+    sys::SystemConfig conf;
+    onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
 }
 
 FBReader::~FBReader() {
@@ -210,6 +215,8 @@ bool FBReader::initWindow() {
         {
             desc.encoding() = conf().options[CONFIG_ENCODING].toString().toStdString();
         }
+        conf().info.mutable_authors() = QString::fromLocal8Bit(desc.author()->displayName().c_str());
+        conf().info.mutable_title() = QString::fromLocal8Bit(desc.title().c_str());
         ZLApplication::EncodingOption.setValue(desc.encoding());
         openBook(description);
     }
@@ -328,10 +335,55 @@ void FBReader::tryShowFootnoteView(const std::string &id, const std::string &typ
                     view.gotoParagraph(label.ParagraphNumber);
                 }
                 setHyperlinkCursor(false);
-                refreshWindow();
             }
         }
     } else if (type == "book") {
+    }
+}
+
+void FBReader::getFootnote(const std::string &id, const std::string &type,
+        std::string &foot_note)
+{
+    if (type == "external")
+    {
+    }
+    else if (type == "internal")
+    {
+        if ((myMode == BOOK_TEXT_MODE) && (myModel != 0))
+        {
+            BookModel::Label label = myModel->label(id);
+            if (label.Model)
+            {
+                if (label.Model == myModel->bookTextModel())
+                {
+                    // do nothing
+                }
+                else
+                {
+                    FootnoteView &view = ((FootnoteView&)*myFootnoteView);
+                    view.setModel(label.Model, myModel->description()->language());
+                    setMode(FOOTNOTE_MODE);
+                    view.gotoParagraph(label.ParagraphNumber);
+
+                    view.selectionModel().selectWord(0, 0);
+                    view.selectionModel().extendWordSelectionToParagraph();
+                    const char *header = view.selectionModel().text().data();
+                    foot_note.append(header);
+                    foot_note.append(" ");
+                    if (view.selectionModel().selectNextWord())
+                    {
+                        view.selectionModel().extendWordSelectionToParagraph();
+                        const char *note_content = view.selectionModel().text().data();
+                        foot_note.append(note_content);
+                    }
+
+                    // quit from foot note view
+                    doAction("quit");
+                }
+                setHyperlinkCursor(false);
+                refreshWindow();
+            }
+        }
     }
 }
 
@@ -344,7 +396,10 @@ bool FBReader::isViewFinal() const {
 }
 
 void FBReader::setMode(ViewMode mode) {
-    if (mode == myMode) {
+
+    // To solve toc issue.
+    if (mode == myMode && mode != BOOK_TEXT_MODE)
+    {
         return;
     }
 
@@ -443,3 +498,62 @@ bool FBReader::isDictionarySupported() const {
 
 void FBReader::openInDictionary(const std::string &word) {
 }
+
+void FBReader::loadTreeModelData(std::vector<int> & paragraphs,std::vector<std::string> & titles)
+{
+    ZLTextModel & aaModel = *myModel->contentsModel();
+    if (aaModel.kind()  != ZLTextModel::TREE_MODEL)
+    {
+        return ;
+    }
+
+    for(int i=0;i < aaModel.paragraphsNumber();++i)
+    {
+        ZLTextParagraph * textP = aaModel[i];
+        if ( textP->kind() == ZLTextParagraph::TREE_PARAGRAPH)
+        {
+            ZLTextTreeParagraph * tree = (ZLTextTreeParagraph *)textP;
+
+            std::string title;
+            ZLTextParagraph::Iterator  zit( *tree );
+            for ( ;!zit.isEnd();zit.next())
+            { 
+                if( zit.entryKind() == ZLTextParagraphEntry::TEXT_ENTRY )
+                {
+                    const shared_ptr<ZLTextParagraphEntry>  entry = zit.entry() ;
+                    const ZLTextEntry & text = (const ZLTextEntry&) *entry;
+                    title += std::string(text.data(),text.dataLength()); 
+                }
+
+            }
+
+            paragraphs.push_back(tree->depth());
+            titles.push_back(title);
+
+        }
+
+    }
+}
+
+QString FBReader::filePath()
+{
+    QString filePath;
+    if (myModel)
+    {
+        filePath = myModel->description()->fileName().data();
+    }
+    return filePath;
+}
+
+void FBReader::gotoParagraph(int pos)
+{
+    ZLTextModel & aaModel = *myModel->contentsModel();
+    const ZLTextTreeParagraph *paragraph = (const ZLTextTreeParagraph*) aaModel[pos];
+
+    const ContentsModel &contentsModel = (const ContentsModel&)aaModel;
+    int reference = contentsModel.reference(paragraph);
+
+    bookTextView().gotoParagraph(reference);
+    showBookTextView();
+}
+
