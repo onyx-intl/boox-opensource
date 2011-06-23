@@ -64,9 +64,14 @@ void ZLLinkInfoDialog::createLinks()
 
     links_.setData(links_datas_);
     int data_size = links_datas_.size();
-    links_.setFixedGrid(data_size, 1);
-    links_.setFixedHeight(data_size*LINK_ITEM_HEIGHT+10);
-    dialog_height_ = data_size*LINK_ITEM_HEIGHT+10+5;
+
+    // avoid the dialog height exceeds the screen height.
+    int max_dialog_height = ui::screenGeometry().height()/3;
+    int rows = max_dialog_height/LINK_ITEM_HEIGHT;
+    links_.setFixedGrid(rows, 1);
+    int fixed_height = rows*LINK_ITEM_HEIGHT+10;
+    links_.setFixedHeight(fixed_height);
+    dialog_height_ = fixed_height+10;
 }
 
 void ZLLinkInfoDialog::connectWithChildren()
