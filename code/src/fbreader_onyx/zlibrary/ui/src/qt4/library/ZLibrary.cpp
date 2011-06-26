@@ -24,6 +24,8 @@
 
 static std::string DOCUMENT_PATH;
 
+static ZLApplication * my_app;
+
 void initLibrary() {
     new ZLQtLibraryImplementation();
 }
@@ -71,6 +73,14 @@ ZLPaintContext *ZLQtLibraryImplementation::createContext() {
 
 bool ZLQtLibraryImplementation::flip(int value)
 {
+    if (value > 0)
+    {
+        my_app->doAction("largeScrollForward");
+    }
+    else
+    {
+        my_app->doAction("largeScrollBackward");
+    }
     return true;
 }
 
@@ -79,6 +89,7 @@ void ZLQtLibraryImplementation::run(ZLApplication *application) {
         qApp->setLayoutDirection(Qt::RightToLeft);
     }
 
+    my_app = application;
     application->document_path = QString::fromLocal8Bit(DOCUMENT_PATH.c_str());
 
     ZLDialogManager::instance().createApplicationWindow(application);
