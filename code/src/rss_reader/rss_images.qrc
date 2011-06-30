@@ -1,0 +1,15 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource>
+    <file>rss_images/desktop.png</file>
+    <file>rss_images/thumbnail.png</file>
+    <file>rss_images/list_view.png</file>
+    <file>rss_images/remove.png</file>
+    <file>rss_images/edit.png</file>
+    <file>rss_images/arrow_left.png</file>
+    <file>rss_images/arrow_right.png</file>
+    <file>rss_images/check_box_speical.png</file>
+    <file>rss_images/update.png</file>
+    <file>rss_images/updating.png</file>
+
+  </qresource>
+</RCC>
