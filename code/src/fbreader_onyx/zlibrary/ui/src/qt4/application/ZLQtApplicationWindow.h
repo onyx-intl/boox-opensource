@@ -81,7 +81,7 @@ private:
 	bool myWasMaximized;
 
 	bool myCursorIsHyperlink;
-	QCursor myStoredCursor;
+	//QCursor myStoredCursor;
 };
 
 
