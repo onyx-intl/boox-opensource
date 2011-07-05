@@ -197,6 +197,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
             {
                 // TODO, not good
                 feedInfo->Title = dialog.title();
+                feedInfo->Title_for_save = dialog.title();
                 feedInfo->Url = QUrl(dialog.url());
 
                 OData *dd = feedInfo->GetAssociatedListItem();
@@ -251,6 +252,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
                 // TODO, not good
                 CRSSFeedInfo feedInfo;
                 feedInfo.Title = dialog.title();
+                feedInfo.Title_for_save = dialog.title();
                 feedInfo.Url = QUrl(dialog.url());
 
                 emit addFeed(feedInfo);
