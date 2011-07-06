@@ -32,7 +32,7 @@ public:
 	~ZLQtWaitMessage();
 
 private:
-	QCursor myStoredCursor;
+//	QCursor myStoredCursor;
 	QWidget *myMainWidget;
 };
 

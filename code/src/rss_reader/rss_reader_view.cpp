@@ -103,13 +103,6 @@ RssReaderView::RssReaderView(QWidget *parent)
             this, SLOT(onProgressClicked(const int, const int)));
 
     wifi_dialog = new WifiDialog(this, sys::SysStatus::instance());
-    connect(&sys::SysStatus::instance().connectionManager(), SIGNAL(wpaStateChanged(bool)), this,SLOT(onWpaStateChanged(bool)));
-    connect(&sys::SysStatus::instance().connectionManager(), SIGNAL(passwordRequired(WifiProfile)), this, SLOT(onPasswordRequired(WifiProfile)));
-    connect(&sys::SysStatus::instance().connectionManager(), SIGNAL(noMatchedAP()), this, SLOT(onNoMatchedAP()));
-    connect(&sys::SysStatus::instance().connectionManager(),
-            SIGNAL(connectionChanged(WifiProfile, WpaConnection::ConnectionState)),
-            this,
-            SLOT(onConnectionChanged(WifiProfile, WpaConnection::ConnectionState)));
 
 
     createLayout();
@@ -724,14 +717,6 @@ void RssReaderView::markRead()
 void RssReaderView::onDesktopClicked()
 {
     close(true);
-}
-
-void RssReaderView::onReportWifiNetwork(const int signal, const int total, const int network)
-{
-    if (signal <= 0)
-    {
-        //sys::SysStatus::instance().popupWifiDialog();
-    }
 }
 
 void RssReaderView::onWpaStateChanged(bool running)
