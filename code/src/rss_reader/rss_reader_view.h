@@ -40,8 +40,6 @@ public Q_SLOTS:
     void onAddFeed(const CRSSFeedInfo & feedInfo);
     void onRemoveFeed(int i);
 
-    void onReportWifiNetwork(const int signal, const int total, const int network);
-
     void updateOnStart();
 
 Q_SIGNALS:
@@ -50,11 +48,6 @@ Q_SIGNALS:
 private Q_SLOTS:
     void popupMenu();
     void onProgressClicked(const int percent, const int value);
-
-    void onWpaStateChanged(bool running);
-    void onPasswordRequired(WifiProfile profile);
-    void onNoMatchedAP();
-    void onConnectionChanged(WifiProfile profile, WpaConnection::ConnectionState state);
 
 protected:
     void paintEvent(QPaintEvent * event);
