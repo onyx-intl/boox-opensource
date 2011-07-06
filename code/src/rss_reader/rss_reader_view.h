@@ -40,6 +40,8 @@ public Q_SLOTS:
     void onAddFeed(const CRSSFeedInfo & feedInfo);
     void onRemoveFeed(int i);
 
+    void onReportWifiNetwork(const int signal, const int total, const int network);
+
     void updateOnStart();
 
 Q_SIGNALS:
