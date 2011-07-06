@@ -55,6 +55,7 @@ private Q_SLOTS:
     void onPasswordRequired(WifiProfile profile);
     void onNoMatchedAP();
     void onConnectionChanged(WifiProfile profile, WpaConnection::ConnectionState state);
+    void connectToNetwork();
 
 protected:
     void paintEvent(QPaintEvent * event);

@@ -128,7 +128,9 @@ RssReaderView::RssReaderView(QWidget *parent)
     QDesktopServices::setUrlHandler("https", this, "OnOpenUrl");
 #endif
 
-    QTimer::singleShot(800, this, SLOT(updateOnStart()));
+    connectToNetwork();
+
+    QTimer::singleShot(1600, this, SLOT(updateOnStart()));
 }
 
 RssReaderView::~RssReaderView()
@@ -734,7 +736,14 @@ void RssReaderView::onReportWifiNetwork(const int signal, const int total, const
 
 void RssReaderView::onWpaStateChanged(bool running)
 {
-    configNetwork();
+    if (!running)
+    {
+        configNetwork();
+    }
+    else
+    {
+        // TODO.
+    }
 }
 
 void RssReaderView::onPasswordRequired(WifiProfile profile)
@@ -754,13 +763,18 @@ void RssReaderView::onConnectionChanged(WifiProfile profile, WpaConnection::Conn
 
 void RssReaderView::configNetwork()
 {
-    if (wifi_dialog->isActiveWindow())
+    if (wifi_dialog->isVisible())
     {
         return;
     }
     wifi_dialog->popup(true);
     update();
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+}
+
+void RssReaderView::connectToNetwork()
+{
+    sys::SysStatus::instance().connectionManager().start();
 }
 
 NotifyDialog::NotifyDialog(QWidget *parent)
