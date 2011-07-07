@@ -30,6 +30,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     statusbar_ = new StatusBar(this);
     this->setStatusBar(statusbar_);
 
+    sys::SystemConfig conf;
+    onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
     onyx::screen::watcher().addWatcher(this);
 
 #ifdef _LINUX
@@ -196,8 +198,6 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
 
  void OnyxMainWindow::keyReleaseEvent(QKeyEvent *ke)
  {
-     static int n=0;
-
      switch (ke->key())
      {
      case Qt::Key_PageDown:
@@ -206,18 +206,8 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              view_->nextPage();
              statusbar_->setProgress(view_->getDocView()->getCurPage()+1, 100);
              update();
-             if(++n%=5)
-             {
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-                 return;
-             }
-             else
-             {
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-                 return;
-             }
+             updateScreen();
+             return;
          }
          break;
      case Qt::Key_PageUp:
@@ -226,18 +216,8 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              view_->prevPage();
              statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
              update();
-             if(++n%=5)
-             {
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-                 return;
-             }
-             else
-             {
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-                 return;
-             }
+             updateScreen();
+             return;
          }
          break;
      case Qt::Key_Up:
@@ -245,8 +225,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              view_->prevChapter();
              statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
              update();
-             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
-                     onyx::screen::ScreenCommand::WAIT_NONE);
+             updateScreen();
              return;
          }
      case Qt::Key_Down:
@@ -254,8 +233,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              view_->nextChapter();
              statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
              update();
-             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
-                     onyx::screen::ScreenCommand::WAIT_NONE);
+             updateScreen();
              return;
          }
      case Qt::Key_Return:
@@ -273,7 +251,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              if (this->isFullScreenByWidgetSize())
              {
                  statusbar_->show();
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
+                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                          onyx::screen::ScreenCommand::WAIT_NONE);
              }
              else
@@ -294,9 +272,9 @@ void OnyxMainWindow::showContextMenu()
 
     menu.addGroup(&font_family_actions_);
     menu.addGroup(&font_actions_);
-    menu.addGroup(&reading_style_actions_);
-    menu.addGroup(&zoom_setting_actions_);
-    menu.addGroup(&reading_tool_actions_);
+    //menu.addGroup(&reading_style_actions_);
+    //menu.addGroup(&zoom_setting_actions_);
+    //menu.addGroup(&reading_tool_actions_);
     menu.setSystemAction(&system_actions_);
 
     if (menu.popup() != QDialog::Accepted)
@@ -337,13 +315,13 @@ void OnyxMainWindow::showContextMenu()
         else if (system == FULL_SCREEN)
         {
             statusbar_->hide();
-            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
         else if (system == EXIT_FULL_SCREEN)
         {
             statusbar_->show();
-            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
         else if (system == MUSIC)
@@ -465,4 +443,41 @@ void OnyxMainWindow::gotoPage()
 void OnyxMainWindow::showClock()
 {
 
+}
+
+void OnyxMainWindow::updateScreen()
+{
+    if (onyx::screen::instance().userData() < 2)
+    {
+        ++onyx::screen::instance().userData();
+        if (onyx::screen::instance().userData() == 2)
+        {
+            sys::SysStatus::instance().setSystemBusy(false);
+            onyx::screen::instance().updateWidget(
+                this,
+                onyx::screen::ScreenProxy::GC,
+                true,
+                onyx::screen::ScreenCommand::WAIT_ALL);
+        }
+        return;
+    }
+
+    if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
+    {
+        onyx::screen::instance().updateWidget(
+            this,
+            onyx::screen::ScreenProxy::DW,
+            true,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
+    else
+    {
+        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
+        onyx::screen::instance().updateWidgetWithGCInterval(
+            this,
+            NULL,
+            w,
+            true,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
 }

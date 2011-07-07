@@ -95,6 +95,7 @@ private:
     void processToolActions();
     void showClock();
     void gotoPage();
+    void updateScreen();
 
     void updateZoomingActions();
     void updateToolActions();
