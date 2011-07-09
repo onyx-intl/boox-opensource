@@ -1,0 +1,274 @@
+PROJECT(cr3)
+cmake_minimum_required(VERSION 2.6)
+
+#INCLUDE(CPack)
+
+# setting hard coded cmake parameters
+SET(GUI QT)
+SET(ENABLE_ANTIWORD 1)
+SET(MAX_IMAGE_SCALE_MUL 2)
+SET(DOC_DATA_COMPRESSION_LEVEL 3)
+SET(DOC_BUFFER_SIZE 0x1400000)
+
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+IF(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+  ADD_DEFINITIONS( -D_DEBUG=1 -DDEBUG=1 )
+ELSE()
+  ADD_DEFINITIONS( -DNDEBUG=1 )
+ENDIF(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+
+if (NOT DEFINED GUI)
+  SET(GUI QT)
+  message("GUI type is not specified!")
+  message("Using ${GUI} as default")
+  message("Add cmake parameter -D GUI={QT|WX|CRGUI_XCB|CRGUI_NANOX|CRGUI_JINKE_PLUGIN|CRGUI_WIN32|FB2PROPS} to use another GUI frontend")
+else ()
+  message("Using GUI frontend ${GUI}")
+endif (NOT DEFINED GUI)
+
+
+
+# Determines whether to use external app EDICT for dictionary
+if (NOT DEFINED USE_EXTERNAL_EDICT_DICTIONARY)
+  SET(USE_EXTERNAL_EDICT_DICTIONARY 0)
+else()
+  SET(USE_EXTERNAL_EDICT_DICTIONARY ${USE_EXTERNAL_EDICT_DICTIONARY})
+endif (NOT DEFINED USE_EXTERNAL_EDICT_DICTIONARY)
+message("using USE_EXTERNAL_EDICT_DICTIONARY=${USE_EXTERNAL_EDICT_DICTIONARY}")
+ADD_DEFINITIONS( -DUSE_EXTERNAL_EDICT_DICTIONARY=${USE_EXTERNAL_EDICT_DICTIONARY} )
+
+
+# Document buffer cache / compression settings
+
+#whether to compress data
+if (NOT DEFINED DOC_DATA_COMPRESSION_LEVEL)
+  message("-D DOC_DATA_COMPRESSION_LEVEL=0|1|2|3|4|5 parameter is not defined: will use default value")
+  SET(DOC_DATA_COMPRESSION_LEVEL 1)
+else()
+  SET(DOC_DATA_COMPRESSION_LEVEL ${DOC_DATA_COMPRESSION_LEVEL})
+endif (NOT DEFINED DOC_DATA_COMPRESSION_LEVEL)
+message("using TEXT_COMPRESSION_LEVEL=${DOC_DATA_COMPRESSION_LEVEL}")
+ADD_DEFINITIONS( -DDOC_DATA_COMPRESSION_LEVEL=${DOC_DATA_COMPRESSION_LEVEL} )
+
+# Total RAM buffers size for document
+if (NOT DEFINED DOC_BUFFER_SIZE)
+  message("-D DOC_BUFFER_SIZE=N parameter is not defined: will use default value")
+  SET(DOC_BUFFER_SIZE 0x400000)
+else()
+  SET(DOC_BUFFER_SIZE ${DOC_BUFFER_SIZE})
+endif (NOT DEFINED DOC_BUFFER_SIZE)
+message("using DOC_BUFFER_SIZE=${DOC_BUFFER_SIZE}")
+ADD_DEFINITIONS( -DDOC_BUFFER_SIZE=${DOC_BUFFER_SIZE} )
+
+# big page margins support
+if (NOT DEFINED BIG_PAGE_MARGINS)
+  SET(BIG_PAGE_MARGINS 0)
+else()
+  SET(BIG_PAGE_MARGINS ${BIG_PAGE_MARGINS})
+endif (NOT DEFINED BIG_PAGE_MARGINS)
+ADD_DEFINITIONS( -DBIG_PAGE_MARGINS=${BIG_PAGE_MARGINS} )
+
+# big page margins support
+if (NOT DEFINED MAX_IMAGE_SCALE_MUL)
+  SET(MAX_IMAGE_SCALE_MUL 0)
+else()
+  SET(MAX_IMAGE_SCALE_MUL ${MAX_IMAGE_SCALE_MUL})
+endif (NOT DEFINED MAX_IMAGE_SCALE_MUL)
+ADD_DEFINITIONS( -DMAX_IMAGE_SCALE_MUL=${MAX_IMAGE_SCALE_MUL} )
+message("using MAX_IMAGE_SCALE_MUL=${MAX_IMAGE_SCALE_MUL}")
+
+if ( WIN32 )
+  ADD_DEFINITIONS( -DWIN32=1 -D_WIN32=1 -DCR_EMULATE_GETTEXT=1 )
+else()
+  ADD_DEFINITIONS( -DLINUX=1 -D_LINUX=1 )
+endif( WIN32 )
+
+if (NOT DEFINED GRAY_BACKBUFFER_BITS)
+  SET(GRAY_BACKBUFFER_BITS 2)
+endif (NOT DEFINED GRAY_BACKBUFFER_BITS)
+if (NOT DEFINED ENABLE_DBUS_VIEWER_EVENTS)
+  SET(ENABLE_DBUS_VIEWER_EVENTS 0)
+endif (NOT DEFINED ENABLE_DBUS_VIEWER_EVENTS)
+
+
+SET (CRGUI_DEFS -DCOLOR_BACKBUFFER=0 -DLDOM_USE_OWN_MEM_MAN=0 -DGRAY_BACKBUFFER_BITS=${GRAY_BACKBUFFER_BITS} 
+      -DENABLE_DBUS_VIEWER_EVENTS=${ENABLE_DBUS_VIEWER_EVENTS})
+SET (DESKTOP_DEFS -DCOLOR_BACKBUFFER=1 -DLDOM_USE_OWN_MEM_MAN=1 -DUSE_FREETYPE=1 )
+
+if( ${GUI} STREQUAL QT )
+FIND_PACKAGE( Qt4 REQUIRED )
+INCLUDE(${QT_USE_FILE})
+endif( ${GUI} STREQUAL QT )
+
+if (DEFINED USE_QT_ZLIB)
+  SET(ZLIB_INCLUDE_DIR ${QT_INCLUDE_DIR}/../src/3rdparty/zlib)
+  message("Using QT ZLIB ${USE_QT_ZLIB} include dir: ${ZLIB_INCLUDE_DIR}")
+# SET(ZLIB_LIBRARIES "")
+else()
+if (NOT WIN32 AND NOT DEFINED USE_STATIC_ZLIB)
+FIND_PACKAGE(ZLIB)
+endif (NOT WIN32 AND NOT DEFINED USE_STATIC_ZLIB)
+if (NOT ZLIB_FOUND)
+  message("System ZLIB not found, will build local one")
+  #to disable #include <qconfig.h>
+  ADD_DEFINITIONS(-DCR3_PATCH=1)
+  ADD_SUBDIRECTORY(thirdparty/zlib)
+  SET(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/zlib)
+  SET(ZLIB_LIBRARIES z)
+endif (NOT ZLIB_FOUND)
+endif(DEFINED USE_QT_ZLIB)
+
+if ( NOT ${GUI} STREQUAL FB2PROPS )
+if (NOT WIN32)
+FIND_PACKAGE(PNG)
+endif (NOT WIN32)
+if (NOT PNG_FOUND)
+  message("System LIBPNG not found, will build local one")
+  #to disable #include <qconfig.h>
+  ADD_DEFINITIONS(-DCR3_PATCH=1)
+  INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+  ADD_SUBDIRECTORY(thirdparty/libpng)
+  SET(PNG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libpng)
+  SET(PNG_LIBRARIES png)
+endif (NOT PNG_FOUND)
+
+if (NOT WIN32)
+FIND_PACKAGE(JPEG)
+endif (NOT WIN32)
+
+if (NOT JPEG_FOUND)
+  message("System LIBJPEG not found, will build local one")
+  ADD_SUBDIRECTORY(thirdparty/libjpeg)
+  SET(JPEG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/libjpeg)
+  SET(JPEG_LIBRARIES jpeg_cr3)
+endif (NOT JPEG_FOUND)
+
+if (NOT WIN32)
+FIND_PACKAGE(Freetype)
+endif (NOT WIN32)
+if (NOT FREETYPE_FOUND)
+  message("System FREETYPE not found, will build local one")
+  ADD_SUBDIRECTORY(thirdparty/freetype)
+  SET(FREETYPE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/freetype/include)
+  SET(FREETYPE_LIBRARIES freetype)
+endif (NOT FREETYPE_FOUND)
+
+message("Will build patched LIBCHM library")
+ADD_SUBDIRECTORY(thirdparty/chmlib)
+SET(CHM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chmlib)
+SET(CHM_LIBRARIES chmlib)
+ADD_DEFINITIONS(-DCHM_SUPPORT_ENABLED=1)
+
+if (NOT ${ENABLE_ANTIWORD} STREQUAL 0)
+message("Will build patched ANTIWORD library")
+ADD_DEFINITIONS(-DCR3_ANTIWORD_PATCH=1)
+ADD_SUBDIRECTORY(thirdparty/antiword)
+SET(ANTIWORD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/antiword)
+SET(ANTIWORD_LIBRARIES antiword)
+ADD_DEFINITIONS(-DENABLE_ANTIWORD=1)
+INCLUDE_DIRECTORIES( ${ANTIWORD_INCLUDE_DIR} )
+else()
+ADD_DEFINITIONS(-DENABLE_ANTIWORD=0)
+endif(NOT ${ENABLE_ANTIWORD} STREQUAL 0)
+endif ( NOT ${GUI} STREQUAL FB2PROPS )
+
+
+INCLUDE_DIRECTORIES( 
+  ${PNG_INCLUDE_DIR} 
+  ${JPEG_INCLUDE_DIR} 
+  ${ZLIB_INCLUDE_DIR} 
+  ${FREETYPE_INCLUDE_DIRS}
+  ${ANTIWORD_INCLUDE_DIR}
+  ${CHM_INCLUDE_DIRS}
+)
+
+if ( ${GUI} STREQUAL FB2PROPS )
+SET(STD_LIBS 
+  ${ZLIB_LIBRARIES} 
+)
+else()
+SET(STD_LIBS 
+  ${JPEG_LIBRARIES} 
+  ${FREETYPE_LIBRARIES} 
+  ${PNG_LIBRARIES} 
+  ${ZLIB_LIBRARIES} 
+  ${CHM_LIBRARIES}
+  ${ANTIWORD_LIBRARIES}
+)
+include_directories(${FT_INCLUDE_PATH})
+endif ( ${GUI} STREQUAL FB2PROPS )
+
+include_directories(crengine/include)
+
+if ( NOT ${GUI} STREQUAL FB2PROPS )
+include_directories(tinydict)
+message("Will make tinydict library - .dict format support")
+ADD_SUBDIRECTORY(tinydict)
+endif ( NOT ${GUI} STREQUAL FB2PROPS )
+
+
+include(FindPkgConfig)
+
+if ( ${GUI} STREQUAL CRGUI_XCB )
+  message("Will make CR3GUI for XCB")
+  ADD_DEFINITIONS( -DCR_USE_XCB=1 ${CRGUI_DEFS} )
+  ADD_DEFINITIONS( -DCR_INTERNAL_PAGE_ORIENTATION=0 ${CRGUI_DEFS} )
+  message("Freetype include dir: ${FREETYPE_INCLUDE_DIRS}")
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3gui)
+elseif ( ${GUI} STREQUAL CRGUI_NANOX )
+  message("Will make CR3GUI for NanoX")
+  if (ENABLE_DBUS_VIEWER_EVENTS)
+    message("Will handle DBUS messages")
+    pkg_check_modules( DBUS REQUIRED dbus-1 )
+    message("dbus include dir: ${DBUS_INCLUDE_DIRS} path ${DBUS_INCLUDE_PATH}")
+    include_directories(${DBUS_INCLUDE_DIRS})
+  endif (ENABLE_DBUS_VIEWER_EVENTS)
+  ADD_DEFINITIONS( -DLBOOK=1 -DWITH_JINKE=1 -DCR_USE_JINKE=1
+    -DJINKE_VIEWER ${CRGUI_DEFS} -DENABLE_UPDATE_MODE_SETTING=1 )
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3gui)
+elseif ( ${GUI} STREQUAL CRGUI_JINKE_PLUGIN )
+  message("Will make CR3GUI plugin for Jinke Viewer")
+  ADD_DEFINITIONS( -DLBOOK=1 -DWITH_JINKE=1 -DWITH_JINKE_APP=1
+    -DCR_USE_JINKE=1 ${CRGUI_DEFS}
+    -DENABLE_UPDATE_MODE_SETTING=1 )
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3gui)
+elseif ( ${GUI} STREQUAL FB2PROPS )
+  message("Will make LIBFB2PROPS plugin for Jinke Bookshelf")
+  ADD_DEFINITIONS( -DLBOOK=1 -DWITH_JINKE=1 -DCR_USE_JINKE=1 -DBUILD_LITE=1 ${CRGUI_DEFS} )
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(fb2props)
+elseif ( ${GUI} STREQUAL CRGUI_WIN32 )
+  message("Will make CR3GUI for Win32")
+  ADD_DEFINITIONS( ${CRGUI_DEFS} )
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3gui)
+elseif ( ${GUI} STREQUAL QT )
+  message("Will make CR3/QT")
+  ADD_DEFINITIONS( ${DESKTOP_DEFS} )
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3_onyx)
+elseif ( ${GUI} STREQUAL WX )
+  message("Will make CR3/WX")
+  ADD_DEFINITIONS( ${DESKTOP_DEFS} -DCR_WX_SUPPORT=1 )
+  SET(wxWidgets_USE_LIBS base core )
+  FIND_PACKAGE(wxWidgets)
+  IF (wxWidgets_FOUND)
+    INCLUDE(${wxWidgets_USE_FILE})
+    include_directories( ${wxWidgets_INCLUDE_DIRS} )
+    message( "WX include: ${wxWidgets_INCLUDE_DIRS}" )
+  ELSE (wxWidgets_FOUND)
+    message("wxWidgets library not found!")
+  ENDIF (wxWidgets_FOUND)
+  ADD_SUBDIRECTORY(crengine)
+  ADD_SUBDIRECTORY(cr3wx)
+else ( ${GUI} STREQUAL CRGUI_XCB )
+  message("Unknown GUI type ${GUI}")
+endif ( ${GUI} STREQUAL CRGUI_XCB )
