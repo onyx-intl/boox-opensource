@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(dict_tool
   onyx_data
   onyx_screen
   onyx_ui
-  private_conf
   ${QT_LIBRARIES}
   ${ADD_LIB}
 )
