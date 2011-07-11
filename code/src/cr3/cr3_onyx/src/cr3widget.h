@@ -144,6 +144,7 @@ class CR3View : public QWidget, public LVDocViewCallback
 
     signals:
         //void fileNameChanged( const QString & );
+        void updateProgress(int, int);
 
     protected:
         virtual void keyPressEvent ( QKeyEvent * event );

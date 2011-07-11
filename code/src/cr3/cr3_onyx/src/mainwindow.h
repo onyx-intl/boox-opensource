@@ -72,6 +72,7 @@ private slots:
     void on_view_destroyed();
 */
     void showContextMenu();
+    void onProgressClicked(const int, const int);
 
 private:
     CR3View *view_;

@@ -4052,6 +4052,9 @@ void LVDocView::updateScroll() {
 			} else
 				sprintf(str, "%d / %d", page, m_pages.length() - 1);
 		}
+                if ( m_callback ) {
+                    m_callback->OnLoadFileEnd();
+                }
 		m_scrollinfo.posText = lString16(str);
 	}
 }

@@ -12,6 +12,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/menu.h"
 #include "onyx/sys/sys_status.h"
+#include "onyx/ui/number_dialog.h"
 #include <QKeyEvent>
 
 #define DOC_CACHE_SIZE 128 * 0x100000
@@ -27,7 +28,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     view_->setFocusPolicy(Qt::NoFocus);
     this->setCentralWidget(view_);
 
-    statusbar_ = new StatusBar(this);
+    statusbar_ = new StatusBar(this, MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
     this->setStatusBar(statusbar_);
 
     sys::SystemConfig conf;
@@ -82,7 +83,6 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     }
 
     view_->loadDocument(_filenameToOpen);
-    statusbar_->setProgress(1, view_->getDocView()->getPageCount());
 
 //     QTranslator qtTranslator;
 //     if (qtTranslator.load("qt_" + QLocale::system().name(),
@@ -104,6 +104,9 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     font_family_actions_.loadExternalFonts();
 
     connect(statusbar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
+    connect(view_, SIGNAL(updateProgress(int,int)), statusbar_, SLOT(setProgress(int,int)));
+    connect(statusbar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
+    updateScreen();
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
@@ -187,8 +190,6 @@ void OnyxMainWindow::focusInEvent ( QFocusEvent * event )
 
 void OnyxMainWindow::on_actionFindText_triggered()
 {
-    QMessageBox * mb = new QMessageBox( QMessageBox::Information, tr("Not implemented"), tr("Search is not implemented yet"), QMessageBox::Close, this );
-    mb->exec();
 }
 
 void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
@@ -204,8 +205,6 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_Right:
          {
              view_->nextPage();
-             statusbar_->setProgress(view_->getDocView()->getCurPage()+1, 100);
-             update();
              updateScreen();
              return;
          }
@@ -214,8 +213,6 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_Left:
          {
              view_->prevPage();
-             statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
-             update();
              updateScreen();
              return;
          }
@@ -223,16 +220,12 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_Up:
          {
              view_->prevChapter();
-             statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
-             update();
              updateScreen();
              return;
          }
      case Qt::Key_Down:
          {
              view_->nextChapter();
-             statusbar_->setProgress(view_->getDocView()->getCurPage(), 100);
-             update();
              updateScreen();
              return;
          }
@@ -274,7 +267,7 @@ void OnyxMainWindow::showContextMenu()
     menu.addGroup(&font_actions_);
     //menu.addGroup(&reading_style_actions_);
     //menu.addGroup(&zoom_setting_actions_);
-    //menu.addGroup(&reading_tool_actions_);
+    menu.addGroup(&reading_tool_actions_);
     menu.setSystemAction(&system_actions_);
 
     if (menu.popup() != QDialog::Accepted)
@@ -434,19 +427,35 @@ void OnyxMainWindow::processToolActions()
 
 void OnyxMainWindow::gotoPage()
 {
-    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    if (view_->getDocView()->getPageCount() <= 1)
+        return;
+
+    //onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
     //emit requestGotoPageDialog();
-    statusbar_->onMessageAreaClicked();
+    //statusbar_->onMessageAreaClicked();
     //resetScrollBar();
+    // Popup page dialog.
+    NumberDialog dialog(0);
+    if (dialog.popup(view_->getDocView()->getCurPage(), view_->getDocView()->getPageCount()) != QDialog::Accepted)
+    {
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+        return;
+    }
+
+    int current = dialog.value();
+    this->onProgressClicked(1, current);
 }
 
 void OnyxMainWindow::showClock()
 {
-
+    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    statusbar_->onClockClicked();
 }
 
 void OnyxMainWindow::updateScreen()
 {
+    view_->repaint();
+
     if (onyx::screen::instance().userData() < 2)
     {
         ++onyx::screen::instance().userData();
@@ -480,4 +489,10 @@ void OnyxMainWindow::updateScreen()
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);
     }
+}
+
+void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
+{
+    view_->getDocView()->goToPage(value-1);
+    updateScreen();
 }

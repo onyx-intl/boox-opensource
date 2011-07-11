@@ -1103,6 +1103,7 @@ void CR3View::OnLoadFileError( lString16 message )
 void CR3View::OnLoadFileEnd()
 {
     setCursor( _normalCursor );
+    emit updateProgress(getDocView()->getCurPage()+1, getDocView()->getPageCount());
 }
 
 /// document formatting started
