@@ -13,7 +13,7 @@ RecentBooksDlg::RecentBooksDlg(QWidget *parent, CR3View * docView ) :
 {
     m_ui->setupUi(this);
     m_ui->tableWidget->setColumnCount(4);
-    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << tr("#") << tr("Author") << tr("Title") << tr("Filename") );
+    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << "#" << "Author" << "Title" << "Filename" );
     m_ui->tableWidget->verticalHeader()->hide();
     m_ui->tableWidget->horizontalHeader()->setResizeMode( 0, QHeaderView::ResizeToContents );
     m_ui->tableWidget->horizontalHeader()->setResizeMode( 1, QHeaderView::ResizeToContents ); //Stretch
@@ -151,7 +151,7 @@ void RecentBooksDlg::on_actionRemoveItem_triggered()
 void RecentBooksDlg::on_actionClearAll_triggered()
 {
     //
-    if ( QMessageBox::question(this, tr("Remove all history items"), tr("Do you really want to remove all history records?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) == QMessageBox::Yes ) {
+    if ( QMessageBox::question(this, "Remove all history items", "Do you really want to remove all history records?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) == QMessageBox::Yes ) {
         int firstItem = m_docview->getDocView()->isDocumentOpened() ? 1 : 0;
         LVPtrVector<CRFileHistRecord> & files = m_docview->getDocView()->getHistory()->getRecords();
         for ( int r=files.length(); r>=firstItem; r-- ) {

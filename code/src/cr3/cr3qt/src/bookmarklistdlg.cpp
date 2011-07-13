@@ -19,10 +19,10 @@ BookmarkListDialog::BookmarkListDialog(QWidget *parent, CR3View * docView ) :
     _docview(docView)
 {
     m_ui->setupUi(this);
-    setWindowTitle( tr("Bookmarks") );
+    setWindowTitle( "Bookmarks" );
 
     m_ui->tableWidget->setColumnCount(4);
-    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << tr("Position") << tr("Type", "bookmark type") /*<< tr("Chapter") */ << tr("Text") << tr("Comment") );
+    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << "Position" << "Type", "bookmark type" /*<< tr("Chapter") */ << "Text" << "Comment" );
     m_ui->tableWidget->verticalHeader()->hide();
     int i = 0;
     m_ui->tableWidget->horizontalHeader()->setResizeMode( i++, QHeaderView::ResizeToContents );
@@ -60,11 +60,11 @@ BookmarkListDialog::BookmarkListDialog(QWidget *parent, CR3View * docView ) :
             bestindex = i;
             bestdiff = diff;
         }
-        QString t = tr("P", "Bookmark type first letter - Position");
+        QString t = QString("P")+"Bookmark type first letter - Position";
         if ( bm->getType()==bmkt_comment )
-            t = tr("C", "Bookmark type first letter - Comment");
+            t = QString("C")+"Bookmark type first letter - Comment";
         else if ( bm->getType()==bmkt_correction )
-            t = tr("E", "Bookmark type first letter - Correction/Edit");
+            t = QString("E")+"Bookmark type first letter - Correction/Edit";
         m_ui->tableWidget->setRowCount(y+1);
 		{
 			int i=0;

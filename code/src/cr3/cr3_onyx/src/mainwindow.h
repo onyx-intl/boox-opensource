@@ -10,9 +10,15 @@
 #include "onyx/ui/font_family_actions.h"
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/ui/zoom_setting_actions.h"
+#include "onyx/ui/onyx_search_dialog.h"
+#include "onyx/dictionary/dictionary_manager.h"
+#include "onyx/dictionary/dict_widget.h"
+#include "onyx/tts/tts_widget.h"
 
 class QKeyEvent;
+class SearchTool;
 using namespace ui;
+using namespace tts;
 
 class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
 {
@@ -35,48 +41,18 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *ke);
 
 private slots:
-/*
-    void on_actionNextPage3_triggered();
-    void on_actionToggleEditMode_triggered();
-    void on_actionRotate_triggered();
-    void on_actionFileProperties_triggered();
-    void on_actionShowBookmarksList_triggered();
-    void on_actionAddBookmark_triggered();
-    void on_actionAboutCoolReader_triggered();
-    void on_actionAboutQT_triggered();
-    void on_actionCopy2_triggered();
-    void on_actionCopy_triggered();
-    void on_actionSettings_triggered();
-    void on_actionRecentBooks_triggered();
-    void on_actionTOC_triggered();
-    void on_actionZoom_Out_triggered();
-    void on_actionZoom_In_triggered();
-    void on_actionToggle_Full_Screen_triggered();
-    void on_actionToggle_Pages_Scroll_triggered();
-    void on_actionPrevChapter_triggered();
-    void on_actionNextChapter_triggered();
-    void on_actionForward_triggered();
-    void on_actionBack_triggered();
-    void on_actionLastPage_triggered();
-    void on_actionFirstPage_triggered();
-    void on_actionPrevLine_triggered();
-    void on_actionNextLine_triggered();
-    void on_actionPrevPage_triggered();
-    void on_actionNextPage_triggered();
-    void on_actionPrevPage2_triggered();
-    void on_actionNextPage2_triggered();
-    void on_actionClose_triggered();
-    void on_actionMinimize_triggered();
-    void on_actionOpen_triggered();
-    void on_actionExport_triggered();
-    void on_view_destroyed();
-*/
     void showContextMenu();
     void onProgressClicked(const int, const int);
+    void onSearchClosed();
+    void onSearch(OnyxSearchContext& context);
+    void lookup();
+    void onDictClosed();
+    void processKeyReleaseEvent(int key);
 
 private:
     CR3View *view_;
     StatusBar *statusbar_;
+    SearchTool *search_tool_;
     QString _filenameToOpen;
 
     QFont select_font;
@@ -89,7 +65,13 @@ private:
     ReadingStyleActions reading_style_actions_;
 
     PropsRef props_ref;
+    QRect selected_rect_;
+    scoped_ptr<DictionaryManager> dicts_;
+    scoped_ptr<DictWidget> dict_widget_;
+    scoped_ptr<OnyxSearchDialog> search_widget_;
+    OnyxSearchContext search_context_;
 
+    scoped_ptr<TTS> tts_engine_;
 
     void toggleProperty( const char * name );
     bool isFullScreenByWidgetSize();
@@ -97,6 +79,13 @@ private:
     void showClock();
     void gotoPage();
     void updateScreen();
+    void showSearchWidget();
+    bool updateSearchWidget();
+
+    void startDictLookup();
+    void hideHelperWidget(QWidget * wnd);
+    TTS & tts();
+    bool adjustDictWidget();
 
     void updateZoomingActions();
     void updateToolActions();

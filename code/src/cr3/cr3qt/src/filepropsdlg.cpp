@@ -11,10 +11,10 @@ FilePropsDialog::FilePropsDialog(QWidget *parent, CR3View * docView ) :
     ,_docview(docView->getDocView())
 {
     m_ui->setupUi(this);
-    setWindowTitle( tr("Document properties") );
+    setWindowTitle( "Document properties" );
 
     m_ui->tableWidget->setColumnCount(2);
-    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << tr("Property") << tr("Value") );
+    m_ui->tableWidget->setHorizontalHeaderLabels ( QStringList() << "Property" << "Value" );
     m_ui->tableWidget->verticalHeader()->hide();
     m_ui->tableWidget->horizontalHeader()->setResizeMode( 0, QHeaderView::ResizeToContents );
     m_ui->tableWidget->horizontalHeader()->setResizeMode( 1, QHeaderView::Stretch ); //Stretch
@@ -164,52 +164,52 @@ void FilePropsDialog::fillItems()
     txt << "<table><col width=\"25%\"/><col width=\"75%\"/>\n";
     CRPropRef props = _docview->getDocProps();
 
-    addPropLine( tr("Current page"), cr2qt(lString16::itoa(_docview->getCurPage())) );
-    addPropLine( tr("Total pages"), cr2qt(lString16::itoa(_docview->getPageCount())) );
-    addPropLine( tr("Battery state"), cr2qt(lString16::itoa(_docview->getBatteryState()) + L"%") );
-    addPropLine( tr("Current Time"), cr2qt(_docview->getTimeString()) );
+    addPropLine( "Current page", cr2qt(lString16::itoa(_docview->getCurPage())) );
+    addPropLine( "Total pages", cr2qt(lString16::itoa(_docview->getPageCount())) );
+    addPropLine( "Battery state", cr2qt(lString16::itoa(_docview->getBatteryState()) + L"%") );
+    addPropLine( "Current Time", cr2qt(_docview->getTimeString()) );
     // TODO:
     if ( hist ) {
         CRBookmark * lastpos = hist->getLastPos();
         if ( lastpos ) {
-            addPropLine( tr("Current chapter"), cr2qt(lastpos->getTitleText()));
+            addPropLine( "Current chapter", cr2qt(lastpos->getTitleText()));
         }
     }
-    addInfoSection( tr("Status") );
+    addInfoSection( "Status" );
 
-    addPropLine( tr("Archive name"), cr2qt(props->getStringDef(DOC_PROP_ARC_NAME)) );
-    addPropLine( tr("Archive path"), cr2qt(props->getStringDef(DOC_PROP_ARC_PATH)) );
-    addPropLine( tr("Archive size"), cr2qt(props->getStringDef(DOC_PROP_ARC_SIZE)) );
-    addPropLine( tr("File name"), cr2qt(props->getStringDef(DOC_PROP_FILE_NAME)) );
-    addPropLine( tr("File path"), cr2qt(props->getStringDef(DOC_PROP_FILE_PATH)) );
-    addPropLine( tr("File size"), cr2qt(props->getStringDef(DOC_PROP_FILE_SIZE)) );
-    addPropLine( tr("File format"), cr2qt(props->getStringDef(DOC_PROP_FILE_FORMAT)) );
-    addInfoSection( tr("File info") );
+    addPropLine( "Archive name", cr2qt(props->getStringDef(DOC_PROP_ARC_NAME)) );
+    addPropLine( "Archive path", cr2qt(props->getStringDef(DOC_PROP_ARC_PATH)) );
+    addPropLine( "Archive size", cr2qt(props->getStringDef(DOC_PROP_ARC_SIZE)) );
+    addPropLine( "File name", cr2qt(props->getStringDef(DOC_PROP_FILE_NAME)) );
+    addPropLine( "File path", cr2qt(props->getStringDef(DOC_PROP_FILE_PATH)) );
+    addPropLine( "File size", cr2qt(props->getStringDef(DOC_PROP_FILE_SIZE)) );
+    addPropLine( "File format", cr2qt(props->getStringDef(DOC_PROP_FILE_FORMAT)) );
+    addInfoSection( "File info" );
 
-    addPropLine( tr("Title"), cr2qt(props->getStringDef(DOC_PROP_TITLE)) );
-    addPropLine( tr("Author(s)"), cr2qt(props->getStringDef(DOC_PROP_AUTHORS)) );
-    addPropLine( tr("Series name"), cr2qt(props->getStringDef(DOC_PROP_SERIES_NAME)) );
-    addPropLine( tr("Series number"), cr2qt(props->getStringDef(DOC_PROP_SERIES_NUMBER)) );
-    addPropLine( tr("Date"), getDocText( "/FictionBook/description/title-info/date", ", " ) );
-    addPropLine( tr("Genres"), getDocText( "/FictionBook/description/title-info/genre", ", " ) );
-    addPropLine( tr("Translator"), getDocText( "/FictionBook/description/title-info/translator", ", " ) );
-    addInfoSection( tr("Book info") );
+    addPropLine( "Title", cr2qt(props->getStringDef(DOC_PROP_TITLE)) );
+    addPropLine( "Author(s)", cr2qt(props->getStringDef(DOC_PROP_AUTHORS)) );
+    addPropLine( "Series name", cr2qt(props->getStringDef(DOC_PROP_SERIES_NAME)) );
+    addPropLine( "Series number", cr2qt(props->getStringDef(DOC_PROP_SERIES_NUMBER)) );
+    addPropLine( "Date", getDocText( "/FictionBook/description/title-info/date", ", " ) );
+    addPropLine( "Genres", getDocText( "/FictionBook/description/title-info/genre", ", " ) );
+    addPropLine( "Translator", getDocText( "/FictionBook/description/title-info/translator", ", " ) );
+    addInfoSection( "Book info" );
 
-    addPropLine( tr("Document author"), getDocAuthors( "/FictionBook/description/document-info/author", " " ) );
-    addPropLine( tr("Document date"), getDocText( "/FictionBook/description/document-info/date", " " ) );
-    addPropLine( tr("Document source URL"), getDocText( "/FictionBook/description/document-info/src-url", " " ) );
-    addPropLine( tr("OCR by"), getDocText( "/FictionBook/description/document-info/src-ocr", " " ) );
-    addPropLine( tr("Document version"), getDocText( "/FictionBook/description/document-info/version", " " ) );
-    addInfoSection( tr("Document info") );
+    addPropLine( "Document author", getDocAuthors( "/FictionBook/description/document-info/author", " " ) );
+    addPropLine( "Document date", getDocText( "/FictionBook/description/document-info/date", " " ) );
+    addPropLine( "Document source URL", getDocText( "/FictionBook/description/document-info/src-url", " " ) );
+    addPropLine( "OCR by", getDocText( "/FictionBook/description/document-info/src-ocr", " " ) );
+    addPropLine( "Document version", getDocText( "/FictionBook/description/document-info/version", " " ) );
+    addInfoSection( "Document info" );
 
-    addPropLine( tr("Publication name"), getDocText( "/FictionBook/description/publish-info/book-name", " " ) );
-    addPropLine( tr("Publisher"), getDocText( "/FictionBook/description/publish-info/publisher", " " ) );
-    addPropLine( tr("Publisher city"), getDocText( "/FictionBook/description/publish-info/city", " " ) );
-    addPropLine( tr("Publication year"), getDocText( "/FictionBook/description/publish-info/year", " " ) );
-    addPropLine( tr("ISBN"), getDocText( "/FictionBook/description/publish-info/isbn", " " ) );
-    addInfoSection( tr("Publication info") );
+    addPropLine( "Publication name", getDocText( "/FictionBook/description/publish-info/book-name", " " ) );
+    addPropLine( "Publisher", getDocText( "/FictionBook/description/publish-info/publisher", " " ) );
+    addPropLine( "Publisher city", getDocText( "/FictionBook/description/publish-info/city", " " ) );
+    addPropLine( "Publication year", getDocText( "/FictionBook/description/publish-info/year", " " ) );
+    addPropLine( "ISBN", getDocText( "/FictionBook/description/publish-info/isbn", " " ) );
+    addInfoSection( "Publication info" );
 
-    addPropLine( tr("Custom info"), getDocText( "/FictionBook/description/custom-info", " " ) );
+    addPropLine( "Custom info", getDocText( "/FictionBook/description/custom-info", " " ) );
 
 }
 

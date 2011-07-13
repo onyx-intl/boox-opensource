@@ -165,14 +165,14 @@ public:
 
 void MainWindow::on_actionExport_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Export document to"),
+    QString fileName = QFileDialog::getSaveFileName(this, "Export document to",
          QString(),
-         tr("WOL book (*.wol)"));
+         "WOL book (*.wol)");
     if ( fileName.length()==0 )
         return;
     WolExportDlg * dlg = new WolExportDlg( this );
     //dlg->setModal( true );
-    dlg->setWindowTitle(tr("Export to WOL format"));
+    dlg->setWindowTitle("Export to WOL format");
 //    dlg->setModal( true );
 //    dlg->show();
     //dlg->raise();
@@ -207,9 +207,9 @@ void MainWindow::on_actionOpen_triggered()
     if ( files.length()>0 ) {
         lastPath = cr2qt( files[0]->getFilePath() );
     }
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open book file"),
+    QString fileName = QFileDialog::getOpenFileName(this, "Open book file",
          lastPath,
-         tr("All supported formats (*.fb2 *.txt *.tcr *.rtf *.doc *.epub *.html *.htm *.chm *.zip *.pdb *.pml *.prc *.pml *.mobi);;FB2 books (*.fb2 *.fb2.zip);;Text files (*.txt);;Rich text (*.rtf);;MS Word document (*.doc);;HTML files (*.htm *.html);;EPUB files (*.epub);;CHM files (*.chm);;MOBI files (*.mobi *.prc *.azw);;PalmDOC files (*.pdb *.pml);;ZIP archives (*.zip)"));
+         "All supported formats (*.fb2 *.txt *.tcr *.rtf *.doc *.epub *.html *.htm *.chm *.zip *.pdb *.pml *.prc *.pml *.mobi);;FB2 books (*.fb2 *.fb2.zip);;Text files (*.txt);;Rich text (*.rtf);;MS Word document (*.doc);;HTML files (*.htm *.html);;EPUB files (*.epub);;CHM files (*.chm);;MOBI files (*.mobi *.prc *.azw);;PalmDOC files (*.pdb *.pml);;ZIP archives (*.zip)");
     if ( fileName.length()==0 )
         return;
     if ( !ui->view->loadDocument( fileName ) ) {

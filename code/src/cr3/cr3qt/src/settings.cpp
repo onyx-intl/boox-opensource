@@ -204,9 +204,9 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
             hi = i;
         QString s = cr2qt( item->getTitle() );
         if ( item->getType()==HDT_NONE )
-            s = tr("[No hyphenation]");
+            s = "[No hyphenation]";
         else if ( item->getType()==HDT_ALGORITHM )
-            s = tr("[Algorythmic hyphenation]");
+            s = "[Algorythmic hyphenation]";
         m_ui->cbHyphenation->addItem( s );
     }
     m_ui->cbHyphenation->setCurrentIndex(hi>=0 ? hi : 1);
@@ -215,7 +215,7 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     m_ui->crSample->setOptions( m_props );
     m_ui->crSample->getDocView()->setShowCover( false );
     m_ui->crSample->getDocView()->setViewMode( DVM_SCROLL, 1 );
-    QString testPhrase = tr("The quick brown fox jumps over the lazy dog. ");
+    QString testPhrase = "The quick brown fox jumps over the lazy dog. ";
     m_ui->crSample->getDocView()->createDefaultDocument( lString16(), qt2cr(testPhrase+testPhrase+testPhrase) );
 
     updateStyleSample();
@@ -417,17 +417,17 @@ void SettingsDlg::colorDialog( const char * optionName, QString title )
 
 void SettingsDlg::on_btnTextColor_clicked()
 {
-    colorDialog( PROP_FONT_COLOR, tr("Text color") );
+    colorDialog( PROP_FONT_COLOR, "Text color" );
 }
 
 void SettingsDlg::on_btnBgColor_clicked()
 {
-    colorDialog( PROP_BACKGROUND_COLOR, tr("Background color") );
+    colorDialog( PROP_BACKGROUND_COLOR, "Background color" );
 }
 
 void SettingsDlg::on_btnHeaderTextColor_clicked()
 {
-    colorDialog( PROP_STATUS_FONT_COLOR, tr("Page header text color") );
+    colorDialog( PROP_STATUS_FONT_COLOR, "Page header text color" );
 }
 
 void SettingsDlg::on_cbLookAndFeel_currentIndexChanged( QString styleName )

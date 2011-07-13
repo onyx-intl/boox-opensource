@@ -29,8 +29,11 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabWindow">
       <property name="toolTip">
@@ -47,16 +50,26 @@
         <layout class="QFormLayout" name="formLayout_3">
          <item row="0" column="0">
           <widget class="QLabel" name="label_5">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Look &amp; feel</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QComboBox" name="cbLookAndFeel"/>
+          <widget class="QComboBox" name="cbLookAndFeel">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_10">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Startup action</string>
            </property>
@@ -64,6 +77,9 @@
          </item>
          <item row="1" column="1">
           <widget class="QComboBox" name="cbStartupAction">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <item>
             <property name="text">
              <string>Open recent book</string>
@@ -88,6 +104,9 @@
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_16">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Controls</string>
            </property>
@@ -97,6 +116,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
             <widget class="QCheckBox" name="cbWindowShowToolbar">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Show toolbar</string>
              </property>
@@ -104,6 +126,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbWindowShowMenu">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Show menu</string>
              </property>
@@ -111,6 +136,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbWindowShowScrollbar">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Show scroll bar</string>
              </property>
@@ -118,6 +146,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbWindowShowStatusBar">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Show status bar</string>
              </property>
@@ -129,6 +160,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="cbWindowFullscreen">
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="text">
           <string>Fullscreen display</string>
          </property>
@@ -182,6 +216,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <item>
               <property name="text">
                <string>One page</string>
@@ -207,6 +244,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Vew Mode</string>
              </property>
@@ -220,6 +260,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Page margins</string>
              </property>
@@ -227,6 +270,9 @@
            </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="cbMargins">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <item>
               <property name="text">
                <string>0</string>
@@ -273,6 +319,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cbShowPageHeader">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Show page header</string>
            </property>
@@ -298,6 +347,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbShowBookName">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Book name</string>
              </property>
@@ -325,6 +377,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbShowClock">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Clock</string>
              </property>
@@ -352,6 +407,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="cbShowBattery">
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Battery status</string>
              </property>
@@ -384,6 +442,9 @@
              </property>
              <item row="1" column="0">
               <widget class="QLabel" name="label_7">
+               <property name="accessibleDescription">
+                <string notr="true"/>
+               </property>
                <property name="text">
                 <string>Header font</string>
                </property>
@@ -395,12 +456,19 @@
                 <widget class="QComboBox" name="cbTitleFontFace"/>
                </item>
                <item>
-                <widget class="QComboBox" name="cbTitleFontSize"/>
+                <widget class="QComboBox" name="cbTitleFontSize">
+                 <property name="accessibleDescription">
+                  <string notr="true"/>
+                 </property>
+                </widget>
                </item>
               </layout>
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_11">
+               <property name="accessibleDescription">
+                <string notr="true"/>
+               </property>
                <property name="text">
                 <string>Page header text color</string>
                </property>
@@ -415,6 +483,9 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string>Change</string>
@@ -434,6 +505,9 @@
                    <width>30</width>
                    <height>30</height>
                   </size>
+                 </property>
+                 <property name="accessibleDescription">
+                  <string notr="true"/>
                  </property>
                  <property name="autoFillBackground">
                   <bool>true</bool>
@@ -473,6 +547,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cbShowFootNotes">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Show footnotes at bottom of page</string>
            </property>
@@ -517,6 +594,9 @@
         <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
           <widget class="QLabel" name="label_6">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Text color</string>
            </property>
@@ -524,6 +604,9 @@
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_12">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Text font</string>
            </property>
@@ -531,6 +614,9 @@
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_8">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Background color</string>
            </property>
@@ -545,6 +631,9 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -590,12 +679,18 @@
                <height>0</height>
               </size>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
             </widget>
            </item>
           </layout>
          </item>
          <item row="6" column="0">
           <widget class="QLabel" name="label_9">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Hyphenation</string>
            </property>
@@ -603,19 +698,33 @@
          </item>
          <item row="7" column="0">
           <widget class="QLabel" name="label_13">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Interline spacing</string>
            </property>
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="QComboBox" name="cbHyphenation"/>
+          <widget class="QComboBox" name="cbHyphenation">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+          </widget>
          </item>
          <item row="7" column="1">
-          <widget class="QComboBox" name="cbInterlineSpace"/>
+          <widget class="QComboBox" name="cbInterlineSpace">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_14">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Page skin</string>
            </property>
@@ -647,10 +756,16 @@
              <height>0</height>
             </size>
            </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
           </widget>
          </item>
          <item row="9" column="0">
           <widget class="QLabel" name="label_15">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Sample</string>
            </property>
@@ -682,6 +797,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="text">
               <string>Change</string>
              </property>
@@ -706,6 +824,9 @@
                <width>30</width>
                <height>30</height>
               </size>
+             </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
              </property>
              <property name="autoFillBackground">
               <bool>true</bool>
@@ -735,6 +856,9 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
              </property>
              <property name="text">
               <string>Change</string>
@@ -773,6 +897,9 @@
                <height>0</height>
               </size>
              </property>
+             <property name="accessibleDescription">
+              <string notr="true"/>
+             </property>
              <property name="autoFillBackground">
               <bool>true</bool>
              </property>
@@ -794,6 +921,9 @@
          </item>
          <item row="8" column="0">
           <widget class="QLabel" name="label_17">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>.TXT files</string>
            </property>
@@ -801,6 +931,9 @@
          </item>
          <item row="8" column="1">
           <widget class="QCheckBox" name="cbTxtPreFormatted">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="text">
             <string>Disable automatic formatting</string>
            </property>
@@ -814,6 +947,9 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

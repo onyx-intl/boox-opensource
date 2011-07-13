@@ -449,7 +449,7 @@ bool CR3View::loadDocument( QString fileName )
         CRLog::debug( "Trying to restore position for %s", utf8.constData() );
         _docview->restorePosition();
     } else {
-        _docview->createDefaultDocument( lString16(), qt2cr(tr("Error while opening document ") + fileName) );
+        _docview->createDefaultDocument( lString16(), qt2cr("Error while opening document " + fileName) );
     }
     update();
     return res;
@@ -1223,7 +1223,7 @@ void CR3View::OnLoadFileFirstPagesReady()
         return;
     }
     CRLog::info( "OnLoadFileFirstPagesReady() - painting first page" );
-    _docview->setPageHeaderOverride(qt2cr(tr("Loading: please wait...")));
+    _docview->setPageHeaderOverride(qt2cr("Loading: please wait..."));
     //update();
     repaint();
     CRLog::info( "OnLoadFileFirstPagesReady() - painting done" );

@@ -55,6 +55,7 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         /// returns current page
         int getCurPage();
+        inline QPoint getSelectWordPoint(){ return selectWordPoint;}
 
         /// load settings from file
         bool loadSettings( QString filename );
@@ -145,6 +146,7 @@ class CR3View : public QWidget, public LVDocViewCallback
     signals:
         //void fileNameChanged( const QString & );
         void updateProgress(int, int);
+        void requestTranslate();
 
     protected:
         virtual void keyPressEvent ( QKeyEvent * event );
@@ -157,6 +159,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual void mousePressEvent ( QMouseEvent * event );
         virtual void mouseReleaseEvent ( QMouseEvent * event );
         virtual void refreshPropFromView( const char * propName );
+        virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
     private slots:
 
@@ -185,6 +188,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString _cssDir;
         QString _bookmarkDir;
         bool _editMode;
+        QPoint selectWordPoint;
 };
 
 #endif // CR3WIDGET_H

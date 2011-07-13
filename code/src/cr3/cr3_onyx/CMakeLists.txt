@@ -1,16 +1,20 @@
+ENABLE_QT()
+
 FIND_PACKAGE( Qt4 REQUIRED )
 INCLUDE(${QT_USE_FILE})
 
 SET(CR3_MOC_HDRS 
   src/mainwindow.h      
-  src/cr3widget.h        
+  src/cr3widget.h
+  src/search_tool.h     
 )
 
 SET (CR3_SOURCES 
   src/crqtutil.cpp      
   src/main.cpp         
   src/cr3widget.cpp        
-  src/mainwindow.cpp  
+  src/mainwindow.cpp
+  src/search_tool.cpp
 )
 
 IF (UNIX)
@@ -108,6 +112,8 @@ ELSE()
     SET (EXTRA_LIBS ${QT_LIBRARIES} ${STD_LIBS} )
 ENDIF(UNIX)
 TARGET_LINK_LIBRARIES(cr3 crengine tinydict ${EXTRA_LIBS}
+                      dictionary
+                      tts
                       onyx_ui)
 
 

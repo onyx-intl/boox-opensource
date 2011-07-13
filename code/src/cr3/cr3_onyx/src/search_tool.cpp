@@ -1,48 +1,17 @@
 #include "cr3widget.h"
-#include <QEvent>
-#include <QtGui/QMessageBox>
-#include "searchdlg.h"
-#include "ui_searchdlg.h"
+#include "search_tool.h"
 
-bool SearchDialog::showDlg( QWidget * parent, CR3View * docView )
-{
-    SearchDialog * dlg = new SearchDialog( parent, docView );
-    dlg->setModal( true );
-    dlg->show();
-    dlg->raise();
-    dlg->activateWindow();
-    //dlg->
-    return true;
-}
-
-SearchDialog::SearchDialog(QWidget *parent, CR3View * docView) :
-    QDialog(parent),
-    ui(new Ui::SearchDialog),
+SearchTool::SearchTool(QObject *parent, CR3View * docView) :
+    QObject(parent),
     _docview( docView )
 {
-    ui->setupUi(this);
-    ui->cbCaseSensitive->setCheckState(Qt::Unchecked);
-    ui->rbForward->toggle();
 }
 
-SearchDialog::~SearchDialog()
+SearchTool::~SearchTool()
 {
-    delete ui;
 }
 
-void SearchDialog::changeEvent(QEvent *e)
-{
-    QDialog::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
-}
-
-bool SearchDialog::findText( lString16 pattern, int origin, bool reverse, bool caseInsensitive )
+bool SearchTool::findText( lString16 pattern, int origin, bool reverse, bool caseInsensitive )
 {
     if ( pattern.empty() )
         return false;
@@ -99,25 +68,31 @@ bool SearchDialog::findText( lString16 pattern, int origin, bool reverse, bool c
     return false;
 }
 
-void SearchDialog::on_btnFindNext_clicked()
+bool SearchTool::FindNext()
 {
     bool found = false;
-    QString pattern = ui->edPattern->text();
-    lString16 p16 = qt2cr(pattern);
-    bool reverse = ui->rbBackward->isChecked();
-    bool caseInsensitive = ui->cbCaseSensitive->checkState()!=Qt::Checked;
-    found = findText(p16, 1, reverse , caseInsensitive);
+
+    found = findText(_lastPattern, 1, _forwardOption , false);
     if ( !found )
-        found = findText(p16, -1, reverse, caseInsensitive);
+        found = findText(_lastPattern, -1, _forwardOption, false);
     if ( !found ) {
-        QMessageBox * mb = new QMessageBox( QMessageBox::Information, "Not found", "Search pattern is not found in document", QMessageBox::Close, this );
-        mb->exec();
+        return false;
     } else {
         _docview->update();
+        return true;
     }
 }
 
-void SearchDialog::on_btnClose_clicked()
+void SearchTool::onCloseSearch()
 {
-    this->close();
+    _docview->getDocView()->clearSelection();
+}
+
+void SearchTool::setSearchPattern(const QString & pattern)
+{
+    _lastPattern = qt2cr(pattern);
+}
+void SearchTool::setReverse(bool value)
+{
+    _forwardOption = value;
 }

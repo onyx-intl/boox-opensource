@@ -36,6 +36,9 @@
            <pointsize>16</pointsize>
           </font>
          </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="text">
           <string notr="true">Cool Reader 3.0.22</string>
          </property>
@@ -43,6 +46,9 @@
        </item>
        <item>
         <widget class="QLabel" name="lblDate">
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="text">
           <string notr="true">28-06-2010</string>
          </property>
@@ -55,6 +61,9 @@
      </item>
      <item>
       <widget class="QLabel" name="label_2">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string notr="true">(c) 1998-2010 Vadim Lopatin</string>
        </property>
@@ -62,8 +71,11 @@
      </item>
      <item>
       <widget class="QTabWidget" name="tabWidget">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tabMain">
         <attribute name="title">
@@ -72,14 +84,29 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QTextBrowser" name="textBrowser">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="statusTip">
+            <string notr="true"/>
+           </property>
+           <property name="whatsThis">
+            <string notr="true"/>
+           </property>
            <property name="accessibleName">
-            <string>About Cool Reader</string>
+            <string notr="true">About Cool Reader</string>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
+           <property name="documentTitle">
+            <string notr="true"/>
            </property>
            <property name="html">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+            <string notr="true">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:9pt;&quot;&gt;CoolReader is free open source e-book viewer based on CoolReader engine.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:9pt;&quot;&gt;Source code is available at SourceForge &lt;/span&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:9pt; text-decoration: underline;&quot;&gt;http://sourceforge.net/projects/crengine &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'DejaVu Sans'; font-size:9pt;&quot;&gt;under the terms of GNU GPL2 license.&lt;/span&gt;&lt;/p&gt;
@@ -104,6 +131,9 @@ p, li { white-space: pre-wrap; }
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QPlainTextEdit" name="plainTextEdit">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="verticalScrollBarPolicy">
             <enum>Qt::ScrollBarAlwaysOn</enum>
            </property>
@@ -117,7 +147,7 @@ p, li { white-space: pre-wrap; }
             <bool>true</bool>
            </property>
            <property name="plainText">
-            <string>		    GNU GENERAL PUBLIC LICENSE
+            <string notr="true">		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
 
  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
@@ -410,6 +440,9 @@ POSSIBILITY OF SUCH DAMAGES.
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="QPlainTextEdit" name="plainTextEdit_2">
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="lineWrapMode">
             <enum>QPlainTextEdit::NoWrap</enum>
            </property>
@@ -417,7 +450,7 @@ POSSIBILITY OF SUCH DAMAGES.
             <bool>true</bool>
            </property>
            <property name="plainText">
-            <string>Source code may be downloaded from sourceforge crengine project page:
+            <string notr="true">Source code may be downloaded from sourceforge crengine project page:
 http://sourceforge.net/projects/crengine/
 
 Latest source code is available from GIT repository:
@@ -439,6 +472,9 @@ See README.TXT at root directory of project for build instructions.
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

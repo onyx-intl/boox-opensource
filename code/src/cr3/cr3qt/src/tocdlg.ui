@@ -14,12 +14,15 @@
    <string>Table of Contents</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="cr3res.qrc">
     <normaloff>:/icons/action/icons/view-table-of-contents-ltr.png</normaloff>:/icons/action/icons/view-table-of-contents-ltr.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTreeWidget" name="treeWidget">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="alternatingRowColors">
       <bool>false</bool>
      </property>
@@ -32,6 +35,9 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -42,7 +48,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="cr3res.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

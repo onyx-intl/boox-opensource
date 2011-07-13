@@ -18,6 +18,9 @@
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string>Bits per pixel</string>
        </property>
@@ -25,6 +28,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QComboBox" name="cbBitsPerPixel">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <item>
         <property name="text">
          <string>1</string>
@@ -39,6 +45,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <property name="text">
         <string>Table of Contents levels</string>
        </property>
@@ -46,6 +55,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QComboBox" name="cbTocLevels">
+       <property name="accessibleDescription">
+        <string notr="true"/>
+       </property>
        <item>
         <property name="text">
          <string>1</string>
@@ -67,6 +79,9 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="accessibleDescription">
+      <string notr="true"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

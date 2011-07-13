@@ -16,6 +16,7 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QDebug>
+#include "onyx/screen/screen_update_watcher.h"
 
 /// to hide non-qt implementation, place all crengine-related fields here
 class CR3View::DocViewData
@@ -294,6 +295,7 @@ CR3View::CR3View( QWidget *parent)
         , _normalCursor(Qt::ArrowCursor), _linkCursor(Qt::PointingHandCursor)
         , _selCursor(Qt::IBeamCursor), _waitCursor(Qt::WaitCursor)
         , _selecting(false), _selected(false), _editMode(false)
+        , selectWordPoint(0, 0)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -548,6 +550,15 @@ void CR3View::paintEvent ( QPaintEvent * event )
         }
     }
     updateScroll();
+}
+
+void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(!getSelectionText().isEmpty())
+    {
+        selectWordPoint = event->pos();
+        emit requestTranslate();
+    }
 }
 
 void CR3View::updateScroll()

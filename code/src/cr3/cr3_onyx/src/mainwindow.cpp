@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "settings.h"
 #include "crqtutil.h"
+#include "search_tool.h"
 #include "../crengine/include/lvtinydom.h"
 
 #include "onyx/screen/screen_update_watcher.h"
@@ -20,6 +21,9 @@
 #ifndef ENABLE_BOOKMARKS_DIR
 #define ENABLE_BOOKMARKS_DIR 1
 #endif
+
+static const int BEFORE_SEARCH = 0;
+static const int IN_SEARCHING  = 1;
 
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -84,6 +88,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
 
     view_->loadDocument(_filenameToOpen);
 
+    search_tool_ = new SearchTool(this, view_);
+
 //     QTranslator qtTranslator;
 //     if (qtTranslator.load("qt_" + QLocale::system().name(),
 //             QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
@@ -106,6 +112,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     connect(statusbar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
     connect(view_, SIGNAL(updateProgress(int,int)), statusbar_, SLOT(setProgress(int,int)));
     connect(statusbar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
+    connect(view_, SIGNAL(requestTranslate()), this, SLOT(lookup()));
     updateScreen();
 }
 
@@ -115,6 +122,8 @@ void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 
 OnyxMainWindow::~OnyxMainWindow()
 {
+    dict_widget_.release();
+    search_widget_.release();
 }
 
 void OnyxMainWindow::onPropsChange( PropsRef props )
@@ -358,8 +367,16 @@ void OnyxMainWindow::updateToolActions()
 {
     // Reading tools of go to page and clock.
     std::vector<ReadingToolsType> tools;
+    if (SysStatus::instance().hasTouchScreen() ||
+        sys::SysStatus::instance().isDictionaryEnabled())
+    {
+        tools.push_back(DICTIONARY_TOOL);
+    }
+
+    tools.push_back(::ui::SEARCH_TOOL);
     tools.push_back(::ui::GOTO_PAGE);
     tools.push_back(::ui::CLOCK_TOOL);
+
     reading_tool_actions_.generateActions(tools, false);
 }
 
@@ -410,6 +427,16 @@ void OnyxMainWindow::processToolActions()
     ReadingToolsType tool = reading_tool_actions_.selectedTool();
     switch (tool)
     {
+    case ::ui::DICTIONARY_TOOL:
+        {
+            startDictLookup();
+        }
+        break;
+    case ::ui::SEARCH_TOOL:
+        {
+            showSearchWidget();
+        }
+        break;
     case ::ui::GOTO_PAGE:
         {
             gotoPage();
@@ -495,4 +522,155 @@ void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
     view_->getDocView()->goToPage(value-1);
     updateScreen();
+}
+
+void OnyxMainWindow::showSearchWidget()
+{
+    if (!search_widget_)
+    {
+        search_widget_.reset(new OnyxSearchDialog(this, search_context_));
+        connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
+            this, SLOT(onSearch(OnyxSearchContext &)));
+        connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
+        onyx::screen::watcher().addWatcher(search_widget_.get());
+    }
+
+    search_context_.userData() = BEFORE_SEARCH;
+    hideHelperWidget(dict_widget_.get());
+    search_widget_->showNormal();
+}
+
+void OnyxMainWindow::onSearch(OnyxSearchContext& context)
+{
+    if (search_context_.userData() <= BEFORE_SEARCH)
+    {
+        search_tool_->setSearchPattern(context.pattern());
+        search_tool_->setReverse(!context.forward());
+        search_context_.userData() = IN_SEARCHING;
+
+        // TODO
+        updateSearchWidget();
+    }
+    else
+    {
+        updateSearchWidget();
+    }
+}
+
+void OnyxMainWindow::onSearchClosed()
+{
+    //OnyxMainWindow->doAction("clearSearchResult");
+    search_tool_->onCloseSearch();
+    updateScreen();
+}
+
+bool OnyxMainWindow::updateSearchWidget()
+{
+    search_tool_->setReverse(!search_context_.forward());
+    if (search_context_.forward())
+    {
+        if (!search_tool_->FindNext())
+        {
+            search_widget_->noMoreMatches();
+            return false;
+        }
+    }
+    else
+    {
+        if (!search_tool_->FindNext())
+        {
+            search_widget_->noMoreMatches();
+            return false;
+        }
+    }
+    updateScreen();
+    return true;
+}
+
+void OnyxMainWindow::startDictLookup()
+{
+    if (!dicts_)
+    {
+        dicts_.reset(new DictionaryManager);
+    }
+
+    if (!dict_widget_)
+    {
+        dict_widget_.reset(new DictWidget(this, *dicts_, &tts()) );
+        connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
+        connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
+    }
+
+    hideHelperWidget(search_widget_.get());
+
+    // When dictionary widget is not visible, it's necessary to update the text view.
+    dict_widget_->lookup(view_->getSelectionText());
+    dict_widget_->ensureVisible(selected_rect_, true);
+}
+
+TTS & OnyxMainWindow::tts()
+{
+    if (!tts_engine_)
+    {
+        tts_engine_.reset(new TTS(QLocale::system()));
+        connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
+    }
+    return *tts_engine_;
+}
+
+void OnyxMainWindow::hideHelperWidget(QWidget * wnd)
+{
+    if (wnd)
+    {
+        wnd->hide();
+    }
+}
+
+void OnyxMainWindow::processKeyReleaseEvent(int key)
+{
+    //TODO:
+    switch (key)
+    {
+    case Qt::Key_Escape:
+        hideHelperWidget(dict_widget_.get());
+        onDictClosed();
+        break;
+    case Qt::Key_PageDown:
+        view_->nextPage();
+        updateScreen();
+        break;
+    case Qt::Key_PageUp:
+        view_->prevPage();
+        updateScreen();
+        break;
+    }
+}
+
+void OnyxMainWindow::onDictClosed()
+{
+    dict_widget_.reset(0);
+    search_tool_->onCloseSearch();
+}
+
+void OnyxMainWindow::lookup()
+{
+    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    if (!dict_widget_)
+    {
+        startDictLookup();
+    }
+
+    adjustDictWidget();
+    dict_widget_->lookup(view_->getSelectionText());
+}
+
+bool OnyxMainWindow::adjustDictWidget()
+{
+    if(dict_widget_.get()->isVisible())
+    {
+        QPoint point = view_->getSelectWordPoint();
+        selected_rect_.setCoords(point.x(), point.y(), point.x()+1, point.y()+1);
+    }
+
+    return dict_widget_->ensureVisible(selected_rect_);
 }
