@@ -42,46 +42,115 @@
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Text</string>
+        <string notr="true">Text</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QCheckBox" name="cbCaseSensitive">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Case Sensitive</string>
+        <string notr="true">Case Sensitive</string>
+       </property>
+       <property name="shortcut">
+        <string notr="true"/>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QRadioButton" name="rbForward">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Search forward</string>
+        <string notr="true">Search forward</string>
+       </property>
+       <property name="shortcut">
+        <string notr="true"/>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
       <widget class="QRadioButton" name="rbBackward">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Search backward</string>
+        <string notr="true">Search backward</string>
+       </property>
+       <property name="shortcut">
+        <string notr="true"/>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="edPattern">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
@@ -110,7 +179,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Find Next</string>
+        <string notr="true">Find Next</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -123,7 +192,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Close</string>
+        <string notr="true">Close</string>
        </property>
       </widget>
      </item>

@@ -39,7 +39,7 @@
        <item>
         <widget class="QToolButton" name="btnSite">
          <property name="text">
-          <string>...</string>
+          <string notr="true">...</string>
          </property>
          <property name="icon">
           <iconset resource="cr3res.qrc">
@@ -89,15 +89,27 @@
      </item>
      <item>
       <widget class="QTabWidget" name="tabWidget">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabMain">
         <attribute name="title">
-         <string>About</string>
+         <string notr="true">About</string>
         </attribute>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
@@ -144,7 +156,7 @@ p, li { white-space: pre-wrap; }
        </widget>
        <widget class="QWidget" name="tabLicense">
         <attribute name="title">
-         <string>License</string>
+         <string notr="true">License</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -453,7 +465,7 @@ POSSIBILITY OF SUCH DAMAGES.
        </widget>
        <widget class="QWidget" name="tab">
         <attribute name="title">
-         <string>Source Code</string>
+         <string notr="true">Source Code</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
@@ -490,6 +502,18 @@ See README.TXT at root directory of project for build instructions.
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="toolTip">
+      <string notr="true"/>
+     </property>
+     <property name="statusTip">
+      <string notr="true"/>
+     </property>
+     <property name="whatsThis">
+      <string notr="true"/>
+     </property>
+     <property name="accessibleName">
+      <string notr="true"/>
+     </property>
      <property name="accessibleDescription">
       <string notr="true"/>
      </property>

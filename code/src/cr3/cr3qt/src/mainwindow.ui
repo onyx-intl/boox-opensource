@@ -62,6 +62,21 @@
         <property name="contextMenuPolicy">
          <enum>Qt::CustomContextMenu</enum>
         </property>
+        <property name="toolTip">
+         <string notr="true"/>
+        </property>
+        <property name="statusTip">
+         <string notr="true"/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="accessibleName">
+         <string notr="true"/>
+        </property>
+        <property name="accessibleDescription">
+         <string notr="true"/>
+        </property>
        </widget>
       </item>
       <item>
@@ -84,9 +99,39 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string notr="true"/>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
+   <property name="accessibleName">
+    <string notr="true"/>
+   </property>
+   <property name="accessibleDescription">
+    <string notr="true"/>
+   </property>
    <widget class="QMenu" name="menuFile">
+    <property name="toolTip">
+     <string notr="true"/>
+    </property>
+    <property name="statusTip">
+     <string notr="true"/>
+    </property>
+    <property name="whatsThis">
+     <string notr="true"/>
+    </property>
+    <property name="accessibleName">
+     <string notr="true"/>
+    </property>
+    <property name="accessibleDescription">
+     <string notr="true"/>
+    </property>
     <property name="title">
-     <string>File</string>
+     <string notr="true">File</string>
     </property>
     <addaction name="actionOpen"/>
     <addaction name="actionRecentBooks"/>
@@ -99,7 +144,7 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string notr="true">View</string>
     </property>
     <addaction name="actionFindText"/>
     <addaction name="actionToggle_Pages_Scroll"/>
@@ -115,7 +160,7 @@
    </widget>
    <widget class="QMenu" name="menuNavigation">
     <property name="title">
-     <string>Navigation</string>
+     <string notr="true">Navigation</string>
     </property>
     <addaction name="actionNextPage"/>
     <addaction name="actionPrevPage"/>
@@ -131,7 +176,7 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string notr="true">Help</string>
     </property>
     <addaction name="actionAboutQT"/>
     <addaction name="actionAboutCoolReader"/>
@@ -192,19 +237,40 @@
    <property name="text">
     <string notr="true">Open...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Open</string>
+   </property>
    <property name="toolTip">
-    <string>Open file</string>
+    <string notr="true">Open file</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F3</string>
+    <string notr="true">F3</string>
    </property>
   </action>
   <action name="actionToggle_Pages_Scroll">
    <property name="text">
     <string notr="true">Toggle Pages/Scroll</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Toggle Pages/Scroll</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Toggle Pages/Scroll</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
    <property name="shortcut">
-    <string>Ctrl+P</string>
+    <string notr="true">Ctrl+P</string>
    </property>
   </action>
   <action name="actionClose">
@@ -215,16 +281,40 @@
    <property name="text">
     <string notr="true">Close</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Close</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Close</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
    <property name="shortcut">
-    <string>F12</string>
+    <string notr="true">F12</string>
    </property>
   </action>
   <action name="actionMinimize">
    <property name="text">
     <string notr="true">Minimize</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Minimize</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Minimize</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
    <property name="shortcut">
-    <string>Esc</string>
+    <string notr="true">Esc</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
@@ -238,11 +328,20 @@
    <property name="text">
     <string notr="true">Page Down</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Page Down</string>
+   </property>
    <property name="toolTip">
-    <string>Go to next page</string>
+    <string notr="true">Go to next page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>PgDown</string>
+    <string notr="true">PgDown</string>
    </property>
   </action>
   <action name="actionPrevPage">
@@ -253,99 +352,180 @@
    <property name="text">
     <string notr="true">Page Up</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Page Up</string>
+   </property>
    <property name="toolTip">
-    <string>Back by page</string>
+    <string notr="true">Back by page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>PgUp</string>
+    <string notr="true">PgUp</string>
    </property>
   </action>
   <action name="actionNextLine">
    <property name="text">
     <string notr="true">Line Down</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Line Down</string>
+   </property>
    <property name="toolTip">
-    <string>Forward by one line</string>
+    <string notr="true">Forward by one line</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Down</string>
+    <string notr="true">Down</string>
    </property>
   </action>
   <action name="actionPrevLine">
    <property name="text">
     <string notr="true">Line Up</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Line Up</string>
+   </property>
    <property name="toolTip">
-    <string>Back by line</string>
+    <string notr="true">Back by line</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Up</string>
+    <string notr="true">Up</string>
    </property>
   </action>
   <action name="actionFirstPage">
    <property name="text">
     <string notr="true">First Page</string>
    </property>
+   <property name="iconText">
+    <string notr="true">First Page</string>
+   </property>
    <property name="toolTip">
-    <string>Go to first page</string>
+    <string notr="true">Go to first page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Home</string>
+    <string notr="true">Home</string>
    </property>
   </action>
   <action name="actionLastPage">
    <property name="text">
     <string notr="true">Last Page</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Last Page</string>
+   </property>
    <property name="toolTip">
-    <string>Go to last page</string>
+    <string notr="true">Go to last page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>End</string>
+    <string notr="true">End</string>
    </property>
   </action>
   <action name="actionBack">
    <property name="text">
     <string notr="true">Back</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Back</string>
+   </property>
    <property name="toolTip">
-    <string>Back in navigation history</string>
+    <string notr="true">Back in navigation history</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Backspace</string>
+    <string notr="true">Backspace</string>
    </property>
   </action>
   <action name="actionForward">
    <property name="text">
     <string notr="true">Forward</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Forward</string>
+   </property>
    <property name="toolTip">
-    <string>Go to the next position in navigation history</string>
+    <string notr="true">Go to the next position in navigation history</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Shift+Backspace</string>
+    <string notr="true">Shift+Backspace</string>
    </property>
   </action>
   <action name="actionNextChapter">
    <property name="text">
     <string notr="true">Next Chapter</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Next Chapter</string>
+   </property>
    <property name="toolTip">
-    <string>Go to next chapter</string>
+    <string notr="true">Go to next chapter</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Alt+Down</string>
+    <string notr="true">Alt+Down</string>
    </property>
   </action>
   <action name="actionPrevChapter">
    <property name="text">
     <string notr="true">Previous Chapter</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Previous Chapter</string>
+   </property>
    <property name="toolTip">
-    <string>Go to previous chapter</string>
+    <string notr="true">Go to previous chapter</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Alt+Up</string>
+    <string notr="true">Alt+Up</string>
    </property>
   </action>
   <action name="actionToggle_Full_Screen">
@@ -359,11 +539,20 @@
    <property name="text">
     <string notr="true">Toggle Full Screen</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Toggle Full Screen</string>
+   </property>
    <property name="toolTip">
-    <string>Toggle Full Screen mode</string>
+    <string notr="true">Toggle Full Screen mode</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Alt+Return</string>
+    <string notr="true">Alt+Return</string>
    </property>
   </action>
   <action name="actionZoom_In">
@@ -374,11 +563,20 @@
    <property name="text">
     <string notr="true">Zoom In</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Zoom In</string>
+   </property>
    <property name="toolTip">
-    <string>Increase font size</string>
+    <string notr="true">Increase font size</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>+</string>
+    <string notr="true">+</string>
    </property>
   </action>
   <action name="actionZoom_Out">
@@ -389,11 +587,20 @@
    <property name="text">
     <string notr="true">Zoom Out</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Zoom Out</string>
+   </property>
    <property name="toolTip">
-    <string>Decrease font size</string>
+    <string notr="true">Decrease font size</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>-</string>
+    <string notr="true">-</string>
    </property>
   </action>
   <action name="actionTOC">
@@ -404,11 +611,20 @@
    <property name="text">
     <string notr="true">Table of Contents...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Table of Contents</string>
+   </property>
    <property name="toolTip">
-    <string>Show table of contents</string>
+    <string notr="true">Show table of contents</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F4</string>
+    <string notr="true">F4</string>
    </property>
   </action>
   <action name="actionRecentBooks">
@@ -419,11 +635,20 @@
    <property name="text">
     <string notr="true">Recent Books</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Recent Books</string>
+   </property>
    <property name="toolTip">
-    <string>Show recent books list</string>
+    <string notr="true">Show recent books list</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F5</string>
+    <string notr="true">F5</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -434,11 +659,20 @@
    <property name="text">
     <string notr="true">Settings...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Settings</string>
+   </property>
    <property name="toolTip">
-    <string>Settings dialog</string>
+    <string notr="true">Settings dialog</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F9</string>
+    <string notr="true">F9</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -447,43 +681,82 @@
      <normaloff>:/icons/action/icons/editcopy.png</normaloff>:/icons/action/icons/editcopy.png</iconset>
    </property>
    <property name="text">
-    <string>Copy</string>
+    <string notr="true">Copy</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Copy</string>
    </property>
    <property name="toolTip">
-    <string>Copy selected text</string>
+    <string notr="true">Copy selected text</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string notr="true">Ctrl+C</string>
    </property>
   </action>
   <action name="actionCopy2">
    <property name="text">
-    <string>copy2</string>
+    <string notr="true">copy2</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">copy2</string>
    </property>
    <property name="toolTip">
-    <string>Copy alternative shortcut</string>
+    <string notr="true">Copy alternative shortcut</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Ins</string>
+    <string notr="true">Ctrl+Ins</string>
    </property>
   </action>
   <action name="actionAboutQT">
    <property name="text">
     <string notr="true">About Qt</string>
    </property>
+   <property name="iconText">
+    <string notr="true">About Qt</string>
+   </property>
    <property name="toolTip">
-    <string>About Qt</string>
+    <string notr="true">About Qt</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
    </property>
   </action>
   <action name="actionAboutCoolReader">
    <property name="text">
     <string notr="true">About CoolReader</string>
    </property>
+   <property name="iconText">
+    <string notr="true">About CoolReader</string>
+   </property>
    <property name="toolTip">
-    <string>About CoolReader</string>
+    <string notr="true">About CoolReader</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string notr="true">F1</string>
    </property>
   </action>
   <action name="actionAddBookmark">
@@ -494,11 +767,20 @@
    <property name="text">
     <string notr="true">Add Bookmark</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Add Bookmark</string>
+   </property>
    <property name="toolTip">
-    <string>Add bookmark</string>
+    <string notr="true">Add bookmark</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+B</string>
+    <string notr="true">Ctrl+B</string>
    </property>
   </action>
   <action name="actionShowBookmarksList">
@@ -509,11 +791,20 @@
    <property name="text">
     <string notr="true">Bookmark List...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Bookmark List</string>
+   </property>
    <property name="toolTip">
-    <string>Show bookmarks list</string>
+    <string notr="true">Show bookmarks list</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>F6</string>
+    <string notr="true">F6</string>
    </property>
   </action>
   <action name="actionFileProperties">
@@ -524,11 +815,20 @@
    <property name="text">
     <string notr="true">File Properties...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">File Properties</string>
+   </property>
    <property name="toolTip">
-    <string>Show file properties</string>
+    <string notr="true">Show file properties</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F1</string>
+    <string notr="true">Ctrl+F1</string>
    </property>
   </action>
   <action name="actionRotate">
@@ -539,8 +839,20 @@
    <property name="text">
     <string notr="true">Rotate</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Rotate</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Rotate</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string notr="true">Ctrl+R</string>
    </property>
   </action>
   <action name="actionFindText">
@@ -551,66 +863,120 @@
    <property name="text">
     <string notr="true">Find text...</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Find text</string>
+   </property>
    <property name="toolTip">
-    <string>Find text</string>
+    <string notr="true">Find text</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F</string>
+    <string notr="true">Ctrl+F</string>
    </property>
   </action>
   <action name="actionToggleEditMode">
    <property name="text">
-    <string>Toggle Edit Mode</string>
+    <string notr="true">Toggle Edit Mode</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Toggle Edit Mode</string>
    </property>
    <property name="toolTip">
-    <string>Toggle edit mode</string>
+    <string notr="true">Toggle edit mode</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string notr="true">Ctrl+E</string>
    </property>
   </action>
   <action name="actionExport">
    <property name="text">
     <string notr="true">Export</string>
    </property>
+   <property name="iconText">
+    <string notr="true">Export</string>
+   </property>
    <property name="toolTip">
-    <string>Export document</string>
+    <string notr="true">Export document</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string notr="true">Ctrl+S</string>
    </property>
   </action>
   <action name="actionNextPage2">
    <property name="text">
-    <string>Next Page</string>
+    <string notr="true">Next Page</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Next Page</string>
    </property>
    <property name="toolTip">
-    <string>Next Page</string>
+    <string notr="true">Next Page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Right</string>
+    <string notr="true">Right</string>
    </property>
   </action>
   <action name="actionPrevPage2">
    <property name="text">
-    <string>Previous Page</string>
+    <string notr="true">Previous Page</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Previous Page</string>
    </property>
    <property name="toolTip">
-    <string>Previous Page</string>
+    <string notr="true">Previous Page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Left</string>
+    <string notr="true">Left</string>
    </property>
   </action>
   <action name="actionNextPage3">
    <property name="text">
-    <string>Next Page</string>
+    <string notr="true">Next Page</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Next Page</string>
    </property>
    <property name="toolTip">
-    <string>Next Page</string>
+    <string notr="true">Next Page</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Space</string>
+    <string notr="true">Space</string>
    </property>
   </action>
  </widget>

@@ -59,15 +59,45 @@
   </layout>
   <action name="actionRemoveItem">
    <property name="text">
-    <string>Remove Item</string>
+    <string notr="true">Remove Item</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Remove Item</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Remove Item</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
    </property>
    <property name="shortcut">
-    <string>Del</string>
+    <string notr="true">Del</string>
    </property>
   </action>
   <action name="actionClearAll">
    <property name="text">
-    <string>Clear All</string>
+    <string notr="true">Clear All</string>
+   </property>
+   <property name="iconText">
+    <string notr="true">Clear All</string>
+   </property>
+   <property name="toolTip">
+    <string notr="true">Clear All</string>
+   </property>
+   <property name="statusTip">
+    <string notr="true"/>
+   </property>
+   <property name="whatsThis">
+    <string notr="true"/>
+   </property>
+   <property name="shortcut">
+    <string notr="true"/>
+   </property>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

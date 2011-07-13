@@ -38,7 +38,7 @@
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>Export is in progress...</string>
+      <string notr="true">Export is in progress...</string>
      </property>
     </widget>
    </item>

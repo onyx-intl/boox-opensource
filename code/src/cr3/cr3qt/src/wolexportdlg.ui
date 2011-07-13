@@ -36,11 +36,23 @@
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
+       <property name="accessibleName">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Bits per pixel</string>
+        <string notr="true">Bits per pixel</string>
        </property>
       </widget>
      </item>
@@ -63,23 +75,32 @@
        </property>
        <item>
         <property name="text">
-         <string>1</string>
+         <string notr="true">1</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>2</string>
+         <string notr="true">2</string>
         </property>
        </item>
       </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="statusTip">
+        <string notr="true"/>
+       </property>
+       <property name="whatsThis">
+        <string notr="true"/>
+       </property>
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Table of Contents levels</string>
+        <string notr="true">Table of Contents levels</string>
        </property>
       </widget>
      </item>
@@ -100,19 +121,22 @@
        <property name="accessibleDescription">
         <string notr="true"/>
        </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
        <item>
         <property name="text">
-         <string>1</string>
+         <string notr="true">1</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>2</string>
+         <string notr="true">2</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>3</string>
+         <string notr="true">3</string>
         </property>
        </item>
       </widget>
