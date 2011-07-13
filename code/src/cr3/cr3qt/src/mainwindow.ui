@@ -11,11 +11,29 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CoolReader</string>
+   <string notr="true">CoolReader</string>
   </property>
   <property name="windowIcon">
    <iconset resource="cr3res.qrc">
     <normaloff>:/icons/action/icons/coolreader.png</normaloff>:/icons/action/icons/coolreader.png</iconset>
+  </property>
+  <property name="toolTip">
+   <string notr="true"/>
+  </property>
+  <property name="statusTip">
+   <string notr="true"/>
+  </property>
+  <property name="whatsThis">
+   <string notr="true"/>
+  </property>
+  <property name="accessibleName">
+   <string notr="true"/>
+  </property>
+  <property name="accessibleDescription">
+   <string notr="true"/>
+  </property>
+  <property name="windowFilePath">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="minimumSize">
