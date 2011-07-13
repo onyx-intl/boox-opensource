@@ -66,11 +66,17 @@ void ZLLinkInfoDialog::createLinks()
     int data_size = links_datas_.size();
 
     // avoid the dialog height exceeds the screen height.
-    int max_dialog_height = ui::screenGeometry().height()/3;
-    int rows = max_dialog_height/LINK_ITEM_HEIGHT;
+
+    int rows = data_size;
+    if (size > 4)
+    {
+        int max_dialog_height = ui::screenGeometry().height()/3;
+        rows = max_dialog_height/LINK_ITEM_HEIGHT;
+    }
     links_.setFixedGrid(rows, 1);
     int fixed_height = rows*LINK_ITEM_HEIGHT+10;
     links_.setFixedHeight(fixed_height);
+
     dialog_height_ = fixed_height+10;
 }
 
