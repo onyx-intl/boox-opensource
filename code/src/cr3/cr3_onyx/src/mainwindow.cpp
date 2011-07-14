@@ -306,6 +306,7 @@ void OnyxMainWindow::showContextMenu()
     else if (group == reading_tool_actions_.category())
     {
         processToolActions();
+        return;
     }
     else if (group == system_actions_.category())
     {
@@ -367,17 +368,22 @@ void OnyxMainWindow::updateToolActions()
 {
     // Reading tools of go to page and clock.
     std::vector<ReadingToolsType> tools;
+
+    tools.clear();
+    tools.push_back(::ui::SEARCH_TOOL);
     if (SysStatus::instance().hasTouchScreen() ||
         sys::SysStatus::instance().isDictionaryEnabled())
     {
         tools.push_back(DICTIONARY_TOOL);
     }
+    tools.push_back(::ui::TOC_VIEW_TOOL);
+    reading_tool_actions_.generateActions(tools, true);
 
-    tools.push_back(::ui::SEARCH_TOOL);
+    tools.clear();
     tools.push_back(::ui::GOTO_PAGE);
     tools.push_back(::ui::CLOCK_TOOL);
 
-    reading_tool_actions_.generateActions(tools, false);
+    reading_tool_actions_.generateActions(tools, true);
 }
 
 bool OnyxMainWindow::updateActions()
@@ -427,6 +433,11 @@ void OnyxMainWindow::processToolActions()
     ReadingToolsType tool = reading_tool_actions_.selectedTool();
     switch (tool)
     {
+    case ::ui::TOC_VIEW_TOOL:
+        {
+            showTableOfContents();
+        }
+        break;
     case ::ui::DICTIONARY_TOOL:
         {
             startDictLookup();
@@ -673,4 +684,79 @@ bool OnyxMainWindow::adjustDictWidget()
     }
 
     return dict_widget_->ensureVisible(selected_rect_);
+}
+
+void OnyxMainWindow::showTableOfContents()
+{
+    std::vector<int> paragraphs;
+    std::vector<int> pages;
+    std::vector<QString> titles;
+    std::vector<QString> paths;
+    LVTocItem * root = this->view_->getToc();
+
+    for ( int i=0; i<root->getChildCount(); i++ )
+    {
+        LVTocItem *n = root->getChild(i);
+        paragraphs.push_back(n->getLevel());
+        titles.push_back( cr2qt(n->getName()));
+        paths.push_back(cr2qt(n->getPath()));
+        pages.push_back(n->getPage());
+        for ( int j=0; j<n->getChildCount(); j++ )
+        {
+            LVTocItem *m = n->getChild(j);
+            paragraphs.push_back(m->getLevel());
+            titles.push_back( cr2qt(m->getName()));
+            paths.push_back(cr2qt(m->getPath()));
+            pages.push_back(m->getPage());
+        }
+    }
+
+    std::vector<QStandardItem *> ptrs;
+    QStandardItemModel model;
+
+    QStandardItem *parent = model.invisibleRootItem();
+    for (size_t i = 0;i < paragraphs.size();++i)
+    {
+        QStandardItem *item= new QStandardItem(titles[i]);
+        item->setData(paths[i],Qt::UserRole+100);
+        item->setEditable(false);
+        ptrs.push_back(item);
+
+        // Get parent.
+        parent = searchParent(i, paragraphs, ptrs, model);
+        parent->appendRow(item);
+    }
+
+    TreeViewDialog dialog( this );
+    dialog.setModel( &model);
+
+    int ret = dialog.popup( tr("Table of Contents") );
+    if (ret != QDialog::Accepted)
+    {
+        onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+        return;
+    }
+
+    QModelIndex index = dialog.selectedItem();
+    if ( !index.isValid() )
+    {
+        return;
+    }
+    view_->goToXPointer(index.data(Qt::UserRole+100).toString());
+}
+
+QStandardItem * OnyxMainWindow::searchParent(const int index,
+                                           std::vector<int> & entries,
+                                           std::vector<QStandardItem *> & ptrs,
+                                           QStandardItemModel &model)
+{
+    int indent = entries[index];
+    for(int i = index - 1; i >= 0; --i)
+    {
+        if (entries[i] < indent)
+        {
+            return ptrs[i];
+        }
+    }
+    return model.invisibleRootItem();
 }

@@ -81,6 +81,11 @@ private:
     void updateScreen();
     void showSearchWidget();
     bool updateSearchWidget();
+    void showTableOfContents();
+    QStandardItem * searchParent(const int index,
+                                 std::vector<int> & entries,
+                                 std::vector<QStandardItem *> & ptrs,
+                                 QStandardItemModel &model);
 
     void startDictLookup();
     void hideHelperWidget(QWidget * wnd);
