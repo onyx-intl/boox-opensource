@@ -7,7 +7,6 @@ SET(CR3_MOC_HDRS
   src/mainwindow.h      
   src/cr3widget.h
   src/search_tool.h
-  src/bookmark.h    
 )
 
 SET (CR3_SOURCES 
@@ -16,7 +15,6 @@ SET (CR3_SOURCES
   src/cr3widget.cpp        
   src/mainwindow.cpp
   src/search_tool.cpp
-  src/bookmark.cpp
 )
 
 IF (UNIX)
