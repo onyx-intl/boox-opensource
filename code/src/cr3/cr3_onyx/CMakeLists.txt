@@ -6,7 +6,8 @@ INCLUDE(${QT_USE_FILE})
 SET(CR3_MOC_HDRS 
   src/mainwindow.h      
   src/cr3widget.h
-  src/search_tool.h     
+  src/search_tool.h
+  src/bookmark.h    
 )
 
 SET (CR3_SOURCES 
@@ -15,6 +16,7 @@ SET (CR3_SOURCES
   src/cr3widget.cpp        
   src/mainwindow.cpp
   src/search_tool.cpp
+  src/bookmark.cpp
 )
 
 IF (UNIX)
@@ -114,6 +116,12 @@ ENDIF(UNIX)
 TARGET_LINK_LIBRARIES(cr3 crengine tinydict ${EXTRA_LIBS}
                       dictionary
                       tts
+                      onyx_base
+    		      onyx_screen
+    		      onyx_ui
+    		      onyx_data
+    		      onyx_sys
+    		      onyx_cms
                       onyx_ui)
 
 

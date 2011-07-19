@@ -2,6 +2,7 @@
 #define OnyxMainWindow_H
 
 #include <QtGui/QMainWindow>
+#include <QImage>
 #include "cr3widget.h"
 #include "onyx/ui/status_bar.h"
 #include "onyx/ui/system_actions.h"
@@ -13,12 +14,10 @@
 #include "onyx/ui/onyx_search_dialog.h"
 #include "onyx/dictionary/dictionary_manager.h"
 #include "onyx/dictionary/dict_widget.h"
-#include "onyx/tts/tts_widget.h"
 
 class QKeyEvent;
 class SearchTool;
 using namespace ui;
-using namespace tts;
 
 class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
 {
@@ -47,7 +46,9 @@ private slots:
     void onSearch(OnyxSearchContext& context);
     void lookup();
     void onDictClosed();
+    bool addBookmark();
     void processKeyReleaseEvent(int key);
+    void updateScreen();
 
 private:
     CR3View *view_;
@@ -71,14 +72,11 @@ private:
     scoped_ptr<OnyxSearchDialog> search_widget_;
     OnyxSearchContext search_context_;
 
-    scoped_ptr<TTS> tts_engine_;
-
     void toggleProperty( const char * name );
     bool isFullScreenByWidgetSize();
     void processToolActions();
     void showClock();
     void gotoPage();
-    void updateScreen();
     void showSearchWidget();
     bool updateSearchWidget();
     void showTableOfContents();
@@ -86,10 +84,12 @@ private:
                                  std::vector<int> & entries,
                                  std::vector<QStandardItem *> & ptrs,
                                  QStandardItemModel &model);
+    void showAllBookmarks();
+    void bookmarkModel(QStandardItemModel & model,
+                       QModelIndex & selected);
 
     void startDictLookup();
     void hideHelperWidget(QWidget * wnd);
-    TTS & tts();
     bool adjustDictWidget();
 
     void updateZoomingActions();

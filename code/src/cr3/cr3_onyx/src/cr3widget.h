@@ -3,11 +3,14 @@
 
 #include <qwidget.h>
 #include <QScrollBar>
+#include <QImage>
 #include "crqtutil.h"
+#include "onyx/tts/tts_widget.h"
 
 class LVDocView;
 class LVTocItem;
 class CRBookmark;
+using namespace tts;
 
 
 class PropsChangeCallback {
@@ -99,6 +102,8 @@ class CR3View : public QWidget, public LVDocViewCallback
         CRBookmark * createBookmark();
         /// go to bookmark and highlight it
         void goToBookmark( CRBookmark * bm );
+        bool hasBookmark();
+        void deleteBookmark();
 
         /// rotate view, +1 = 90` clockwise, -1 = 90` counterclockwise
         void rotate( int angle );
@@ -142,6 +147,15 @@ class CR3View : public QWidget, public LVDocViewCallback
         void zoomIn();
         void zoomOut();
 
+        void collectTTSContent();
+        bool hasPendingTTSContent();
+        void startTTS();
+        void onSpeakDone();
+        void stopTTS();
+
+        TTSWidget & ttsWidget();
+        TTS & tts();
+
 
     signals:
         //void fileNameChanged( const QString & );
@@ -150,6 +164,7 @@ class CR3View : public QWidget, public LVDocViewCallback
 
     protected:
         virtual void keyPressEvent ( QKeyEvent * event );
+        virtual void keyReleaseEvent(QKeyEvent * event);
         virtual void paintEvent ( QPaintEvent * event );
         virtual void resizeEvent ( QResizeEvent * event );
         virtual void wheelEvent ( QWheelEvent * event );
@@ -162,6 +177,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
 
     private slots:
+        void updateScreen();
 
     private:
         void updateDefProps();
@@ -169,6 +185,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         void startSelection( ldomXPointer p );
         bool endSelection( ldomXPointer p );
         bool updateSelection( ldomXPointer p );
+
+        void paintBookmark( QPainter & painter );
+        void hideHelperWidget(QWidget * wnd);
 
         DocViewData * _data; // to hide non-qt implementation
         LVDocView * _docview;
@@ -189,6 +208,12 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString _bookmarkDir;
         bool _editMode;
         QPoint selectWordPoint;
+        QImage bookmark_image_;
+
+        scoped_ptr<TTS> tts_engine_;
+        scoped_ptr<TTSWidget> tts_widget_;
+        QStringList text_to_speak_;
+        int tts_paragraph_index_;
 };
 
 #endif // CR3WIDGET_H

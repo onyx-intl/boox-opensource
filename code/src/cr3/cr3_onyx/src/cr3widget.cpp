@@ -17,6 +17,7 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include "onyx/screen/screen_update_watcher.h"
+using namespace tts;
 
 /// to hide non-qt implementation, place all crengine-related fields here
 class CR3View::DocViewData
@@ -296,6 +297,7 @@ CR3View::CR3View( QWidget *parent)
         , _selCursor(Qt::IBeamCursor), _waitCursor(Qt::WaitCursor)
         , _selecting(false), _selected(false), _editMode(false)
         , selectWordPoint(0, 0)
+        , bookmark_image_(":/images/bookmark_flag.png")
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -360,6 +362,8 @@ CR3View::~CR3View()
     saveSettings( QString() );
     delete _docview;
     delete _data;
+
+    tts_widget_.release();
 }
 
 #if WORD_SELECTOR_ENABLED==1
@@ -548,6 +552,10 @@ void CR3View::paintEvent ( QPaintEvent * event )
                 painter.drawRect( cursorRc.left, cursorRc.top, cursorRc.width(), cursorRc.height() );
             }
         }
+    }
+    if(hasBookmark())
+    {
+        paintBookmark(painter);
     }
     updateScroll();
 }
@@ -1213,6 +1221,44 @@ void CR3View::keyPressEvent ( QKeyEvent * event )
     }
 }
 
+void CR3View::keyReleaseEvent(QKeyEvent * event)
+{
+    if (ttsWidget().isVisible())
+    {
+        qDebug()<<" Key type is:"<<event->key();
+        switch (event->key())
+        {
+        case Qt::Key_Escape:
+            {
+                stopTTS();
+                break;
+            }
+        case Qt::Key_PageUp:
+            {
+                qDebug()<<"*****  UP";
+                tts_engine_->stop();
+                prevPage();
+                updateScreen();
+                startTTS();
+                break;
+            }
+        case Qt::Key_PageDown:
+            {
+                qDebug()<<"****  down";
+                tts_engine_->stop();
+                nextPage();
+                updateScreen();
+                startTTS();
+                break;
+            }
+        }
+    }
+    else
+    {
+        QWidget::keyReleaseEvent(event);
+    }
+}
+
 /// file progress indicator, called with values 0..100
 void CR3View::OnLoadFileProgress( int percent )
 {
@@ -1243,4 +1289,174 @@ void CR3View::OnLoadFileFirstPagesReady()
     // TODO: remove debug sleep
     //sleep(5);
 #endif
+}
+
+bool CR3View::hasBookmark()
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = getDocView()->getCurrentFileHistRecord();
+    if ( !rec )
+        return false;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        ldomXPointer pt1 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
+        if( getDocView()->getBookmarkPage(pt1) == now_page ||
+            getDocView()->getBookmarkPage(pt2) == now_page )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void CR3View::paintBookmark( QPainter & painter )
+{
+    QPoint pt(rect().width()- bookmark_image_.width(), 0);
+    painter.drawImage(pt, bookmark_image_);
+}
+
+void CR3View::deleteBookmark()
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = getDocView()->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        ldomXPointer pt1 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
+        if( getDocView()->getBookmarkPage(pt1) == now_page ||
+            getDocView()->getBookmarkPage(pt2) == now_page )
+        {
+            list.remove(i);
+            return;
+        }
+    }
+}
+
+void CR3View::collectTTSContent()
+{
+    text_to_speak_.clear();
+    tts_paragraph_index_ = 0;
+    QString text_tmp = cr2qt( getDocView()->getPageText(true) );
+    text_to_speak_.push_back(text_tmp);
+}
+
+bool CR3View::hasPendingTTSContent()
+{
+    return (tts_paragraph_index_ < text_to_speak_.size());
+}
+
+void CR3View::startTTS()
+{
+    collectTTSContent();
+    if (hasPendingTTSContent())
+    {
+        ttsWidget().ensureVisible();
+        ttsWidget().speak(text_to_speak_.at(tts_paragraph_index_++));
+    }
+    else
+    {
+        onSpeakDone();
+    }
+}
+
+void CR3View::onSpeakDone()
+{
+    if (!hasPendingTTSContent())
+    {
+        if (getCurPage() != getDocView()->getPageCount())
+        {
+            nextPage();
+            updateScreen();
+            startTTS();
+        }
+        else
+        {
+            ttsWidget().stop();
+        }
+    }
+    else
+    {
+        tts().speak(text_to_speak_.at(tts_paragraph_index_++));
+    }
+}
+
+void CR3View::stopTTS()
+{
+    ttsWidget().stop();
+    hideHelperWidget(tts_widget_.get());
+}
+
+TTSWidget & CR3View::ttsWidget()
+{
+    if (!tts_widget_)
+    {
+        tts_widget_.reset(new TTSWidget(this, tts()));
+        tts_widget_->installEventFilter(this);
+        connect(tts_widget_.get(), SIGNAL(closed()), this, SLOT(stopTTS()));
+    }
+    return *tts_widget_;
+}
+
+TTS & CR3View::tts()
+{
+    if (!tts_engine_)
+    {
+        tts_engine_.reset(new TTS(QLocale::system()));
+        connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
+    }
+    return *tts_engine_;
+}
+
+void CR3View::hideHelperWidget(QWidget * wnd)
+{
+    if (wnd)
+    {
+        wnd->hide();
+    }
+}
+
+void CR3View::updateScreen()
+{
+    repaint();
+
+    if (onyx::screen::instance().userData() < 2)
+    {
+        ++onyx::screen::instance().userData();
+        if (onyx::screen::instance().userData() == 2)
+        {
+            sys::SysStatus::instance().setSystemBusy(false);
+            onyx::screen::instance().updateWidget(
+                this,
+                onyx::screen::ScreenProxy::GC,
+                true,
+                onyx::screen::ScreenCommand::WAIT_ALL);
+        }
+        return;
+    }
+
+    if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
+    {
+        onyx::screen::instance().updateWidget(
+            this,
+            onyx::screen::ScreenProxy::DW,
+            true,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
+    else
+    {
+        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
+        onyx::screen::instance().updateWidgetWithGCInterval(
+            this,
+            NULL,
+            w,
+            true,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
 }

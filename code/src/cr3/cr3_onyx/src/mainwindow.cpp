@@ -11,6 +11,7 @@
 #include "../crengine/include/lvtinydom.h"
 
 #include "onyx/screen/screen_update_watcher.h"
+#include "onyx/data/bookmark.h"
 #include "onyx/ui/menu.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/number_dialog.h"
@@ -29,7 +30,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     view_ = new CR3View;
-    view_->setFocusPolicy(Qt::NoFocus);
+    view_->setFocusPolicy(Qt::StrongFocus);
     this->setCentralWidget(view_);
 
     statusbar_ = new StatusBar(this, MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
@@ -241,6 +242,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_Return:
          {
              //gotoPage();
+             ldomXPointer p=view_->getDocView()->getPageBookmark(view_->getDocView()->getCurPage());
          }
          break;
      case Qt::Key_Menu:
@@ -367,6 +369,7 @@ void OnyxMainWindow::updateZoomingActions()
 void OnyxMainWindow::updateToolActions()
 {
     // Reading tools of go to page and clock.
+    reading_tool_actions_.clear();
     std::vector<ReadingToolsType> tools;
 
     tools.clear();
@@ -377,6 +380,27 @@ void OnyxMainWindow::updateToolActions()
         tools.push_back(DICTIONARY_TOOL);
     }
     tools.push_back(::ui::TOC_VIEW_TOOL);
+    reading_tool_actions_.generateActions(tools, true);
+
+    if (SysStatus::instance().hasTouchScreen() ||
+        SysStatus::instance().isTTSEnabled())
+    {
+        tools.clear();
+        tools.push_back(::ui::TEXT_TO_SPEECH);
+        reading_tool_actions_.generateActions(tools, true);
+    }
+
+    tools.clear();
+    if( !view_->hasBookmark() )
+    {
+        tools.push_back(::ui::ADD_BOOKMARK);
+    }
+    else
+    {
+        tools.push_back(::ui::DELETE_BOOKMARK);
+    }
+
+    tools.push_back(::ui::SHOW_ALL_BOOKMARKS);
     reading_tool_actions_.generateActions(tools, true);
 
     tools.clear();
@@ -394,7 +418,6 @@ bool OnyxMainWindow::updateActions()
 
     // Font family.
     QFont font = currentFont();
-    qDebug()<<"font :"<<font.toString();
     font_family_actions_.generateActions(font.family(), true);
 
     // size
@@ -448,6 +471,26 @@ void OnyxMainWindow::processToolActions()
             showSearchWidget();
         }
         break;
+
+    case ::ui::TEXT_TO_SPEECH:
+        {
+            view_->startTTS();
+        }
+        break;
+
+    case ::ui::ADD_BOOKMARK:
+        addBookmark();
+        view_->restoreWindowPos(this, "MyBookmark");
+        updateScreen();
+        break;
+    case ::ui::DELETE_BOOKMARK:
+        view_->deleteBookmark();
+        updateScreen();
+        break;
+    case ::ui::SHOW_ALL_BOOKMARKS:
+        showAllBookmarks();
+        break;
+
     case ::ui::GOTO_PAGE:
         {
             gotoPage();
@@ -607,26 +650,17 @@ void OnyxMainWindow::startDictLookup()
 
     if (!dict_widget_)
     {
-        dict_widget_.reset(new DictWidget(this, *dicts_, &tts()) );
+        dict_widget_.reset(new DictWidget(this, *dicts_, &(view_->tts())) );
         connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
         connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
     }
 
     hideHelperWidget(search_widget_.get());
+    hideHelperWidget(&(view_->ttsWidget()));
 
     // When dictionary widget is not visible, it's necessary to update the text view.
     dict_widget_->lookup(view_->getSelectionText());
     dict_widget_->ensureVisible(selected_rect_, true);
-}
-
-TTS & OnyxMainWindow::tts()
-{
-    if (!tts_engine_)
-    {
-        tts_engine_.reset(new TTS(QLocale::system()));
-        connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
-    }
-    return *tts_engine_;
 }
 
 void OnyxMainWindow::hideHelperWidget(QWidget * wnd)
@@ -759,4 +793,65 @@ QStandardItem * OnyxMainWindow::searchParent(const int index,
         }
     }
     return model.invisibleRootItem();
+}
+
+bool OnyxMainWindow::addBookmark()
+{
+    view_->createBookmark();
+    return true;
+}
+
+void OnyxMainWindow::showAllBookmarks()
+{
+    QStandardItemModel model;
+    QModelIndex selected = model.invisibleRootItem()->index();
+    bookmarkModel(model, selected);
+
+    TreeViewDialog bookmark_view(this);
+    bookmark_view.setModel(&model);
+    QVector<int> percentages;
+    percentages.push_back(80);
+    percentages.push_back(20);
+    bookmark_view.tree().setColumnWidth(percentages);
+
+    int ret = bookmark_view.popup(QCoreApplication::tr("Bookmarks"));
+    // Returned from the bookmark view.
+    onyx::screen::instance().flush();
+
+    if (ret != QDialog::Accepted)
+    {
+        onyx::screen::instance().updateWidget(0);
+        return;
+    }
+
+    CRBookmark *pos = (CRBookmark *)(model.data(bookmark_view.selectedItem(), Qt::UserRole + 1).toInt());
+    view_->goToBookmark(pos);
+}
+
+void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
+                                   QModelIndex & selected)
+{
+    CRFileHistRecord * rec = view_->getDocView()->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+    model.setColumnCount(2);
+    int row = 0;
+    for(int i  = 0; i < list.length(); ++i, ++row)
+    {
+        QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
+        t.truncate(100);
+        QStandardItem *title = new QStandardItem(t);
+        title->setData((int)list[i]);
+        title->setEditable(false);
+        model.setItem(row, 0, title);
+
+        int pos = list[i]->getPercent();
+        QString str(tr("%1"));
+        str = str.arg(pos);
+        QStandardItem *page = new QStandardItem(str);
+        page->setTextAlignment(Qt::AlignCenter);
+        page->setEditable(false);
+        model.setItem(row, 1, page);
+    }
 }
