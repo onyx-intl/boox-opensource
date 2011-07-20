@@ -175,6 +175,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual void mouseReleaseEvent ( QMouseEvent * event );
         virtual void refreshPropFromView( const char * propName );
         virtual void mouseDoubleClickEvent(QMouseEvent *event);
+        virtual bool eventFilter(QObject *obj, QEvent *event);
 
     private slots:
         void updateScreen();

@@ -1225,7 +1225,6 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
 {
     if (ttsWidget().isVisible())
     {
-        qDebug()<<" Key type is:"<<event->key();
         switch (event->key())
         {
         case Qt::Key_Escape:
@@ -1235,7 +1234,6 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
             }
         case Qt::Key_PageUp:
             {
-                qDebug()<<"*****  UP";
                 tts_engine_->stop();
                 prevPage();
                 updateScreen();
@@ -1244,7 +1242,6 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
             }
         case Qt::Key_PageDown:
             {
-                qDebug()<<"****  down";
                 tts_engine_->stop();
                 nextPage();
                 updateScreen();
@@ -1370,7 +1367,7 @@ void CR3View::onSpeakDone()
 {
     if (!hasPendingTTSContent())
     {
-        if (getCurPage() != getDocView()->getPageCount())
+        if (getDocView()->getCurPage() != getDocView()->getPageCount())
         {
             nextPage();
             updateScreen();
@@ -1459,4 +1456,30 @@ void CR3View::updateScreen()
             true,
             onyx::screen::ScreenCommand::WAIT_ALL);
     }
+}
+
+bool CR3View::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *key_event = static_cast<QKeyEvent *>(event);
+        if (key_event->key() == Qt::Key_Escape)
+        {
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::KeyRelease)
+    {
+        QKeyEvent *key_event = static_cast<QKeyEvent *>(event);
+        if (key_event->key() == Qt::Key_PageDown ||
+            key_event->key() == Qt::Key_PageUp ||
+            key_event->key() == Qt::Key_Escape)
+        {
+            keyReleaseEvent(key_event);
+            return true;
+        }
+    }
+
+    // standard event processing
+    return QObject::eventFilter(obj, event);
 }
