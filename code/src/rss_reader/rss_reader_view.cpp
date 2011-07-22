@@ -91,6 +91,7 @@ RssReaderView::RssReaderView(QWidget *parent)
     , ExitOnDone(false)
 {
     setWindowTitle(tr("News Feeds"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
     if (!AppDir.exists())
     {
