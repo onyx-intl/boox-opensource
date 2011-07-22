@@ -6,11 +6,16 @@
 #include <QImage>
 #include "crqtutil.h"
 #include "onyx/tts/tts_widget.h"
+#include "onyx/ui/onyx_search_dialog.h"
+#include "onyx/dictionary/dictionary_manager.h"
+#include "onyx/dictionary/dict_widget.h"
+#include "search_tool.h"
 
 class LVDocView;
 class LVTocItem;
 class CRBookmark;
 using namespace tts;
+using namespace ui;
 
 
 class PropsChangeCallback {
@@ -147,6 +152,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         void zoomIn();
         void zoomOut();
 
+        void startDictLookup();
+        void showSearchWidget();
+
         void collectTTSContent();
         bool hasPendingTTSContent();
         void startTTS();
@@ -161,6 +169,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         //void fileNameChanged( const QString & );
         void updateProgress(int, int);
         void requestTranslate();
+        void requestUpdateAll();
 
     protected:
         virtual void keyPressEvent ( QKeyEvent * event );
@@ -178,7 +187,12 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual bool eventFilter(QObject *obj, QEvent *event);
 
     private slots:
+        void lookup();
         void updateScreen();
+        void onDictClosed();
+        void onSearchClosed();
+        void onSearch(OnyxSearchContext& context);
+        void processKeyReleaseEvent(int key);
 
     private:
         void updateDefProps();
@@ -187,8 +201,12 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool endSelection( ldomXPointer p );
         bool updateSelection( ldomXPointer p );
 
+        bool adjustDictWidget();
+
         void paintBookmark( QPainter & painter );
         void hideHelperWidget(QWidget * wnd);
+        bool updateSearchWidget();
+        void stylusPan(const QPoint &now, const QPoint &old);
 
         DocViewData * _data; // to hide non-qt implementation
         LVDocView * _docview;
@@ -209,8 +227,15 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString _bookmarkDir;
         bool _editMode;
         QPoint selectWordPoint;
+        QPoint beginPoint;
         QImage bookmark_image_;
+        QRect selected_rect_;
 
+        SearchTool *search_tool_;
+        scoped_ptr<OnyxSearchDialog> search_widget_;
+        OnyxSearchContext search_context_;
+        scoped_ptr<DictionaryManager> dicts_;
+        scoped_ptr<DictWidget> dict_widget_;
         scoped_ptr<TTS> tts_engine_;
         scoped_ptr<TTSWidget> tts_widget_;
         QStringList text_to_speak_;

@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include "settings.h"
 #include "crqtutil.h"
-#include "search_tool.h"
 #include "../crengine/include/lvtinydom.h"
 
 #include "onyx/screen/screen_update_watcher.h"
@@ -23,18 +22,14 @@
 #define ENABLE_BOOKMARKS_DIR 1
 #endif
 
-static const int BEFORE_SEARCH = 0;
-static const int IN_SEARCHING  = 1;
-
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     view_ = new CR3View;
-    view_->setFocusPolicy(Qt::StrongFocus);
-    this->setCentralWidget(view_);
+    setCentralWidget(view_);
 
     statusbar_ = new StatusBar(this, MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
-    this->setStatusBar(statusbar_);
+    setStatusBar(statusbar_);
 
     sys::SystemConfig conf;
     onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
@@ -89,7 +84,6 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
 
     view_->loadDocument(_filenameToOpen);
 
-    search_tool_ = new SearchTool(this, view_);
 
 //     QTranslator qtTranslator;
 //     if (qtTranslator.load("qt_" + QLocale::system().name(),
@@ -102,29 +96,29 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
 //     if ( myappTranslator.load(trname, translations) )
 //         QApplication::installTranslator(&myappTranslator);
 
-    props_ref = view_->getOptions();
-    QString family;
-    QString size;
-    props_ref->getString(PROP_FONT_FACE, family);
-    props_ref->getString(PROP_FONT_SIZE, size);
-    select_font = QFont(family, size.toInt());
+    select_font = currentFont();
     font_family_actions_.loadExternalFonts();
+
+    connect( &(SysStatus::instance()), SIGNAL( aboutToShutdown() ), this, SLOT(close()) );
 
     connect(statusbar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
     connect(view_, SIGNAL(updateProgress(int,int)), statusbar_, SLOT(setProgress(int,int)));
     connect(statusbar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
-    connect(view_, SIGNAL(requestTranslate()), this, SLOT(lookup()));
+    connect(view_, SIGNAL(requestUpdateAll()), this,SLOT(updateScreen()));
     updateScreen();
+
+    view_->restoreWindowPos( this, "main.", true );
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 {
+    view_->saveWindowPos( this, "main." );
 }
 
 OnyxMainWindow::~OnyxMainWindow()
 {
-    dict_widget_.release();
-    search_widget_.release();
+    delete statusbar_;
+    delete view_;
 }
 
 void OnyxMainWindow::onPropsChange( PropsRef props )
@@ -163,10 +157,6 @@ void OnyxMainWindow::onPropsChange( PropsRef props )
             QApplication::setStyle( value );
         }
     }
-}
-
-void OnyxMainWindow::contextMenu( QPoint pos )
-{
 }
 
 
@@ -229,20 +219,20 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          break;
      case Qt::Key_Up:
          {
-             view_->prevChapter();
+             view_->zoomIn();
              updateScreen();
              return;
          }
      case Qt::Key_Down:
          {
-             view_->nextChapter();
+             view_->zoomOut();
              updateScreen();
              return;
          }
      case Qt::Key_Return:
          {
              //gotoPage();
-             ldomXPointer p=view_->getDocView()->getPageBookmark(view_->getDocView()->getCurPage());
+             //ldomXPointer p=view_->getDocView()->getPageBookmark(view_->getDocView()->getCurPage());
          }
          break;
      case Qt::Key_Menu:
@@ -276,14 +266,14 @@ void OnyxMainWindow::showContextMenu()
 
     menu.addGroup(&font_family_actions_);
     menu.addGroup(&font_actions_);
-    //menu.addGroup(&reading_style_actions_);
+    menu.addGroup(&reading_style_actions_);
     //menu.addGroup(&zoom_setting_actions_);
     menu.addGroup(&reading_tool_actions_);
     menu.setSystemAction(&system_actions_);
 
     if (menu.popup() != QDialog::Accepted)
     {
-        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+        //onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
         QApplication::processEvents();
         return;
     }
@@ -338,32 +328,32 @@ void OnyxMainWindow::showContextMenu()
         else if (system == ROTATE_SCREEN)
         {
             SysStatus::instance().rotateScreen();
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+            view_->update();
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+            return;
+        }
+    }
+    else if(group == reading_style_actions_.category())
+    {
+        ReadingStyleType s = reading_style_actions_.selected();
+        if (STYLE_LINE_SPACING_8 <= s && STYLE_LINE_SPACING_20 >= s)
+        {
+            props_ref->setInt(PROP_INTERLINE_SPACE, (s+8)*10);
+            view_->setOptions(props_ref);
+            statusbar_->update();
+            updateScreen();
+            return;
         }
     }
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
-void OnyxMainWindow::updateZoomingActions()
+void OnyxMainWindow::updateReadingStyleActions()
 {
-    if (zoom_setting_actions_.actions().size() <= 0)
-    {
-         std::vector<ZoomFactor> zoom_settings;
-         zoom_settings.clear();
-         zoom_settings.push_back(ZOOM_TO_PAGE);
-         zoom_settings.push_back(ZOOM_TO_WIDTH);
-         zoom_settings.push_back(ZOOM_TO_HEIGHT);
-         zoom_settings.push_back(75.0f);
-         zoom_settings.push_back(100.0f);
-         zoom_settings.push_back(125.0f);
-         zoom_settings.push_back(150.0f);
-         zoom_settings.push_back(175.0f);
-         zoom_settings.push_back(200.0f);
-         zoom_settings.push_back(300.0f);
-         zoom_settings.push_back(400.0f);
-         zoom_setting_actions_.generateActions(zoom_settings);
-     }
-     //zoom_setting_actions_.setCurrentZoomValue(model_->currentZoomRatio());
+    int index;
+    view_->getOptions()->getInt(PROP_INTERLINE_SPACE, index);
+    index = STYLE_LINE_SPACING_8+((index-80)/10);
+    reading_style_actions_.generateActions(static_cast<ReadingStyleType>(index));
 }
 
 void OnyxMainWindow::updateToolActions()
@@ -411,10 +401,9 @@ void OnyxMainWindow::updateToolActions()
 }
 
 bool OnyxMainWindow::updateActions()
-{
-    updateZoomingActions();
+{   
+    updateReadingStyleActions();
     updateToolActions();
-
 
     // Font family.
     QFont font = currentFont();
@@ -443,6 +432,12 @@ bool OnyxMainWindow::updateActions()
 
 const QFont & OnyxMainWindow::currentFont()
 {
+    props_ref = view_->getOptions();
+    QString family;
+    QString size;
+    props_ref->getString(PROP_FONT_FACE, family);
+    props_ref->getString(PROP_FONT_SIZE, size);
+    select_font = QFont(family, size.toInt());
     return select_font;
 }
 
@@ -463,12 +458,12 @@ void OnyxMainWindow::processToolActions()
         break;
     case ::ui::DICTIONARY_TOOL:
         {
-            startDictLookup();
+            view_->startDictLookup();
         }
         break;
     case ::ui::SEARCH_TOOL:
         {
-            showSearchWidget();
+            view_->showSearchWidget();
         }
         break;
 
@@ -578,147 +573,7 @@ void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
     updateScreen();
 }
 
-void OnyxMainWindow::showSearchWidget()
-{
-    if (!search_widget_)
-    {
-        search_widget_.reset(new OnyxSearchDialog(this, search_context_));
-        connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
-            this, SLOT(onSearch(OnyxSearchContext &)));
-        connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
-        onyx::screen::watcher().addWatcher(search_widget_.get());
-    }
 
-    search_context_.userData() = BEFORE_SEARCH;
-    hideHelperWidget(dict_widget_.get());
-    search_widget_->showNormal();
-}
-
-void OnyxMainWindow::onSearch(OnyxSearchContext& context)
-{
-    if (search_context_.userData() <= BEFORE_SEARCH)
-    {
-        search_tool_->setSearchPattern(context.pattern());
-        search_tool_->setReverse(!context.forward());
-        search_context_.userData() = IN_SEARCHING;
-
-        // TODO
-        updateSearchWidget();
-    }
-    else
-    {
-        updateSearchWidget();
-    }
-}
-
-void OnyxMainWindow::onSearchClosed()
-{
-    //OnyxMainWindow->doAction("clearSearchResult");
-    search_tool_->onCloseSearch();
-    updateScreen();
-}
-
-bool OnyxMainWindow::updateSearchWidget()
-{
-    search_tool_->setReverse(!search_context_.forward());
-    if (search_context_.forward())
-    {
-        if (!search_tool_->FindNext())
-        {
-            search_widget_->noMoreMatches();
-            return false;
-        }
-    }
-    else
-    {
-        if (!search_tool_->FindNext())
-        {
-            search_widget_->noMoreMatches();
-            return false;
-        }
-    }
-    updateScreen();
-    return true;
-}
-
-void OnyxMainWindow::startDictLookup()
-{
-    if (!dicts_)
-    {
-        dicts_.reset(new DictionaryManager);
-    }
-
-    if (!dict_widget_)
-    {
-        dict_widget_.reset(new DictWidget(this, *dicts_, &(view_->tts())) );
-        connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
-        connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
-    }
-
-    hideHelperWidget(search_widget_.get());
-    hideHelperWidget(&(view_->ttsWidget()));
-
-    // When dictionary widget is not visible, it's necessary to update the text view.
-    dict_widget_->lookup(view_->getSelectionText());
-    dict_widget_->ensureVisible(selected_rect_, true);
-}
-
-void OnyxMainWindow::hideHelperWidget(QWidget * wnd)
-{
-    if (wnd)
-    {
-        wnd->hide();
-    }
-}
-
-void OnyxMainWindow::processKeyReleaseEvent(int key)
-{
-    //TODO:
-    switch (key)
-    {
-    case Qt::Key_Escape:
-        hideHelperWidget(dict_widget_.get());
-        onDictClosed();
-        break;
-    case Qt::Key_PageDown:
-        view_->nextPage();
-        updateScreen();
-        break;
-    case Qt::Key_PageUp:
-        view_->prevPage();
-        updateScreen();
-        break;
-    }
-}
-
-void OnyxMainWindow::onDictClosed()
-{
-    dict_widget_.reset(0);
-    search_tool_->onCloseSearch();
-}
-
-void OnyxMainWindow::lookup()
-{
-    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
-    if (!dict_widget_)
-    {
-        startDictLookup();
-    }
-
-    adjustDictWidget();
-    dict_widget_->lookup(view_->getSelectionText());
-}
-
-bool OnyxMainWindow::adjustDictWidget()
-{
-    if(dict_widget_.get()->isVisible())
-    {
-        QPoint point = view_->getSelectWordPoint();
-        selected_rect_.setCoords(point.x(), point.y(), point.x()+1, point.y()+1);
-    }
-
-    return dict_widget_->ensureVisible(selected_rect_);
-}
 
 void OnyxMainWindow::showTableOfContents()
 {

@@ -126,12 +126,12 @@ LVDocView::LVDocView(int bitsPerPixel) :
 			m_pageMargins(DEFAULT_PAGE_MARGIN,
 					DEFAULT_PAGE_MARGIN / 2 /*+ INFO_FONT_SIZE + 4 */,
 					DEFAULT_PAGE_MARGIN, DEFAULT_PAGE_MARGIN / 2),
-			m_pagesVisible(2), m_pageHeaderInfo(PGHDR_PAGE_NUMBER
+                        m_pagesVisible(2), m_pageHeaderInfo(PGHDR_PAGE_NUMBER
 #ifndef LBOOK
-					| PGHDR_CLOCK
+                                        | PGHDR_CLOCK
 #endif
-					| PGHDR_BATTERY | PGHDR_PAGE_COUNT | PGHDR_AUTHOR
-					| PGHDR_TITLE), m_showCover(true)
+                                        | PGHDR_BATTERY | PGHDR_PAGE_COUNT | PGHDR_AUTHOR
+                                        | PGHDR_TITLE), m_showCover(true)
 #if CR_INTERNAL_PAGE_ORIENTATION==1
 			, m_rotateAngle(CR_ROTATE_ANGLE_0)
 #endif
@@ -1081,9 +1081,7 @@ int LVDocView::GetFullHeight() {
 #define HEADER_MARGIN 4
 /// calculate page header height
 int LVDocView::getPageHeaderHeight() {
-	if (!getPageHeaderInfo())
-		return 0;
-	return getInfoFont()->getHeight()*12/10 + HEADER_MARGIN + 5;
+        return 0;
 }
 
 /// calculate page header rectangle
@@ -1408,230 +1406,7 @@ void LVDocView::setPageHeaderOverride(lString16 s) {
 /// draw page header to buffer
 void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
 		int pageIndex, int phi, int pageCount) {
-	lvRect oldcr;
-	drawbuf->GetClipRect(&oldcr);
-	lvRect hrc = headerRc;
-	drawbuf->SetClipRect(&hrc);
-	bool drawGauge = true;
-	lvRect info = headerRc;
-//    if ( m_statusColor!=0xFF000000 ) {
-//        CRLog::trace("Status color = %06x, textColor=%06x", m_statusColor, getTextColor());
-//    } else {
-//        CRLog::trace("Status color = TRANSPARENT, textColor=%06x", getTextColor());
-//    }
-	lUInt32 cl1 = m_statusColor!=0xFF000000 ? m_statusColor : getTextColor();
-	lUInt32 cl2 = getBackgroundColor();
-	lUInt32 cl3 = 0xD0D0D0;
-	lUInt32 cl4 = 0xC0C0C0;
-	drawbuf->SetTextColor(cl1);
-	//lUInt32 pal[4];
-	int percent = getPosPercent();
-	bool leftPage = (getVisiblePageCount() == 2 && !(pageIndex & 1));
-	if (leftPage || !drawGauge)
-		percent = 10000;
-	int percent_pos = percent * info.width() / 10000;
-	//    int gh = 3; //drawGauge ? 3 : 1;
-	LVArray<int> & sbounds = getSectionBounds();
-	lvRect navBar;
-	getNavigationBarRectangle(pageIndex, navBar);
-	int gpos = info.bottom;
-	if (drawbuf->GetBitsPerPixel() <= 2) {
-		// gray
-		cl3 = 1;
-		cl4 = cl1;
-		//pal[0] = cl1;
-	}
-	//drawbuf->FillRect(info.left, gpos-gh, info.left+percent_pos, gpos-gh+1, cl1 );
-    if ( leftPage )
-        drawbuf->FillRect(info.left, gpos - 2, info.right, gpos - 2	+ 1, cl1);
-	//drawbuf->FillRect(info.left+percent_pos, gpos-gh, info.right, gpos-gh+1, cl1 ); //cl3
-//	drawbuf->FillRect(info.left + percent_pos, gpos - 2, info.right, gpos - 2
-//			+ 1, cl1); // cl3
 
-	int sbound_index = 0;
-	bool enableMarks = !leftPage && (phi & PGHDR_CHAPTER_MARKS) && sbounds.length()<info.width()/5;
-	for ( int x = info.left; x<info.right; x++ ) {
-		int cl = -1;
-		int sz = 1;
-		int boundCategory = 0;
-		while ( enableMarks && sbound_index<sbounds.length() ) {
-			int sx = info.left + sbounds[sbound_index] * (info.width() - 1) / 10000;
-			if ( sx<x ) {
-				sbound_index++;
-				continue;
-			}
-			if ( sx==x ) {
-				boundCategory = 1;
-			}
-			break;
-		}
-		if ( leftPage ) {
-			cl = cl1;
-			sz = 1;
-		} else {
-            if ( x < info.left + percent_pos ) {
-				sz = 3;
-				if ( boundCategory==0 )
-					cl = cl1;
-                else
-                    sz = 0;
-            } else {
-				if ( boundCategory!=0 )
-					sz = 3;
-				cl = cl1;
-			}
-		}
-        if ( cl!=-1 && sz>0 )
-			drawbuf->FillRect(x, gpos - 2 - sz/2, x+1, gpos - 2
-					+ sz/2 + 1, cl);
-	}
-
-	lString16 text;
-	//int iy = info.top; // + (info.height() - m_infoFont->getHeight()) * 2 / 3;
-	int iy = info.top + /*m_infoFont->getHeight() +*/ (info.height() - m_infoFont->getHeight()) / 2;
-
-	if (!m_pageHeaderOverride.empty()) {
-		text = m_pageHeaderOverride;
-	} else {
-
-//		if (!leftPage) {
-//			drawbuf->FillRect(info.left, gpos - 3, info.left + percent_pos,
-//					gpos - 3 + 1, cl1);
-//			drawbuf->FillRect(info.left, gpos - 1, info.left + percent_pos,
-//					gpos - 1 + 1, cl1);
-//		}
-
-		// disable section marks for left page, and for too many marks
-//		if (!leftPage && (phi & PGHDR_CHAPTER_MARKS) && sbounds.length()<info.width()/5 ) {
-//			for (int i = 0; i < sbounds.length(); i++) {
-//				int x = info.left + sbounds[i] * (info.width() - 1) / 10000;
-//				lUInt32 c = x < info.left + percent_pos ? cl2 : cl1;
-//				drawbuf->FillRect(x, gpos - 4, x + 1, gpos - 0 + 2, c);
-//			}
-//		}
-
-		if (getVisiblePageCount() == 1 || !(pageIndex & 1)) {
-			int dwIcons = 0;
-			int icony = iy + m_infoFont->getHeight() / 2;
-			for (int ni = 0; ni < m_headerIcons.length(); ni++) {
-				LVImageSourceRef icon = m_headerIcons[ni];
-				int h = icon->GetHeight();
-				int w = icon->GetWidth();
-				drawbuf->Draw(icon, info.left + dwIcons, icony - h / 2, w, h);
-				dwIcons += w + 4;
-			}
-			info.left += dwIcons;
-		}
-
-		bool batteryPercentNormalFont = false; // PROP_SHOW_BATTERY_PERCENT
-		if ((phi & PGHDR_BATTERY) && m_battery_state >= -1) {
-			batteryPercentNormalFont = m_props->getBoolDef(PROP_SHOW_BATTERY_PERCENT, true) || m_batteryIcons.size()<=2;
-			if ( !batteryPercentNormalFont ) {
-				lvRect brc = info;
-				brc.right -= 2;
-				//brc.top += 1;
-				//brc.bottom -= 2;
-				int h = brc.height();
-				int batteryIconWidth = 32;
-				if (m_batteryIcons.length() > 0)
-					batteryIconWidth = m_batteryIcons[0]->GetWidth();
-				bool isVertical = (h > 30);
-				//if ( isVertical )
-				//    brc.left = brc.right - brc.height()/2;
-				//else
-				brc.left = brc.right - batteryIconWidth - 2;
-				brc.bottom -= 5;
-				drawBatteryState(drawbuf, brc, isVertical);
-				info.right = brc.left - info.height() / 2;
-			}
-		}
-		lString16 pageinfo;
-		if (pageCount > 0) {
-			if (phi & PGHDR_PAGE_NUMBER)
-				pageinfo += lString16::itoa(pageIndex + 1);
-            if (phi & PGHDR_PAGE_COUNT) {
-                if ( !pageinfo.empty() )
-                    pageinfo += L" / ";
-                pageinfo += lString16::itoa(pageCount);
-            }
-            if (phi & PGHDR_PERCENT) {
-                if ( !pageinfo.empty() )
-                    pageinfo += L"  ";
-                //pageinfo += lString16::itoa(percent/100)+L"%"; //+L"."+lString16::itoa(percent/10%10)+L"%";
-                pageinfo += lString16::itoa(percent/100);
-                pageinfo += L",";
-                int pp = percent%100;
-                if ( pp<10 )
-                	pageinfo += L"0";
-                pageinfo += lString16::itoa(pp);
-                pageinfo += L"%";
-            }
-            if ( batteryPercentNormalFont && m_battery_state>=0 ) {
-            	pageinfo += L"  [";
-                pageinfo += lString16::itoa(m_battery_state)+L"%";
-            	pageinfo += L"]";
-            }
-		}
-		int piw = 0;
-		if (!pageinfo.empty()) {
-			piw = m_infoFont->getTextWidth(pageinfo.c_str(), pageinfo.length());
-			m_infoFont->DrawTextString(drawbuf, info.right - piw, iy,
-					pageinfo.c_str(), pageinfo.length(), L' ', NULL, false);
-			info.right -= piw + info.height() / 2;
-		}
-		if (phi & PGHDR_CLOCK) {
-			lString16 clock = getTimeString();
-			m_last_clock = clock;
-			int w = m_infoFont->getTextWidth(clock.c_str(), clock.length()) + 2;
-			m_infoFont->DrawTextString(drawbuf, info.right - w, iy,
-					clock.c_str(), clock.length(), L' ', NULL, false);
-			info.right -= w + info.height() / 2;
-		}
-		int authorsw = 0;
-		lString16 authors;
-		if (phi & PGHDR_AUTHOR)
-			authors = getAuthors();
-		int titlew = 0;
-		lString16 title;
-		if (phi & PGHDR_TITLE) {
-			title = getTitle();
-			if (title.empty() && authors.empty())
-				title = m_doc_props->getStringDef(DOC_PROP_FILE_NAME);
-			if (!title.empty())
-				titlew
-						= m_infoFont->getTextWidth(title.c_str(),
-								title.length());
-		}
-		if (phi & PGHDR_AUTHOR && !authors.empty()) {
-			if (!title.empty())
-				authors += L'.';
-			authorsw = m_infoFont->getTextWidth(authors.c_str(),
-					authors.length());
-		}
-		int w = info.width() - 10;
-		if (authorsw + titlew + 10 > w) {
-			if ((pageIndex & 1))
-				text = title;
-			else {
-				text = authors;
-				if (!text.empty() && text[text.length() - 1] == '.')
-					text = text.substr(0, text.length() - 1);
-			}
-		} else {
-			text = authors + L"  " + title;
-		}
-	}
-	lvRect newcr = headerRc;
-	newcr.right = info.right - 10;
-	drawbuf->SetClipRect(&newcr);
-	text = fitTextWidthWithEllipsis(text, m_infoFont, newcr.width());
-	if (!text.empty()) {
-		m_infoFont->DrawTextString(drawbuf, info.left, iy, text.c_str(),
-				text.length(), L' ', NULL, false);
-	}
-	drawbuf->SetClipRect(&oldcr);
-	//--------------
-	drawbuf->SetTextColor(getTextColor());
 }
 
 void LVDocView::drawPageTo(LVDrawBuf * drawbuf, LVRendPageInfo & page,

@@ -17,7 +17,11 @@
 #include <QDesktopServices>
 #include <QDebug>
 #include "onyx/screen/screen_update_watcher.h"
+
 using namespace tts;
+
+static const int BEFORE_SEARCH = 0;
+static const int IN_SEARCHING  = 1;
 
 /// to hide non-qt implementation, place all crengine-related fields here
 class CR3View::DocViewData
@@ -330,6 +334,7 @@ CR3View::CR3View( QWidget *parent)
     updateDefProps();
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
+    search_tool_ = new SearchTool(this, this);
 }
 
 void CR3View::updateDefProps()
@@ -363,7 +368,12 @@ CR3View::~CR3View()
     delete _docview;
     delete _data;
 
+    delete search_tool_;
     tts_widget_.release();
+    dicts_.release();
+    tts_engine_.release();
+    dict_widget_.release();
+    search_widget_.release();
 }
 
 #if WORD_SELECTOR_ENABLED==1
@@ -565,7 +575,7 @@ void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
     if(!getSelectionText().isEmpty())
     {
         selectWordPoint = event->pos();
-        emit requestTranslate();
+        lookup();
     }
 }
 
@@ -642,15 +652,35 @@ void CR3View::refreshPropFromView( const char * propName )
 }
 
 void CR3View::zoomIn()
-{ 
-    doCommand( DCMD_ZOOM_IN, 1 );
-    refreshPropFromView( PROP_FONT_SIZE );
+{
+    int size;
+    PropsRef props_ref = getOptions();
+    props_ref->getInt(PROP_FONT_SIZE, size);
+    if (size >= 40)
+    {
+        return;
+    }
+    else
+    {
+        props_ref->setString( PROP_FONT_SIZE, QString::number(size+2));
+        setOptions(props_ref);
+    }
 }
 
 void CR3View::zoomOut()
 {
-    doCommand( DCMD_ZOOM_OUT, 1 );
-    refreshPropFromView( PROP_FONT_SIZE );
+    int size;
+    PropsRef props_ref = getOptions();
+    props_ref->getInt(PROP_FONT_SIZE, size);
+    if (size <= 12)
+    {
+        return;
+    }
+    else
+    {
+        props_ref->setString( PROP_FONT_SIZE, QString::number(size-2));
+        setOptions(props_ref);
+    }
 }
 
 QScrollBar * CR3View::scrollBar() const
@@ -953,6 +983,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
     bool left = event->button() == Qt::LeftButton;
     //bool right = event->button() == Qt::RightButton;
     //bool mid = event->button() == Qt::MidButton;
+    beginPoint = event->pos();
     lvPoint pt (event->x(), event->y());
     ldomXPointer p = _docview->getNodeByPoint( pt );
     lString16 path;
@@ -1013,6 +1044,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
         }
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
+    stylusPan(event->pos(), beginPoint);
 }
 
 /// Override to handle external links
@@ -1223,7 +1255,8 @@ void CR3View::keyPressEvent ( QKeyEvent * event )
 
 void CR3View::keyReleaseEvent(QKeyEvent * event)
 {
-    if (ttsWidget().isVisible())
+    if ( (tts_widget_) &&
+         (tts_widget_->isVisible()))
     {
         switch (event->key())
         {
@@ -1236,7 +1269,7 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
             {
                 tts_engine_->stop();
                 prevPage();
-                updateScreen();
+                emit requestUpdateAll();
                 startTTS();
                 break;
             }
@@ -1244,7 +1277,7 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
             {
                 tts_engine_->stop();
                 nextPage();
-                updateScreen();
+                emit requestUpdateAll();
                 startTTS();
                 break;
             }
@@ -1370,7 +1403,7 @@ void CR3View::onSpeakDone()
         if (getDocView()->getCurPage() != getDocView()->getPageCount())
         {
             nextPage();
-            updateScreen();
+            emit requestUpdateAll();
             startTTS();
         }
         else
@@ -1482,4 +1515,165 @@ bool CR3View::eventFilter(QObject *obj, QEvent *event)
 
     // standard event processing
     return QObject::eventFilter(obj, event);
+}
+
+void CR3View::startDictLookup()
+{
+    if (!dicts_)
+    {
+        dicts_.reset(new DictionaryManager);
+    }
+
+    if (!dict_widget_)
+    {
+        dict_widget_.reset(new DictWidget(this, *dicts_, &(tts())) );
+        connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
+        connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
+    }
+
+    hideHelperWidget(search_widget_.get());
+    hideHelperWidget(&(ttsWidget()));
+
+    // When dictionary widget is not visible, it's necessary to update the text view.
+    dict_widget_->lookup(getSelectionText());
+    dict_widget_->ensureVisible(selected_rect_, true);
+}
+
+void CR3View::showSearchWidget()
+{
+    if (!search_widget_)
+    {
+        search_widget_.reset(new OnyxSearchDialog(this, search_context_));
+        connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
+            this, SLOT(onSearch(OnyxSearchContext &)));
+        connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
+        onyx::screen::watcher().addWatcher(search_widget_.get());
+    }
+
+    search_context_.userData() = BEFORE_SEARCH;
+    hideHelperWidget(dict_widget_.get());
+    search_widget_->showNormal();
+}
+
+void CR3View::onDictClosed()
+{
+    dict_widget_.reset(0);
+    search_tool_->onCloseSearch();
+}
+
+void CR3View::lookup()
+{
+    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    if (!dict_widget_)
+    {
+        startDictLookup();
+    }
+
+    adjustDictWidget();
+    dict_widget_->lookup(getSelectionText());
+}
+
+bool CR3View::adjustDictWidget()
+{
+    if(dict_widget_.get()->isVisible())
+    {
+        QPoint point = getSelectWordPoint();
+        selected_rect_.setCoords(point.x(), point.y(), point.x()+1, point.y()+1);
+    }
+
+    return dict_widget_->ensureVisible(selected_rect_);
+}
+
+void CR3View::onSearch(OnyxSearchContext& context)
+{
+    if (search_context_.userData() <= BEFORE_SEARCH)
+    {
+        search_tool_->setSearchPattern(context.pattern());
+        search_tool_->setReverse(!context.forward());
+        search_context_.userData() = IN_SEARCHING;
+
+        // TODO
+        updateSearchWidget();
+    }
+    else
+    {
+        updateSearchWidget();
+    }
+}
+
+void CR3View::onSearchClosed()
+{
+    //OnyxMainWindow->doAction("clearSearchResult");
+    search_tool_->onCloseSearch();
+    updateScreen();
+}
+
+bool CR3View::updateSearchWidget()
+{
+    search_tool_->setReverse(!search_context_.forward());
+    if (search_context_.forward())
+    {
+        if (!search_tool_->FindNext())
+        {
+            search_widget_->noMoreMatches();
+            return false;
+        }
+    }
+    else
+    {
+        if (!search_tool_->FindNext())
+        {
+            search_widget_->noMoreMatches();
+            return false;
+        }
+    }
+    updateScreen();
+    return true;
+}
+
+void CR3View::processKeyReleaseEvent(int key)
+{
+    //TODO:
+    switch (key)
+    {
+    case Qt::Key_Escape:
+        hideHelperWidget(dict_widget_.get());
+        onDictClosed();
+        break;
+    case Qt::Key_PageDown:
+        nextPage();
+        emit requestUpdateAll();
+        break;
+    case Qt::Key_PageUp:
+        prevPage();
+        emit requestUpdateAll();
+        break;
+    }
+}
+
+void CR3View::stylusPan(const QPoint &now, const QPoint &old)
+{
+    int direction = sys::SystemConfig::direction(old, now);
+
+    if (direction > 0)
+    {
+        nextPage();
+        emit requestUpdateAll();
+    }
+    else if (direction < 0)
+    {
+        prevPage();
+        emit requestUpdateAll();
+    }
+    else
+    {
+        if( dict_widget_ &&
+            dict_widget_->isVisible() &&
+            !getSelectionText().isEmpty())
+        {
+            selectWordPoint = now;
+            update();
+            lookup();
+        }
+    }
 }

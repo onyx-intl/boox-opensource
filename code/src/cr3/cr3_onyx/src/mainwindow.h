@@ -11,12 +11,8 @@
 #include "onyx/ui/font_family_actions.h"
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/ui/zoom_setting_actions.h"
-#include "onyx/ui/onyx_search_dialog.h"
-#include "onyx/dictionary/dictionary_manager.h"
-#include "onyx/dictionary/dict_widget.h"
 
 class QKeyEvent;
-class SearchTool;
 using namespace ui;
 
 class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
@@ -29,7 +25,6 @@ public:
     ~OnyxMainWindow();
 
 public slots:
-    void contextMenu( QPoint pos );
     void on_actionFindText_triggered();
 
 protected:
@@ -42,18 +37,12 @@ protected:
 private slots:
     void showContextMenu();
     void onProgressClicked(const int, const int);
-    void onSearchClosed();
-    void onSearch(OnyxSearchContext& context);
-    void lookup();
-    void onDictClosed();
     bool addBookmark();
-    void processKeyReleaseEvent(int key);
     void updateScreen();
 
 private:
     CR3View *view_;
     StatusBar *statusbar_;
-    SearchTool *search_tool_;
     QString _filenameToOpen;
 
     QFont select_font;
@@ -66,33 +55,23 @@ private:
     ReadingStyleActions reading_style_actions_;
 
     PropsRef props_ref;
-    QRect selected_rect_;
-    scoped_ptr<DictionaryManager> dicts_;
-    scoped_ptr<DictWidget> dict_widget_;
-    scoped_ptr<OnyxSearchDialog> search_widget_;
-    OnyxSearchContext search_context_;
 
     void toggleProperty( const char * name );
     bool isFullScreenByWidgetSize();
     void processToolActions();
     void showClock();
     void gotoPage();
-    void showSearchWidget();
-    bool updateSearchWidget();
     void showTableOfContents();
+
+    void showAllBookmarks();
+    void bookmarkModel(QStandardItemModel & model,
+                       QModelIndex & selected);
     QStandardItem * searchParent(const int index,
                                  std::vector<int> & entries,
                                  std::vector<QStandardItem *> & ptrs,
                                  QStandardItemModel &model);
-    void showAllBookmarks();
-    void bookmarkModel(QStandardItemModel & model,
-                       QModelIndex & selected);
 
-    void startDictLookup();
-    void hideHelperWidget(QWidget * wnd);
-    bool adjustDictWidget();
-
-    void updateZoomingActions();
+    void updateReadingStyleActions();
     void updateToolActions();
     bool updateActions();
     const QFont & currentFont();
