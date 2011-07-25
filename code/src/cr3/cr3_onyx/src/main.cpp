@@ -143,6 +143,9 @@ int main(int argc, char *argv[])
         //}
         {
             QApplication a(argc, argv);
+
+            Q_INIT_RESOURCE(onyx_ui_images);
+            Q_INIT_RESOURCE(tts_images);
 #ifdef _WIN32
             QString exeDir = QDir::toNativeSeparators(qApp->applicationDirPath() + "/"); //QDir::separator();
             QString translations = exeDir + "i18n";

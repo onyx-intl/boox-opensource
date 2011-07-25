@@ -99,7 +99,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     select_font = currentFont();
     font_family_actions_.loadExternalFonts();
 
-    connect( &(SysStatus::instance()), SIGNAL( aboutToShutdown() ), this, SLOT(close()) );
+    connect( &(SysStatus::instance()), SIGNAL(aboutToShutdown()), this, SLOT(close()) );
+    connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
 
     connect(statusbar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
     connect(view_, SIGNAL(updateProgress(int,int)), statusbar_, SLOT(setProgress(int,int)));

@@ -45,7 +45,6 @@ static void replaceColor( char * str, lUInt32 color )
 }
 
 
-
 CR3View::CR3View( QWidget *parent)
         : QWidget( parent, Qt::WindowFlags() ), _scroll(NULL), _propsCallback(NULL)
         , _normalCursor(Qt::ArrowCursor), _linkCursor(Qt::PointingHandCursor)
@@ -812,9 +811,9 @@ CRBookmark * CR3View::createBookmark()
 {
     CRBookmark * bm = NULL;
     if ( getSelectionText().length()>0 && !_selRange.isNull() ) {
-        bm = getDocView()->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
+        bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
     } else {
-        bm = getDocView()->saveCurrentPageBookmark(lString16());
+        bm = _docview->saveCurrentPageBookmark(lString16());
     }
 
     return bm;
@@ -837,7 +836,7 @@ void CR3View::goToBookmark( CRBookmark * bm )
 /// rotate view, +1 = 90` clockwise, -1 = 90` counterclockwise
 void CR3View::rotate( int angle )
 {
-    getDocView()->doCommand( DCMD_ROTATE_BY, angle );
+    _docview->doCommand( DCMD_ROTATE_BY, angle );
     update();
 
 //    int currAngle = _data->_props->getIntDef( PROP_ROTATE_ANGLE, 0 );
@@ -847,7 +846,7 @@ void CR3View::rotate( int angle )
 //        newAngle += 4;
 //    if ( newAngle == currAngle )
 //        return;
-//    getDocView()->SetRotateAngle( (cr_rotate_angle_t) newAngle );
+//    _docview->SetRotateAngle( (cr_rotate_angle_t) newAngle );
 //    _data->_props->setInt( PROP_ROTATE_ANGLE, newAngle );
 //    update();
 }
@@ -905,7 +904,7 @@ void CR3View::OnLoadFileError( lString16 message )
 void CR3View::OnLoadFileEnd()
 {
     setCursor( _normalCursor );
-    emit updateProgress(getDocView()->getCurPage()+1, getDocView()->getPageCount());
+    emit updateProgress(_docview->getCurPage()+1, _docview->getPageCount());
 }
 
 /// document formatting started
@@ -1075,17 +1074,17 @@ void CR3View::OnLoadFileFirstPagesReady()
 bool CR3View::hasBookmark()
 {
     int now_page = getCurPage();
-    CRFileHistRecord * rec = getDocView()->getCurrentFileHistRecord();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
     if ( !rec )
         return false;
     LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
 
     for(int i  = 0; i < list.length(); i++)
     {
-        ldomXPointer pt1 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
-        ldomXPointer pt2 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
-        if( getDocView()->getBookmarkPage(pt1) == now_page ||
-            getDocView()->getBookmarkPage(pt2) == now_page )
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
         {
             return true;
         }
@@ -1102,17 +1101,17 @@ void CR3View::paintBookmark( QPainter & painter )
 void CR3View::deleteBookmark()
 {
     int now_page = getCurPage();
-    CRFileHistRecord * rec = getDocView()->getCurrentFileHistRecord();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
     if ( !rec )
         return;
     LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
 
     for(int i  = 0; i < list.length(); i++)
     {
-        ldomXPointer pt1 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
-        ldomXPointer pt2 = getDocView()->getDocument()->createXPointer( list[i]->getStartPos() );
-        if( getDocView()->getBookmarkPage(pt1) == now_page ||
-            getDocView()->getBookmarkPage(pt2) == now_page )
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
         {
             list.remove(i);
             return;
@@ -1124,7 +1123,7 @@ void CR3View::collectTTSContent()
 {
     text_to_speak_.clear();
     tts_paragraph_index_ = 0;
-    QString text_tmp = cr2qt( getDocView()->getPageText(true) );
+    QString text_tmp = cr2qt( _docview->getPageText(true) );
     text_to_speak_.push_back(text_tmp);
 }
 
@@ -1135,6 +1134,8 @@ bool CR3View::hasPendingTTSContent()
 
 void CR3View::startTTS()
 {
+    hideHelperWidget(search_widget_.get());
+    hideHelperWidget(dict_widget_.get());
     collectTTSContent();
     if (hasPendingTTSContent())
     {
@@ -1151,7 +1152,7 @@ void CR3View::onSpeakDone()
 {
     if (!hasPendingTTSContent())
     {
-        if (getDocView()->getCurPage() != getDocView()->getPageCount())
+        if ( (_docview->getCurPage()+1) != _docview->getPageCount())
         {
             nextPage();
             emit requestUpdateAll();
@@ -1303,6 +1304,7 @@ void CR3View::showSearchWidget()
 
     search_context_.userData() = BEFORE_SEARCH;
     hideHelperWidget(dict_widget_.get());
+    hideHelperWidget(&(ttsWidget()));
     search_widget_->showNormal();
 }
 
@@ -1384,7 +1386,6 @@ bool CR3View::updateSearchWidget()
 
 void CR3View::processKeyReleaseEvent(int key)
 {
-    //TODO:
     switch (key)
     {
     case Qt::Key_Escape:
