@@ -135,7 +135,7 @@ void RssView::paintEvent(QPaintEvent * event)
         {
              painter.fillRect(rect().adjusted(penWidth(), penWidth(),
                      -penWidth() - 1, -penWidth() - 1), Qt::gray);
-       }
+        }
 
         if (hasFocus())
         {

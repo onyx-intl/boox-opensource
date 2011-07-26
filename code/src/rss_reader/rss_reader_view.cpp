@@ -163,11 +163,11 @@ void RssReaderView::OnOpenUrl(QUrl url)
 
 void RssReaderView::onReloadFeedList()
 {
-    clearDatas(list_data_); 
-	for (int i = 0; i < rss_feeds_.size(); i++)
-	{
-		delete rss_feeds_.at(i);
-	}
+    clearDatas(list_data_);
+    for (int i = 0; i < rss_feeds_.size(); i++)
+    {
+            delete rss_feeds_.at(i);
+    }
     rss_feeds_.clear();
 
     QDir myDir(MyConf::getStoreDir());
@@ -223,53 +223,53 @@ void RssReaderView::onRemoveFeed(int i)
 
 bool RssReaderView::loadFeedList()
 {
-	CRSSFeedInfo* newFeedInfo;
-	
-	QSettings settings(AppDir.absoluteFilePath(CONFIGFILE), QSettings::IniFormat, this);
-    settings.setIniCodec("UTF-8");
-	QStringList groups = settings.childGroups();
-	
-	if (groups.length()==0)
-	{
-		qDebug() << "Error reading config file";
-		return false;
-	}
-	
-	QStringListIterator groupsI(groups);
-	while (groupsI.hasNext())
-	{
-		newFeedInfo=new CRSSFeedInfo();
-		newFeedInfo->Load(&settings, groupsI.next());
+    CRSSFeedInfo* newFeedInfo;
 
-        //for special use
-        //if (newFeedInfo->Title.compare("Elisan Asiakastiedotteet", Qt::CaseInsensitive) == 0)
-        //{
-        //    newFeedInfo->Selected = true;
-        //    rss_feeds_.push_front(newFeedInfo);
-        //}
-        //else
-        //{
-        rss_feeds_.push_back(newFeedInfo);
-        //}
-	}
-	
-	return true;
+    QSettings settings(AppDir.absoluteFilePath(CONFIGFILE), QSettings::IniFormat, this);
+    settings.setIniCodec("UTF-8");
+    QStringList groups = settings.childGroups();
+
+    if (groups.length()==0)
+    {
+            qDebug() << "Error reading config file";
+            return false;
+    }
+
+    QStringListIterator groupsI(groups);
+    while (groupsI.hasNext())
+    {
+            newFeedInfo=new CRSSFeedInfo();
+            newFeedInfo->Load(&settings, groupsI.next());
+
+    //for special use
+    //if (newFeedInfo->Title.compare("Elisan Asiakastiedotteet", Qt::CaseInsensitive) == 0)
+    //{
+    //    newFeedInfo->Selected = true;
+    //    rss_feeds_.push_front(newFeedInfo);
+    //}
+    //else
+    //{
+    rss_feeds_.push_back(newFeedInfo);
+    //}
+    }
+
+    return true;
 }
 
 void RssReaderView::saveFeedList()
 {
-	//-- Save the settings if this doesn't work, no problem
+    //-- Save the settings if this doesn't work, no problem
     //TODO
     QFile::remove(AppDir.absoluteFilePath(CONFIGFILE));
 
-	QSettings settings(AppDir.absoluteFilePath(CONFIGFILE), QSettings::IniFormat, this);
+    QSettings settings(AppDir.absoluteFilePath(CONFIGFILE), QSettings::IniFormat, this);
     settings.setIniCodec("UTF-8");
 
-	for (int i = 0; i < rss_feeds_.size(); i++)
-	{
-		rss_feeds_.at(i)->Save(&settings);
-	}
-	settings.sync();
+    for (int i = 0; i < rss_feeds_.size(); i++)
+    {
+            rss_feeds_.at(i)->Save(&settings);
+    }
+    settings.sync();
 }
 
 void RssReaderView::onStatus(CRSSFeedInfo feed, CStatus status)
@@ -284,18 +284,18 @@ void RssReaderView::onStatus(CRSSFeedInfo feed, CStatus status)
 void RssReaderView::setStatus(OData * dd, const CStatus & status)
 {
     CRSSFeedInfo* feedInfo = (CRSSFeedInfo *) dd->value(TAG_POINTER).toInt();
-	//-- Update the count properties of the FeedInfo if these have been transmitted with the status update
-	if (status.GetFlags() & CStatus::sfCountUpdate)
-	{
-		feedInfo->NewItems=status.GetNewItems();
-		feedInfo->ItemCount=status.GetItemCount();
+    //-- Update the count properties of the FeedInfo if these have been transmitted with the status update
+    if (status.GetFlags() & CStatus::sfCountUpdate)
+    {
+            feedInfo->NewItems=status.GetNewItems();
+            feedInfo->ItemCount=status.GetItemCount();
 
-        dd->insert(RssView::TAG_NEW_ITEMS, status.GetNewItems());
-        dd->insert(RssView::TAG_ALL_ITEMS, status.GetItemCount());
-	}
+    dd->insert(RssView::TAG_NEW_ITEMS, status.GetNewItems());
+    dd->insert(RssView::TAG_ALL_ITEMS, status.GetItemCount());
+    }
 
-	//-- If this is the finished-message, set the last-updated timestamp
-	if (status.GetFlags() & CStatus::sfFinished)
+    //-- If this is the finished-message, set the last-updated timestamp
+    if (status.GetFlags() & CStatus::sfFinished)
     {
         feedInfo->LastUpdateTimestamp=QDateTime::currentDateTime().toTimeSpec(Qt::UTC);	//All times are handled in UTC!
         dd->insert(RssView::TAG_UPDATE_TIME, QDateTime::currentDateTime());
@@ -307,32 +307,32 @@ void RssReaderView::setStatus(OData * dd, const CStatus & status)
 
 void RssReaderView::onDone()
 {
-	if (CancelWindow)
-	{
-		CancelWindow->hide();
-		delete CancelWindow;
-		CancelWindow=0;
-	}
-
-	if (ExitOnDone)
+    if (CancelWindow)
     {
-		close(true);
+            CancelWindow->hide();
+            delete CancelWindow;
+            CancelWindow=0;
     }
-	else
+
+    if (ExitOnDone)
     {
-		saveFeedList();
+        close(true);
+    }
+    else
+    {
+        saveFeedList();
     }
 }
 
 void RssReaderView::onStartUpdate()
 {
-	//-- Only start downloading if it is not already running
-	if (!Loader->IsBusy())
-	{
-		//-- Reset the exit on done flag if it is already set
-		ExitOnDone=false;
+    //-- Only start downloading if it is not already running
+    if (!Loader->IsBusy())
+    {
+        //-- Reset the exit on done flag if it is already set
+        ExitOnDone=false;
 
-		startWifi();
+        startWifi();
 
         for (int i = 0; i < rss_feeds_.size(); i++)
         {
@@ -346,7 +346,7 @@ void RssReaderView::onStartUpdate()
                 dd->insert(RssView::TAG_UPDATE_TIME, QDateTime());
             }
         }
-	}
+    }
 
     list_view_.update();
 }
@@ -365,7 +365,7 @@ void RssReaderView::onSettings()
 
 void RssReaderView::enqueueListItem(const CRSSFeedInfo & feedInfo)
 {
-	emit sendUpdateFeed(feedInfo);
+    emit sendUpdateFeed(feedInfo);
 }
 
 void RssReaderView::startWifi()
@@ -375,8 +375,8 @@ void RssReaderView::startWifi()
 
 void RssReaderView::closeEvent(QCloseEvent* event)
 {
-	saveFeedList();
-	event->accept();
+    saveFeedList();
+    event->accept();
 }
 
 void RssReaderView::loadSettings()
@@ -445,8 +445,8 @@ void RssReaderView::createListView()
     list_data_.clear();
 
     ODatas   selected_data;
-	for (int i = 0; i < rss_feeds_.size(); i++)
-	{
+    for (int i = 0; i < rss_feeds_.size(); i++)
+    {
         CRSSFeedInfo * info = rss_feeds_.at(i);
 
         OData *dd = new OData;
@@ -465,7 +465,7 @@ void RssReaderView::createListView()
         {
             selected_data.push_back(dd);
         }
-	}
+    }
 
     list_view_.setSpacing(2);
     list_view_.setData(selected_data);
@@ -542,7 +542,7 @@ void RssReaderView::close(bool)
 {
     hide();
     saveSettings();
-	saveFeedList();
+    saveFeedList();
 
     qApp->exit();
 }
@@ -585,24 +585,26 @@ void RssReaderView::keyReleaseEvent(QKeyEvent *ke)
 
 void RssReaderView::ExitApp(bool exitOnDone)
 {
-	if (Loader->IsBusy())
-	{
-		cancelLoader(exitOnDone);
-		ExitOnDone=exitOnDone;
-	}
-	else
-		close(true);
+    if (Loader->IsBusy())
+    {
+        cancelLoader(exitOnDone);
+        ExitOnDone=exitOnDone;
+    }
+    else
+    {
+        close(true);
+    }
 }
 
 void RssReaderView::cancelLoader(bool showExit)
 {
-  //-- If the loader is already running or we're already canceling
-  if (Loader->IsBusy()&&(!Loader->Cancel)) //&&(CancelWindow==NULL))
-  {
-    Loader->Cancel=true;
-    CancelWindow=new CCancelWindow(this, (showExit?tr("Exiting, please wait..."):tr("Canceling, please wait...")));
-    CancelWindow->show();
-  }
+    //-- If the loader is already running or we're already canceling
+    if (Loader->IsBusy()&&(!Loader->Cancel)) //&&(CancelWindow==NULL))
+    {
+        Loader->Cancel=true;
+        CancelWindow=new CCancelWindow(this, (showExit?tr("Exiting, please wait..."):tr("Canceling, please wait...")));
+        CancelWindow->show();
+    }
 }
 
 bool RssReaderView::event(QEvent * event)
@@ -705,13 +707,13 @@ void RssReaderView::onItemActivated(CatalogView *catalog,
 
 bool RssReaderView::openInBrowser(const QString & str)
 {
-	CFeedStore feedStore;
-	
-	QUrl feedURL(str);
-	
-	if (feedStore.Initialize(feedURL)==CFeedStore::ssSucceeded)
+    CFeedStore feedStore;
+
+    QUrl feedURL(str);
+
+    if (feedStore.Initialize(feedURL)==CFeedStore::ssSucceeded)
     {
-		return QDesktopServices::openUrl(feedStore.GetLocalFileUrl("index.html"));
+        return QDesktopServices::openUrl(feedStore.GetLocalFileUrl("index.html"));
     }
     return false;
 }
@@ -791,7 +793,6 @@ NotifyDialog::NotifyDialog(QWidget *parent)
 
 NotifyDialog::~NotifyDialog (void)
 {
-
 }
 
 }

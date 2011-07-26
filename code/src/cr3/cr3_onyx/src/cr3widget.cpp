@@ -1123,7 +1123,7 @@ void CR3View::collectTTSContent()
 {
     text_to_speak_.clear();
     tts_paragraph_index_ = 0;
-    QString text_tmp = cr2qt( _docview->getPageText(true) );
+    QString text_tmp = cr2qt( _docview->getAllPageText() );
     text_to_speak_.push_back(text_tmp);
 }
 

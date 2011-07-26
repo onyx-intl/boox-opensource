@@ -1947,7 +1947,7 @@ LVRef<ldomXRange> LVDocView::getPageDocumentRange(int pageIndex) {
 	LVLock lock(getMutex());
 	checkRender();
 	LVRef < ldomXRange > res(NULL);
-	if (isScrollMode()) {
+        if (isScrollMode()) {
 		// SCROLL mode
 		int starty = _pos;
 		int endy = _pos + m_dy;
@@ -1977,14 +1977,44 @@ LVRef<ldomXRange> LVDocView::getPageDocumentRange(int pageIndex) {
 	return res;
 }
 
+LVRef<ldomXRange> LVDocView::getScrollPageDocumentRange(int pageIndex) {
+        LVLock lock(getMutex());
+        checkRender();
+        LVRef < ldomXRange > res(NULL);
+
+        // SCROLL mode
+        int starty = _pos;
+        int endy = _pos + m_dy;
+        int fh = GetFullHeight();
+        if (endy >= fh)
+                endy = fh - 1;
+        ldomXPointer start = m_doc->createXPointer(lvPoint(0, starty));
+        ldomXPointer end = m_doc->createXPointer(lvPoint(0, endy));
+        if (start.isNull() || end.isNull())
+                return res;
+        res = LVRef<ldomXRange> (new ldomXRange(start, end));
+
+        return res;
+}
+
 /// get page text, -1 for current page
 lString16 LVDocView::getPageText(bool, int pageIndex) {
 	LVLock lock(getMutex());
 	checkRender();
 	lString16 txt;
 	LVRef < ldomXRange > range = getPageDocumentRange(pageIndex);
-	txt = range->getRangeText();
+        txt = range->getRangeText();
 	return txt;
+}
+
+lString16 LVDocView::getAllPageText(int pageIndex)
+{
+    LVLock lock(getMutex());
+    checkRender();
+    lString16 txt;
+    LVRef < ldomXRange > range = getScrollPageDocumentRange(pageIndex);
+    txt = range->getRangeText();
+    return txt;
 }
 
 void LVDocView::setRenderProps(int dx, int dy) {
