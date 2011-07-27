@@ -47,8 +47,6 @@ static void replaceColor( char * str, lUInt32 color )
 
 CR3View::CR3View( QWidget *parent)
         : QWidget( parent, Qt::WindowFlags() ), _scroll(NULL), _propsCallback(NULL)
-        , _normalCursor(Qt::ArrowCursor), _linkCursor(Qt::PointingHandCursor)
-        , _selCursor(Qt::IBeamCursor), _waitCursor(Qt::WaitCursor)
         , _selecting(false), _selected(false), _editMode(false)
         , selectWordPoint(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
@@ -292,26 +290,6 @@ void CR3View::paintEvent ( QPaintEvent * event )
         painter.drawImage( rc, img );
     }
     if ( _editMode ) {
-        // draw caret
-        lvRect cursorRc;
-        if ( _docview->getCursorRect( cursorRc, false ) ) {
-            if ( cursorRc.left<0 )
-                cursorRc.left = 0;
-            if ( cursorRc.top<0 )
-                cursorRc.top = 0;
-            if ( cursorRc.right>dx )
-                cursorRc.right = dx;
-            if ( cursorRc.bottom > dy )
-                cursorRc.bottom = dy;
-            if ( !cursorRc.isEmpty() ) {
-                painter.setPen(QColor(255,255,255));
-                painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
-                //QPainter::RasterOp_SourceXorDestination;
-                //QPainter::CompositionMode_Xor;
-                //painter.setBrush(
-                painter.drawRect( cursorRc.left, cursorRc.top, cursorRc.width(), cursorRc.height() );
-            }
-        }
     }
     if(hasBookmark())
     {
@@ -644,18 +622,10 @@ void CR3View::mouseMoveEvent ( QMouseEvent * event )
     if ( !p.isNull() ) {
         path = p.toString();
         href = p.getHRef();
-        if ( _editMode && _selecting )
-            _docview->setCursorPos( p );
         updateSelection(p);
     } else {
         //CRLog::trace("Node not found for %d, %d", event->x(), event->y());
     }
-    if ( _selecting )
-        setCursor( _selCursor );
-    else if ( href.empty() )
-        setCursor( _normalCursor );
-    else
-        setCursor( _linkCursor );
     //CRLog::trace("mouseMoveEvent - doc pos (%d,%d), buttons: %d %d %d %s", pt.x, pt.y, (int)left, (int)right
     //             , (int)mid, href.empty()?"":UnicodeToUtf8(href).c_str()
     //             //, path.empty()?"":UnicodeToUtf8(path).c_str()
@@ -748,8 +718,6 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
     if ( href.empty() ) {
         //CRLog::trace("No href pressed" );
         if ( !p.isNull() && left ) {
-            if ( _editMode )
-                _docview->setCursorPos( p );
             startSelection(p);
         }
     } else {
@@ -775,8 +743,6 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     if ( !p.isNull() ) {
         path = p.toString();
         href = p.getHRef();
-        if ( _editMode )
-            _docview->setCursorPos( p );
     }
     if ( _selecting )
         endSelection(p);
@@ -891,32 +857,27 @@ void CR3View::OnLoadFileFormatDetected( doc_format_t fileFormat )
 /// on starting file loading
 void CR3View::OnLoadFileStart( lString16 filename )
 {
-    setCursor( _waitCursor );
 }
 
 /// file load finiished with error
 void CR3View::OnLoadFileError( lString16 message )
 {
-    setCursor( _normalCursor );
 }
 
 /// file loading is finished successfully - drawCoveTo() may be called there
 void CR3View::OnLoadFileEnd()
 {
-    setCursor( _normalCursor );
     emit updateProgress(_docview->getCurPage()+1, _docview->getPageCount());
 }
 
 /// document formatting started
 void CR3View::OnFormatStart()
 {
-    setCursor( _waitCursor );
 }
 
 /// document formatting finished
 void CR3View::OnFormatEnd()
 {
-    setCursor( _normalCursor );
 }
 
 /// set bookmarks dir

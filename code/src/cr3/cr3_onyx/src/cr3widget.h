@@ -213,10 +213,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         QScrollBar * _scroll;
         PropsChangeCallback * _propsCallback;
         QStringList _hyphDicts;
-        QCursor _normalCursor;
-        QCursor _linkCursor;
-        QCursor _selCursor;
-        QCursor _waitCursor;
+
         bool _selecting;
         bool _selected;
         ldomXPointer _selStart;
