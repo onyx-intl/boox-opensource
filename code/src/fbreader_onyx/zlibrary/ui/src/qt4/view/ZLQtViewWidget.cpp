@@ -306,6 +306,9 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
         ptr->selectionModel().clear();
         myHolder.hyperlink_selected_ = false;    
         myHolder.view()->openInternalLink(now.x(), now.y());
+        this->repaint();
+        onyx::screen::instance().updateWidget(myHolder.widget(),
+                        onyx::screen::ScreenProxy::GC);
     }
     else if (myHolder.isTextSelectionEnabled())
     {
