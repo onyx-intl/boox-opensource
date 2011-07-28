@@ -129,7 +129,6 @@ RssReaderView::RssReaderView(QWidget *parent)
     QDesktopServices::setUrlHandler("https", this, "OnOpenUrl");
 #endif
 
-    connectToNetwork();
 }
 
 RssReaderView::~RssReaderView()

@@ -5,6 +5,7 @@
 #include "onyx/ui/menu.h"
 #include "onyx/ui/ui_global.h"
 #include "onyx/ui/ui_utils.h"
+#include "onyx/screen/screen_update_watcher.h"
 
 namespace rss_reader
 {
@@ -28,7 +29,7 @@ RssFeedDialog::RssFeedDialog(const QString & str, QWidget *parent)
 , label_feed_url_(this)
 , edit_feed_title_(this)
 , edit_feed_url_(this)
-, keyboard_(0)
+, keyboard_(this)
 , input_title_(true)
 {
     createLayout();
@@ -45,6 +46,7 @@ RssFeedDialog::RssFeedDialog(const QString & str, QWidget *parent)
     button(QMessageBox::Yes)->installEventFilter(this);
     button(QMessageBox::No)->installEventFilter(this);
     //keyboard_.installEventFilter(this);
+    onyx::screen::watcher().addWatcher(&keyboard_);
 
     setFocusPolicy(Qt::NoFocus);
     connect(&keyboard_, SIGNAL(toLoseFocus()), button(QMessageBox::Yes), SLOT(setFocus()));
@@ -244,7 +246,9 @@ void RssFeedDialog::keyPressEvent(QKeyEvent * ke)
     {
         return;
     }
-    else if (ke->key() == Qt::Key_Shift || ke->key() == Qt::Key_CapsLock)
+    else if (ke->key() == Qt::Key_Shift ||
+             ke->key() == Qt::Key_CapsLock ||
+             ke->key() == Qt::Key_F23 )
     {
         return;
     }
@@ -278,7 +282,6 @@ void RssFeedDialog::keyPressEvent(QKeyEvent * ke)
 
     onyx::screen::instance().enableUpdate(true);
 
-    //if (update_whole_widget_)
     if (0)
     {
         onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU);
@@ -317,17 +320,13 @@ void RssFeedDialog::mouseReleaseEvent(QMouseEvent *me)
 
 void RssFeedDialog::resizeEvent(QResizeEvent *e)
 {
-    //getInfoLabel().setStyleSheet("QLabel{font:20px}");
     OnyxDialog::resizeEvent(e);
     setFixedWidth(580);
 }
 
 int RssFeedDialog::popup()
 {
-
-    //centerWidgetOnScreen(this);
-
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, false, onyx::screen::ScreenCommand::WAIT_ALL);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
     int ret = exec();
 
     return ret;

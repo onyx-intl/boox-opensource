@@ -245,7 +245,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
         {
             RssFeedDialog dialog(tr("Add Feed"), this);
             int ret = dialog.popup();
-            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GC);
 
             if (ret == QDialog::Accepted && !dialog.title().isEmpty() && !dialog.url().isEmpty())
             {
