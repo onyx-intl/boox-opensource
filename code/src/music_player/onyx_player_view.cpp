@@ -271,7 +271,7 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    dd->insert(TAG_COVER, play_pixmap_);
+    dd->insert(TAG_COVER, pause_pixmap_);
     dd->insert(TAG_MENU_TYPE, MENU_PLAY);
     menu_view_datas_.push_back(dd);
 
@@ -691,7 +691,7 @@ void OnyxPlayerView::setPlayPauseIcon()
     OData * data = play_pause->data();
     if (data && data->contains(TAG_COVER))
     {
-        data->insert(TAG_COVER, paused_? pause_pixmap_: play_pixmap_);
+        data->insert(TAG_COVER, paused_? play_pixmap_ : pause_pixmap_);
     }
     menu_view_.update();
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
