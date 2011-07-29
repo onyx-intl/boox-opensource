@@ -286,11 +286,11 @@ void RssReaderView::setStatus(OData * dd, const CStatus & status)
     //-- Update the count properties of the FeedInfo if these have been transmitted with the status update
     if (status.GetFlags() & CStatus::sfCountUpdate)
     {
-            feedInfo->NewItems=status.GetNewItems();
-            feedInfo->ItemCount=status.GetItemCount();
+        feedInfo->NewItems=status.GetNewItems();
+        feedInfo->ItemCount=status.GetItemCount();
 
-    dd->insert(RssView::TAG_NEW_ITEMS, status.GetNewItems());
-    dd->insert(RssView::TAG_ALL_ITEMS, status.GetItemCount());
+        dd->insert(RssView::TAG_NEW_ITEMS, status.GetNewItems());
+        dd->insert(RssView::TAG_ALL_ITEMS, status.GetItemCount());
     }
 
     //-- If this is the finished-message, set the last-updated timestamp
