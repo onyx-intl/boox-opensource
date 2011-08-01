@@ -55,8 +55,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     QString iniFile2 = homeDir + "cr3.ini";
     QString cssFile = homeDir + "fb2.css";
     QString cssFile2 = exeDir + "fb2.css";
-    //QString translations = exeDir + "i18n";
-    //CRLog::info("Translations directory: %s", LCSTR(qt2cr(translations)) );
+
     QString hyphDir = exeDir + "hyph" + QDir::separator();
     ldomDocCache::init( qt2cr( cacheDir ), DOC_CACHE_SIZE );
     view_->setPropsChangeCallback( this );
@@ -83,18 +82,6 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     }
 
     view_->loadDocument(_filenameToOpen);
-
-
-//     QTranslator qtTranslator;
-//     if (qtTranslator.load("qt_" + QLocale::system().name(),
-//             QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-//        QApplication::installTranslator(&qtTranslator);
-//
-//     QTranslator myappTranslator;
-//     QString trname = "cr3_" + QLocale::system().name();
-//     CRLog::info("Using translation file %s from dir %s", UnicodeToUtf8(qt2cr(trname)).c_str(), UnicodeToUtf8(qt2cr(translations)).c_str() );
-//     if ( myappTranslator.load(trname, translations) )
-//         QApplication::installTranslator(&myappTranslator);
 
     select_font = currentFont();
     font_family_actions_.loadExternalFonts();
@@ -231,10 +218,6 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              return;
          }
      case Qt::Key_Return:
-         {
-             //gotoPage();
-             //ldomXPointer p=view_->getDocView()->getPageBookmark(view_->getDocView()->getCurPage());
-         }
          break;
      case Qt::Key_Menu:
          {

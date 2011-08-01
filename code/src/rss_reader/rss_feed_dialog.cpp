@@ -45,7 +45,6 @@ RssFeedDialog::RssFeedDialog(const QString & str, QWidget *parent)
     edit_feed_url_.installEventFilter(this);
     button(QMessageBox::Yes)->installEventFilter(this);
     button(QMessageBox::No)->installEventFilter(this);
-    //keyboard_.installEventFilter(this);
     onyx::screen::watcher().addWatcher(&keyboard_);
 
     setFocusPolicy(Qt::NoFocus);
@@ -59,14 +58,11 @@ void RssFeedDialog::createLayout(void)
     setFixedWidth(580);
     
     getInfoLabel().setVisible(false);
-    //getTitleLabel().setVisible(false);
 
     getInfoLayout().setContentsMargins(0,0,0,0);
     h_layout_title_.setContentsMargins(0,0,10,0);
     h_layout_url_.setContentsMargins(0,0,10,0);
 
-    // showCloseLabel(false);
-    // showCloseButton(false);
     button(QMessageBox::Yes)->setText(tr("OK"));
     button(QMessageBox::No)->setText(tr("Cancel"));
     button(QMessageBox::Yes)->adjustSize();
@@ -89,14 +85,11 @@ void RssFeedDialog::createLayout(void)
     getInfoLayout().insertLayout(2, title_url_layout);
 
     getContentLayout().addWidget(&keyboard_);
-    //keyboard_.attachReceiver(this);
 
-    //getTitleLabel().setFixedWidth(width() - 10);
     getInfoLabel().setFixedWidth(width() - 10);
 
     label_feed_title_.setStyleSheet(MY_MESSAGE_STYLE);
     label_feed_url_.setStyleSheet(MY_MESSAGE_STYLE);
-    //getTitleLabel().setStyleSheet(MY_MESSAGE_STYLE);
     getInfoLabel().setStyleSheet("QLabel{font:20px}");
 
     label_feed_title_.setText(tr("Title"));
@@ -217,23 +210,6 @@ bool RssFeedDialog::eventFilter(QObject *obj, QEvent *event)
                  return true;
              }
          }
-/*
-         else if (obj == &keyboard_)
-         {
-             if (key_event->key() == Qt::Key_Down ||
-                 key_event->key() == Qt::Key_Up ||
-                 key_event->key() == Qt::Key_Left ||
-                 key_event->key() == Qt::Key_Right)
-             {
-                 wnd = ui::moveFocus(this, key_event->key());
-                 if (wnd)
-                 {
-                     wnd->setFocus();
-                 }
-                 return true;
-             }
-        }
-*/
      }
      // standard event processing
      return QObject::eventFilter(obj, event);
