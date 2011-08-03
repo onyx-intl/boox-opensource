@@ -312,12 +312,32 @@ void OnyxPlayerView::connectWithChildren()
 
 void OnyxPlayerView::keyReleaseEvent(QKeyEvent * ke)
 {
-    if (ke->key() == Qt::Key_Escape)
+    int key = ke->key();
+    if (key == Qt::Key_Escape)
     {
         minimize(true);
         ke->accept();
         return;
     }
+    else if (key == Qt::Key_MediaPlay)
+    {
+        onPlayPauseClicked(true);
+        ke->accept();
+        return;
+    }
+    else if (key == Qt::Key_MediaPrevious)
+    {
+        onPrevClicked(true);
+        ke->accept();
+        return;
+    }
+    else if (key == Qt::Key_MediaNext)
+    {
+        onNextClicked(true);
+        ke->accept();
+        return;
+    }
+
     OnyxDialog::keyReleaseEvent(ke);
 }
 
