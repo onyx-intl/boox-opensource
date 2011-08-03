@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
         //fontDirs.add( lString16(L"/mnt/fonts") );
         fontDirs.add( lString16(L"/usr/share/fonts/truetype") );
         fontDirs.add( lString16(L"/opt/onyx/arm/lib/fonts") );
+        fontDirs.add( lString16(L"/app/fonts") );
 #if 0
         fontDirs.add( exefontpath );
         fontDirs.add( lString16(L"/usr/share/fonts/truetype") );
