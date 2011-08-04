@@ -725,7 +725,10 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
         if ( left ) {
             // link is pressed
             if ( _docview->goLink( href ) )
+            {
                 update();
+                emit requestUpdateAll();
+            }
         }
     }
     //CRLog::debug("mousePressEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
