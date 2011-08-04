@@ -43,6 +43,7 @@ public:
 
 	bool readDocument(shared_ptr<ZLInputStream> stream);
 	bool readDocument(const std::string &fileName);
+	bool readDocument(const std::string &fileName, const std::string &aesKey);
 
 	void initialize(const char *encoding = 0);
 	void shutdown();

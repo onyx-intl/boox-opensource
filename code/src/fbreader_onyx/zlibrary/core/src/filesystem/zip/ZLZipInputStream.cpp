@@ -24,7 +24,12 @@
 #include "ZLZDecompressor.h"
 #include "../ZLFSManager.h"
 
-ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> &base, const std::string &entryName) : myBaseStream(new ZLInputStreamDecorator(base)), myEntryName(entryName), myUncompressedSize(0) {
+ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> &base,
+        const std::string &entryName)
+    : myBaseStream(new ZLInputStreamDecorator(base))
+    , myEntryName(entryName)
+    , myUncompressedSize(0)
+{
 }
 
 ZLZipInputStream::~ZLZipInputStream() {
@@ -111,4 +116,14 @@ size_t ZLZipInputStream::offset() const {
 size_t ZLZipInputStream::sizeOfOpened() {
 	// TODO: implement for files with Flags & 0x08
 	return myUncompressedSize;
+}
+
+void ZLZipInputStream::setAESKey(const std::string &aesKey)
+{
+    this->aesKey = aesKey;
+}
+
+std::string ZLZipInputStream::getAESKey() const
+{
+    return aesKey;
 }

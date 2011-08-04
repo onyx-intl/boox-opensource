@@ -91,7 +91,8 @@ bool OEBPlugin::readModel(const BookDescription &description, BookModel &model) 
 		"inputStreamLock",
 		shared_ptr<ZLUserData>(new InputStreamLock(ZLFile(description.fileName()).inputStream()))
 	);
-	return OEBBookReader(model).readBook(opfFileName(description.fileName()));
+	return OEBBookReader(model).readBook(description.fileName(),
+	        opfFileName(description.fileName()));
 }
 
 const std::string &OEBPlugin::iconName() const {

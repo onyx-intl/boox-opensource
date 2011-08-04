@@ -31,7 +31,8 @@
 
 std::map<std::string,weak_ptr<ZLInputStream> > ZLFile::ourPlainStreamCache;
 
-ZLFile::ZLFile(const std::string &path) : myPath(path), myInfoIsFilled(false) {
+ZLFile::ZLFile(const std::string &path, const std::string &aesKey)
+  : myPath(path), aesKey(aesKey), myInfoIsFilled(false) {
 	ZLFSManager::instance().normalize(myPath);
 	{
 		size_t index = ZLFSManager::instance().findLastFileNameDelimiter(myPath);
@@ -110,7 +111,14 @@ shared_ptr<ZLInputStream> ZLFile::inputStream() const {
 		shared_ptr<ZLInputStream> base = baseFile.inputStream();
 		if (base) {
 			if (baseFile.myArchiveType & ZIP) {
-                          stream.reset(new ZLZipInputStream(base, myPath.substr(index + 1)));
+			    ZLZipInputStream *zipInputStream = new ZLZipInputStream(base,
+			            myPath.substr(index + 1));
+			    if (!ZLStringUtil::stringEndsWith(myPath.substr(index + 1),
+			            "cover.html"))
+			    {
+			        zipInputStream->setAESKey(aesKey);
+			    }
+			    stream.reset(zipInputStream);
 			} else if (baseFile.myArchiveType & TAR) {
                           stream.reset(new ZLTarInputStream(base, myPath.substr(index + 1)));
 			}

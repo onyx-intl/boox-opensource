@@ -23,9 +23,12 @@
 
 #include "../ZLInputStream.h"
 #include "ZLZDecompressor.h"
+#include <openssl/aes.h>
 
 const size_t IN_BUFFER_SIZE = 2048;
 const size_t OUT_BUFFER_SIZE = 32768;
+
+static const size_t AES_KEY_LENGTH_BITS = 128;
 
 ZLZDecompressor::ZLZDecompressor(size_t size) : myAvailableSize(size) {
 	myZStream = new z_stream;
@@ -50,6 +53,24 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer, size_t m
 
 		myZStream->next_in = (Bytef*)myInBuffer;
 		myZStream->avail_in = stream.read(myInBuffer, size);
+
+		// decrypt myInBuffer if aesKey is not empty
+		std::string aesKey = stream.getAESKey();
+		if (!aesKey.empty())
+		{
+		    AES_KEY aeskeyDec;
+		    unsigned char *keyItself = (unsigned char *)aesKey.data();
+		    AES_set_decrypt_key(keyItself, AES_KEY_LENGTH_BITS,
+		            &aeskeyDec);
+
+		    unsigned char decryptedBuffer[IN_BUFFER_SIZE];
+		    AES_decrypt((unsigned char *)myInBuffer, decryptedBuffer, &aeskeyDec);
+
+		    memcpy(myInBuffer, decryptedBuffer, IN_BUFFER_SIZE);
+
+		    // TODO (Jim): here needs debugging.
+		}
+
 		if (myZStream->avail_in == size) {
 			myAvailableSize -= size;
 		} else {
