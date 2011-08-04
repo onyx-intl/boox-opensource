@@ -122,6 +122,7 @@ RssReaderView::RssReaderView(QWidget *parent)
     Loader->start();
 
     connectWithChildren();
+    onyx::screen::watcher().addWatcher(this);
 
 #ifdef BUILD_FOR_ARM
     QDesktopServices::setUrlHandler("file", this, "OnOpenUrl");
@@ -151,13 +152,13 @@ void RssReaderView::updateOnStart()
 
 void RssReaderView::OnOpenUrl(QUrl url)
 {
-    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, true, onyx::screen::ScreenCommand::WAIT_ALL);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_ALL);
 
     sys::SysStatus::instance().setSystemBusy(true);
     QProcess::execute(QString("web_browser \"")+url.toString()+"\"");
     sys::SysStatus::instance().setSystemBusy(false);
 
-    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_ALL);
 }
 
 void RssReaderView::onReloadFeedList()
@@ -614,7 +615,7 @@ bool RssReaderView::event(QEvent * event)
     {
         static int count = 0;
         qDebug("Update request %d", ++count);
-        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW);
         event->accept();
         return true;
     }

@@ -45,6 +45,7 @@ SettingsView::SettingsView(QWidget *parent, QVector<CRSSFeedInfo * > & rss)
             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
     connect(&list_view_,SIGNAL(itemActivated(CatalogView *, ContentView *, int)),
             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
+    onyx::screen::watcher().addWatcher(this);
 }
 
 SettingsView::~SettingsView()
@@ -245,7 +246,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
         {
             RssFeedDialog dialog(tr("Add Feed"), this);
             int ret = dialog.popup();
-            onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GC);
+            onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC, onyx::screen::ScreenCommand::WAIT_ALL);
 
             if (ret == QDialog::Accepted && !dialog.title().isEmpty() && !dialog.url().isEmpty())
             {
@@ -274,7 +275,7 @@ bool SettingsView::event(QEvent* event)
 
     if (event->type() == QEvent::UpdateRequest)
     {
-        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW);
     }
     return ret;
 }
