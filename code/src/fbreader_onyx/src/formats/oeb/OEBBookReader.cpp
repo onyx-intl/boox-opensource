@@ -133,7 +133,7 @@ std::string OEBBookReader::keyFileName(const std::string &oebFileName) const
     oebFile.forceArchiveType(ZLFile::ZIP);
     shared_ptr<ZLDir> zipDir = oebFile.directory(false);
     if (!zipDir) {
-        return false;
+        return std::string();
     }
 
     std::string keyName("");
