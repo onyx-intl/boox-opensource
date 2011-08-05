@@ -77,7 +77,8 @@ bool ZLZipInputStream::open() {
 size_t ZLZipInputStream::read(char *buffer, size_t maxSize) {
 	size_t realSize = 0;
 	if (myIsDeflated) {
-		realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize);
+		realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize,
+		        getAESKey());
 		myOffset += realSize;
 	} else {
 		realSize = myBaseStream->read(buffer, std::min(maxSize, myAvailableSize));
@@ -121,9 +122,4 @@ size_t ZLZipInputStream::sizeOfOpened() {
 void ZLZipInputStream::setAESKey(const std::string &aesKey)
 {
     this->aesKey = aesKey;
-}
-
-std::string ZLZipInputStream::getAESKey() const
-{
-    return aesKey;
 }

@@ -32,7 +32,11 @@ public:
 	ZLZDecompressor(size_t size);
 	~ZLZDecompressor();
 
-	size_t decompress(ZLInputStream &stream, char *buffer, size_t maxSize);
+	size_t decompress(ZLInputStream &stream, char *buffer, size_t maxSize,
+	        const std::string &aesKey = std::string());
+
+private:
+	void uncompress(Byte *compr, uLong comprLen, Byte *uncompr, uLong uncomprLen);
 
 private:
 	z_stream *myZStream;

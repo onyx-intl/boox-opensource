@@ -40,12 +40,17 @@ public:
 	virtual size_t offset() const = 0;
 	virtual size_t sizeOfOpened() = 0;
 
-	virtual std::string getAESKey() const;
+	virtual void setAESKey(const std::string &aesKey);
+	std::string getAESKey() const;
+
+protected:
+    std::string aesKey;
 
 private:
 	// disable copying
 	ZLInputStream(const ZLInputStream&);
 	const ZLInputStream &operator = (const ZLInputStream&);
+
 };
 
 class ZLInputStreamDecorator : public ZLInputStream {
@@ -70,6 +75,8 @@ private:
 inline ZLInputStream::ZLInputStream() {}
 inline ZLInputStream::~ZLInputStream() {}
 
-inline std::string ZLInputStream::getAESKey() const { return std::string(); }
+inline void ZLInputStream::setAESKey(const std::string &aesKey)
+    {  this->aesKey = aesKey; }
+inline std::string ZLInputStream::getAESKey() const { return this->aesKey; }
 
 #endif /* __ZLINPUTSTREAM_H__ */

@@ -18,12 +18,26 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
+#include "zlib.h"
+#include <stdio.h>
 
 #include <algorithm>
 
 #include "../ZLInputStream.h"
 #include "ZLZDecompressor.h"
 #include <openssl/aes.h>
+#include <openssl/evp.h>
+
+#include <QByteArray>
+#include <QDebug>
+
+#define CHECK_ERR(err, msg) { \
+    if (err != Z_OK) { \
+        fprintf(stderr, "%s error: %d\n", msg, err); \
+        exit(1); \
+    } \
+}
 
 const size_t IN_BUFFER_SIZE = 2048;
 const size_t OUT_BUFFER_SIZE = 32768;
@@ -47,29 +61,57 @@ ZLZDecompressor::~ZLZDecompressor() {
 	delete myZStream;
 }
 
-size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer, size_t maxSize) {
+unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len)
+{
+    int p_len = *len, f_len = 0;
+    unsigned char *plaintext = (unsigned char *)malloc(p_len);
+
+    EVP_DecryptInit_ex(e, NULL, NULL, NULL, NULL);
+    EVP_DecryptUpdate(e, plaintext, &p_len, ciphertext, *len);
+    EVP_DecryptFinal_ex(e, plaintext + p_len, &f_len);
+
+    *len = p_len + f_len;
+    return plaintext;
+}
+
+void ZLZDecompressor::uncompress(Byte *compr, uLong comprLen, Byte *uncompr,
+        uLong uncomprLen)
+{
+    int err;
+    z_stream d_stream; /* decompression stream */
+
+    strcpy((char*)uncompr, "garbage");
+
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+
+    d_stream.next_in  = compr;
+    d_stream.avail_in = 0;
+    d_stream.next_out = uncompr;
+
+    err = inflateInit(&d_stream);
+    CHECK_ERR(err, "inflateInit");
+
+    while (d_stream.total_out < uncomprLen && d_stream.total_in < comprLen) {
+        d_stream.avail_in = d_stream.avail_out = 1; /* force small buffers */
+        err = inflate(&d_stream, Z_NO_FLUSH);
+        if (err == Z_STREAM_END) break;
+        CHECK_ERR(err, "inflate");
+    }
+
+    err = inflateEnd(&d_stream);
+    CHECK_ERR(err, "inflateEnd");
+
+}
+
+size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
+        size_t maxSize, const std::string &aesKey) {
 	while ((myBuffer.length() < maxSize) && (myAvailableSize > 0)) {
 		size_t size = std::min(myAvailableSize, (size_t)IN_BUFFER_SIZE);
 
 		myZStream->next_in = (Bytef*)myInBuffer;
 		myZStream->avail_in = stream.read(myInBuffer, size);
-
-		// decrypt myInBuffer if aesKey is not empty
-		std::string aesKey = stream.getAESKey();
-		if (!aesKey.empty())
-		{
-		    AES_KEY aeskeyDec;
-		    unsigned char *keyItself = (unsigned char *)aesKey.data();
-		    AES_set_decrypt_key(keyItself, AES_KEY_LENGTH_BITS,
-		            &aeskeyDec);
-
-		    unsigned char decryptedBuffer[IN_BUFFER_SIZE];
-		    AES_decrypt((unsigned char *)myInBuffer, decryptedBuffer, &aeskeyDec);
-
-		    memcpy(myInBuffer, decryptedBuffer, IN_BUFFER_SIZE);
-
-		    // TODO (Jim): here needs debugging.
-		}
 
 		if (myZStream->avail_in == size) {
 			myAvailableSize -= size;
@@ -97,6 +139,37 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer, size_t m
 			}
 		}
 	}
+
+	// decrypt myInBuffer if aesKey is not empty
+    if (!aesKey.empty() && myBuffer.length() > 0)
+    {
+        qDebug("key not empty");
+        unsigned char * key = (unsigned char *)aesKey.data();
+
+        EVP_CIPHER_CTX d_ctx;
+        EVP_CIPHER_CTX_init(&d_ctx);
+        EVP_DecryptInit_ex(&d_ctx, EVP_aes_128_cbc(), NULL, key, key);
+
+        char *gzcompressed;
+        gzcompressed = (char *)aes_decrypt(&d_ctx,
+                (unsigned char *)myBuffer.data(), &len);
+        EVP_CIPHER_CTX_cleanup(&d_ctx);
+
+        uLong comprLen = len;
+        uLong uncomprLen = comprLen*2;
+
+        Byte *uncompr  = (Byte*)calloc((uInt)uncomprLen, 1);
+
+        uncompress((Byte *)gzcompressed, comprLen, uncompr, uncomprLen);
+        free(gzcompressed);
+
+        qDebug("inflate result: %s\n", uncompr);
+        qDebug() << "inflate size: " << uncomprLen;
+
+        myBuffer.clear();
+        myBuffer.append((char *)uncompr, uncomprLen);
+        free(uncompr);
+    }
 
 	size_t realSize = std::min(maxSize, myBuffer.length());
 	if (buffer != 0) {

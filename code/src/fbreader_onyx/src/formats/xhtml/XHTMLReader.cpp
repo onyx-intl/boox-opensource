@@ -375,7 +375,10 @@ void XHTMLReader::fillTagTable() {
 XHTMLReader::XHTMLReader(BookReader &modelReader) : myModelReader(modelReader) {
 }
 
-bool XHTMLReader::readFile(const std::string &pathPrefix, const std::string &fileName, const std::string &referenceName) {
+bool XHTMLReader::readFile(const std::string &pathPrefix,
+        const std::string &fileName, const std::string &referenceName,
+        const std::string &aesKey)
+{
 	myModelReader.addHyperlinkLabel(referenceName);
 
 	fillTagTable();
@@ -389,7 +392,7 @@ bool XHTMLReader::readFile(const std::string &pathPrefix, const std::string &fil
 	myStyleEntryStack.clear();
 	myStylesToRemove = 0;
 
-	return readDocument(pathPrefix + fileName);
+	return readDocument(pathPrefix + fileName, aesKey);
 }
 
 bool XHTMLReader::readFile(const std::string &pathPrefix, shared_ptr<ZLInputStream> stream, const std::string &referenceName) {

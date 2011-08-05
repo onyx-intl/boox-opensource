@@ -69,8 +69,7 @@ public:
 	size_t offset() const;
 	size_t sizeOfOpened();
 
-	void setAESKey(const std::string &aesKey);
-	std::string getAESKey() const;
+	virtual void setAESKey(const std::string &aesKey);
 
 private:
 	shared_ptr<ZLInputStream> myBaseStream;
@@ -82,7 +81,6 @@ private:
 	size_t myOffset;
 
 	shared_ptr<ZLZDecompressor> myDecompressor;
-	std::string aesKey;
 
 friend class ZLFile;
 };
