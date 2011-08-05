@@ -30,7 +30,6 @@
 #include <openssl/evp.h>
 
 #include <QByteArray>
-#include <QDebug>
 
 #define CHECK_ERR(err, msg) { \
     if (err != Z_OK) { \
@@ -140,18 +139,21 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
 		}
 	}
 
-	// decrypt myInBuffer if aesKey is not empty
+	size_t realSize;
+
+	// Decrypt myInBuffer if aesKey is not empty.
+	// Each time, only decrypt one block that it's size not exceeds maxSize.
     if (!aesKey.empty() && myBuffer.length() > 0)
     {
-        qDebug("key not empty");
-        unsigned char * key = (unsigned char *)aesKey.data();
+        const int sizeToProcess = std::min(maxSize, myBuffer.length())/2;
 
+        unsigned char * key = (unsigned char *)aesKey.data();
         EVP_CIPHER_CTX d_ctx;
         EVP_CIPHER_CTX_init(&d_ctx);
         EVP_DecryptInit_ex(&d_ctx, EVP_aes_128_cbc(), NULL, key, key);
 
         char *gzcompressed;
-        int len = myBuffer.length();
+        int len = sizeToProcess;
         gzcompressed = (char *)aes_decrypt(&d_ctx,
                 (unsigned char *)myBuffer.data(), &len);
         EVP_CIPHER_CTX_cleanup(&d_ctx);
@@ -164,18 +166,27 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
         uncompress((Byte *)gzcompressed, comprLen, uncompr, uncomprLen);
         free(gzcompressed);
 
-        qDebug("inflate result: %s\n", uncompr);
-        qDebug() << "inflate size: " << uncomprLen;
+        if (uncomprLen > maxSize)
+        {
+            printf("Warning! The size of uncompress buffer exceeds max size.\n");
+        }
 
-        myBuffer.clear();
-        myBuffer.append((char *)uncompr, uncomprLen);
+        realSize = uncomprLen;
+        if (buffer != 0)
+        {
+            memcpy(buffer, uncompr, realSize);
+        }
+
         free(uncompr);
+        myBuffer.erase(0, sizeToProcess);
     }
-
-	size_t realSize = std::min(maxSize, myBuffer.length());
-	if (buffer != 0) {
-		memcpy(buffer, myBuffer.data(), realSize);
-	}
-	myBuffer.erase(0, realSize);
+    else
+    {
+        realSize = std::min(maxSize, myBuffer.length());
+        if (buffer != 0) {
+            memcpy(buffer, myBuffer.data(), realSize);
+        }
+        myBuffer.erase(0, realSize);
+    }
 	return realSize;
 }

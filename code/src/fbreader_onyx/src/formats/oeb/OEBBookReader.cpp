@@ -233,8 +233,6 @@ bool OEBBookReader::checkValidDate(char *plain)
 /// containing the valid date and AES key.
 ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
 {
-    qDebug("path: %s", path.c_str());
-
     const int MAX_SIZE = 200;
     char buffer[MAX_SIZE];
     memset(buffer, 0, MAX_SIZE);
@@ -259,9 +257,7 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
         bool decrypted = rsaDecrypt(encrypted, plain);
         if (decrypted)
         {
-            printf("plain: %s\n", plain);
             bool dateValid = checkValidDate(plain);
-            qDebug() << "date valid? " << dateValid;
             if (dateValid)
             {
                 char keyArray[AES_KEY_SIZE+1];
@@ -271,7 +267,6 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
                     keyArray[i] = plain[startIndex+i];
                 }
                 keyArray[AES_KEY_SIZE] = '\0';
-                printf("aes key: %s\n", keyArray);
                 strcpy(aesKey, keyArray);
             }
             else
@@ -302,7 +297,6 @@ bool OEBBookReader::readBook(const std::string &origin_path, const std::string &
 	myState = READ_NONE;
 
 	ZLFile::DRMStatus drmStatus = checkKeyFile(origin_path);
-    qDebug() << "DRM status: " << drmStatus;
     if (ZLFile::DRM_FAILED == drmStatus)
     {
         return false;
