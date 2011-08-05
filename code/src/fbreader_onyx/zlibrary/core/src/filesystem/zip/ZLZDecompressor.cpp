@@ -151,6 +151,7 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
         EVP_DecryptInit_ex(&d_ctx, EVP_aes_128_cbc(), NULL, key, key);
 
         char *gzcompressed;
+        int len = myBuffer.length();
         gzcompressed = (char *)aes_decrypt(&d_ctx,
                 (unsigned char *)myBuffer.data(), &len);
         EVP_CIPHER_CTX_cleanup(&d_ctx);
