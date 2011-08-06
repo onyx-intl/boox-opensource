@@ -174,7 +174,7 @@ std::string OEBBookReader::privateKey()
 #ifdef WIN32
     return std::string("C:\\key.private");
 #else
-    return std::string("/usr/share/key.private");
+    return std::string("/root/key.private");
 #endif
 }
 
