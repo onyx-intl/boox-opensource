@@ -443,7 +443,7 @@ void ZLTextSelectionModel::createData() const {
 					const ZLTextWord &word = (const ZLTextWord&)element;
 					if (cursor.sameElementAs(end)) {
 						if (start.sameElementAs(end)) {
-							int skip = ZLUnicodeUtil::length(word.Data, start.charIndex());
+							int skip = ZLUnicodeUtil::length(word.Data, start.charIndex() - 1);
 							int length = ZLUnicodeUtil::length(word.Data, end.charIndex()) - skip;
 							myText.append(word.Data + skip, length);
 						} else {
@@ -452,7 +452,7 @@ void ZLTextSelectionModel::createData() const {
 					} else if (cursor.charIndex() == 0) {
 						myText.append(word.Data, word.Size);
 					} else /* cursor == start */ {
-						int skip = ZLUnicodeUtil::length(word.Data, cursor.charIndex());
+						int skip = ZLUnicodeUtil::length(word.Data, cursor.charIndex() - 1);
 						myText.append(word.Data + skip, word.Size - skip);
 					}
 					break;

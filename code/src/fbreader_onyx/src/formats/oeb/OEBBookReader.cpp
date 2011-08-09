@@ -19,6 +19,9 @@
 
 #include <algorithm>
 
+#include <ZLFile.h>
+#include <ZLStringUtil.h>
+#include <ZLDir.h>
 #include <ZLUnicodeUtil.h>
 #include <ZLFileImage.h>
 
@@ -27,8 +30,30 @@
 #include "../xhtml/XHTMLReader.h"
 #include "../util/MiscUtil.h"
 #include "../../bookmodel/BookModel.h"
+#include <QDebug>
+#include <QByteArray>
+#include <QDate>
+#include <openssl/rsa.h>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
+#include <openssl/err.h>
 
-OEBBookReader::OEBBookReader(BookModel &model) : myModelReader(model) {
+static const int AES_KEY_SIZE = 16;
+
+OEBBookReader::OEBBookReader(BookModel &model)
+    : myModelReader(model)
+{
+    aesKey = (char *)malloc(AES_KEY_SIZE+1);
+    memset(aesKey, 0, AES_KEY_SIZE+1);
+}
+
+OEBBookReader::~OEBBookReader()
+{
+    if (aesKey)
+    {
+        delete aesKey;
+    }
 }
 
 static const std::string MANIFEST = "manifest";
@@ -40,6 +65,8 @@ static const std::string SITE = "site";
 static const std::string ITEM = "item";
 static const std::string ITEMREF = "itemref";
 static const std::string REFERENCE = "reference";
+
+static const std::string DATE_FORMAT = "yyyy-MM-dd";
 
 void OEBBookReader::startElementHandler(const char *tag, const char **xmlattributes) {
 	const std::string tagString = ZLUnicodeUtil::toLower(tag);
@@ -100,7 +127,166 @@ void OEBBookReader::endElementHandler(const char *tag) {
 	}
 }
 
-bool OEBBookReader::readBook(const std::string &fileName) {
+std::string OEBBookReader::keyFileName(const std::string &oebFileName) const
+{
+    ZLFile oebFile = ZLFile(oebFileName);
+    oebFile.forceArchiveType(ZLFile::ZIP);
+    shared_ptr<ZLDir> zipDir = oebFile.directory(false);
+    if (!zipDir) {
+        return std::string();
+    }
+
+    std::string keyName("");
+    std::vector<std::string> fileNames;
+    zipDir->collectFiles(fileNames, false);
+    for (std::vector<std::string>::const_iterator it = fileNames.begin(); it != fileNames.end(); ++it) {
+        if (ZLStringUtil::stringEndsWith(*it, "key")) {
+            keyName = zipDir->itemPath(*it);
+        }
+    }
+
+    return keyName;
+}
+
+bool OEBBookReader::keyFileContent(const std::string name, char *buffer,
+        size_t maxSize) const
+{
+    // Read content
+    shared_ptr<ZLInputStream> inputStream = ZLFile(name).inputStream();
+    if (inputStream->open())
+    {
+        size_t realSize = inputStream->read(buffer, maxSize);
+        inputStream->close();
+        if (realSize <= 0)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+std::string OEBBookReader::privateKey()
+{
+#ifdef WIN32
+    return std::string("C:\\key.private");
+#else
+    return std::string("/root/key.private");
+#endif
+}
+
+bool OEBBookReader::rsaDecrypt(char *encryptedMessage, char *plain) const
+{
+    std::string privateKeyName = OEBBookReader::privateKey();
+    FILE *keyFile = fopen(privateKeyName.c_str(), "r");
+    RSA *privKey = PEM_read_RSAPrivateKey(keyFile, 0, 0, 0);
+    fclose(keyFile);
+
+    unsigned char inbuffer[RSA_size(privKey)];
+    unsigned char outbuffer[RSA_size(privKey)];
+    BIO *b64 = BIO_new(BIO_f_base64());
+    BIO *bp = BIO_new_mem_buf(encryptedMessage, -1);
+    bp = BIO_push(b64, bp);
+    BIO_read(bp, inbuffer, RSA_size(privKey));
+    BIO_free_all(bp);
+
+    int len = RSA_private_decrypt(RSA_size(privKey), inbuffer, outbuffer,
+            privKey, RSA_PKCS1_PADDING);
+    outbuffer[len] = '\0';
+
+    if (len > 1)
+    {
+        memcpy(plain, outbuffer, len+1);
+    }
+    else
+    {
+        return false;
+    }
+
+    RSA_free(privKey);
+    return true;
+}
+
+QDate OEBBookReader::extractFromDate(char *plain)
+{
+    return QDate::fromString(QString::fromLatin1(plain, 10), DATE_FORMAT.c_str());
+}
+
+QDate OEBBookReader::extractToDate(char *plain)
+{
+    QString to(plain);
+    to = to.mid(10, 10);
+    return QDate::fromString(to, DATE_FORMAT.c_str());
+}
+
+bool OEBBookReader::checkValidDate(char *plain)
+{
+    QDate from = extractFromDate(plain);
+    QDate to = extractToDate(plain);
+    return (QDate::currentDate() >= from) && (QDate::currentDate() <= to);
+}
+
+/// Check key file in epub file format. This file is the validation source,
+/// containing the valid date and AES key.
+ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
+{
+    const int MAX_SIZE = 200;
+    char buffer[MAX_SIZE];
+    memset(buffer, 0, MAX_SIZE);
+    std::string fileName = keyFileName(path);
+    if (fileName.empty())
+    {
+        return ZLFile::NOT_DRM;
+    }
+
+    bool success = keyFileContent(fileName, buffer, MAX_SIZE);
+    if (success)
+    {
+        QByteArray array(buffer);
+        QByteArray converted = array.toBase64();
+        int esize = converted.size();
+        char encrypted[esize+1];
+        memcpy(encrypted, converted.data(), esize);
+        encrypted[esize] = '\n';
+
+        char plain[MAX_SIZE];
+        memset(plain, 0, MAX_SIZE);
+        bool decrypted = rsaDecrypt(encrypted, plain);
+        if (decrypted)
+        {
+            bool dateValid = checkValidDate(plain);
+            if (dateValid)
+            {
+                char keyArray[AES_KEY_SIZE+1];
+                const int startIndex = 10*2;
+                for (int i=0; i<AES_KEY_SIZE; i++)
+                {
+                    keyArray[i] = plain[startIndex+i];
+                }
+                keyArray[AES_KEY_SIZE] = '\0';
+                strcpy(aesKey, keyArray);
+            }
+            else
+            {
+                return ZLFile::DRM_FAILED;
+            }
+        }
+        else
+        {
+            return ZLFile::DRM_FAILED;
+        }
+    }
+    else
+    {
+        return ZLFile::DRM_FAILED;
+    }
+    return ZLFile::DRM;
+}
+
+bool OEBBookReader::readBook(const std::string &origin_path, const std::string &fileName) {
 	myFilePrefix = MiscUtil::htmlDirectoryPrefix(fileName);
 
 	myIdToHref.clear();
@@ -110,7 +296,13 @@ bool OEBBookReader::readBook(const std::string &fileName) {
 	myGuideTOC.clear();
 	myState = READ_NONE;
 
-	if (!readDocument(fileName)) {
+	ZLFile::DRMStatus drmStatus = checkKeyFile(origin_path);
+    if (ZLFile::DRM_FAILED == drmStatus)
+    {
+        return false;
+    }
+
+	if (!readDocument(fileName, std::string(aesKey))) {
 		return false;
 	}
 
@@ -122,7 +314,7 @@ bool OEBBookReader::readBook(const std::string &fileName) {
 		if (it != myHtmlFileNames.begin()) {
 			myModelReader.insertEndOfSectionParagraph();
 		}
-		xhtmlReader.readFile(myFilePrefix, *it, *it);
+		xhtmlReader.readFile(myFilePrefix, *it, *it, std::string(aesKey));
 	}
 
 	generateTOC();

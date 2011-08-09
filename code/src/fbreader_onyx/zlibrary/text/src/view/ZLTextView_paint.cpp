@@ -255,7 +255,7 @@ void ZLTextView::drawTextLine(const ZLTextLineInfo &info, int y, size_t from, si
 								r = areaBound(paragraph, area, rightBound.CharIndex, mainDir);
 							}
 							if (leftBound.ElementIndex == area.ElementIndex) {
-								l = areaBound(paragraph, area, leftBound.CharIndex, mainDir);
+								l = areaBound(paragraph, area, leftBound.CharIndex - 1, mainDir);
 							}
 						}
 

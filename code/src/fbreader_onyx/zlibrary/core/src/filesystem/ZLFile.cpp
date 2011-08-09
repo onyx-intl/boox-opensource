@@ -28,10 +28,12 @@
 #include "tar/ZLTar.h"
 #include "bzip2/ZLBzip2InputStream.h"
 #include "ZLFSManager.h"
+#include <QDebug>
 
 std::map<std::string,weak_ptr<ZLInputStream> > ZLFile::ourPlainStreamCache;
 
-ZLFile::ZLFile(const std::string &path) : myPath(path), myInfoIsFilled(false) {
+ZLFile::ZLFile(const std::string &path, const std::string &aesKey)
+  : myPath(path), aesKey(aesKey), myInfoIsFilled(false) {
 	ZLFSManager::instance().normalize(myPath);
 	{
 		size_t index = ZLFSManager::instance().findLastFileNameDelimiter(myPath);
@@ -109,10 +111,18 @@ shared_ptr<ZLInputStream> ZLFile::inputStream() const {
 		ZLFile baseFile(myPath.substr(0, index));
 		shared_ptr<ZLInputStream> base = baseFile.inputStream();
 		if (base) {
+		    std::string entryName = myPath.substr(index + 1);
 			if (baseFile.myArchiveType & ZIP) {
-                          stream.reset(new ZLZipInputStream(base, myPath.substr(index + 1)));
+			    ZLZipInputStream *zipInputStream = new ZLZipInputStream(base,
+			            entryName);
+			    if (ZLStringUtil::stringEndsWith(entryName, ".html")
+			            && !ZLStringUtil::stringEndsWith(entryName, "cover.html"))
+			    {
+			        zipInputStream->setAESKey(aesKey);
+			    }
+			    stream.reset(zipInputStream);
 			} else if (baseFile.myArchiveType & TAR) {
-                          stream.reset(new ZLTarInputStream(base, myPath.substr(index + 1)));
+			    stream.reset(new ZLTarInputStream(base, entryName));
 			}
 		}
 		stream = envelopeCompressedStream(stream);

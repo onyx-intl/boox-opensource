@@ -18,14 +18,30 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
+#include "zlib.h"
+#include <stdio.h>
 
 #include <algorithm>
 
 #include "../ZLInputStream.h"
 #include "ZLZDecompressor.h"
+#include <openssl/aes.h>
+#include <openssl/evp.h>
+
+#include <QByteArray>
+
+#define CHECK_ERR(err, msg) { \
+    if (err != Z_OK) { \
+        fprintf(stderr, "%s error: %d\n", msg, err); \
+        exit(1); \
+    } \
+}
 
 const size_t IN_BUFFER_SIZE = 2048;
 const size_t OUT_BUFFER_SIZE = 32768;
+
+static const size_t AES_KEY_LENGTH_BITS = 128;
 
 ZLZDecompressor::ZLZDecompressor(size_t size) : myAvailableSize(size) {
 	myZStream = new z_stream;
@@ -44,12 +60,58 @@ ZLZDecompressor::~ZLZDecompressor() {
 	delete myZStream;
 }
 
-size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer, size_t maxSize) {
+unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len)
+{
+    int p_len = *len, f_len = 0;
+    unsigned char *plaintext = (unsigned char *)malloc(p_len);
+
+    EVP_DecryptInit_ex(e, NULL, NULL, NULL, NULL);
+    EVP_DecryptUpdate(e, plaintext, &p_len, ciphertext, *len);
+    EVP_DecryptFinal_ex(e, plaintext + p_len, &f_len);
+
+    *len = p_len + f_len;
+    return plaintext;
+}
+
+void ZLZDecompressor::uncompress(Byte *compr, uLong comprLen, Byte *uncompr,
+        uLong uncomprLen)
+{
+    int err;
+    z_stream d_stream; /* decompression stream */
+
+    strcpy((char*)uncompr, "garbage");
+
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+
+    d_stream.next_in  = compr;
+    d_stream.avail_in = 0;
+    d_stream.next_out = uncompr;
+
+    err = inflateInit(&d_stream);
+    CHECK_ERR(err, "inflateInit");
+
+    while (d_stream.total_out < uncomprLen && d_stream.total_in < comprLen) {
+        d_stream.avail_in = d_stream.avail_out = 1; /* force small buffers */
+        err = inflate(&d_stream, Z_NO_FLUSH);
+        if (err == Z_STREAM_END) break;
+        CHECK_ERR(err, "inflate");
+    }
+
+    err = inflateEnd(&d_stream);
+    CHECK_ERR(err, "inflateEnd");
+
+}
+
+size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
+        size_t maxSize, const std::string &aesKey) {
 	while ((myBuffer.length() < maxSize) && (myAvailableSize > 0)) {
 		size_t size = std::min(myAvailableSize, (size_t)IN_BUFFER_SIZE);
 
 		myZStream->next_in = (Bytef*)myInBuffer;
 		myZStream->avail_in = stream.read(myInBuffer, size);
+
 		if (myZStream->avail_in == size) {
 			myAvailableSize -= size;
 		} else {
@@ -77,10 +139,54 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer, size_t m
 		}
 	}
 
-	size_t realSize = std::min(maxSize, myBuffer.length());
-	if (buffer != 0) {
-		memcpy(buffer, myBuffer.data(), realSize);
-	}
-	myBuffer.erase(0, realSize);
+	size_t realSize;
+
+	// Decrypt myInBuffer if aesKey is not empty.
+	// Each time, only decrypt one block that it's size not exceeds maxSize.
+    if (!aesKey.empty() && myBuffer.length() > 0)
+    {
+        const int sizeToProcess = std::min(maxSize, myBuffer.length())/2;
+
+        unsigned char * key = (unsigned char *)aesKey.data();
+        EVP_CIPHER_CTX d_ctx;
+        EVP_CIPHER_CTX_init(&d_ctx);
+        EVP_DecryptInit_ex(&d_ctx, EVP_aes_128_cbc(), NULL, key, key);
+
+        char *gzcompressed;
+        int len = sizeToProcess;
+        gzcompressed = (char *)aes_decrypt(&d_ctx,
+                (unsigned char *)myBuffer.data(), &len);
+        EVP_CIPHER_CTX_cleanup(&d_ctx);
+
+        uLong comprLen = len;
+        uLong uncomprLen = comprLen*2;
+
+        Byte *uncompr  = (Byte*)calloc((uInt)uncomprLen, 1);
+
+        uncompress((Byte *)gzcompressed, comprLen, uncompr, uncomprLen);
+        free(gzcompressed);
+
+        if (uncomprLen > maxSize)
+        {
+            printf("Warning! The size of uncompress buffer exceeds max size.\n");
+        }
+
+        realSize = uncomprLen;
+        if (buffer != 0)
+        {
+            memcpy(buffer, uncompr, realSize);
+        }
+
+        free(uncompr);
+        myBuffer.erase(0, sizeToProcess);
+    }
+    else
+    {
+        realSize = std::min(maxSize, myBuffer.length());
+        if (buffer != 0) {
+            memcpy(buffer, myBuffer.data(), realSize);
+        }
+        myBuffer.erase(0, realSize);
+    }
 	return realSize;
 }

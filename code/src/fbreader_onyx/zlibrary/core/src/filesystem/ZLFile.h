@@ -47,10 +47,17 @@ public:
 		ZIP = 0x0100,
 		TAR = 0x0200,
 		ARCHIVE = 0xff00,
+
 	};
+	enum DRMStatus {
+	    NOT_DRM = 0,
+	    DRM = 1,
+	    DRM_FAILED = 2,
+	};
+
 	
 public:
-	ZLFile(const std::string &path);
+	ZLFile(const std::string &path, const std::string &aesKey = "");
 	~ZLFile();
 
 	bool exists() const;
@@ -81,6 +88,7 @@ private:
 
 private:
 	std::string myPath;
+	std::string aesKey;
 	std::string myNameWithExtension;
 	std::string myNameWithoutExtension;
 	std::string myExtension;

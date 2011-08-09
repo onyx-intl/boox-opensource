@@ -62,6 +62,12 @@ bool ZLXMLReader::readDocument(const std::string &fileName) {
 	return readDocument(ZLFile(fileName).inputStream());
 }
 
+bool ZLXMLReader::readDocument(const std::string &fileName,
+        const std::string &aesKey)
+{
+    return readDocument(ZLFile(fileName, aesKey).inputStream());
+}
+
 bool ZLXMLReader::readDocument(shared_ptr<ZLInputStream> stream) {
 	if (!stream || !stream->open()) {
 		return false;

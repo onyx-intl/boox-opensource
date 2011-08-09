@@ -58,7 +58,9 @@ private:
 
 public:
 	XHTMLReader(BookReader &modelReader);
-	bool readFile(const std::string &pathPrefix, const std::string &fileName, const std::string &referenceName);
+	bool readFile(const std::string &pathPrefix,
+	        const std::string &fileName, const std::string &referenceName,
+	        const std::string &aesKey = std::string());
 	bool readFile(const std::string &pathPrefix, shared_ptr<ZLInputStream> stream, const std::string &referenceName);
 
 private:

@@ -24,7 +24,12 @@
 #include "ZLZDecompressor.h"
 #include "../ZLFSManager.h"
 
-ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> &base, const std::string &entryName) : myBaseStream(new ZLInputStreamDecorator(base)), myEntryName(entryName), myUncompressedSize(0) {
+ZLZipInputStream::ZLZipInputStream(shared_ptr<ZLInputStream> &base,
+        const std::string &entryName)
+    : myBaseStream(new ZLInputStreamDecorator(base))
+    , myEntryName(entryName)
+    , myUncompressedSize(0)
+{
 }
 
 ZLZipInputStream::~ZLZipInputStream() {
@@ -72,7 +77,8 @@ bool ZLZipInputStream::open() {
 size_t ZLZipInputStream::read(char *buffer, size_t maxSize) {
 	size_t realSize = 0;
 	if (myIsDeflated) {
-		realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize);
+		realSize = myDecompressor->decompress(*myBaseStream, buffer, maxSize,
+		        getAESKey());
 		myOffset += realSize;
 	} else {
 		realSize = myBaseStream->read(buffer, std::min(maxSize, myAvailableSize));
@@ -111,4 +117,9 @@ size_t ZLZipInputStream::offset() const {
 size_t ZLZipInputStream::sizeOfOpened() {
 	// TODO: implement for files with Flags & 0x08
 	return myUncompressedSize;
+}
+
+void ZLZipInputStream::setAESKey(const std::string &aesKey)
+{
+    this->aesKey = aesKey;
 }

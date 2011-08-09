@@ -69,6 +69,8 @@ public:
 	size_t offset() const;
 	size_t sizeOfOpened();
 
+	virtual void setAESKey(const std::string &aesKey);
+
 private:
 	shared_ptr<ZLInputStream> myBaseStream;
 	std::string myEntryName;
