@@ -30,7 +30,7 @@
 
 #include "expat/ZLXMLReaderInternal.h"
 
-static const size_t BUFFER_SIZE = 2048;
+static const size_t BUFFER_SIZE = 2 * 1024 * 1024;
 
 void ZLXMLReader::startElementHandler(const char*, const char**) {
 }

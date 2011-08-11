@@ -104,48 +104,15 @@ void ZLZDecompressor::uncompress(Byte *compr, uLong comprLen, Byte *uncompr,
 
 }
 
-size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
+size_t ZLZDecompressor::decompress_drm(ZLInputStream &stream, char *buffer,
         size_t maxSize, const std::string &aesKey) {
-	while ((myBuffer.length() < maxSize) && (myAvailableSize > 0)) {
-		size_t size = std::min(myAvailableSize, (size_t)IN_BUFFER_SIZE);
+    size_t realSize;
 
-		myZStream->next_in = (Bytef*)myInBuffer;
-		myZStream->avail_in = stream.read(myInBuffer, size);
-
-		if (myZStream->avail_in == size) {
-			myAvailableSize -= size;
-		} else {
-			myAvailableSize = 0;
-		}
-		while (myZStream->avail_in == 0) {
-			break;
-		}
-		while (myZStream->avail_in > 0) {
-			myZStream->avail_out = OUT_BUFFER_SIZE;
-			myZStream->next_out = (Bytef*)myOutBuffer;
-			int code = ::inflate(myZStream, Z_SYNC_FLUSH);
-			if ((code != Z_OK) && (code != Z_STREAM_END)) {
-				break;
-			}
-			if (OUT_BUFFER_SIZE == myZStream->avail_out) {
-				break;
-			}
-			myBuffer.append(myOutBuffer, OUT_BUFFER_SIZE - myZStream->avail_out);
-			if (code == Z_STREAM_END) {
-				myAvailableSize = 0;
-				stream.seek(-myZStream->avail_in, false);
-				break;
-			}
-		}
-	}
-
-	size_t realSize;
-
-	// Decrypt myInBuffer if aesKey is not empty.
-	// Each time, only decrypt one block that it's size not exceeds maxSize.
-    if (!aesKey.empty() && myBuffer.length() > 0)
+    // Decrypt myBuffer if aesKey is not empty.
+    // Each time, only decrypt one block that it's size not exceeds maxSize.
+    if (myBuffer.length() > 0)
     {
-        const int sizeToProcess = std::min(maxSize, myBuffer.length())/2;
+        const int sizeToProcess = std::min(maxSize, myBuffer.length());
 
         unsigned char * key = (unsigned char *)aesKey.data();
         EVP_CIPHER_CTX d_ctx;
@@ -159,34 +126,82 @@ size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
         EVP_CIPHER_CTX_cleanup(&d_ctx);
 
         uLong comprLen = len;
-        uLong uncomprLen = comprLen*2;
+        uLong uncomprLen = comprLen*7;
 
         Byte *uncompr  = (Byte*)calloc((uInt)uncomprLen, 1);
 
         uncompress((Byte *)gzcompressed, comprLen, uncompr, uncomprLen);
         free(gzcompressed);
 
-        if (uncomprLen > maxSize)
-        {
-            printf("Warning! The size of uncompress buffer exceeds max size.\n");
-        }
-
-        realSize = uncomprLen;
         if (buffer != 0)
         {
-            memcpy(buffer, uncompr, realSize);
+            plainBuffer.append((char *)uncompr, uncomprLen);
+            realSize = std::min(maxSize, plainBuffer.length());
+            memcpy(buffer, plainBuffer.data(), realSize);
         }
 
         free(uncompr);
+        plainBuffer.erase(0, realSize);
         myBuffer.erase(0, sizeToProcess);
     }
-    else
+    return realSize;
+}
+
+size_t ZLZDecompressor::decompress(ZLInputStream &stream, char *buffer,
+        size_t maxSize, const std::string &aesKey) {
+    while ((myBuffer.length() < maxSize) && (myAvailableSize > 0))
     {
-        realSize = std::min(maxSize, myBuffer.length());
+        size_t size = std::min(myAvailableSize, (size_t) IN_BUFFER_SIZE);
+
+        myZStream->next_in = (Bytef*) myInBuffer;
+        myZStream->avail_in = stream.read(myInBuffer, size);
+
+        if (myZStream->avail_in == size)
+        {
+            myAvailableSize -= size;
+        }
+        else
+        {
+            myAvailableSize = 0;
+        }
+        while (myZStream->avail_in == 0)
+        {
+            break;
+        }
+        while (myZStream->avail_in > 0)
+        {
+            myZStream->avail_out = OUT_BUFFER_SIZE;
+            myZStream->next_out = (Bytef*) myOutBuffer;
+            int code = ::inflate(myZStream, Z_SYNC_FLUSH);
+            if ((code != Z_OK) && (code != Z_STREAM_END))
+            {
+                break;
+            }
+            if (OUT_BUFFER_SIZE == myZStream->avail_out)
+            {
+                break;
+            }
+            myBuffer.append(myOutBuffer, OUT_BUFFER_SIZE - myZStream->avail_out);
+            if (code == Z_STREAM_END)
+            {
+                myAvailableSize = 0;
+                stream.seek(-myZStream->avail_in, false);
+                break;
+            }
+        }
+    }
+
+    if (aesKey.empty())
+    {
+        size_t realSize = std::min(maxSize, myBuffer.length());
         if (buffer != 0) {
             memcpy(buffer, myBuffer.data(), realSize);
         }
         myBuffer.erase(0, realSize);
+        return realSize;
     }
-	return realSize;
+    else
+    {
+        return decompress_drm(stream, buffer, maxSize, aesKey);
+    }
 }
