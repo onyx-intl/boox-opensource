@@ -25,7 +25,11 @@
 
 #include "../formats/FormatPlugin.h"
 
-BookModel::BookModel(const BookDescriptionPtr description) : myDescription(description) {
+BookModel::BookModel(const BookDescriptionPtr description)
+    : myDescription(description)
+    , isDRM(false)
+    , myOpenStatus(OPEN_NORMAL)
+{
   myBookTextModel.reset(new ZLTextPlainModel(102400));
   myContentsModel.reset(new ContentsModel());
 	ZLFile file(description->fileName());
@@ -45,6 +49,16 @@ const std::string &BookModel::fileName() const {
 BookModel::Label BookModel::label(const std::string &id) const {
   std::map<std::string,Label>::const_iterator it = myInternalHyperlinks.find(id);
   return (it != myInternalHyperlinks.end()) ? it->second : Label(shared_ptr<ZLTextModel>(), -1);
+}
+
+void BookModel::setDRM(bool isDRM)
+{
+    this->isDRM = isDRM;
+}
+
+void BookModel::setOpenStatus(OpenStatus openStatus)
+{
+    this->myOpenStatus = openStatus;
 }
 
 void ContentsModel::setReference(const ZLTextTreeParagraph *paragraph, int reference) {

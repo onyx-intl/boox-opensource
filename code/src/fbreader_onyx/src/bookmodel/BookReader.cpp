@@ -265,3 +265,13 @@ void BookReader::setReference(size_t contentsParagraphNumber, int referenceNumbe
 void BookReader::reset() {
 	myKindStack.clear();
 }
+
+void BookReader::setDRM(bool isDRM) const
+{
+    myModel.setDRM(isDRM);
+}
+
+void BookReader::setOpenStatus(int openStatus) const
+{
+    myModel.setOpenStatus((BookModel::OpenStatus)openStatus);
+}

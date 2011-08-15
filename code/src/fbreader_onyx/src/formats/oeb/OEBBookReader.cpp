@@ -239,9 +239,11 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
     std::string fileName = keyFileName(path);
     if (fileName.empty())
     {
+        myModelReader.setDRM(false);
         return ZLFile::NOT_DRM;
     }
 
+    myModelReader.setDRM(true);
     bool success = keyFileContent(fileName, buffer, MAX_SIZE);
     if (success)
     {
@@ -271,18 +273,23 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
             }
             else
             {
+                myModelReader.setOpenStatus(BookModel::OPEN_DATE_INVALID);
                 return ZLFile::DRM_FAILED;
             }
         }
         else
         {
+            myModelReader.setOpenStatus(BookModel::OPEN_DECRYPTION_FAILED);
             return ZLFile::DRM_FAILED;
         }
     }
     else
     {
+        myModelReader.setOpenStatus(BookModel::OPEN_DECRYPTION_FAILED);
         return ZLFile::DRM_FAILED;
     }
+
+    myModelReader.setOpenStatus(BookModel::OPEN_NORMAL);
     return ZLFile::DRM;
 }
 

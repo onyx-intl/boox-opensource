@@ -50,6 +50,13 @@ public:
 		const int ParagraphNumber;
 	};
 
+    enum OpenStatus {
+        OPEN_NORMAL = 0x01,
+        OPEN_DATE_INVALID = 0xFD,
+        OPEN_DECRYPTION_FAILED = 0xFE,
+        OPEN_UNKNOWN_ERROR = 0xFF,
+    };
+
 public:
 	BookModel(const BookDescriptionPtr description);
 	~BookModel();
@@ -64,6 +71,12 @@ public:
 
 	const BookDescriptionPtr description() const;
 
+	// for DRM content
+	bool drm() const;
+	OpenStatus openStatus() const;
+	void setDRM(bool isDRM);
+	void setOpenStatus(OpenStatus openStatus);
+
 private:
 	const BookDescriptionPtr myDescription;
 	shared_ptr<ZLTextModel> myBookTextModel;
@@ -71,6 +84,8 @@ private:
 	ZLImageMap myImages;
 	std::map<std::string,shared_ptr<ZLTextModel> > myFootnotes;
 	std::map<std::string,Label> myInternalHyperlinks;
+	bool isDRM;
+	OpenStatus myOpenStatus;
 
 friend class BookReader;
 };
@@ -79,5 +94,10 @@ inline shared_ptr<ZLTextModel> BookModel::bookTextModel() const { return myBookT
 inline shared_ptr<ZLTextModel> BookModel::contentsModel() const { return myContentsModel; }
 inline const ZLImageMap &BookModel::imageMap() const { return myImages; }
 inline const BookDescriptionPtr BookModel::description() const { return myDescription; }
+inline bool BookModel::drm() const { return isDRM; }
+inline BookModel::OpenStatus BookModel::openStatus() const
+{
+    return myOpenStatus;
+}
 
 #endif /* __BOOKMODEL_H__ */
