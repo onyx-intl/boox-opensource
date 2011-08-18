@@ -68,6 +68,21 @@ static const std::string REFERENCE = "reference";
 
 static const std::string DATE_FORMAT = "yyyy-MM-dd";
 
+// calculate the size of the array
+int calculateArraySize(const char *buffer, size_t memSize)
+{
+    int size = 0;
+    for (int i = memSize-1; i >= 0; i--)
+    {
+        if (0 != buffer[i])
+        {
+            size = i+1;
+            break;
+        }
+    }
+    return size;
+}
+
 void OEBBookReader::startElementHandler(const char *tag, const char **xmlattributes) {
 	const std::string tagString = ZLUnicodeUtil::toLower(tag);
 	if (MANIFEST == tagString) {
@@ -245,9 +260,10 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
 
     myModelReader.setDRM(true);
     bool success = keyFileContent(fileName, buffer, MAX_SIZE);
+
     if (success)
     {
-        QByteArray array(buffer);
+        QByteArray array(buffer, calculateArraySize(buffer, MAX_SIZE));
         QByteArray converted = array.toBase64();
         int esize = converted.size();
         char encrypted[esize+1];
