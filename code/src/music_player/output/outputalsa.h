@@ -5,7 +5,6 @@
 #include <core/volumecontrol.h>
 
 #ifdef BUILD_WITH_TFT
-#include "akuio/akuio.h"
 #include "alsa/asoundlib.h"
 #endif
 
