@@ -1,65 +1,71 @@
-#ifndef RSS_FEED_DIALOG_H_H
-#define RSS_FEED_DIALOG_H_H
+#ifndef RSSFEEDDIALOG_H
+#define RSSFEEDDIALOG_H
 
-#include "onyx/ui/message_dialog.h"
-#include "onyx/ui/text_browser.h"
-#include "onyx/ui/line_edit.h"
+#include "onyx/base/base.h"
+#include "onyx/ui/ui_global.h"
+#include "onyx/ui/onyx_dialog.h"
 #include "onyx/ui/onyx_keyboard.h"
-#include "onyx/ui/keyboard_navigator.h"
-#include "onyx/ui/ui.h"
+#include "onyx/ui/line_edit_view_group.h"
 
 using namespace ui;
-namespace rss_reader
-{
 
-class RssFeedDialog : public MessageDialog
+class RssFeedDialog: public OnyxDialog
 {
     Q_OBJECT
 
 public:
-    explicit RssFeedDialog(const QString & str, QWidget *parent = 0);
-    ~RssFeedDialog(void);
+    RssFeedDialog(const QString & str, QWidget *parent);
+    ~RssFeedDialog();
 
 public:
-    int popup();
-
-    void createLayout(void);
-    QString title() const;
-    QString url() const;
-
+    bool popup();
+    QString value(OData * d_index = 0);
+    QString title();
+    QString url();
     void setTitle(const QString & title);
     void setUrl(const QString & url);
 
-private Q_SLOTS:
-    void onSave(void);
-    void onCancel(void);
-    void onClicked(void);
-    bool eventFilter(QObject *obj, QEvent *event);
-
-    void mouseMoveEvent(QMouseEvent *me);
-    void mousePressEvent(QMouseEvent *me);
-    void mouseReleaseEvent(QMouseEvent *me);
-    void keyReleaseEvent(QKeyEvent *);
-    void keyPressEvent(QKeyEvent * ke);
-    void resizeEvent(QResizeEvent *e);
-    
+protected Q_SLOTS:
+    void onItemActivated(CatalogView *catalog, ContentView *item,
+            int user_data);
 
 private:
-    QHBoxLayout h_layout_title_;
-    QHBoxLayout h_layout_url_;
+    void appendDefaultPasswordEdit();
+    void addLineEditsToGroup();
 
-    OnyxLabel label_feed_title_;    
-    OnyxLabel label_feed_url_;    
+    void createLayout();
+    void createLineEdits(const int &line_edit_width);
+    void createSubMenu(const int &sub_menu_width);
+    void connectWithChildren();
 
-    OnyxLineEdit  edit_feed_title_;
-    OnyxLineEdit  edit_feed_url_;
+    CatalogView * createEditItem(OData *data, int index, ODatas *edit_datas,
+            const int &line_edit_width);
 
-    OnyxKeyboard  keyboard_;     ///< Keyboard.
+    void clearClicked();
 
-    bool   input_title_;
+    void keyPressEvent(QKeyEvent *event);
+    void init();
+
+private:
+    QVBoxLayout big_layout_;
+    QHBoxLayout *line_edit_layout_;
+
+    CatalogView sub_menu_;
+    QVector<CatalogView *> edit_view_list_;
+    LineEditViewGroup edit_view_group_;
+
+    ODatas sub_menu_datas_;
+    QVector<ODatas *> all_line_edit_datas_;
+
+    OnyxKeyboard keyboard_;
+    QString title_;
+    ODatas edit_list_;
+
+    ODataPtr title_data;
+    ODataPtr url_data;
+    QString feed_title_;
+    QString feed_url_;
+
 };
 
-};  // namespace rss_reader
-
-
-#endif  // RSS_FEED_DIALOG_H_H
+#endif // RSSFEEDDIALOG_H

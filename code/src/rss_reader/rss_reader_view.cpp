@@ -8,6 +8,7 @@
 #include "onyx/sys/sys_utils.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/wireless/connecting_dialog.h"
 
 #include "rssLoaderThread.h"
 #include "rssFeedInfo.h"
@@ -138,7 +139,7 @@ RssReaderView::~RssReaderView()
     Loader->wait();
     delete Loader;
 
-	saveFeedList();
+    saveFeedList();
 }
 
 void RssReaderView::updateOnStart()
@@ -238,19 +239,10 @@ bool RssReaderView::loadFeedList()
     QStringListIterator groupsI(groups);
     while (groupsI.hasNext())
     {
-            newFeedInfo=new CRSSFeedInfo();
-            newFeedInfo->Load(&settings, groupsI.next());
+        newFeedInfo=new CRSSFeedInfo();
+        newFeedInfo->Load(&settings, groupsI.next());
 
-    //for special use
-    //if (newFeedInfo->Title.compare("Elisan Asiakastiedotteet", Qt::CaseInsensitive) == 0)
-    //{
-    //    newFeedInfo->Selected = true;
-    //    rss_feeds_.push_front(newFeedInfo);
-    //}
-    //else
-    //{
-    rss_feeds_.push_back(newFeedInfo);
-    //}
+        rss_feeds_.push_back(newFeedInfo);
     }
 
     return true;
@@ -267,7 +259,7 @@ void RssReaderView::saveFeedList()
 
     for (int i = 0; i < rss_feeds_.size(); i++)
     {
-            rss_feeds_.at(i)->Save(&settings);
+        rss_feeds_.at(i)->Save(&settings);
     }
     settings.sync();
 }
@@ -301,6 +293,12 @@ void RssReaderView::setStatus(OData * dd, const CStatus & status)
         dd->insert(RssView::TAG_UPDATE_TIME, QDateTime::currentDateTime());
     }
 
+    if (status.GetFlags() & CStatus::sfFailed)
+    {
+        feedInfo->LastUpdateTimestamp=QDateTime::currentDateTime().toTimeSpec(Qt::UTC);	//All times are handled in UTC!
+        dd->insert(RssView::TAG_UPDATE_TIME, QDateTime::currentDateTime());
+    }
+
     // TODO
     list_view_.update();
 }
@@ -309,9 +307,9 @@ void RssReaderView::onDone()
 {
     if (CancelWindow)
     {
-            CancelWindow->hide();
-            delete CancelWindow;
-            CancelWindow=0;
+        CancelWindow->hide();
+        delete CancelWindow;
+        CancelWindow=0;
     }
 
     if (ExitOnDone)
@@ -332,6 +330,7 @@ void RssReaderView::onStartUpdate()
         //-- Reset the exit on done flag if it is already set
         ExitOnDone=false;
 
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         startWifi();
 
         for (int i = 0; i < rss_feeds_.size(); i++)
@@ -353,7 +352,7 @@ void RssReaderView::onStartUpdate()
 
 void RssReaderView::onSettings()
 {
-    SettingsView view(0, rss_feeds_);
+    SettingsView view(this, rss_feeds_);
     connect(&view, SIGNAL(reloadFeedList()), this, SLOT(onReloadFeedList()));
     connect(&view, SIGNAL(addFeed(const CRSSFeedInfo &)), this, SLOT(onAddFeed(const CRSSFeedInfo &)));
     connect(&view, SIGNAL(removeFeed(int)), this, SLOT(onRemoveFeed(int)));
@@ -370,7 +369,21 @@ void RssReaderView::enqueueListItem(const CRSSFeedInfo & feedInfo)
 
 void RssReaderView::startWifi()
 {
-    SysStatus::instance().connectionManager().start();
+    static bool tried = false;
+
+    if(!tried)
+    {
+        QProcess cmd;
+        cmd.start("ping -c 2 8.8.8.8");
+        cmd.waitForFinished();
+        if(cmd.exitCode())
+        {
+            configNetwork();
+        }
+        tried = true;
+    }
+
+    //sys::SysStatus::instance().connectionManager().start();
 }
 
 void RssReaderView::closeEvent(QCloseEvent* event)
@@ -477,8 +490,6 @@ void RssReaderView::createButtonView()
     const static QSize MENU_ITEM_SIZE = QSize(60, 60);
 
     button_view_.setSubItemType(ButtonView::type());
-    // button_view_.setBackgroundColor(QColor(151, 151, 151));
-    // button_view_.setSubItemBkColor(QColor(151, 151, 151));
 
     button_view_.setPreferItemSize(MENU_ITEM_SIZE);
 
@@ -494,7 +505,6 @@ void RssReaderView::createButtonView()
 
     button_view_.setSpacing(2);
     button_view_.setFixedGrid(1, 2);
-    // button_view_.setFixedHeight(MENU_ITEM_SIZE.height() + 6 * SPACING);
     button_view_.setData(button_data_);
     button_view_.setSearchPolicy(CatalogView::NeighborFirst
             | CatalogView::AutoHorRecycle);
@@ -531,6 +541,28 @@ void RssReaderView::connectWithChildren()
 
 void RssReaderView::popupMenu()
 {
+    ui::PopupMenu menu(this);
+
+    NetworkActions network_actions_;
+    std::vector<ui::NetworkType> networks;
+    networks.push_back(ui::NETWORK_WIFI);
+    network_actions_.generateActions(networks);
+
+    menu.addGroup(&network_actions_);
+    if (menu.popup() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QAction * group = menu.selectedCategory();
+    if (group == network_actions_.category())
+    {
+        if (network_actions_.selected() == ui::NETWORK_WIFI ||
+            network_actions_.selected() == ui::NETWORK_WCDMA)
+        {
+            configNetwork();
+        }
+    }
 }
 
 void RssReaderView::onProgressClicked(const int percent, const int value)
@@ -577,6 +609,9 @@ void RssReaderView::keyReleaseEvent(QKeyEvent *ke)
     {
         case Qt::Key_Escape:
             ExitApp(false);
+            break;
+        case ui::Device_Menu_Key:
+            popupMenu();
             break;
         default:
             break;
@@ -665,7 +700,8 @@ void RssReaderView::onItemActivated(CatalogView *catalog,
         {
             ExitOnDone = false;
 
-		    startWifi();
+            startWifi();
+
             int i =  item_data->value(TAG_ROW).toInt(); 
             enqueueListItem(*rss_feeds_.at(i));
 
@@ -764,11 +800,40 @@ void RssReaderView::onConnectionChanged(WifiProfile profile, WpaConnection::Conn
 
 void RssReaderView::configNetwork()
 {
-    if (wifi_dialog->isVisible())
+    QString type = sys::SysStatus::instance().connectionType();
+    if (type.contains("wifi", Qt::CaseInsensitive))
     {
-        return;
+        if (!wifi_dialog->isVisible())
+        {
+            wifi_dialog->popup(true);
+        }
+        else
+        {
+            return;
+        }
     }
-    wifi_dialog->popup(true);
+    else if (type.contains("3g", Qt::CaseInsensitive))
+    {
+        ConnectingDialog tg_dialog(0, SysStatus::instance());
+        if(qgetenv("CONNECT_TO_DEFAULT_APN").toInt() > 0 &&
+            sys::SysStatus::instance().isPowerSwitchOn())
+        {
+            sys::SysStatus::instance().connect3g("","","");
+            tg_dialog.popup();
+        }
+        else
+        {
+            if (!wifi_dialog->isVisible())
+            {
+                wifi_dialog->popup(true);
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
     update();
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
