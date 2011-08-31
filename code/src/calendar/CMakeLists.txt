@@ -7,8 +7,8 @@ QT4_WRAP_CPP(MOC_SRCS ${HDRS})
 FILE(GLOB SRCS *.cpp)
 SET(SRCS ${HDRS} ${SRCS} ${MOC_SRCS})
 
-ADD_EXECUTABLE(clock.oar main.cpp ${SRCS})
-TARGET_LINK_LIBRARIES(clock.oar
+ADD_EXECUTABLE(calendar.oar main.cpp ${SRCS})
+TARGET_LINK_LIBRARIES(calendar.oar
   onyxapp
   onyx_data
   onyx_screen
