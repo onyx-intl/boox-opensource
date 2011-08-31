@@ -1,6 +1,7 @@
 #include <core/constants.h>
 #include <core/buffer.h>
 #include "outputalsa.h"
+#include "outputasynplayer.h"
 
 namespace player
 {
