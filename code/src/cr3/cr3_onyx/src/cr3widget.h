@@ -4,19 +4,18 @@
 #include <qwidget.h>
 #include <QScrollBar>
 #include <QImage>
+
 #include "crqtutil.h"
+#include "search_tool.h"
+
 #include "onyx/tts/tts_widget.h"
 #include "onyx/ui/onyx_search_dialog.h"
 #include "onyx/dictionary/dictionary_manager.h"
 #include "onyx/dictionary/dict_widget.h"
-#include "search_tool.h"
 
 class LVDocView;
 class LVTocItem;
 class CRBookmark;
-using namespace tts;
-using namespace ui;
-
 
 class PropsChangeCallback {
 public:
@@ -63,7 +62,7 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         /// returns current page
         int getCurPage();
-        inline QPoint getSelectWordPoint(){ return selectWordPoint;}
+        inline QPoint getSelectWordPoint(){ return select_word_point_;}
 
         /// load settings from file
         bool loadSettings( QString filename );
@@ -161,8 +160,8 @@ class CR3View : public QWidget, public LVDocViewCallback
         void onSpeakDone();
         void stopTTS();
 
-        TTSWidget & ttsWidget();
-        TTS & tts();
+        tts::TTSWidget & ttsWidget();
+        tts::TTS & tts();
 
 
     signals:
@@ -223,18 +222,20 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString _cssDir;
         QString _bookmarkDir;
         bool _editMode;
-        QPoint selectWordPoint;
-        QPoint beginPoint;
+
+        QPoint select_word_point_;
+        QPoint begin_point_;
+
         QImage bookmark_image_;
         QRect selected_rect_;
 
         SearchTool *search_tool_;
-        scoped_ptr<OnyxSearchDialog> search_widget_;
+        scoped_ptr<ui::OnyxSearchDialog> search_widget_;
         OnyxSearchContext search_context_;
         scoped_ptr<DictionaryManager> dicts_;
-        scoped_ptr<DictWidget> dict_widget_;
-        scoped_ptr<TTS> tts_engine_;
-        scoped_ptr<TTSWidget> tts_widget_;
+        scoped_ptr<ui::DictWidget> dict_widget_;
+        scoped_ptr<tts::TTS> tts_engine_;
+        scoped_ptr<tts::TTSWidget> tts_widget_;
         QStringList text_to_speak_;
         int tts_paragraph_index_;
 };

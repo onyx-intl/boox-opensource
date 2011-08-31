@@ -8,6 +8,7 @@
 // TODO. Remove the reference
 #include <output/outputwaveoutfactory.h>
 #include <output/outputasynplayerfactory.h>
+#include <output/outputalsafactory.h>
 
 namespace player
 {
@@ -279,7 +280,11 @@ void Output::checkFactories()
         factories_ = new QList<OutputFactory *>;
 
 #ifndef WIN32
+#ifdef BUILD_WITH_TFT
+        OutputFactory *factory = new OutputAlsaFactory();
+#else
         OutputFactory *factory = new OutputAsynPlayerFactory();
+#endif
 #else
         OutputFactory *factory = new OutputWaveOutFactory();
 #endif

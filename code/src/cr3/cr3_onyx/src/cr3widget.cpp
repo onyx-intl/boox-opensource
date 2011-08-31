@@ -1,10 +1,3 @@
-#include "../crengine/include/lvdocview.h"
-#include "../crengine/include/crtrace.h"
-#include "../crengine/include/props.h"
-#include "cr3widget.h"
-#include "crqtutil.h"
-#include "qpainter.h"
-#include "settings.h"
 #include <QtGui/QResizeEvent>
 #include <QtGui/QScrollBar>
 #include <QtGui/QMenu>
@@ -16,9 +9,18 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QDebug>
-#include "onyx/screen/screen_update_watcher.h"
 
-using namespace tts;
+#include "cr3widget.h"
+
+#include "crqtutil.h"
+#include "qpainter.h"
+#include "settings.h"
+
+#include "../crengine/include/lvdocview.h"
+#include "../crengine/include/crtrace.h"
+#include "../crengine/include/props.h"
+
+#include "onyx/screen/screen_update_watcher.h"
 
 static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
@@ -34,21 +36,21 @@ class CR3View::DocViewData
 
 DECL_DEF_CR_FONT_SIZES;
 
-static void replaceColor( char * str, lUInt32 color )
-{
-    // in line like "0 c #80000000",
-    // replace value of color
-    for ( int i=0; i<8; i++ ) {
-        str[i+5] = toHexDigit((color>>28) & 0xF);
-        color <<= 4;
-    }
-}
-
+// comment out to eliminate compiler warning
+//static void replaceColor( char * str, lUInt32 color )
+//{
+//    // in line like "0 c #80000000",
+//    // replace value of color
+//    for ( int i=0; i<8; i++ ) {
+//        str[i+5] = toHexDigit((color>>28) & 0xF);
+//        color <<= 4;
+//    }
+//}
 
 CR3View::CR3View( QWidget *parent)
         : QWidget( parent, Qt::WindowFlags() ), _scroll(NULL), _propsCallback(NULL)
         , _selecting(false), _selected(false), _editMode(false)
-        , selectWordPoint(0, 0)
+        , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
 {
 #if WORD_SELECTOR_ENABLED==1
@@ -302,7 +304,7 @@ void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if(!getSelectionText().isEmpty())
     {
-        selectWordPoint = event->pos();
+        select_word_point_ = event->pos();
         lookup();
     }
 }
@@ -703,7 +705,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
     bool left = event->button() == Qt::LeftButton;
     //bool right = event->button() == Qt::RightButton;
     //bool mid = event->button() == Qt::MidButton;
-    beginPoint = event->pos();
+    begin_point_ = event->pos();
     lvPoint pt (event->x(), event->y());
     ldomXPointer p = _docview->getNodeByPoint( pt );
     lString16 path;
@@ -763,7 +765,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
         }
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
-    stylusPan(event->pos(), beginPoint);
+    stylusPan(event->pos(), begin_point_);
 }
 
 /// Override to handle external links
@@ -846,7 +848,7 @@ void CR3View::OnLoadFileFormatDetected( doc_format_t fileFormat )
             break;
         default:
             // do nothing
-            ;
+            break;
         }
         CRLog::debug( "CSS file to load: %s", filename.toUtf8().constData() );
         if ( QFileInfo( _cssDir + filename ).exists() ) {
@@ -1139,22 +1141,22 @@ void CR3View::stopTTS()
     hideHelperWidget(tts_widget_.get());
 }
 
-TTSWidget & CR3View::ttsWidget()
+tts::TTSWidget & CR3View::ttsWidget()
 {
     if (!tts_widget_)
     {
-        tts_widget_.reset(new TTSWidget(this, tts()));
+        tts_widget_.reset(new tts::TTSWidget(this, tts()));
         tts_widget_->installEventFilter(this);
         connect(tts_widget_.get(), SIGNAL(closed()), this, SLOT(stopTTS()));
     }
     return *tts_widget_;
 }
 
-TTS & CR3View::tts()
+tts::TTS & CR3View::tts()
 {
     if (!tts_engine_)
     {
-        tts_engine_.reset(new TTS(QLocale::system()));
+        tts_engine_.reset(new tts::TTS(QLocale::system()));
         connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
     }
     return *tts_engine_;
@@ -1242,7 +1244,7 @@ void CR3View::startDictLookup()
 
     if (!dict_widget_)
     {
-        dict_widget_.reset(new DictWidget(this, *dicts_, &(tts())) );
+        dict_widget_.reset(new ui::DictWidget(this, *dicts_, &(tts())) );
         connect(dict_widget_.get(), SIGNAL(keyReleaseSignal(int)), this, SLOT(processKeyReleaseEvent(int)));
         connect(dict_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onDictClosed()));
     }
@@ -1259,7 +1261,7 @@ void CR3View::showSearchWidget()
 {
     if (!search_widget_)
     {
-        search_widget_.reset(new OnyxSearchDialog(this, search_context_));
+        search_widget_.reset(new ui::OnyxSearchDialog(this, search_context_));
         connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
             this, SLOT(onSearch(OnyxSearchContext &)));
         connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
@@ -1387,7 +1389,7 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
             dict_widget_->isVisible() &&
             !getSelectionText().isEmpty())
         {
-            selectWordPoint = now;
+            select_word_point_ = now;
             update();
             lookup();
         }

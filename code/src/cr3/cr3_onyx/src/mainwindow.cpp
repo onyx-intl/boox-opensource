@@ -1,10 +1,13 @@
-#include "mainwindow.h"
 #include <QtGui/QFileDialog>
 #include <QtGui/QStyleFactory>
 #include <QClipboard>
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QMessageBox>
+#include <QKeyEvent>
+
+#include "mainwindow.h"
+
 #include "settings.h"
 #include "crqtutil.h"
 #include "../crengine/include/lvtinydom.h"
@@ -14,7 +17,6 @@
 #include "onyx/ui/menu.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/number_dialog.h"
-#include <QKeyEvent>
 
 #define DOC_CACHE_SIZE 128 * 0x100000
 
@@ -22,14 +24,16 @@
 #define ENABLE_BOOKMARKS_DIR 1
 #endif
 
+using namespace ui;
+
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     view_ = new CR3View;
     setCentralWidget(view_);
 
-    statusbar_ = new StatusBar(this, MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
-    setStatusBar(statusbar_);
+    status_bar_ = new StatusBar(this, MENU|PROGRESS|MESSAGE|CLOCK|BATTERY|SCREEN_REFRESH);
+    setStatusBar(status_bar_);
 
     sys::SystemConfig conf;
     onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
@@ -76,22 +80,22 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
             // option
         } else {
             // filename to open
-            if ( _filenameToOpen.length()==0 )
-                _filenameToOpen = args[i];
+            if ( file_name_to_open_.length()==0 )
+                file_name_to_open_ = args[i];
         }
     }
 
-    view_->loadDocument(_filenameToOpen);
+    view_->loadDocument(file_name_to_open_);
 
-    select_font = currentFont();
+    select_font_ = currentFont();
     font_family_actions_.loadExternalFonts();
 
     connect( &(SysStatus::instance()), SIGNAL(aboutToShutdown()), this, SLOT(close()) );
     connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
 
-    connect(statusbar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
-    connect(view_, SIGNAL(updateProgress(int,int)), statusbar_, SLOT(setProgress(int,int)));
-    connect(statusbar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
+    connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
+    connect(view_, SIGNAL(updateProgress(int,int)), status_bar_, SLOT(setProgress(int,int)));
+    connect(status_bar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
     connect(view_, SIGNAL(requestUpdateAll()), this,SLOT(updateScreen()));
     updateScreen();
 
@@ -105,7 +109,7 @@ void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 
 OnyxMainWindow::~OnyxMainWindow()
 {
-    delete statusbar_;
+    delete status_bar_;
     delete view_;
 }
 
@@ -228,7 +232,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          {
              if (this->isFullScreenByWidgetSize())
              {
-                 statusbar_->show();
+                 status_bar_->show();
                  onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                          onyx::screen::ScreenCommand::WAIT_NONE);
              }
@@ -269,15 +273,15 @@ void OnyxMainWindow::showContextMenu()
     }
     else if (group == font_family_actions_.category())
     {
-        select_font.setFamily(font_family_actions_.selectedFont());
-        props_ref->setString( PROP_FONT_FACE, font_family_actions_.selectedFont() );
-        view_->setOptions(props_ref);
+        select_font_.setFamily(font_family_actions_.selectedFont());
+        props_ref_->setString( PROP_FONT_FACE, font_family_actions_.selectedFont() );
+        view_->setOptions(props_ref_);
     }
     else if (group == font_actions_.category())
     {
-        select_font = font_actions_.selectedFont();
-        props_ref->setString( PROP_FONT_SIZE, QString().setNum(select_font.pointSize()));
-        view_->setOptions(props_ref);
+        select_font_ = font_actions_.selectedFont();
+        props_ref_->setString( PROP_FONT_SIZE, QString().setNum(select_font_.pointSize()));
+        view_->setOptions(props_ref_);
     }
     else if (group == reading_tool_actions_.category())
     {
@@ -293,13 +297,13 @@ void OnyxMainWindow::showContextMenu()
         }
         else if (system == FULL_SCREEN)
         {
-            statusbar_->hide();
+            status_bar_->hide();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
         else if (system == EXIT_FULL_SCREEN)
         {
-            statusbar_->show();
+            status_bar_->show();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
@@ -322,9 +326,9 @@ void OnyxMainWindow::showContextMenu()
         ReadingStyleType s = reading_style_actions_.selected();
         if (STYLE_LINE_SPACING_8 <= s && STYLE_LINE_SPACING_20 >= s)
         {
-            props_ref->setInt(PROP_INTERLINE_SPACE, (s+8)*10);
-            view_->setOptions(props_ref);
-            statusbar_->update();
+            props_ref_->setInt(PROP_INTERLINE_SPACE, (s+8)*10);
+            view_->setOptions(props_ref_);
+            status_bar_->update();
             updateScreen();
             return;
         }
@@ -416,18 +420,18 @@ bool OnyxMainWindow::updateActions()
 
 const QFont & OnyxMainWindow::currentFont()
 {
-    props_ref = view_->getOptions();
+    props_ref_ = view_->getOptions();
     QString family;
     QString size;
-    props_ref->getString(PROP_FONT_FACE, family);
-    props_ref->getString(PROP_FONT_SIZE, size);
-    select_font = QFont(family, size.toInt());
-    return select_font;
+    props_ref_->getString(PROP_FONT_FACE, family);
+    props_ref_->getString(PROP_FONT_SIZE, size);
+    select_font_ = QFont(family, size.toInt());
+    return select_font_;
 }
 
 bool OnyxMainWindow::isFullScreenByWidgetSize()
 {
-    return !statusbar_->isVisible();
+    return !status_bar_->isVisible();
 }
 
 void OnyxMainWindow::processToolActions()
@@ -509,7 +513,7 @@ void OnyxMainWindow::gotoPage()
 void OnyxMainWindow::showClock()
 {
     onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
-    statusbar_->onClockClicked();
+    status_bar_->onClockClicked();
 }
 
 void OnyxMainWindow::updateScreen()

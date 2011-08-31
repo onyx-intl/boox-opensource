@@ -45,6 +45,8 @@
 
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/sys/sys_conf.h"
+#include "onyx/sys/sys_status.h"
+#include "onyx/ui/message_dialog.h"
 
 static const std::string OPTIONS = "Options";
 static const std::string STATE = "State";
@@ -219,6 +221,10 @@ bool FBReader::initWindow() {
         conf().info.mutable_title() = QString::fromLocal8Bit(desc.title().c_str());
         ZLApplication::EncodingOption.setValue(desc.encoding());
         openBook(description);
+        if (!bookOpened)
+        {
+            return false;
+        }
     }
     ZLApplication::content_ready = true;
     refreshWindow();
@@ -307,6 +313,26 @@ void FBReader::openBookInternal(BookDescriptionPtr description) {
             delete myModel;
         }
         myModel = new BookModel(description);
+        bookOpened = true;
+
+        // If it's DRM content, check if it's valid to open
+        if(myModel->drm() && BookModel::OPEN_NORMAL != myModel->openStatus())
+        {
+            if (sys::SysStatus::instance().isSystemBusy())
+            {
+                sys::SysStatus::instance().setSystemBusy(false);
+            }
+            ui::MessageDialog dialog(QMessageBox::Critical,
+                                     QCoreApplication::tr("Failed!"),
+                                     QCoreApplication::tr("Failed opening the "
+                                         "book! The book is damaged or you do "
+                                         "not have permission to open it."),
+                                     QMessageBox::Yes);
+            dialog.exec();
+            bookOpened = false;
+            return;
+        }
+
         ZLStringOption(ZLCategoryKey::STATE, STATE, BOOK, std::string()).setValue(myModel->fileName());
         const std::string &lang = description->language();
         ZLTextHyphenator::instance().load(lang);

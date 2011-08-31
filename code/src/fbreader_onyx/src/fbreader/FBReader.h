@@ -148,6 +148,9 @@ class FBReader : public ZLApplication {
     std::string myBookToOpen;
     bool myBookAlreadyOpen;
 
+    // temporary for failed to open book
+    bool bookOpened;
+
     shared_ptr<ZLMessageHandler> myOpenFileHandler;
 
     enum {

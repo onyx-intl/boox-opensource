@@ -77,6 +77,9 @@ public:
 
 	void reset();
 
+	void setDRM(bool isDRM) const;
+	void setOpenStatus(int openStatus) const;
+
 private:
 	void insertEndParagraph(ZLTextParagraph::Kind kind);
 	void flushTextBufferToParagraph();

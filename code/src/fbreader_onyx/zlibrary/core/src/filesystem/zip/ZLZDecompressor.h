@@ -35,6 +35,10 @@ public:
 	size_t decompress(ZLInputStream &stream, char *buffer, size_t maxSize,
 	        const std::string &aesKey = std::string());
 
+protected:
+	size_t decompress_drm(ZLInputStream &stream, char *buffer, size_t maxSize,
+	        const std::string &aesKey);
+
 private:
 	void uncompress(Byte *compr, uLong comprLen, Byte *uncompr, uLong uncomprLen);
 
@@ -44,6 +48,7 @@ private:
 	char *myInBuffer;
 	char *myOutBuffer;
 	std::string myBuffer;
+	std::string plainBuffer;
 };
 
 #endif /* __ZLZDECOMPRESSOR_H__ */
