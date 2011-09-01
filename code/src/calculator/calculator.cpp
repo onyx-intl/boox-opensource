@@ -47,6 +47,51 @@
  #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/keyboard_navigator.h"
 
+static const QString BUTTON_STYLE =   "\
+QPushButton                             \
+{                                       \
+    background: white;                  \
+    font-size: 38px;                    \
+    border-width: 1px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 3;                   \
+    color: black;                       \
+    padding: 0px;                       \
+    min-width: 65px;                    \
+    min-height: 32px;                   \
+}                                       \
+QPushButton:pressed                     \
+{                                       \
+    padding-left: 0px;                  \
+    padding-top: 0px;                   \
+    color: white;                       \
+    border-color: white;                \
+    background-color: black;            \
+}                                       \
+QPushButton:checked                     \
+{                                       \
+    padding-left: 0px;                  \
+    padding-top: 0px;                   \
+    color: white;                       \
+    border-color: white;                \
+    background-color: black;            \
+}                                       \
+QPushButton:focus {                     \
+    border-width: 2px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 3;                   \
+}                                       \
+QPushButton:disabled                    \
+{                                       \
+    padding-left: 0px;                  \
+    padding-top: 0px;                   \
+    border-color: dark;                 \
+    color: dark;                        \
+    background-color: white;            \
+}";
+
  Calculator::Calculator(QWidget *parent)
      : QDialog(parent, Qt::FramelessWindowHint)
  {
@@ -398,6 +443,7 @@
  Button *Calculator::createButton(const QString &text, const char *member)
  {
      Button *button = new Button(text);
+     button->setStyleSheet(BUTTON_STYLE);
      connect(button, SIGNAL(clicked()), this, member);
      return button;
  }
