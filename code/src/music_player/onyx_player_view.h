@@ -95,6 +95,8 @@ private:
     void setCheckedPlayingSong(const int current_page);
     int getStep(qint64 total, qint64 current);
 
+    void enqueueFullyRefresh(qint64 current);
+
 private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;
@@ -145,6 +147,7 @@ private:
     int previous_page_; ///< store the previous page in page view
     int fixed_grid_rows_;
     bool need_refresh_immediately_;
+    int previous_gc_;  ///< store the previous time that use GC screen refresh.
 };
 
 }   // namespace player

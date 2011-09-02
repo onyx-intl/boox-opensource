@@ -58,6 +58,7 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , previous_page_(1)
     , fixed_grid_rows_(0)
     , need_refresh_immediately_(true)
+    , previous_gc_(0)
 {
 #ifndef Q_WS_QWS
     resize(600, 800);
@@ -440,6 +441,17 @@ int OnyxPlayerView::getStep(qint64 total, qint64 current)
     return step;
 }
 
+void OnyxPlayerView::enqueueFullyRefresh(qint64 current)
+{
+    qint64 currentSeconds = current/1000;
+    if (0 == (currentSeconds % 60) && currentSeconds != previous_gc_)
+    {
+        previous_gc_ = currentSeconds;
+        update();
+        onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    }
+}
+
 void OnyxPlayerView::setTime(qint64 t)
 {
     if (progress_bar_enabled_ && isVisible() && core_->totalTime() >= t)
@@ -478,7 +490,7 @@ void OnyxPlayerView::setTime(qint64 t)
                     onyx::screen::ScreenProxy::GU);
         }
 
-        // Wait some seconds to refresh time to save power
+        // Wait some seconds to refresh time and progress bar to save power
         int step = getStep(core_->totalTime(), t);
         if (count >= step)
         {
@@ -488,6 +500,9 @@ void OnyxPlayerView::setTime(qint64 t)
         {
             count++;
         }
+
+        // fully refresh the screen per minute in order to have better display
+        enqueueFullyRefresh(t);
     }
 }
 
@@ -855,6 +870,8 @@ void OnyxPlayerView::onCurrentChanged()
             onyx::screen::watcher().enqueue(&total_time_label_,
                     onyx::screen::ScreenProxy::GU);
         }
+
+        previous_gc_ = 0;
     }
 }
 
