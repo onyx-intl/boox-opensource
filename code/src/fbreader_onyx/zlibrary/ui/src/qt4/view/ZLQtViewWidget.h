@@ -183,6 +183,9 @@ private:
     void handleHyperlinks();
     void popupLinkInfoDialog();
 
+    // report user behavior, like page turning
+    void reportUserBehavior(int current, int total);
+
 public:
     bool hyperlink_selected_;
 

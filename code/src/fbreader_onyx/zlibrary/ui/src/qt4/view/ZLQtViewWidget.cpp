@@ -36,6 +36,7 @@
 #include "../dialogs/ZLFileListDialog.h"
 #include "../dialogs/ZLLinkInfoDialog.h"
 
+#include "onyx/sys/platform.h"
 #include "onyx/sys/sys.h"
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/screen/screen_update_watcher.h"
@@ -1091,6 +1092,23 @@ void ZLQtViewWidget::popupLinkInfoDialog()
     }
 }
 
+void ZLQtViewWidget::reportUserBehavior(int current, int total)
+{
+    bool send_user_behavior = true;
+    if (current == total && 1 == total)
+    {
+        send_user_behavior = false;
+    }
+    // report user behavior
+    if (send_user_behavior && sys::collectUserBehavior())
+    {
+        onyx::data::UserBehavior behavior("FBReader",
+                myApplication->filePath(), current,
+                onyx::data::UserBehavior::PAGE_TURNING, QTime::currentTime());
+        sys::SysStatus::instance().reportUserBehavior(behavior);
+    }
+}
+
 void ZLQtViewWidget::processKeyReleaseEvent(int key)
 {
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
@@ -1264,6 +1282,8 @@ void ZLQtViewWidget::updateProgress(size_t full, size_t from, size_t to)
     }
 
     status_bar_->setProgress(current, total);
+
+    reportUserBehavior(current, total);
 }
 
 bool ZLQtViewWidget::isWidgetVisible(QWidget * wnd)
