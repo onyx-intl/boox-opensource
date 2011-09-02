@@ -42,6 +42,10 @@
  #define CALCULATOR_H
 
  #include <QDialog>
+#include "onyx/ui/catalog_view.h"
+#include "button_view.h"
+
+using namespace ui;
 
  class QLineEdit;
 
@@ -57,12 +61,13 @@
  protected:
      void keyPressEvent(QKeyEvent *ke);
      void keyReleaseEvent(QKeyEvent *ke);
+     void showEvent(QShowEvent * e);
 
  private slots:
-     void digitClicked();
-     void unaryOperatorClicked();
-     void additiveOperatorClicked();
-     void multiplicativeOperatorClicked();
+     void digitClicked(const QString &title);
+     void unaryOperatorClicked(const QString &title);
+     void additiveOperatorClicked(const QString &title);
+     void multiplicativeOperatorClicked(const QString &title);
      void equalClicked();
      void pointClicked();
      void changeSignClicked();
@@ -76,12 +81,14 @@
 
      void refreshScreen();
 
-     void initFocus(Button * init_focus);
+     void onItemActivated(CatalogView *catalog, ContentView *item, int user_data);
 
  private:
-     Button *createButton(const QString &text, const char *member);
      void abortOperation();
      bool calculate(double rightOperand, const QString &pendingOperator);
+
+     void createLineButtons(const QVector< QPair<QString, int> > & button_list, CatalogView &view);
+     void createAllButtons();
 
      double sumInMemory;
      double sumSoFar;
@@ -90,10 +97,16 @@
      QString pendingMultiplicativeOperator;
      bool waitingForOperand;
 
-     QLineEdit *display;
+     enum { eDigitClicked, eUnaryOperatorClicked, eAdditiveOperatorClicked,eMultiplicativeOperatorClicked,
+            eEqualClicked, ePointClicked, eChangeSignClicked, eBackspaceClicked, eClear, eClearAll, eClearMemory,
+            eReadMemory, eSetMemory, eAddToMemory};
 
-     enum { NumDigitButtons = 10 };
-     Button *digitButtons[NumDigitButtons];
+     QLineEdit *display;
+     CatalogView first_line_buttons_;
+     CatalogView second_line_buttons_;
+     CatalogView third_line_buttons_;
+     CatalogView fourth_line_buttons_;
+     CatalogView fifth_line_buttons_;
  };
 
  #endif

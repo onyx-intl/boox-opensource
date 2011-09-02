@@ -46,9 +46,19 @@
  #include "calculator.h"
  #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/keyboard_navigator.h"
+#include "button_view.h"
+#include "onyx/data/data_tags.h"
+
+using namespace ui;
+CalculatorFactory factory;
 
  Calculator::Calculator(QWidget *parent)
      : QDialog(parent, Qt::FramelessWindowHint)
+     , first_line_buttons_(&factory, this)
+     , second_line_buttons_(&factory, this)
+     , third_line_buttons_(&factory, this)
+     , fourth_line_buttons_(&factory, this)
+     , fifth_line_buttons_(&factory, this)
  {
      sumInMemory = 0.0;
      sumSoFar = 0.0;
@@ -62,84 +72,127 @@
      display->setFont(line_edit_font);
      display->setAlignment(Qt::AlignRight);
      display->setMaxLength(15);
+     display->setFocusPolicy(Qt::NoFocus);
 
      QFont font = display->font();
      font.setPointSize(font.pointSize() + 8);
      display->setFont(font);
 
-     Button * init_focus;
-     for (int i = 0; i < NumDigitButtons; ++i) {
-         digitButtons[i] = createButton(QString::number(i), SLOT(digitClicked()));
-         if (5 == i)
-         {
-             init_focus = digitButtons[i];
-         }
-     }
-
-     Button *pointButton = createButton(".", SLOT(pointClicked()));
-     Button *changeSignButton = createButton("\261", SLOT(changeSignClicked()));
-
-     Button *backspaceButton = createButton(tr("Backspace"), SLOT(backspaceClicked()));
-     Button *clearButton = createButton(tr("Clear"), SLOT(clear()));
-     Button *clearAllButton = createButton(tr("Clear All"), SLOT(clearAll()));
-
-     Button *clearMemoryButton = createButton("MC", SLOT(clearMemory()));
-     Button *readMemoryButton = createButton("MR", SLOT(readMemory()));
-     Button *setMemoryButton = createButton("MS", SLOT(setMemory()));
-     Button *addToMemoryButton = createButton("M+", SLOT(addToMemory()));
-
-     Button *divisionButton = createButton("\367", SLOT(multiplicativeOperatorClicked()));
-     Button *timesButton = createButton("\327", SLOT(multiplicativeOperatorClicked()));
-     Button *minusButton = createButton("-", SLOT(additiveOperatorClicked()));
-     Button *plusButton = createButton("+", SLOT(additiveOperatorClicked()));
-
-     Button *squareRootButton = createButton("Sqrt", SLOT(unaryOperatorClicked()));
-     Button *powerButton = createButton("x\262", SLOT(unaryOperatorClicked()));
-     Button *reciprocalButton = createButton("1/x", SLOT(unaryOperatorClicked()));
-     Button *equalButton = createButton("=", SLOT(equalClicked()));
-
-     QGridLayout *mainLayout = new QGridLayout;
+     QVBoxLayout *mainLayout = new QVBoxLayout;
      mainLayout->setSizeConstraint(QLayout::SetMaximumSize);
+     mainLayout->setSpacing(10);
 
-     mainLayout->addWidget(display, 0, 0, 1, 6);
-     mainLayout->addWidget(backspaceButton, 1, 0, 1, 2);
-     mainLayout->addWidget(clearButton, 1, 2, 1, 2);
-     mainLayout->addWidget(clearAllButton, 1, 4, 1, 2);
+     mainLayout->addWidget(display);
 
-     mainLayout->addWidget(clearMemoryButton, 2, 0);
-     mainLayout->addWidget(readMemoryButton, 3, 0);
-     mainLayout->addWidget(setMemoryButton, 4, 0);
-     mainLayout->addWidget(addToMemoryButton, 5, 0);
+     createAllButtons();
+     mainLayout->addWidget(&first_line_buttons_);
+     mainLayout->addWidget(&second_line_buttons_);
+     mainLayout->addWidget(&third_line_buttons_);
+     mainLayout->addWidget(&fourth_line_buttons_);
+     mainLayout->addWidget(&fifth_line_buttons_);
+     mainLayout->addStretch();
 
-     for (int i = 1; i < NumDigitButtons; ++i) {
-         int row = ((9 - i) / 3) + 2;
-         int column = ((i - 1) % 3) + 1;
-         mainLayout->addWidget(digitButtons[i], row, column);
-     }
+     first_line_buttons_.setNeighbor(&second_line_buttons_, CatalogView::DOWN);
+     second_line_buttons_.setNeighbor(&third_line_buttons_, CatalogView::DOWN);
+     third_line_buttons_.setNeighbor(&fourth_line_buttons_, CatalogView::DOWN);
+     fourth_line_buttons_.setNeighbor(&fifth_line_buttons_, CatalogView::DOWN);
+     fifth_line_buttons_.setNeighbor(&first_line_buttons_, CatalogView::DOWN);
 
-     mainLayout->addWidget(digitButtons[0], 5, 1);
-     mainLayout->addWidget(pointButton, 5, 2);
-     mainLayout->addWidget(changeSignButton, 5, 3);
-
-     mainLayout->addWidget(divisionButton, 2, 4);
-     mainLayout->addWidget(timesButton, 3, 4);
-     mainLayout->addWidget(minusButton, 4, 4);
-     mainLayout->addWidget(plusButton, 5, 4);
-
-     mainLayout->addWidget(squareRootButton, 2, 5);
-     mainLayout->addWidget(powerButton, 3, 5);
-     mainLayout->addWidget(reciprocalButton, 4, 5);
-     mainLayout->addWidget(equalButton, 5, 5);
      setLayout(mainLayout);
 
      setWindowTitle(tr("Calculator"));
+}
 
-     initFocus(init_focus);
+void Calculator::createAllButtons()
+{
+     QVector< QPair<QString, int> > button_list;
+
+     //first_line
+     {
+         button_list.clear();
+         button_list.push_back(QPair<QString, int>(tr("Backspace"), eBackspaceClicked));
+         button_list.push_back(QPair<QString, int>(tr("Clear"), eClear));
+         button_list.push_back(QPair<QString, int>(tr("Clear All"), eClearAll));
+
+         createLineButtons(button_list, first_line_buttons_);
+     }
+
+     //second_line
+     {
+         button_list.clear();
+         button_list.push_back( QPair<QString, int>("MC", eClearMemory) );
+         button_list.push_back(QPair<QString, int>("7", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("8", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("9", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("\367", eMultiplicativeOperatorClicked));
+         button_list.push_back(QPair<QString, int>("Sqrt", eUnaryOperatorClicked));
+
+         createLineButtons(button_list, second_line_buttons_);
+     }
+
+     //third_line
+     {
+         button_list.clear();
+         button_list.push_back(QPair<QString, int>("MR",eReadMemory));
+         button_list.push_back(QPair<QString, int>("4", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("5", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("6", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("\327", eMultiplicativeOperatorClicked));
+         button_list.push_back(QPair<QString, int>("x\262", eUnaryOperatorClicked));
+
+         createLineButtons(button_list, third_line_buttons_);
+     }
+
+     //fourth_line
+     {
+         button_list.clear();
+         button_list.push_back(QPair<QString, int>("MS", eSetMemory));
+         button_list.push_back(QPair<QString, int>("1", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("2", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("3", eDigitClicked));
+         button_list.push_back(QPair<QString, int>("-", eAdditiveOperatorClicked));
+         button_list.push_back(QPair<QString, int>("1/x", eUnaryOperatorClicked));
+
+         createLineButtons(button_list, fourth_line_buttons_);
+     }
+
+     //fifth_line
+     {
+         button_list.clear();
+         button_list.push_back(QPair<QString, int>("M+", eAddToMemory));
+         button_list.push_back(QPair<QString, int>("0", eDigitClicked));
+         button_list.push_back(QPair<QString, int>(".", ePointClicked));
+         button_list.push_back(QPair<QString, int>("\261", eChangeSignClicked));
+         button_list.push_back(QPair<QString, int>("+", eAdditiveOperatorClicked));
+         button_list.push_back(QPair<QString, int>("=", eEqualClicked));
+
+         createLineButtons(button_list, fifth_line_buttons_);
+     }
  }
 
- void Calculator::initFocus(Button * init_focus)
+ void Calculator::createLineButtons(const QVector< QPair<QString, int> > & button_list, CatalogView &view)
  {
-     init_focus->setFocus();
+     ODatas button_data;
+     view.setSubItemType(ButtonView::type());
+     view.setPreferItemSize(QSize(80, 80));
+
+     for (int i = 0; i < button_list.size(); ++i)
+     {
+         OData * dd = new OData;
+         dd->insert(TAG_TITLE, button_list[i].first);
+         dd->insert(TAG_ID, button_list[i].second);
+         dd->insert(TAG_FONT_SIZE, 36);
+         button_data.push_back(dd);
+     }
+
+     view.setData(button_data);
+     view.setFixedGrid(1, button_list.size());
+     view.setSpacing(10);
+     view.setMinimumHeight(85);
+
+     view.setSearchPolicy(CatalogView::AutoHorRecycle|CatalogView::NeighborFirst);
+     connect(&view, SIGNAL(itemActivated(CatalogView*,ContentView*,int)),
+             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
  }
 
  void Calculator::keyPressEvent(QKeyEvent *ke)
@@ -159,11 +212,6 @@
      else if (key == Qt::Key_Up || key == Qt::Key_Down
              || key == Qt::Key_Left || key == Qt::Key_Right)
      {
-         QWidget *wid = ui::moveFocus(this, key);
-         if (wid)
-         {
-             wid->setFocus();
-         }
          update();
          onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW,
                  onyx::screen::ScreenCommand::WAIT_NONE);
@@ -180,10 +228,9 @@
     onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::DW);
  }
 
- void Calculator::digitClicked()
+ void Calculator::digitClicked(const QString &title)
  {
-     Button *clickedButton = qobject_cast<Button *>(sender());
-     int digitValue = clickedButton->text().toInt();
+     int digitValue = title.toInt();
      if (display->text() == "0" && digitValue == 0.0)
          return;
 
@@ -193,14 +240,12 @@
      }
      display->setText(display->text() + QString::number(digitValue));
 
-     clickedButton->setFocus();
      refreshScreen();
  }
 
- void Calculator::unaryOperatorClicked()
+ void Calculator::unaryOperatorClicked(const QString &title)
  {
-     Button *clickedButton = qobject_cast<Button *>(sender());
-     QString clickedOperator = clickedButton->text();
+     QString clickedOperator = title;
      double operand = display->text().toDouble();
      double result = 0.0;
 
@@ -225,10 +270,9 @@
      refreshScreen();
  }
 
- void Calculator::additiveOperatorClicked()
+ void Calculator::additiveOperatorClicked(const QString &title)
  {
-     Button *clickedButton = qobject_cast<Button *>(sender());
-     QString clickedOperator = clickedButton->text();
+     QString clickedOperator = title;
      double operand = display->text().toDouble();
 
      if (!pendingMultiplicativeOperator.isEmpty()) {
@@ -257,10 +301,9 @@
 
  }
 
- void Calculator::multiplicativeOperatorClicked()
+ void Calculator::multiplicativeOperatorClicked(const QString &title)
  {
-     Button *clickedButton = qobject_cast<Button *>(sender());
-     QString clickedOperator = clickedButton->text();
+     QString clickedOperator = title;
      double operand = display->text().toDouble();
 
      if (!pendingMultiplicativeOperator.isEmpty()) {
@@ -395,12 +438,6 @@
      equalClicked();
      sumInMemory += display->text().toDouble();
  }
- Button *Calculator::createButton(const QString &text, const char *member)
- {
-     Button *button = new Button(text);
-     connect(button, SIGNAL(clicked()), this, member);
-     return button;
- }
 
  void Calculator::abortOperation()
  {
@@ -423,3 +460,68 @@
      }
      return true;
  }
+
+void Calculator::onItemActivated(CatalogView *catalog, ContentView *item, int user_data)
+{
+    if (!item || !item->data())
+    {
+        return;
+    }
+
+    OData * item_data = item->data();
+    int method = item_data->value(TAG_ID).toInt();
+    QString title = item_data->value(TAG_TITLE).toString();
+
+    switch(method)
+    {
+    case eDigitClicked:
+        digitClicked(title);
+        break;
+    case eUnaryOperatorClicked:
+        unaryOperatorClicked(title);
+        break;
+    case eAdditiveOperatorClicked:
+        additiveOperatorClicked(title);
+        break;
+    case eMultiplicativeOperatorClicked:
+        multiplicativeOperatorClicked(title);
+        break;
+    case eEqualClicked:
+        equalClicked();
+        break;
+    case ePointClicked:
+        pointClicked();
+        break;
+    case eChangeSignClicked:
+        changeSignClicked();
+        break;
+    case eBackspaceClicked:
+        backspaceClicked();
+        break;
+    case eClear:
+        clear();
+        break;
+    case eClearAll:
+        clearAll();
+        break;
+    case eClearMemory:
+        clearMemory();
+        break;
+    case eReadMemory:
+        readMemory();
+        break;
+    case eSetMemory:
+        setMemory();
+        break;
+    case eAddToMemory:
+        addToMemory();
+        break;
+    }
+}
+
+void Calculator::showEvent(QShowEvent *e)
+{
+    QDialog::showEvent(e);
+    second_line_buttons_.setFocus();
+    second_line_buttons_.setFocusTo(0, 2);
+}
