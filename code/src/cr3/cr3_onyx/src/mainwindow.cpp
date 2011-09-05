@@ -713,3 +713,9 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         model.setItem(row, 1, page);
     }
 }
+
+void OnyxMainWindow::updateScreenManually()
+{
+    sys::SysStatus::instance().setSystemBusy(false);
+    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
+}

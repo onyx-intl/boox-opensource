@@ -25,6 +25,8 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     OnyxMainWindow(QWidget *parent = 0);
     ~OnyxMainWindow();
 
+    void updateScreenManually();
+
   public slots:
     void on_actionFindText_triggered();
 

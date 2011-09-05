@@ -170,6 +170,7 @@ int main(int argc, char *argv[])
             onyx::screen::watcher().addWatcher(&w);
             //w.showMaximized();
             w.showFullScreen();
+            w.updateScreenManually();
             sys::SysStatus::instance().setSystemBusy(false);
             res = a.exec();
         }
