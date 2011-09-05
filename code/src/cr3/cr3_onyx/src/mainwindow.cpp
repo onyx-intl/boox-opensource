@@ -196,16 +196,14 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_PageDown:
      case Qt::Key_Right:
          {
-             view_->nextPage();
-             updateScreen();
+             view_->nextPageWithTTSChecking();
              return;
          }
          break;
      case Qt::Key_PageUp:
      case Qt::Key_Left:
          {
-             view_->prevPage();
-             updateScreen();
+             view_->prevPageWithTTSChecking();
              return;
          }
          break;
@@ -221,7 +219,12 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
              updateScreen();
              return;
          }
+     case Qt::Key_Enter: // fall through
      case Qt::Key_Return:
+         {
+             this->gotoPage();
+             return;
+         }
          break;
      case Qt::Key_Menu:
          {
@@ -281,6 +284,9 @@ void OnyxMainWindow::showContextMenu()
     {
         select_font_ = font_actions_.selectedFont();
         props_ref_->setString( PROP_FONT_SIZE, QString().setNum(select_font_.pointSize()));
+        if (select_font_.bold()) {
+            view_->toggleFontEmbolden();
+        }
         view_->setOptions(props_ref_);
     }
     else if (group == reading_tool_actions_.category())
@@ -324,16 +330,26 @@ void OnyxMainWindow::showContextMenu()
     else if(group == reading_style_actions_.category())
     {
         ReadingStyleType s = reading_style_actions_.selected();
-        if (STYLE_LINE_SPACING_8 <= s && STYLE_LINE_SPACING_20 >= s)
+        if (s >= STYLE_LINE_SPACING_8 && s <= STYLE_LINE_SPACING_20)
         {
-            props_ref_->setInt(PROP_INTERLINE_SPACE, (s+8)*10);
-            view_->setOptions(props_ref_);
+            const unsigned int Percentage_Compensation = 80;
+            // since (int)STYLE_LINE_SPACING_8's value is 0
+            int line_height_percentage = ((int)s * 10) + Percentage_Compensation;
+            this->setLineHeight(line_height_percentage);
+
             status_bar_->update();
             updateScreen();
             return;
         }
     }
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+}
+
+void OnyxMainWindow::setLineHeight(const unsigned int lineHeightPercentage)
+{
+    props_ref_->setInt(PROP_INTERLINE_SPACE, lineHeightPercentage);
+    view_->setOptions(props_ref_);
+    return;
 }
 
 void OnyxMainWindow::updateReadingStyleActions()
@@ -557,8 +573,7 @@ void OnyxMainWindow::updateScreen()
 
 void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
-    view_->getDocView()->goToPage(value-1);
-    updateScreen();
+    view_->gotoPageWithTTSChecking(value);
 }
 
 

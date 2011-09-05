@@ -138,8 +138,14 @@ class CR3View : public QWidget, public LVDocViewCallback
         /// on scroll
         void togglePageScrollView();
         void scrollTo( int value );
-        void nextPage();
-        void prevPage();
+
+        // handle screen updating internally
+        void nextPageWithTTSChecking();
+        // handle screen updating internally
+        void prevPageWithTTSChecking();
+        // handle screen updating internally
+        void gotoPageWithTTSChecking(const int dstPage);
+
         void nextLine();
         void prevLine();
         void nextChapter();
@@ -160,9 +166,10 @@ class CR3View : public QWidget, public LVDocViewCallback
         void onSpeakDone();
         void stopTTS();
 
+        void toggleFontEmbolden();
+
         tts::TTSWidget & ttsWidget();
         tts::TTS & tts();
-
 
     signals:
         //void fileNameChanged( const QString & );
@@ -186,6 +193,10 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual bool eventFilter(QObject *obj, QEvent *event);
 
     private slots:
+        void nextPage();
+        void prevPage();
+        void gotoPage(const int dstPage);
+
         void lookup();
         void updateScreen();
         void onDictClosed();
@@ -198,7 +209,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         void clearSelection();
         void startSelection( ldomXPointer p );
         bool endSelection( ldomXPointer p );
+
         bool updateSelection( ldomXPointer p );
+        bool updateSelection(ldomXRange * range);
 
         bool adjustDictWidget();
 
@@ -206,6 +219,18 @@ class CR3View : public QWidget, public LVDocViewCallback
         void hideHelperWidget(QWidget * wnd);
         bool updateSearchWidget();
         void stylusPan(const QPoint &now, const QPoint &old);
+
+        bool docToWindowRect(lvRect &rect);
+
+        bool getPreviousWord(ldomXRange *range, bool *meetPageBoundary);
+        bool getNextWord(ldomXRange *range, bool *meetPageBoundary);
+        bool getUpWord(ldomXRange *range);
+        bool getDownWord(ldomXRange *range);
+
+        bool selectPreviousWord();
+        bool selectNextWord();
+        bool selectUpWord();
+        bool selectDownWord();
 
         DocViewData * _data; // to hide non-qt implementation
         LVDocView * _docview;

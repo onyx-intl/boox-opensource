@@ -96,7 +96,6 @@ void CR3View::updateDefProps()
     _data->_props->setStringDef( PROP_WINDOW_SHOW_STATUSBAR, "0" );
     _data->_props->setStringDef( PROP_APP_START_ACTION, "0" );
 
-
     QStringList styles = QStyleFactory::keys();
     QStyle * s = QApplication::style();
     QString currStyle = s->objectName();
@@ -364,9 +363,8 @@ void CR3View::setEditMode( bool flgEdit )
     update();
 }
 
+void CR3View::toggleFontEmbolden() { doCommand(DCMD_TOGGLE_BOLD, 1); };
 
-void CR3View::nextPage() { doCommand( DCMD_PAGEDOWN, 1 ); }
-void CR3View::prevPage() { doCommand( DCMD_PAGEUP, 1 ); }
 void CR3View::nextLine() { doCommand( DCMD_LINEDOWN, 1 ); }
 void CR3View::prevLine() { doCommand( DCMD_LINEUP, 1 ); }
 void CR3View::nextChapter() { doCommand( DCMD_MOVE_BY_CHAPTER, 1 ); }
@@ -375,6 +373,55 @@ void CR3View::firstPage() { doCommand( DCMD_BEGIN, 1 ); }
 void CR3View::lastPage() { doCommand( DCMD_END, 1 ); }
 void CR3View::historyBack() { doCommand( DCMD_LINK_BACK, 1 ); }
 void CR3View::historyForward() { doCommand( DCMD_LINK_FORWARD, 1 ); }
+void CR3View::nextPage() { doCommand(DCMD_PAGEDOWN, 1); }
+void CR3View::prevPage() { doCommand(DCMD_PAGEUP, 1); }
+
+void CR3View::gotoPage(const int dstPage)
+{
+    this->_docview->goToPage(dstPage - 1);
+}
+
+void CR3View::nextPageWithTTSChecking()
+{
+    if ((tts_widget_) && (tts_widget_->isVisible()))
+    {
+        tts_engine_->stop();
+        this->nextPage();
+        emit requestUpdateAll();
+        startTTS();
+    }
+    else {
+        this->nextPage();
+        emit requestUpdateAll();
+    }
+}
+
+void CR3View::prevPageWithTTSChecking() {
+    if ((tts_widget_) && (tts_widget_->isVisible())) {
+        tts_engine_->stop();
+        this->prevPage();
+        emit requestUpdateAll();
+        startTTS();
+    }
+    else {
+        this->prevPage();
+        emit requestUpdateAll();
+    }
+}
+
+void CR3View::gotoPageWithTTSChecking(const int dstPage)
+{
+    if ((tts_widget_) && (tts_widget_->isVisible())) {
+        tts_engine_->stop();
+        this->gotoPage(dstPage);
+        emit requestUpdateAll();
+        startTTS();
+    }
+    else {
+        this->gotoPage(dstPage);
+        emit requestUpdateAll();
+    }
+}
 
 void CR3View::refreshPropFromView( const char * propName )
 {
@@ -455,6 +502,13 @@ bool CR3View::loadSettings( QString fn )
         CRLog::error("Loading settings from file %s", fn.toUtf8().data() );
         res = true;
     } else {
+        // when first load, give some default values. joy@onyx
+        const char* Default_Font_Size = "22";
+        _data->_props->setString( PROP_FONT_SIZE, Default_Font_Size);
+
+        const unsigned int Default_Line_Height_Percentage = 130;
+        _data->_props->setInt(PROP_INTERLINE_SPACE, Default_Line_Height_Percentage);
+
         CRLog::error("Cannot load settings from file %s", fn.toUtf8().data() );
     }
     _docview->propsUpdateDefaults( _data->_props );
@@ -677,26 +731,42 @@ bool CR3View::updateSelection( ldomXPointer p )
         return false;
     _selEnd = p;
     ldomXRange r( _selStart, _selEnd );
-    if ( r.getStart().isNull() || r.getEnd().isNull() )
+
+    return this->updateSelection(&r);
+}
+
+bool CR3View::updateSelection(ldomXRange *range)
+{
+    if (range->getStart().isNull() || range->getEnd().isNull())
         return false;
-    r.sort();
-    if ( !_editMode ) {
-        if ( !r.getStart().isVisibleWordStart() )
-            r.getStart().prevVisibleWordStart();
+
+    range->sort();
+    if (!_editMode) {
+        if (!range->getStart().isVisibleWordStart()) {
+            range->getStart().prevVisibleWordStart();
+        }
         //lString16 start = r.getStart().toString();
-        if ( !r.getEnd().isVisibleWordEnd() )
-            r.getEnd().nextVisibleWordEnd();
+        if (!range->getEnd().isVisibleWordEnd()) {
+            range->getEnd().nextVisibleWordEnd();
+        }
     }
-    if ( r.isNull() )
+    if (range->isNull())
         return false;
     //lString16 end = r.getEnd().toString();
     //CRLog::debug("Range: %s - %s", UnicodeToUtf8(start).c_str(), UnicodeToUtf8(end).c_str());
-    r.setFlags(1);
-    _docview->selectRange( r );
-    _selText = cr2qt( r.getRangeText( '\n', 10000 ) );
+    range->setFlags(1);
+    _docview->selectRange(*range);
+    _selText = cr2qt(range->getRangeText('\n', 10000));
     _selected = true;
-    _selRange = r;
+    _selRange = *range;
+
+    _selStart = range->getStart();
+    _selEnd = range->getEnd();
+
     update();
+
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+
     return true;
 }
 
@@ -983,18 +1053,12 @@ void CR3View::keyReleaseEvent(QKeyEvent * event)
             }
         case Qt::Key_PageUp:
             {
-                tts_engine_->stop();
-                prevPage();
-                emit requestUpdateAll();
-                startTTS();
+                this->prevPageWithTTSChecking();
                 break;
             }
         case Qt::Key_PageDown:
             {
-                tts_engine_->stop();
-                nextPage();
-                emit requestUpdateAll();
-                startTTS();
+                this->nextPageWithTTSChecking();
                 break;
             }
         }
@@ -1089,7 +1153,7 @@ void CR3View::collectTTSContent()
 {
     text_to_speak_.clear();
     tts_paragraph_index_ = 0;
-    QString text_tmp = cr2qt( _docview->getAllPageText() );
+    QString text_tmp = cr2qt( _docview->getPageText(false, -1) );
     text_to_speak_.push_back(text_tmp);
 }
 
@@ -1359,15 +1423,39 @@ void CR3View::processKeyReleaseEvent(int key)
         onDictClosed();
         break;
     case Qt::Key_PageDown:
-        nextPage();
-        emit requestUpdateAll();
+        nextPageWithTTSChecking();
         break;
     case Qt::Key_PageUp:
-        prevPage();
-        emit requestUpdateAll();
+        prevPageWithTTSChecking();
+        break;
+    default:
+        if (dict_widget_->isInRetrieveWordsMode()) {
+            switch (key) {
+                case Qt::Key_Up:
+                    this->selectUpWord();
+                    break;
+                case Qt::Key_Down:
+                    this->selectDownWord();
+                    break;
+                case Qt::Key_Left:
+                    this->selectPreviousWord();
+                    break;
+                case Qt::Key_Right:
+                    this->selectNextWord();
+                    break;
+                case Qt::Key_Enter: // fall through
+                case Qt::Key_Return:
+                    this->lookup();
+                    break;
+                default:
+                    break;
+            }
+        }
         break;
     }
 }
+
+
 
 void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 {
@@ -1375,13 +1463,11 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 
     if (direction > 0)
     {
-        nextPage();
-        emit requestUpdateAll();
+        nextPageWithTTSChecking();
     }
     else if (direction < 0)
     {
-        prevPage();
-        emit requestUpdateAll();
+        prevPageWithTTSChecking();
     }
     else
     {
@@ -1394,4 +1480,382 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
             lookup();
         }
     }
+}
+
+bool CR3View::docToWindowRect(lvRect &rect)
+{
+    lvPoint top_left = rect.topLeft();
+    if (!_docview->docToWindowPoint(top_left)) {
+        CRLog::error("(%s, %d) docToWindowPoint failed (%d, %d)", __FILE__,
+                        __LINE__, top_left.x, top_left.y);
+        return false;
+    }
+
+    lvPoint bottom_right = rect.bottomRight();
+    if (!_docview->docToWindowPoint(bottom_right)) {
+        CRLog::error("(%s, %d) docToWindowPoint failed (%d, %d)", __FILE__,
+                __LINE__, bottom_right.x, bottom_right.y);
+        return false;
+    }
+
+    rect.setTopLeft(top_left);
+    rect.setBottomRight(bottom_right);
+
+    return true;
+}
+
+bool CR3View::getPreviousWord(ldomXRange *range, bool *meetPageBoundary)
+{
+    *meetPageBoundary = false;
+
+    ldomXRange test_range = ldomXRange(range->getStart(), range->getEnd());
+
+    if (!test_range.getStart().prevVisibleWordStart()) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+    if (!test_range.getEnd().prevVisibleWordEnd()) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    // to deal with cross-line range, we have to use range's end point instead of the range for locating. joy@onyx
+    lvRect test_start_rect;
+    if (!test_range.getStart().getRect(test_start_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    LVRendPageList *page_list = _docview->getPageList();
+    LVRendPageInfo *cur_page = (*page_list)[_docview->getCurPage()];
+
+
+    if (test_start_rect.top >= cur_page->start) {
+        *range = test_range;
+        return true;
+    }
+    else {
+        *meetPageBoundary = true;
+        return false;
+    }
+}
+
+bool CR3View::getNextWord(ldomXRange *range, bool *meetPageBoundary)
+{
+    *meetPageBoundary = false;
+
+    ldomXRange test_range = ldomXRange(range->getStart(), range->getEnd());
+
+    if (!test_range.getStart().nextVisibleWordStart()) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+    if (!test_range.getEnd().nextVisibleWordEnd()) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    // to deal with cross-line range, we have to use range's end point instead of the range for locating. joy@onyx
+    lvRect test_end_rect;
+    if (!test_range.getEnd().getRect(test_end_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    LVRendPageList *page_list = _docview->getPageList();
+    LVRendPageInfo *cur_page = (*page_list)[_docview->getCurPage()];
+
+
+    if (test_end_rect.bottom <= (cur_page->start + cur_page->height)) {
+        *range = test_range;
+        return true;
+    }
+    else {
+        *meetPageBoundary = true;
+        return false;
+    }
+}
+
+bool CR3View::getUpWord(ldomXRange *range)
+{
+    // to deal with cross-line range, we have to use range's end points instead of the range for locating. joy@onyx
+    lvRect src_start_rect;
+    if (!range->getStart().getRect(src_start_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    lvRect src_end_rect;
+    if (!range->getStart().getRect(src_end_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    ldomXRange test_range = ldomXRange(range->getStart(),
+            range->getEnd());
+    ldomXRange prev_range = ldomXRange();
+    lvRect prev_start_rect = src_start_rect;
+    lvRect prev_end_rect = src_end_rect;
+
+    do {
+        // word finding is a bit intricate, please be careful to maintain it. joy@onyx
+        bool page_boundary = false;
+        if (!this->getPreviousWord(&test_range, &page_boundary)) {
+            if (page_boundary) {
+                if (prev_start_rect.bottom <= src_start_rect.top) {
+                    // already in up line, prev_range is the best choice
+                    *range = prev_range;
+                }
+                break;
+            }
+            else {
+                return false;
+            }
+        }
+
+        lvRect test_start_rect;
+        if (!test_range.getStart().getRect(test_start_rect)) {
+            CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+            return false;
+        }
+
+        lvRect test_end_rect;
+        if (!test_range.getEnd().getRect(test_end_rect)) {
+            CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+            return false;
+        }
+
+        // when going up, choosing which word is a problem,
+        // here we choose the approach that using range->getStart()'s cursor as standard.
+        // joy@onyx
+        if ((test_start_rect.bottom <= src_start_rect.top)) {
+            if ((prev_start_rect.bottom <= src_start_rect.top)
+                    && (test_start_rect.bottom <= prev_start_rect.top)) {
+                // not crossing to 2nd up line
+                *range = prev_range;
+                break;
+            } else if (test_start_rect.left < src_start_rect.left) {
+                if (test_end_rect.left <= src_start_rect.left) {
+                    if (test_end_rect.bottom > src_start_rect.top) {
+                        // test_range crossing current line and up line
+                        *range = test_range;
+                        break;
+                    } else if (prev_start_rect.bottom > src_start_rect.top) {
+                        // prev_range in the same line with current range,
+                        // in this case, test_range is the only choice
+                        *range = test_range;
+                        break;
+                    }
+                    else {
+                        *range = prev_range;
+                        break;
+                    }
+                } else {
+                    *range = test_range;
+                    break;
+                }
+            }
+        }
+
+        prev_range = test_range;
+        prev_start_rect = test_start_rect;
+        prev_end_rect = test_end_rect;
+    } while (true);
+
+    return true;
+}
+
+bool CR3View::getDownWord(ldomXRange *range)
+{
+    // to deal with cross-line range, we have to use range's end points instead of the range for locating. joy@onyx
+    lvRect src_start_rect;
+    if (!range->getStart().getRect(src_start_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    lvRect src_end_rect;
+    if (!range->getStart().getRect(src_end_rect)) {
+        CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+        return false;
+    }
+
+    ldomXRange test_range = ldomXRange(range->getStart(), range->getEnd());
+    ldomXRange prev_range = ldomXRange();
+    lvRect prev_start_rect = src_start_rect;
+    lvRect prev_end_rect = src_end_rect;
+
+    do {
+        // word finding is a bit intricate, please be careful to maintain it. joy@onyx
+        bool page_boundary = false;
+        if (!this->getNextWord(&test_range, &page_boundary)) {
+            if (page_boundary) {
+                if (prev_start_rect.top <= src_start_rect.bottom) {
+                    // already in down line, prev_range is the best choice
+                    *range = prev_range;
+                }
+                break;
+            } else {
+                return false;
+            }
+        }
+
+        lvRect test_start_rect;
+        if (!test_range.getStart().getRect(test_start_rect)) {
+            CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+            return false;
+        }
+
+        lvRect test_end_rect;
+        if (!test_range.getEnd().getRect(test_end_rect)) {
+            CRLog::error("(%s, %d) function failed", __FILE__, __LINE__);
+            return false;
+        }
+
+        // when going down, selecting which word is a problem,
+        // here we choose the approach that using range->getStart()'s cursor as standard.
+        // joy@onyx
+        if ((test_start_rect.top >= src_start_rect.bottom)) {
+            if ((prev_start_rect.top >= src_start_rect.bottom)
+                    && (test_start_rect.top >= prev_start_rect.bottom)) {
+                // try not to cross to 2nd down line
+                *range = prev_range;
+                break;
+            } else if (test_end_rect.right > src_start_rect.left) {
+                *range = test_range;
+                break;
+            }
+        }
+
+        prev_range = test_range;
+        prev_start_rect = test_start_rect;
+        prev_end_rect = test_end_rect;
+    } while (true);
+
+    return true;
+}
+
+bool CR3View::selectPreviousWord()
+{
+    ldomXRangeList range_list =  _docview->getDocument()->getSelections();
+    if (range_list.empty()) {
+        assert(false);
+        CRLog::error("(%s, %d) current selection range should not be empty", __FILE__, __LINE__);
+        return false;
+    }
+    // TODO should delete after used? joy@onyx
+    ldomXRange *current_range = range_list.first();
+    LVArray<ldomWord> range_words;
+    current_range->getRangeWords(range_words);
+    if (range_words.length() != 1) {
+        // TODO such as "e-reader" will be in selection, how to handle this situation? joy@onyx
+//        return false;
+    }
+
+    bool page_boundary = false;
+    if (!this->getPreviousWord(current_range, &page_boundary)) {
+        if (!page_boundary) {
+            return false;
+        }
+    }
+
+    this->clearSelection();
+
+    if (!this->updateSelection(current_range)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool CR3View::selectNextWord()
+{
+    ldomXRangeList range_list = _docview->getDocument()->getSelections();
+    if (range_list.empty()) {
+        assert(false);
+        CRLog::error("(%s, %d) current selection range should not be empty", __FILE__, __LINE__);
+        return false;
+    }
+    // TODO should delete after used? joy@onyx
+    ldomXRange *current_range = range_list.first();
+    LVArray<ldomWord> range_words;
+    current_range->getRangeWords(range_words);
+    if (range_words.length() != 1) {
+        // TODO such as "e-reader" will be in selection, how to handle this situation? joy@onyx
+//            return false;
+    }
+
+    bool page_boundary = false;
+    if (!this->getNextWord(current_range, &page_boundary)) {
+        if (!page_boundary) {
+            return false;
+        }
+    }
+
+    this->clearSelection();
+
+    if (!this->updateSelection(current_range)) {
+        return false;
+    }
+
+    return true;
+}
+bool CR3View::selectUpWord()
+{
+    ldomXRangeList range_list = _docview->getDocument()->getSelections();
+    if (range_list.empty()) {
+        assert(false);
+        CRLog::error("(%s, %d) current selection range should not be empty", __FILE__, __LINE__);
+        return false;
+    }
+    // TODO should delete after used? joy@onyx
+    ldomXRange *current_range = range_list.first();
+    LVArray<ldomWord> range_words;
+    current_range->getRangeWords(range_words);
+    if (range_words.length() != 1) {
+        // TODO such as "e-reader" will be in selection, how to handle this situation? joy@onyx
+        //            return false;
+    }
+
+    if (!this->getUpWord(current_range)) {
+        return false;
+    }
+
+    this->clearSelection();
+
+    if (!this->updateSelection(current_range)) {
+        return false;
+    }
+
+    return true;
+}
+bool CR3View::selectDownWord()
+{
+    ldomXRangeList range_list = _docview->getDocument()->getSelections();
+    if (range_list.empty()) {
+        assert(false);
+        CRLog::error("(%s, %d) current selection range should not be empty",
+                __FILE__, __LINE__);
+        return false;
+    }
+    // TODO should delete after used? joy@onyx
+    ldomXRange *current_range = range_list.first();
+    LVArray<ldomWord> range_words;
+    current_range->getRangeWords(range_words);
+    if (range_words.length() != 1) {
+        // TODO such as "e-reader" will be in selection, how to handle this situation? joy@onyx
+        //            return false;
+    }
+
+    if (!this->getDownWord(current_range)) {
+        return false;
+    }
+
+    this->clearSelection();
+
+    if (!this->updateSelection(current_range)) {
+        return false;
+    }
+
+    return true;
 }
