@@ -42,6 +42,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void onProgressClicked(const int, const int);
     bool addBookmark();
     void updateScreen();
+    void onScreenSizeChanged(int);
 
   private:
     void toggleProperty( const char * name );

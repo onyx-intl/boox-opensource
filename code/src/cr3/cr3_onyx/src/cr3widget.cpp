@@ -763,9 +763,10 @@ bool CR3View::updateSelection(ldomXRange *range)
     _selStart = range->getStart();
     _selEnd = range->getEnd();
 
-    update();
-
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+    // TODO comment out by joy@onyx
+//    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+//
+//    update();
 
     return true;
 }
@@ -836,6 +837,9 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     stylusPan(event->pos(), begin_point_);
+
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+    this->update();
 }
 
 /// Override to handle external links
@@ -1234,45 +1238,6 @@ void CR3View::hideHelperWidget(QWidget * wnd)
     }
 }
 
-void CR3View::updateScreen()
-{
-    repaint();
-
-    if (onyx::screen::instance().userData() < 2)
-    {
-        ++onyx::screen::instance().userData();
-        if (onyx::screen::instance().userData() == 2)
-        {
-            sys::SysStatus::instance().setSystemBusy(false);
-            onyx::screen::instance().updateWidget(
-                this,
-                onyx::screen::ScreenProxy::GC,
-                true,
-                onyx::screen::ScreenCommand::WAIT_ALL);
-        }
-        return;
-    }
-
-    if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
-    {
-        onyx::screen::instance().updateWidget(
-            this,
-            onyx::screen::ScreenProxy::DW,
-            true,
-            onyx::screen::ScreenCommand::WAIT_ALL);
-    }
-    else
-    {
-        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
-        onyx::screen::instance().updateWidgetWithGCInterval(
-            this,
-            NULL,
-            w,
-            true,
-            onyx::screen::ScreenCommand::WAIT_ALL);
-    }
-}
-
 bool CR3View::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress)
@@ -1329,7 +1294,9 @@ void CR3View::showSearchWidget()
         connect(search_widget_.get(), SIGNAL(search(OnyxSearchContext &)),
             this, SLOT(onSearch(OnyxSearchContext &)));
         connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
-        onyx::screen::watcher().addWatcher(search_widget_.get());
+
+        sys::SystemConfig conf;
+        onyx::screen::watcher().addWatcher(this, conf.screenUpdateGCInterval());
     }
 
     search_context_.userData() = BEFORE_SEARCH;
@@ -1346,7 +1313,7 @@ void CR3View::onDictClosed()
 
 void CR3View::lookup()
 {
-    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
     if (!dict_widget_)
     {
         startDictLookup();
@@ -1388,7 +1355,7 @@ void CR3View::onSearchClosed()
 {
     //OnyxMainWindow->doAction("clearSearchResult");
     search_tool_->onCloseSearch();
-    updateScreen();
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
 }
 
 bool CR3View::updateSearchWidget()
@@ -1410,7 +1377,7 @@ bool CR3View::updateSearchWidget()
             return false;
         }
     }
-    updateScreen();
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
     return true;
 }
 

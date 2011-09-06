@@ -36,8 +36,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     setStatusBar(status_bar_);
 
     sys::SystemConfig conf;
-    onyx::screen::instance().setGCInterval(conf.screenUpdateGCInterval());
-    onyx::screen::watcher().addWatcher(this);
+    onyx::screen::watcher().addWatcher(this, conf.screenUpdateGCInterval());
 
 #ifdef _LINUX
     QString homeDir = QDir::toNativeSeparators(QDir::homePath() + "/.cr3/");
@@ -90,6 +89,9 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     select_font_ = currentFont();
     font_family_actions_.loadExternalFonts();
 
+#ifdef Q_WS_QWS
+    connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
+#endif
     connect( &(SysStatus::instance()), SIGNAL(aboutToShutdown()), this, SLOT(close()) );
     connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
 
@@ -97,7 +99,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     connect(view_, SIGNAL(updateProgress(int,int)), status_bar_, SLOT(setProgress(int,int)));
     connect(status_bar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
     connect(view_, SIGNAL(requestUpdateAll()), this,SLOT(updateScreen()));
-    updateScreen();
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
 
     view_->restoreWindowPos( this, "main.", true );
 }
@@ -210,13 +212,13 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      case Qt::Key_Up:
          {
              view_->zoomIn();
-             updateScreen();
+             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
              return;
          }
      case Qt::Key_Down:
          {
              view_->zoomOut();
-             updateScreen();
+             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
              return;
          }
      case Qt::Key_Enter: // fall through
@@ -316,14 +318,16 @@ void OnyxMainWindow::showContextMenu()
         else if (system == MUSIC)
         {
             // Start or show music player.
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+            this->update();
             sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
         }
         else if (system == ROTATE_SCREEN)
         {
             SysStatus::instance().rotateScreen();
-            view_->update();
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+//            view_->update();
+//            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+//            this->update();
             return;
         }
     }
@@ -338,11 +342,12 @@ void OnyxMainWindow::showContextMenu()
             this->setLineHeight(line_height_percentage);
 
             status_bar_->update();
-            updateScreen();
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
             return;
         }
     }
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+    this->update();
 }
 
 void OnyxMainWindow::setLineHeight(const unsigned int lineHeightPercentage)
@@ -480,11 +485,11 @@ void OnyxMainWindow::processToolActions()
     case ::ui::ADD_BOOKMARK:
         addBookmark();
         view_->restoreWindowPos(this, "MyBookmark");
-        updateScreen();
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         break;
     case ::ui::DELETE_BOOKMARK:
         view_->deleteBookmark();
-        updateScreen();
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         break;
     case ::ui::SHOW_ALL_BOOKMARKS:
         showAllBookmarks();
@@ -518,7 +523,7 @@ void OnyxMainWindow::gotoPage()
     NumberDialog dialog(0);
     if (dialog.popup(view_->getDocView()->getCurPage(), view_->getDocView()->getPageCount()) != QDialog::Accepted)
     {
-        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         return;
     }
 
@@ -528,46 +533,21 @@ void OnyxMainWindow::gotoPage()
 
 void OnyxMainWindow::showClock()
 {
-    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
     status_bar_->onClockClicked();
 }
 
 void OnyxMainWindow::updateScreen()
 {
-    view_->repaint();
-
-    if (onyx::screen::instance().userData() < 2)
-    {
-        ++onyx::screen::instance().userData();
-        if (onyx::screen::instance().userData() == 2)
-        {
-            sys::SysStatus::instance().setSystemBusy(false);
-            onyx::screen::instance().updateWidget(
-                this,
-                onyx::screen::ScreenProxy::GC,
-                true,
-                onyx::screen::ScreenCommand::WAIT_ALL);
-        }
-        return;
-    }
+    view_->update();
 
     if (onyx::screen::instance().defaultWaveform() == onyx::screen::ScreenProxy::DW)
     {
-        onyx::screen::instance().updateWidget(
-            this,
-            onyx::screen::ScreenProxy::DW,
-            true,
-            onyx::screen::ScreenCommand::WAIT_ALL);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW);
     }
     else
     {
-        onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
-        onyx::screen::instance().updateWidgetWithGCInterval(
-            this,
-            NULL,
-            w,
-            true,
-            onyx::screen::ScreenCommand::WAIT_ALL);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
     }
 }
 
@@ -575,8 +555,6 @@ void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
     view_->gotoPageWithTTSChecking(value);
 }
-
-
 
 void OnyxMainWindow::showTableOfContents()
 {
@@ -625,7 +603,7 @@ void OnyxMainWindow::showTableOfContents()
     int ret = dialog.popup( tr("Table of Contents") );
     if (ret != QDialog::Accepted)
     {
-        onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         return;
     }
 
@@ -674,11 +652,12 @@ void OnyxMainWindow::showAllBookmarks()
 
     int ret = bookmark_view.popup(QCoreApplication::tr("Bookmarks"));
     // Returned from the bookmark view.
-    onyx::screen::instance().flush();
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+    this->update();
 
     if (ret != QDialog::Accepted)
     {
-        onyx::screen::instance().updateWidget(0);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         return;
     }
 
@@ -718,4 +697,27 @@ void OnyxMainWindow::updateScreenManually()
 {
     sys::SysStatus::instance().setSystemBusy(false);
     onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
+}
+
+void OnyxMainWindow::onScreenSizeChanged(int)
+{
+    // Preserve updatability.
+    QWidget *wnd = qApp->focusWidget();
+
+    setFixedSize(qApp->desktop()->screenGeometry().size());
+
+    if (isActiveWindow())
+    {
+        if (wnd)
+        {
+            wnd->setFocus();
+        }
+        update();
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+    }
+
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+    this->update();
+
+//    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 }

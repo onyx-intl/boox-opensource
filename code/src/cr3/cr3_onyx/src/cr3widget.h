@@ -198,7 +198,6 @@ class CR3View : public QWidget, public LVDocViewCallback
         void gotoPage(const int dstPage);
 
         void lookup();
-        void updateScreen();
         void onDictClosed();
         void onSearchClosed();
         void onSearch(OnyxSearchContext& context);

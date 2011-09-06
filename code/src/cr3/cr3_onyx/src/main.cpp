@@ -167,11 +167,11 @@ int main(int argc, char *argv[])
              else
                 CRLog::error("Canot load translation file %s from dir %s", UnicodeToUtf8(qt2cr(trname)).c_str(), UnicodeToUtf8(qt2cr(translations)).c_str() );
             OnyxMainWindow w;
-            onyx::screen::watcher().addWatcher(&w);
             //w.showMaximized();
             w.showFullScreen();
-            w.updateScreenManually();
             sys::SysStatus::instance().setSystemBusy(false);
+            w.updateScreenManually();
+
             res = a.exec();
         }
     }
