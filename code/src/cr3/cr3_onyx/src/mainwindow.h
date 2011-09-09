@@ -25,6 +25,8 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     OnyxMainWindow(QWidget *parent = 0);
     ~OnyxMainWindow();
 
+    void updateScreenManually();
+
   public slots:
     void on_actionFindText_triggered();
 
@@ -40,6 +42,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void onProgressClicked(const int, const int);
     bool addBookmark();
     void updateScreen();
+    void onScreenSizeChanged(int);
 
   private:
     void toggleProperty( const char * name );

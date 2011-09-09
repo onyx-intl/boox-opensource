@@ -181,7 +181,7 @@ void Calculator::createAllButtons()
          OData * dd = new OData;
          dd->insert(TAG_TITLE, button_list[i].first);
          dd->insert(TAG_ID, button_list[i].second);
-         dd->insert(TAG_FONT_SIZE, 36);
+         dd->insert(TAG_FONT_SIZE, 32);
          button_data.push_back(dd);
      }
 
