@@ -570,12 +570,18 @@ bool ZLQtViewWidget::addBookmark()
     vbf::Bookmark new_bookmark(title, from_);
     myApplication->addBookmark(new_bookmark);
     myApplication->refreshWindow();
+
+    // Have to refresh again.
+    myApplication->refreshWindow();
     return true;
 }
 
 bool ZLQtViewWidget::removeBookmarks()
 {
     myApplication->removeBookmarks(from_, to_);
+    myApplication->refreshWindow();
+
+    // Have to refresh window.
     myApplication->refreshWindow();
     return true;
 }
