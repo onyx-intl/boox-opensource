@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     FullScreenClock clock(0);
+    clock.showFullScreen();
     sys::SysStatus::instance().setSystemBusy(false);
-    clock.exec();
     return app.exec();
 }
