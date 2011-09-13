@@ -39,6 +39,7 @@
  ****************************************************************************/
 
  #include <QtGui>
+ #include <QCoreApplication>
 
  #include <math.h>
 
@@ -100,7 +101,7 @@ CalculatorFactory factory;
 
      setLayout(mainLayout);
 
-     setWindowTitle(tr("Calculator"));
+     setWindowTitle(QCoreApplication::tr("Calculator"));
 }
 
 void Calculator::createAllButtons()
