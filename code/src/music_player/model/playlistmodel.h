@@ -146,6 +146,7 @@ public Q_SLOTS:
     void setConvertTwenty(bool enabled);
     void setUseMetadata(bool enabled);
     void setFormat(const QString &format);
+    void readMediaInfos();
 
 private:
     void doSort(int mode,QList<PlayListItem*>& list_to_sort);

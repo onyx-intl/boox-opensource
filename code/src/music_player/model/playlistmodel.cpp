@@ -9,6 +9,10 @@
 #include "playlistitem.h"
 #include "playstate.h"
 #include "playlistsettings.h"
+#include "onyx/cms/media_info_manager.h"
+#include "onyx/cms/media_db.h"
+
+using namespace cms;
 
 namespace player
 {
@@ -74,6 +78,16 @@ PlayListModel::~PlayListModel()
 
 void PlayListModel::load(PlayListItem *item)
 {
+    int size = items_.size();
+    for (int i=0; i<size; i++)
+    {
+        PlayListItem *list_item = items_.at(i);
+        if (item->fileInfo()->path() == list_item->fileInfo()->path())
+        {
+            return;
+        }
+    }
+
     total_length_ += item->length();
     items_ << item;
 
@@ -422,6 +436,34 @@ void PlayListModel::readSettings()
     }
     block_update_signals_ = FALSE;
     doCurrentVisibleRequest();
+}
+
+void PlayListModel::readMediaInfos()
+{
+    QList <FileInfo *> infoList;
+
+    MediaInfoManager media_manager;
+    QStringList media_list = media_manager.mediaInfo(MUSIC);
+    int size = media_list.size();
+    for (int i=0; i<size; i++)
+    {
+        QString item = media_list.at(i);
+        if (!item.isEmpty())
+        {
+            infoList << new FileInfo(item);
+        }
+    }
+
+    if (current_ > infoList.count() - 1)
+    {
+        current_ = 0;
+    }
+    block_update_signals_ = TRUE;
+    foreach(FileInfo *info, infoList)
+    {
+        load(new PlayListItem(info));
+    }
+    block_update_signals_ = FALSE;
 }
 
 void PlayListModel::writeSettings()

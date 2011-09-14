@@ -130,6 +130,9 @@ bool PlayerApplication::open(const QString &path_name)
         view_.activateWindow();
     }
 
+    // load audio files from media db
+    model_->readMediaInfos();
+
     sys::SysStatus::instance().setSystemBusy( false );
     onyx::screen::instance().enableUpdate(true);
     // TODO (Jim) need to clean code. Check if it can only use screen update watcher.
