@@ -10,6 +10,20 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 #
 PROJECT(PoDoFo)
 
+if(BUILD_FOR_ARM)
+    INCLUDE(CMakeForceCompiler)
+
+    CMAKE_FORCE_C_COMPILER(arm-linux-gcc GNU)
+    CMAKE_FORCE_CXX_COMPILER(arm-linux-g++ GNU)
+    SET(CMAKE_FIND_ROOT_PATH /opt/onyx/arm)
+
+    # For libraries and headers in the target directories
+    SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+endif(BUILD_FOR_ARM)
+
+
+
 SET(PODOFO_VERSION_MAJOR "0" CACHE STRING "Major part of PoDoFo version number")
 SET(PODOFO_VERSION_MINOR "9" CACHE STRING "Minor part of PoDoFo version number")
 SET(PODOFO_VERSION_PATCH "1" CACHE STRING "Patchlevel part of PoDoFo version number")
