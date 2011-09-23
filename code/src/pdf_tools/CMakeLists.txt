@@ -1,6 +1,7 @@
 ENABLE_QT()
 
-INCLUDE_DIRECTORIES(../podofo)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/boox-opensource/code/src/podofo)
+LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/boox-opensource/code/src/podofo)
 INCLUDE_DIRECTORIES(include)
 
 # Header files.
@@ -24,8 +25,9 @@ TARGET_LINK_LIBRARIES(pdf_tools
   onyx_data
   onyx_screen
   podofo
-  jpeg
+  freetype
   fontconfig
+  jpeg
   ${QT_LIBRARIES}
   ${ADD_LIB}
 )
