@@ -121,13 +121,21 @@ void PdfAnnotation::SetAppearanceStream( PdfXObject* pObject )
         PODOFO_RAISE_ERROR( ePdfError_InvalidHandle );
     }
 
-    internal.AddKey( "On", pObject->GetObject()->Reference() );
-    internal.AddKey( "Off", pObject->GetObject()->Reference() );
+    // when adding #On/Off# entries to #AP#, and set #AS# to "On",
+    // will cause desktop adobe pdf reader not showing display content of the Appearance Stream of PolyLine
+    // so comment out it, joy@onyx
 
-    dict.AddKey( "N", internal );
+//    internal.AddKey( "On", pObject->GetObject()->Reference() );
+//    internal.AddKey( "Off", pObject->GetObject()->Reference() );
+//
+//    dict.AddKey( "N", internal );
+//
+//    this->GetObject()->GetDictionary().AddKey( "AP", dict );
+//    this->GetObject()->GetDictionary().AddKey( "AS", PdfName("On") );
+
+    dict.AddKey( "N", pObject->GetObject()->Reference() );
 
     this->GetObject()->GetDictionary().AddKey( "AP", dict );
-    this->GetObject()->GetDictionary().AddKey( "AS", PdfName("On") );
 }
 
 bool PdfAnnotation::HasAppearanceStream() const
