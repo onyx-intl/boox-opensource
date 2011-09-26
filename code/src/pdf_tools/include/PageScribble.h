@@ -11,14 +11,16 @@ struct PageScribble {
     struct Stroke {
         PARect rect_;
         std::vector<PAPoint> points_;
+        double thickness_;
 
-        Stroke(std::vector<PAPoint> points)
+        Stroke(std::vector<PAPoint> points, double thickness = 1.0)
         {
             rect_ = PARect(points.front(), points.front());
             for (std::vector<PAPoint>::iterator it = points.begin(); it != points.end(); it++) {
                 points_.push_back(*it);
                 rect_.inflateTo(*it);
             }
+            thickness_ = thickness;
         }
     };
 

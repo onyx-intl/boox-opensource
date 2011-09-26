@@ -11,6 +11,7 @@
 #include "onyx/data/sketch_document.h"
 #include "onyx/data/sketch_io.h"
 #include "onyx/data/sketch_stroke.h"
+#include "onyx/data/sketch_graphic_context.h"
 
 #include "../include/DeviceScribbleReader.h"
 #include "../include/GlobalDefines.h"
@@ -136,7 +137,8 @@ static bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::Sk
             continue;
         }
 
-        parsedScribble.strokes_.push_back(PageScribble::Stroke(pa_points));
+        const double stroke_thickness = sketch::getPointSize(it->get()->shape(), 1.0 / stroke_zoom_factor);
+        parsedScribble.strokes_.push_back(PageScribble::Stroke(pa_points, stroke_thickness));
 
         const PARect &rect = parsedScribble.strokes_.back().rect_;
         std::cout<<"Rect: "<<rect.ll_.x_<<","<<rect.ll_.y_<<","<<rect.ur_.x_<<","<<rect.ur_.y_<<std::endl;

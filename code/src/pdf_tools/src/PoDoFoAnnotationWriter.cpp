@@ -21,7 +21,7 @@
 
 using namespace pdfanno;
 
-static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfPage *page, const PARect &rect, const std::vector<PAPoint> &points);
+static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfPage *page, const PageScribble::Stroke &stroke);
 
 PoDoFoAnnotationWriter::PoDoFoAnnotationWriter()
 {
@@ -87,7 +87,7 @@ bool PoDoFoAnnotationWriter::writeScribbles(std::vector<PageScribble> pageScribb
         for (std::vector<PageScribble::Stroke>::iterator it = pageScribbles[i].strokes_.begin();
                 it != pageScribbles[i].strokes_.end();
                 it++) {
-            if (!createAnnotationPolyLine(doc_, page, it->rect_, it->points_)) {
+            if (!createAnnotationPolyLine(doc_, page, *it)) {
                 continue;
             }
         }
@@ -128,11 +128,15 @@ bool PoDoFoAnnotationWriter::closeCore()
     return true;
 }
 
-static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfPage *page, const PARect &rect, const std::vector<PAPoint> &points)
+static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfPage *page, const PageScribble::Stroke &stroke)
 {
     assert(document && page);
 
     using namespace PoDoFo;
+
+    const PARect &rect = stroke.rect_;
+    const std::vector<PAPoint> &points = stroke.points_;
+    const double thickness = stroke.thickness_;
 
     PdfRect pdf_rect(rect.ll_.x_, rect.ll_.y_, rect.getWidth(), rect.getHeight());
 
@@ -156,7 +160,7 @@ static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfP
     PdfXObject *xobj = new PdfXObject(pdf_rect, document);
     PdfPainter pnt;
     pnt.SetPage(xobj);
-    pnt.SetStrokeWidth(1);
+    pnt.SetStrokeWidth(thickness);
     for (int i = 0; i < points.size() - 1; i++) {
         std::cout<<"Line " <<i<<": ("<<points[i].x_<<","<<points[i].y_<<"), ("<<points[i + 1].x_<<","<<points[i + 1].y_<<")"<<std::endl;
         pnt.DrawLine(points[i].x_, points[i].y_, points[i + 1].x_, points[i + 1].y_);
