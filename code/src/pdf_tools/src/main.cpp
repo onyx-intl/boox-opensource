@@ -41,8 +41,15 @@ bool testCombinePageScribbles(std::string docPath)
     }
 
     std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;
-    if (!annot_writer->writeScribbles(page_scribbles)) {
-        return false;
+    if (device_reader.getTransformer()) {
+        if (!annot_writer->writeScribbles(page_scribbles, device_reader.getTransformer())) {
+            return false;
+        }
+    }
+    else {
+        if (!annot_writer->writeScribbles(page_scribbles)) {
+            return false;
+        }
     }
 
     std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;

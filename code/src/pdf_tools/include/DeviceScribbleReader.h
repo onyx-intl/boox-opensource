@@ -11,155 +11,17 @@
 #include <string>
 #include <vector>
 
-#include "onyx/data/sketch_document.h"
-#include "onyx/data/sketch_io.h"
-#include "onyx/data/sketch_stroke.h"
-
+#include "GlobalDefines.h"
 #include "PageScribble.h"
-#include "PAPoint.h"
-#include "PARect.h"
+#include "PASize.h"
 
 namespace pdfanno {
 
 class DeviceScribbleReader {
 public:
-    bool getDocumentScribbles(std::string docPath, std::vector<PageScribble> &pageScribbles)
-    {
-        pageScribbles.clear();
-
-        QString doc_path = QString::fromLocal8Bit(docPath.c_str());
-
-        std::cout<<"sketch file path will be: "<<doc_path.toStdString()<<std::endl;
-
-        sketch::Pages pages;
-        if (!getDeviceScribblePages(doc_path, pages)) {
-            return false;
-        }
-
-        if (!parseDeviceScribblePages(pages, pageScribbles)) {
-            return false;
-        }
-
-        return true;
-    }
-
-private:
-    bool getDeviceScribblePages(const QString &docPath, sketch::Pages &pages)
-    {
-        SketchDocument sketch_document;
-        if (!sketch_document.open(docPath)) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"open sketch data failed: "<<docPath.toStdString()<<std::endl;
-            return false;
-        }
-
-        SketchIOPtr sketch_io = SketchIO::getIO(docPath, false);
-        if (sketch_io == 0) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"open sketch data failed: "<<docPath.toStdString()<<std::endl;
-            return false;
-        }
-
-        if (!sketch_document.loadAllPages(sketch_io)) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"open sketch data failed: "<<docPath.toStdString()<<std::endl;
-            return false;
-        }
-
-        pages = sketch_document.pages();
-        std::cout<<"pages: "<<pages.size()<<std::endl;
-
-        int i = 0;
-        QMapIterator<PageKey, SketchPagePtr> it(pages);
-        while (it.hasNext()) {
-            it.next();
-            std::cout << "loading page " << i << std::endl;
-            i++;
-
-            SketchPagePtr page = it.value();
-
-            if (!sketch_io->loadPageData(page)) {
-                std::cerr<<"loading page failed"<<std::endl;
-            }
-        }
-
-        return true;
-    }
-    bool parseDeviceScribblePages(const sketch::Pages &pages, std::vector<PageScribble> &pageScribbles)
-    {
-        int i = 0;
-        QMapIterator<PageKey, SketchPagePtr> it(pages);
-        while (it.hasNext()) {
-            it.next();
-
-            std::cout<<"parsing page "<<i<<std::endl;
-            i++;
-
-            PageKey key = it.key();
-            SketchPagePtr page = it.value();
-
-            if (!page->dataLoaded()) {
-                std::cout<<"page not loaded yet"<<std::endl;
-                assert(false);
-                continue;
-            }
-
-            PageScribble to_parse;
-            if (!parseDeviceScribblePage(key, page, to_parse)) {
-                return false;
-            }
-
-            pageScribbles.push_back(to_parse);
-        }
-
-        return true;
-    }
-    bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::SketchPagePtr &page, PageScribble &parsedScribble)
-    {
-        bool ok = false;
-        int num_page = key.toInt(&ok);
-        if (!ok) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"parse PageKey to decimal failed: "<<key.toStdString()<<std::endl;
-            assert(false);
-            return false;
-        }
-        parsedScribble.page_ = num_page;
-
-        Strokes strokes = page.get()->strokes();
-        std::cout<<strokes.size()<<" strokes in page"<<std::endl;
-
-        int i = 0;
-        for (StrokesIter it = strokes.begin(); it != strokes.end(); it++) {
-            std::cout<<"parsing stroke "<<i<<std::endl;
-            i++;
-
-            const ZoomFactor stroke_zoom_factor = it->get()->zoom();
-
-            std::vector<PAPoint> pa_points;
-
-            Points points = (*it).get()->points();
-            std::cout<<points.size()<<" points in stroke"<<std::endl;
-
-            int j = 0;
-            for (PointsIter pit = points.begin(); pit != points.end(); pit++) {
-                std::cout<<"parsing point "<<j<<" ("<<pit->x() / stroke_zoom_factor<<", "<<
-                        pit->y() / stroke_zoom_factor<<")"<<std::endl;
-                j++;
-
-                pa_points.push_back(PAPoint(pit->x() / stroke_zoom_factor, pit->y() / stroke_zoom_factor));
-            }
-
-            if (pa_points.size() == 0) {
-                std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"0 points in SketchStroke"<<std::endl;
-                assert(false);
-                continue;
-            }
-
-            parsedScribble.strokes_.push_back(PageScribble::Stroke(pa_points));
-
-            const PARect &rect = parsedScribble.strokes_.back().rect_;
-            std::cout<<"Rect: "<<rect.ll_.x_<<","<<rect.ll_.y_<<","<<rect.ur_.x_<<","<<rect.ur_.y_<<std::endl;
-        }
-
-        return true;
-    }
+    bool getDocumentScribbles(std::string docPath, std::vector<PageScribble> &pageScribbles);
+    // if corrds from device need to be transformed to PDF's, then provide transformer function, else return 0
+    PFunc_DeviceCoorTransformer getTransformer();
 }; // class
 
 } // namespace
