@@ -22,8 +22,8 @@
 
 using namespace pdfanno;
 
-// implementer of PFunc_DeviceCoorTransformer
-static bool tranformDeviceCoorToPDF(const PASize &pageSize, PageScribble &pageScribble);
+static bool transformPointHelper(const PARect &cropBox, PAPoint &point);
+static bool tranformDeviceCoorToPDF(const PARect &cropBox, PageScribble &pageScribble);
 
 static bool getDeviceScribblePages(SketchDocument &sketch_document, sketch::Pages &pages);
 static bool parseDeviceScribblePages(const sketch::Pages &pages, std::vector<PageScribble> &pageScribbles);
@@ -177,45 +177,47 @@ static bool parseDeviceScribblePages(const sketch::Pages &pages, std::vector<Pag
     return true;
 }
 
-static bool tranformDeviceCoorToPDF(const PASize &pageSize, PageScribble &pageScribble)
+static bool transformPointHelper(const PARect &cropBox, PAPoint &point)
 {
-    const int pdf_page_height = pageSize.height_;
+    // device's origin is (left, top) = (0, 0)
+    // need transform to PDF's origin(cropBox.ll_.x_, cropBox.ll_.y_)
+    const int crop_box_height = cropBox.ur_.y_ - cropBox.ll_.y_;
+    if (point.y_ > crop_box_height) {
+        std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<
+                "point's coor (" <<point.x_ <<", " << point.y_ <<") out of CropBox [ "<<
+                cropBox.ll_.x_<<" "<<cropBox.ll_.y_<<" "<<cropBox.ur_.x_<<" "<<cropBox.ur_.y_<<" ]"<<std::endl;
+        return false;
+    }
 
+    point.y_ = crop_box_height - point.y_;
+
+    point.x_ += cropBox.ll_.x_;
+    point.y_ += cropBox.ll_.y_;
+
+    return true;
+}
+
+// implementer of PFunc_DeviceCoorTransformer
+static bool tranformDeviceCoorToPDF(const PARect &cropBox, PageScribble &pageScribble)
+{
     for (std::vector<PageScribble::Stroke>::iterator it = pageScribble.strokes_.begin();
             it != pageScribble.strokes_.end();
             it++) {
-        if (it->rect_.ll_.y_ > pdf_page_height) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"point's coor (" <<
-                    it->rect_.ll_.x_ <<", " << it->rect_.ll_.y_ <<
-                    ") out of page range height: "<<pdf_page_height<<std::endl;
-            assert(false);
+        if (!transformPointHelper(cropBox, it->rect_.ll_)) {
             return false;
-            continue;
         }
-        it->rect_.ll_.y_ = pdf_page_height - it->rect_.ll_.y_;
+        if (!transformPointHelper(cropBox, it->rect_.ur_)) {
+            return false;
+        }
 
-        if (it->rect_.ur_.y_ > pdf_page_height) {
-            std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"point's coor (" <<
-                    it->rect_.ur_.x_ <<", " << it->rect_.ur_.y_ <<
-                    ") out of page range height: "<<pdf_page_height<<std::endl;
-            assert(false);
-            return false;
-            continue;
-        }
-        it->rect_.ur_.y_ = pdf_page_height - it->rect_.ur_.y_;
         PAUtil::internalSwap<double>(&(it->rect_.ll_.y_), &(it->rect_.ur_.y_));
 
         for (std::vector<PAPoint>::iterator pit = (*it).points_.begin();
                 pit != it->points_.end();
                 pit++) {
-            if (pit->y_ > pdf_page_height) {
-                std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"point's coor (" <<
-                        (*pit).x_ <<", " << (*pit).y_ << ") out of page range height: "<<pdf_page_height<<std::endl;
-                assert(false);
+            if (!transformPointHelper(cropBox, *pit)) {
                 return false;
-                continue;
             }
-            pit->y_ = pdf_page_height - pit->y_;
         }
     }
 

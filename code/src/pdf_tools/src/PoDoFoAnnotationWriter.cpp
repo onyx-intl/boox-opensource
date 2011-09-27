@@ -78,8 +78,13 @@ bool PoDoFoAnnotationWriter::writeScribbles(std::vector<PageScribble> pageScribb
         }
 
         if (pFuncDevCoortransformer) {
-            PASize page_size(page->GetCropBox().GetWidth(), page->GetCropBox().GetHeight());
-            if (!pFuncDevCoortransformer(page_size, pageScribbles[i])) {
+            const PoDoFo::PdfRect &crop_box = page->GetCropBox();
+            std::cout<<"CropBox ("<<crop_box.GetLeft()<<", "<<crop_box.GetBottom()<<
+                    "), width: "<<crop_box.GetWidth()<<", height: "<<crop_box.GetHeight()<<std::endl;
+
+            const PARect pdf_rect(PAPoint(crop_box.GetLeft(), crop_box.GetBottom()),
+                    PAPoint(crop_box.GetLeft() + crop_box.GetWidth(), crop_box.GetBottom() + crop_box.GetHeight()));
+            if (!pFuncDevCoortransformer(pdf_rect, pageScribbles[i])) {
                 continue;
             }
         }
