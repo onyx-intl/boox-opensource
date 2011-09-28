@@ -244,6 +244,9 @@ private:
     // multi-touch
     QPoint origin_central_1_;
     QPoint origin_central_2_;
+
+    //Slide Show time interval
+    int slide_time_interval;
 };
 
 /// clear all of the visible pages

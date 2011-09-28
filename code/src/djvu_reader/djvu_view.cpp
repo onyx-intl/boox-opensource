@@ -2,6 +2,7 @@
 #include "djvu_model.h"
 #include "djvu_thumbnail_view.h"
 #include "djvu_thumbnail.h"
+#include "onyx/ui/time_interval_dialog.h"
 #ifdef BUILD_FOR_ARM
 #include <QtGui/qwsdisplay_qws.h>
 #include <QtGui/qscreen_qws.h>
@@ -11,7 +12,6 @@ namespace djvu_reader
 {
 
 static const int OVERLAP_DISTANCE = 80;
-static const int SLIDE_TIME_INTERVAL = 5000;
 static const unsigned int AUTO_FLIP_INTERVAL = 1000;
 
 static RotateDegree getSystemRotateDegree()
@@ -799,6 +799,16 @@ void DjvuView::onPopupMenu()
                 }
                 else
                 {
+                    TimeIntervalDialog dialog(0);
+                    dialog.setValue(5);                //default time interval is 5 second
+                    if (dialog.popup(25, 1000) == QDialog::Accepted)
+                    {
+                        slide_time_interval=dialog.value()*1000;
+                    }
+                    else
+                    {
+                        break;
+                    }
                     startSlideShow();
                 }
             }
@@ -1937,7 +1947,7 @@ void DjvuView::startSlideShow()
     // reset the reading layout and zoom
     zooming(ZOOM_HIDE_MARGIN);
     switchLayout(PAGE_LAYOUT);
-    slide_timer_.start(SLIDE_TIME_INTERVAL);
+    slide_timer_.start(slide_time_interval);
 
     // enter full screen mode
     emit fullScreen(true);
