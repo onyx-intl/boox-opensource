@@ -200,21 +200,21 @@ bool OEBBookReader::rsaDecrypt(char *encryptedMessage, char *plain) const
     RSA *privKey = PEM_read_RSAPrivateKey(keyFile, 0, 0, 0);
     fclose(keyFile);
 
-    unsigned char inbuffer[RSA_size(privKey)];
-    unsigned char outbuffer[RSA_size(privKey)];
+    std::vector<unsigned char> inbuffer;inbuffer.resize(RSA_size(privKey));
+    std::vector<unsigned char> outbuffer; outbuffer.resize(RSA_size(privKey));
     BIO *b64 = BIO_new(BIO_f_base64());
     BIO *bp = BIO_new_mem_buf(encryptedMessage, -1);
     bp = BIO_push(b64, bp);
-    BIO_read(bp, inbuffer, RSA_size(privKey));
+    BIO_read(bp, &inbuffer[0], RSA_size(privKey));
     BIO_free_all(bp);
 
-    int len = RSA_private_decrypt(RSA_size(privKey), inbuffer, outbuffer,
+    int len = RSA_private_decrypt(RSA_size(privKey), &inbuffer[0], &outbuffer[0],
             privKey, RSA_PKCS1_PADDING);
     outbuffer[len] = '\0';
 
     if (len > 1)
     {
-        memcpy(plain, outbuffer, len+1);
+        memcpy(plain, &outbuffer[0], len+1);
     }
     else
     {
@@ -266,13 +266,13 @@ ZLFile::DRMStatus OEBBookReader::checkKeyFile(const std::string &path) const
         QByteArray array(buffer, calculateArraySize(buffer, MAX_SIZE));
         QByteArray converted = array.toBase64();
         int esize = converted.size();
-        char encrypted[esize+1];
-        memcpy(encrypted, converted.data(), esize);
+        std::vector<char> encrypted; encrypted.resize(esize+1);
+        memcpy(&encrypted[0], converted.data(), esize);
         encrypted[esize] = '\n';
 
         char plain[MAX_SIZE];
         memset(plain, 0, MAX_SIZE);
-        bool decrypted = rsaDecrypt(encrypted, plain);
+        bool decrypted = rsaDecrypt(&encrypted[0], plain);
         if (decrypted)
         {
             bool dateValid = checkValidDate(plain);
