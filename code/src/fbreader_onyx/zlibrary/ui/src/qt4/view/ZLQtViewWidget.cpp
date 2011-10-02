@@ -241,7 +241,10 @@ void ZLQtViewWidget::Widget::mouseMoveEvent(QMouseEvent *event) {
 
 void ZLQtViewWidget::Widget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    myHolder.lookup();
+    if (!sys::isIRTouch())
+    {
+        myHolder.lookup();
+    }
 }
 
 void ZLQtViewWidget::Widget::keyReleaseEvent(QKeyEvent *event)
