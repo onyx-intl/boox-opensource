@@ -39,6 +39,7 @@
 #include "../util/ZLQtKeyUtil.h"
 
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/sys/platform.h"
 
 static bool support16GrayScale()
 {
@@ -221,6 +222,11 @@ void ZLQtApplicationWindow::updateScreen()
     else
     {
         onyx::screen::ScreenProxy::Waveform w = onyx::screen::ScreenProxy::GU;
+        if (application().document_path.endsWith(".txt", Qt::CaseInsensitive) && sys::isImx508())
+        {
+            w = onyx::screen::ScreenProxy::GC4;
+        }
+
         onyx::screen::instance().updateWidgetWithGCInterval(
             this,
             NULL,
