@@ -36,6 +36,8 @@ QProgressBar::chunk:horizontal              \
     background: black;                      \
 }";
 
+static int update_count = 0;
+static const int THRESHOLD = 4;
 
 OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     : OnyxDialog(parent)
@@ -444,7 +446,7 @@ int OnyxPlayerView::getStep(qint64 total, qint64 current)
 void OnyxPlayerView::enqueueFullyRefresh(qint64 current)
 {
     qint64 currentSeconds = current/1000;
-    if (0 == (currentSeconds % 60) && currentSeconds != previous_gc_)
+    if ((0 == (currentSeconds % 60) && currentSeconds != previous_gc_) || ++update_count == THRESHOLD)
     {
         previous_gc_ = currentSeconds;
         update();
@@ -872,6 +874,7 @@ void OnyxPlayerView::onCurrentChanged()
         }
 
         previous_gc_ = 0;
+        update_count = 0;
     }
 }
 

@@ -10,3 +10,8 @@ add_subdirectory(cr3)
 #add_subdirectory(rss_reader)
 add_subdirectory(clock)
 add_subdirectory(calendar)
+#add_subdirectory(podofo)
+if (BUILD_PDF_TOOLS)
+    add_subdirectory(pdf_tools)
+endif(BUILD_PDF_TOOLS)
+

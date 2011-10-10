@@ -124,7 +124,7 @@ void OutputAlsa::flush()
     // TODO. Implement Me
 }
 
-void OutputAsynPlayer::uninitialize()
+void OutputAlsa::uninitialize()
 {
 #ifdef BUILD_WITH_TFT
     snd_pcm_drain(pcm_handle_);

@@ -56,7 +56,7 @@ QT4_ADD_RESOURCES(MUSIC_PLAYER_RES music_player.qrc)
 IF (BUILD_WITH_TFT)
     set(ALSALIB asound)
 ELSE (BUILD_WITH_TFT)
-    set(ANYKALIB )
+    set(ALSALIB )
 ENDIF (BUILD_WITH_TFT)
 
 ADD_LIBRARY(music_player_lib ${SRCS} ${MUSIC_PLAYER_RES})
@@ -68,7 +68,7 @@ TARGET_LINK_LIBRARIES(music_player_lib
    onyx_sys
    onyx_cms
    curl
-   ${ANYKALIB}
+   ${ALSALIB}
    ${QT_LIBRARIES}
    ${ADD_LIB}
 )

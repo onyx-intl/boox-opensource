@@ -62,6 +62,7 @@ void PlayerApplication::onWakeUp()
     {
         QTimer::singleShot(300, this, SLOT(onResetTime()));
     }
+    hide_view_on_waking_up = false;
 }
 
 void PlayerApplication::onResetTime()
@@ -136,7 +137,10 @@ bool PlayerApplication::open(const QString &path_name)
     sys::SysStatus::instance().setSystemBusy( false );
     onyx::screen::instance().enableUpdate(true);
     // TODO (Jim) need to clean code. Check if it can only use screen update watcher.
-    view_.show();
+    if(!hide_view_on_waking_up)
+    {
+        view_.show();
+    }
 
     if (!selected_file.isEmpty())
     {
@@ -144,9 +148,12 @@ bool PlayerApplication::open(const QString &path_name)
     }
 
     view_.songListView()->repaint();
-    onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC,
-            false, onyx::screen::ScreenCommand::WAIT_ALL);
-    onyx::screen::watcher().addWatcher(&view_);
+    if(!hide_view_on_waking_up)
+    {
+        onyx::screen::instance().flush(&view_, onyx::screen::ScreenProxy::GC,
+                false, onyx::screen::ScreenCommand::WAIT_ALL);
+        onyx::screen::watcher().addWatcher(&view_);
+    }
     view_.enableProgressBar(true);
     return true;
 }
