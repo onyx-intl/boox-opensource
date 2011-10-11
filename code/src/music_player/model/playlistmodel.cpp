@@ -60,8 +60,7 @@ PlayListModel::PlayListModel(QObject *parent)
 
 PlayListModel::~PlayListModel()
 {
-    // don't write settings currently
-//    writeSettings();
+    writeSettings();
     clear();
     //qDeleteAll(m_registered_pl_formats);
 
