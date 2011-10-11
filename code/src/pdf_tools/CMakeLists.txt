@@ -28,6 +28,7 @@ TARGET_LINK_LIBRARIES(pdf_tools
   freetype
   fontconfig
   jpeg
+  expat
   ${QT_LIBRARIES}
   ${ADD_LIB}
 )
