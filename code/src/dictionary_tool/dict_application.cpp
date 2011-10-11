@@ -25,8 +25,12 @@ bool DictApplication::open()
     frame_->show();
     onyx::screen::watcher().addWatcher(frame_.get());
     frame_->setDefaultFocus();
+    processEvents();
     sys::SysStatus::instance().setSystemBusy(false);
-;    return true;
+
+    frame_->update();
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    return true;
 }
 
 bool DictApplication::close()
