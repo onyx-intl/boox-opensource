@@ -459,6 +459,14 @@ void ZLQtViewWidget::popupMenu()
         return;
     }
 
+    if (sys::isImx508())
+    {
+       // TODO: need to fix it in kernel driver, update timing issue.
+#ifdef BUILD_FOR_ARM
+        usleep(1000 * 200);
+#endif
+    }
+
     QAction * group = menu.selectedCategory();
     if (group == system_actions_.category())
     {
