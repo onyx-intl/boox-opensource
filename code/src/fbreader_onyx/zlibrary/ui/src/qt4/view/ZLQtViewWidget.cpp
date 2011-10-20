@@ -325,6 +325,18 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
             myHolder.lookup();
         }
     }
+    else
+    {
+        direction = sys::SystemConfig::whichArea(old, now);
+        if (direction > 0)
+        {
+            myHolder.nextPage();
+        }
+        else if (direction < 0)
+        {
+            myHolder.prevPage();
+        }
+    }
 }
 
 void ZLQtViewWidget::repaint()
