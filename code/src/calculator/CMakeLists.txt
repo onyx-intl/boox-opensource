@@ -7,8 +7,8 @@ QT4_WRAP_CPP(MOC_SRCS ${HDRS})
 FILE(GLOB SRCS *.cpp)
 SET(SRCS ${HDRS} ${SRCS} ${MOC_SRCS})
 
-ADD_EXECUTABLE(calculator main.cpp ${SRCS})
-TARGET_LINK_LIBRARIES(calculator
+ADD_EXECUTABLE(calculator,oar main.cpp ${SRCS})
+TARGET_LINK_LIBRARIES(calculator.oar
   onyxapp
   onyx_data
   onyx_screen
