@@ -126,10 +126,8 @@ bool PlayerApplication::open(const QString &path_name)
             model_->addDirectory(path_);
         }
     }
-    else
-    {
-        view_.activateWindow();
-    }
+
+    view_.activateWindow();
 
     // load audio files from media db
     model_->readMediaInfos();
