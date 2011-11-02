@@ -960,6 +960,7 @@ void ZLQtViewWidget::showTableOfContents()
     int pos = model.data(index, Qt::UserRole + 100).toInt();
   
     myApplication->gotoParagraph(pos);
+    repaint();
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
