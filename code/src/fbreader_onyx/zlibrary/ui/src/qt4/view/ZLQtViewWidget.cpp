@@ -960,9 +960,8 @@ void ZLQtViewWidget::showTableOfContents()
     int pos = model.data(index, Qt::UserRole + 100).toInt();
   
     myApplication->gotoParagraph(pos);
-    QApplication::processEvents();
     repaint();
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, true, onyx::screen::ScreenCommand::WAIT_ALL);
 }
 
 bool ZLQtViewWidget::suggestTextFiles(const QString &file_path, bool forward)
