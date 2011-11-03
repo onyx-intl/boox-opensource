@@ -52,6 +52,17 @@ static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 static bool has_touch = true;
 
+static void myDelay()
+{
+    if (sys::isImx508())
+    {
+       // TODO: need to fix it in kernel driver, update timing issue.
+#ifdef BUILD_FOR_ARM
+        usleep(1000 * 200);
+#endif
+    }
+}
+
 class MyQScrollBar : public QScrollBar {
 
 public:
@@ -471,13 +482,7 @@ void ZLQtViewWidget::popupMenu()
         return;
     }
 
-    if (sys::isImx508())
-    {
-       // TODO: need to fix it in kernel driver, update timing issue.
-#ifdef BUILD_FOR_ARM
-        usleep(1000 * 200);
-#endif
-    }
+    ::myDelay();
 
     QAction * group = menu.selectedCategory();
     if (group == system_actions_.category())
@@ -960,8 +965,8 @@ void ZLQtViewWidget::showTableOfContents()
     int pos = model.data(index, Qt::UserRole + 100).toInt();
   
     myApplication->gotoParagraph(pos);
-    repaint();
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, true, onyx::screen::ScreenCommand::WAIT_ALL);
+    ::myDelay();
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
 }
 
 bool ZLQtViewWidget::suggestTextFiles(const QString &file_path, bool forward)
