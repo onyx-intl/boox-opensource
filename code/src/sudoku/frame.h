@@ -40,13 +40,9 @@ protected:
     void setHighlightBorder ( bool highlight ) {
         m_highlight_border = highlight;
     }
-    virtual bool event ( QEvent *e ) {
-    QWidget::event ( e );
-//         if ( e->type() == QEvent::UpdateRequest ) {
-//         // qDebug() << "Frame::event";
-//             onyx::screen::instance().updateWidget ( this );
-//         }
-//         return ret;
+    virtual bool event ( QEvent *e )
+    {
+        return QWidget::event ( e );
     }
 private:
     bool m_highlight;
