@@ -43,6 +43,7 @@
 #include "onyx/data/configuration.h"
 #include "onyx/ui/tree_view_dialog.h"
 #include "onyx/ui/brightness_dialog.h"
+#include "onyx/ui/screen_rotation_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
 
 using namespace cms;
@@ -801,7 +802,8 @@ void ZLQtViewWidget::changePageMargins(int margins)
 
 void ZLQtViewWidget::rotateScreen()
 {
-    sys::SysStatus::instance().rotateScreen();
+    ui::ScreenRotationDialog dialog;
+    dialog.popup();
 }
 
 void ZLQtViewWidget::quit()
