@@ -15,6 +15,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/data/bookmark.h"
 #include "onyx/ui/menu.h"
+#include "onyx/ui/screen_rotation_dialog.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/number_dialog.h"
 
@@ -96,6 +97,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
 
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
+    connect(&SysStatus::instance(), SIGNAL(mouseLongPress(QPoint, QSize)), this, SLOT(showContextMenu()));
+
     connect(view_, SIGNAL(updateProgress(int,int)), status_bar_, SLOT(setProgress(int,int)));
     connect(status_bar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
     connect(view_, SIGNAL(requestUpdateAll()), this,SLOT(updateScreen()));
@@ -324,7 +327,8 @@ void OnyxMainWindow::showContextMenu()
         }
         else if (system == ROTATE_SCREEN)
         {
-            SysStatus::instance().rotateScreen();
+            ui::ScreenRotationDialog dialog;
+            dialog.popup();
 //            view_->update();
 //            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
 //            this->update();

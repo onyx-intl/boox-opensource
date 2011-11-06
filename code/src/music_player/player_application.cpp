@@ -2,6 +2,7 @@
 #include <core/fileinfo.h>
 
 #include "player_application.h"
+#include "onyx/ui/screen_rotation_dialog.h"
 
 namespace player
 {
@@ -166,7 +167,8 @@ bool PlayerApplication::close(const QString &path_name)
 
 void PlayerApplication::onRotateScreen()
 {
-    SysStatus::instance().rotateScreen();
+    ui::ScreenRotationDialog dialog;
+    dialog.popup();
 }
 
 void PlayerApplication::onScreenSizeChanged(int)

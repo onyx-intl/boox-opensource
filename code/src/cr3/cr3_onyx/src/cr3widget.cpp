@@ -1446,6 +1446,18 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
             update();
             lookup();
         }
+        else
+        {
+            direction = sys::SystemConfig::whichArea(old, now);
+            if (direction > 0)
+            {
+                nextPageWithTTSChecking();
+            }
+            else if (direction < 0)
+            {
+                prevPageWithTTSChecking();
+            }
+        }
     }
 }
 
