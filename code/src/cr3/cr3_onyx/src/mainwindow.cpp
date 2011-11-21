@@ -706,22 +706,8 @@ void OnyxMainWindow::updateScreenManually()
 void OnyxMainWindow::onScreenSizeChanged(int)
 {
     // Preserve updatability.
-    QWidget *wnd = qApp->focusWidget();
-
     setFixedSize(qApp->desktop()->screenGeometry().size());
+    this->resize(qApp->desktop()->screenGeometry().size());
 
-    if (isActiveWindow())
-    {
-        if (wnd)
-        {
-            wnd->setFocus();
-        }
-        update();
-        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
-    }
-
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
-    this->update();
-
-//    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 }
