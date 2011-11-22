@@ -77,6 +77,17 @@ PlayListModel::~PlayListModel()
 
 void PlayListModel::load(PlayListItem *item)
 {
+    for (QList<PlayListItem*>::iterator i=items_.begin(); i != items_.end(); )
+    {
+        if (!QFile::exists((*i)->fileInfo()->path()))
+        {
+            i = items_.erase(i);
+        }
+        else
+        {
+            i++;
+        }
+    }
     int size = items_.size();
     for (int i=0; i<size; i++)
     {
