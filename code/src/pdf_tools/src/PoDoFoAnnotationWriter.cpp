@@ -108,6 +108,10 @@ bool PoDoFoAnnotationWriter::saveAs(std::string dstPath)
     std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"SaveAs begins"<<std::endl;
 
     assert(doc_);
+
+    std::string new_title = std::string(doc_->GetInfo()->GetTitle().GetString()) + " - " + PAUtil::getMergeMarkAsPostfix();
+    doc_->GetInfo()->SetTitle(new_title.c_str());
+
     doc_->Write(dstPath.c_str());
 
     std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"SaveAs finished"<<std::endl;

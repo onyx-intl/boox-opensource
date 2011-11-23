@@ -15,6 +15,11 @@
 
 using namespace pdfanno;
 
+std::string PAUtil::getMergeMarkAsPostfix()
+{
+    return "Merged";
+}
+
 std::string PAUtil::getTimeStamp()
 {
     time_t t = time(0);

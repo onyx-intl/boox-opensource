@@ -6,6 +6,8 @@
 namespace pdfanno {
 class PAUtil {
 public:
+    // postfix will be added to pdf's title
+    static std::string getMergeMarkAsPostfix();
     static std::string getTimeStamp();
     static std::string getSaveAsPath(const std::string &filePath);
 
