@@ -268,7 +268,7 @@ public:
     /// get fallback font face (returns empty string if no fallback font is set)
     virtual lString8 GetFallbackFontFace() { return lString8::empty_str; }
     /// returns fallback font for specified size
-    virtual LVFontRef GetFallbackFont(int size) { }
+    virtual LVFontRef GetFallbackFont(int size) { return LVFontRef(); }
     /// registers font by name
     virtual bool RegisterFont( lString8 name ) = 0;
     /// initializes font manager
@@ -296,6 +296,17 @@ public:
     virtual ~LVFontManager() { }
     /// returns available typefaces
     virtual void getFaceList( lString16Collection & ) { }
+
+    /// fills array with list of available gamma levels
+    void GetGammaLevels(LVArray<double> dst);
+    /// returns current gamma level index
+    int  GetGammaIndex();
+    /// sets current gamma level index
+    void SetGammaIndex( int gammaIndex );
+    /// returns current gamma level
+    double GetGamma();
+    /// sets current gamma level
+    void SetGamma( double gamma );
 };
 
 class LVBaseFont : public LVFont
@@ -342,7 +353,7 @@ public:
     /// returns font baseline offset
     virtual int getBaseline();
     /// returns font height
-    virtual int getHeight();
+    virtual int getHeight() const;
     
     virtual bool getGlyphImage(lUInt16 code, lUInt8 * buf, lChar16 def_char=0 );
     
@@ -391,7 +402,7 @@ public:
     }
     
     /// returns font height
-    virtual int getHeight()
+    virtual int getHeight() const
     {
         return _height;
     }
@@ -427,6 +438,30 @@ public:
 
     virtual bool Create(int size, int weight, bool italic, css_font_family_t family, lString8 typeface );
     
+    virtual int getWeight() const {
+        return _logfont.lfWeight;
+    }
+
+    virtual int getItalic() const {
+        return _logfont.lfItalic;
+    }
+
+    virtual lString8 getTypeFace() const {
+        return lString8();
+    }
+
+    virtual css_font_family_t getFontFamily() const {
+        return css_ff_inherit;
+    }
+
+    virtual LVFontGlyphCacheItem * getGlyph(lUInt16 ch, lChar16 def_char=0) {
+        return NULL;
+    }
+
+    virtual int getSize() const {
+        return 0;
+    }
+
 };
 
 

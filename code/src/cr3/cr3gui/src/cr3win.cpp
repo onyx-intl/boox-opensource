@@ -106,16 +106,20 @@ public:
        int x=0;
        int y=0;
        lUInt32 flags = 0;
+	   int cxscreen = GetSystemMetrics(SM_CXSCREEN);
+	   int cyscreen = GetSystemMetrics(SM_CYSCREEN);
+        dx = 600 + GetSystemMetrics(SM_CXDLGFRAME)*2
+            + GetSystemMetrics(SM_CXVSCROLL);
+        dy = 800 + GetSystemMetrics(SM_CYDLGFRAME)*2
+            + GetSystemMetrics(SM_CYCAPTION);
+		if ( dx>cxscreen )
+			dx = cxscreen;
+		if ( dy>cyscreen )
+			dy = cyscreen;
     #ifdef FIXED_JINKE_SIZE
           flags = WS_DLGFRAME | WS_MINIMIZEBOX | WS_SYSMENU | WS_VSCROLL; //WS_OVERLAPPEDWINDOW
-          dx = 600 + GetSystemMetrics(SM_CXDLGFRAME)*2
-               + GetSystemMetrics(SM_CXVSCROLL);
-          dy = 800 + GetSystemMetrics(SM_CYDLGFRAME)*2
-               + GetSystemMetrics(SM_CYCAPTION);
     #else
           flags = WS_OVERLAPPEDWINDOW;// | WS_VSCROLL; //
-          dx = 600;
-          dy = 750;
     #endif
 
        _hWnd = CreateWindowW(
@@ -194,7 +198,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
 					RECT rect;
 					::GetClientRect(hWnd, &rect );
-					CRWin32WindowManager::instance->setSize( rect.right-rect.left, rect.bottom-rect.top );
+					CRWin32WindowManager::instance->reconfigure( rect.right-rect.left, rect.bottom-rect.top, CR_ROTATE_ANGLE_0 );
                     needUpdate = true;
                 }
             }
@@ -375,6 +379,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     GetModuleFileNameW( NULL, exe_fn16, MAX_PATH );
 	lString16 exedir = LVExtractPath(lString16(exe_fn16));	
 	lString8 exedir8 = UnicodeToUtf8( exedir );
+	CRLog::debug("exedir=%s", exedir8.c_str());
 
 	CRMoFileTranslator * translator = new CRMoFileTranslator();
 	translator->openMoFile(exedir + L"/po/ru.mo");
@@ -410,6 +415,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         "timesi.ttf",
         "timesb.ttf",
         "timesbi.ttf",
+#if 0
         "comic.ttf",
         "comicbd.ttf",
         "verdana.ttf",
@@ -420,7 +426,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         "bookosi.ttf",
         "bookosb.ttf",
         "bookosbi.ttf",
-#if 1
+#endif
+#if 0
         "calibri.ttf",
         "calibrii.ttf",
         "calibrib.ttf",
@@ -481,8 +488,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         main_win->getDocView()->setFontSize( 20 );
 		main_win->loadCSS( exedir + L"fb2.css" );
 		main_win->loadSettings( exedir + L"cr3.ini" );
+		main_win->saveSettings(lString16());
 		main_win->setHelpFile( exedir + L"cr3-manual-ru.fb2" );
-		HyphMan::initDictionaries( exedir + L"hyph" );
+		HyphMan::initDictionaries( exedir + L"hyph\\" );
 		main_win->loadDefaultCover( exedir + L"cr3_def_cover.png" );
 		main_win->setBookmarkDir(lString16("c:\\cr3\\bookmarks\\"));
 		lString8 exedir8 = UnicodeToUtf8( exedir );

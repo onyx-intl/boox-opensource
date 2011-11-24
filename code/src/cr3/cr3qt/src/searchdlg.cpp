@@ -110,7 +110,7 @@ void SearchDialog::on_btnFindNext_clicked()
     if ( !found )
         found = findText(p16, -1, reverse, caseInsensitive);
     if ( !found ) {
-        QMessageBox * mb = new QMessageBox( QMessageBox::Information, "Not found", "Search pattern is not found in document", QMessageBox::Close, this );
+        QMessageBox * mb = new QMessageBox( QMessageBox::Information, tr("Not found"), tr("Search pattern is not found in document"), QMessageBox::Close, this );
         mb->exec();
     } else {
         _docview->update();

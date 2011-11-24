@@ -27,15 +27,15 @@ AddBookmarkDialog::AddBookmarkDialog(QWidget *parent, CR3View * docView, CRBookm
 {
     initialized = false;
     m_ui->setupUi(this);
-    setWindowTitle( "Add bookmark" );
+    setWindowTitle( tr("Add bookmark") );
     if ( _bm==NULL )
         _bm = docView->createBookmark();
     if ( _bm ) {
         if ( _bm->getType() == bmkt_pos ) {
-            m_ui->cbType->addItem( "Position" );
+            m_ui->cbType->addItem( tr("Position") );
         } else {
-            m_ui->cbType->addItem( "Comment" );
-            m_ui->cbType->addItem( "Correction" );
+            m_ui->cbType->addItem( tr("Comment") );
+            m_ui->cbType->addItem( tr("Correction") );
             m_ui->cbType->setCurrentIndex(0);
         }
         m_ui->edPositionText->setPlainText( cr2qt(_bm->getPosText()) );
@@ -106,10 +106,10 @@ void AddBookmarkDialog::on_cbType_currentIndexChanged(int index)
     if ( index == 0 ) {
         _bm->setType( bmkt_comment );
         m_ui->edComment->setPlainText( QString() );
-        m_ui->lblComment->setText( "Comment" );
+        m_ui->lblComment->setText( tr("Comment") );
     } else {
         _bm->setType( bmkt_correction );
         m_ui->edComment->setPlainText( cr2qt(_bm->getPosText()) );
-        m_ui->lblComment->setText( "Correction" );
+        m_ui->lblComment->setText( tr("Correction") );
     }
 }

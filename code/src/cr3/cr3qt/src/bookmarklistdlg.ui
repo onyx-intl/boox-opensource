@@ -11,46 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">Dialog</string>
-  </property>
-  <property name="toolTip">
-   <string notr="true"/>
-  </property>
-  <property name="statusTip">
-   <string notr="true"/>
-  </property>
-  <property name="whatsThis">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleName">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleDescription">
-   <string notr="true"/>
-  </property>
-  <property name="windowFilePath">
-   <string notr="true"/>
+   <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTableWidget" name="tableWidget">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="toolTip">
-      <string notr="true"/>
-     </property>
-     <property name="statusTip">
-      <string notr="true"/>
-     </property>
-     <property name="whatsThis">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleName">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleDescription">
-      <string notr="true"/>
      </property>
      <property name="horizontalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -68,21 +35,6 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="toolTip">
-      <string notr="true"/>
-     </property>
-     <property name="statusTip">
-      <string notr="true"/>
-     </property>
-     <property name="whatsThis">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleName">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -94,102 +46,39 @@
   </layout>
   <action name="actionGoToBookmark">
    <property name="text">
-    <string notr="true">Go to Bookmark</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Go to Bookmark</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Go to Bookmark</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
+    <string>Go to Bookmark</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Return</string>
+    <string>Return</string>
    </property>
   </action>
   <action name="actionRemoveBookmark">
    <property name="text">
-    <string notr="true">Remove Bookmark</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Remove Bookmark</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Remove Bookmark</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
+    <string>Remove Bookmark</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Del</string>
+    <string>Del</string>
    </property>
   </action>
   <action name="actionRemoveALLBookmarks">
    <property name="text">
-    <string notr="true">Remove ALL Bookmarks</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Remove ALL Bookmarks</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Remove ALL Bookmarks</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+    <string>Remove ALL Bookmarks</string>
    </property>
   </action>
   <action name="actionEdit_Bookmark">
    <property name="text">
-    <string notr="true">Edit Bookmark</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Edit Bookmark</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Edit Bookmark</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
+    <string>Edit Bookmark</string>
    </property>
    <property name="shortcut">
-    <string notr="true">F4</string>
+    <string>F4</string>
    </property>
   </action>
   <action name="actionClose">
    <property name="text">
-    <string notr="true">Close</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Close</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Close</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
+    <string>Close</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Esc</string>
+    <string>Esc</string>
    </property>
   </action>
  </widget>

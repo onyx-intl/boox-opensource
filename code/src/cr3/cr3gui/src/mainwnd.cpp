@@ -43,6 +43,9 @@
 
 #include "citedlg.h"
 
+#ifdef CR_POCKETBOOK
+#include "cr3pocketbook.h"
+#endif
 
 
 #define SECONDS_BEFORE_PROGRESS_BAR 2
@@ -373,6 +376,9 @@ void V3DocViewWin::OnLoadFileFormatDetected( doc_format_t fileFormat )
         case doc_format_chm:
             filename = L"chm.css";
             break;
+        case doc_format_doc:
+			filename = L"doc.css";
+			break;
         default:
             // do nothing
             ;
@@ -418,6 +424,13 @@ void V3DocViewWin::OnFormatEnd()
     time_t t = time((time_t)0);
     if ( t - _loadFileStart >= SECONDS_BEFORE_PROGRESS_BAR )
         _wm->showProgress(lString16("cr3_wait_icon.png"), 100);
+    // Background cache file saving is disabled when _docview->updateCache(infinite) is called here.
+    // To implement background cache file saving, schedule on Idle state following task:
+    // in each idle cycle call _docview->updateCache(timeOut) while it returns CR_TIMEOUT
+#ifndef BACKGROUND_CACHE_FILE_CREATION
+    CRTimerUtil infinite;
+    _docview->updateCache(infinite);
+#endif
 }
 
 /// format progress, called with values 0..100
@@ -525,7 +538,7 @@ void V3DocViewWin::closing()
 	_dict = NULL;
     _docview->savePosition();
     CRLog::trace("after docview->savePosition()");
-    saveHistory( lString16() );
+    saveHistory( lString16(), _props->getBoolDef( PROP_AUTOSAVE_BOOKMARKS, true ) );
 }
 
 bool V3DocViewWin::loadDocument( lString16 filename )
@@ -539,7 +552,7 @@ bool V3DocViewWin::loadDocument( lString16 filename )
     return true;
 }
 
-bool V3DocViewWin::saveHistory( lString16 filename )
+bool V3DocViewWin::saveHistory( lString16 filename, bool exportBookmarks )
 {
     crtrace log;
     if ( filename.empty() )
@@ -548,8 +561,10 @@ bool V3DocViewWin::saveHistory( lString16 filename )
         CRLog::info("Cannot write history file - no file name specified");
         return false;
     }
-    CRLog::debug("Exporting bookmarks to %s", UnicodeToUtf8(_bookmarkDir).c_str());
-    _docview->exportBookmarks(_bookmarkDir); //use default filename
+    if (exportBookmarks) {
+        CRLog::debug("Exporting bookmarks to %s", UnicodeToUtf8(_bookmarkDir).c_str());
+        _docview->exportBookmarks(_bookmarkDir); //use default filename
+    }
     _historyFileName = filename;
     log << "V3DocViewWin::saveHistory(" << filename << ")";
     LVStreamRef stream = LVOpenFileStream( filename.c_str(), LVOM_WRITE );
@@ -595,9 +610,11 @@ void V3DocViewWin::flush()
 
 bool V3DocViewWin::loadSettings( lString16 filename )
 {
+	CRLog::debug("loading settings from %s", LCSTR(filename));
     _settingsFileName = filename;
     LVStreamRef stream = LVOpenFileStream( filename.c_str(), LVOM_READ );
     if ( stream.isNull() ) {
+		CRLog::debug("settings file not found: %s", LCSTR(filename));
         _docview->propsUpdateDefaults( _props );
         _docview->propsApply( _props );
         _wm->getScreen()->setFullUpdateInterval(_props->getIntDef(PROP_DISPLAY_FULL_UPDATE_INTERVAL, 1));
@@ -664,6 +681,12 @@ void V3DocViewWin::applySettings()
     //showWaitIcon();
     CRPropRef delta = _props ^ _newProps;
     CRLog::trace( "applySettings() - %d options changed", delta->getCount() );
+#ifdef CR_POCKETBOOK
+	if (delta->hasProperty(PROP_POCKETBOOK_ORIENTATION)) {
+		CRLog::trace("PB orientation have changed");
+		_wm->postCommand(mm_Orientation, 1525);
+	}
+#endif
     _docview->propsApply( delta );
     _props = _newProps; // | _props;
     _wm->getScreen()->setFullUpdateInterval(_props->getIntDef(PROP_DISPLAY_FULL_UPDATE_INTERVAL, 1));
@@ -764,6 +787,8 @@ void V3DocViewWin::showHelpDialog()
 	//lString8 help = UnicodeToUtf8( LVReadTextFile( _helpFile ) );
 	if ( !help.empty() ) {
 		CRViewDialog * dlg = new CRViewDialog( _wm, lString16(_("Help")), help, lvRect(), true, true );
+                int fs = _props->getIntDef( PROP_FONT_SIZE, 22 );
+                dlg->getDocView()->setFontSize(fs);
 		_wm->activateWindow( dlg );
 	}
 }
@@ -772,6 +797,13 @@ void V3DocViewWin::showBookmarksMenu( bool goMode )
 {
     lvRect rc = _wm->getScreen()->getRect();
     CRBookmarkMenu * menu_win = new CRBookmarkMenu(_wm, _docview, 8, rc, goMode);
+    _wm->activateWindow( menu_win );
+}
+
+void V3DocViewWin::showCitesMenu()
+{
+    lvRect rc = _wm->getScreen()->getRect();
+    CRCitesMenu * menu_win = new CRCitesMenu(_wm, _docview, 8, rc);
     _wm->activateWindow( menu_win );
 }
 
@@ -874,8 +906,12 @@ VIEWER_MENU_4ABOUT=About...
     menu_win->setAccelerators( getMenuAccelerators() );
 
     lString16 s(_("$1 - choose command\n$2, $3 - close"));
+#ifdef CR_POCKETBOOK
+	s.replaceParam(1, menu_win->getCommandKeyName( MCMD_SELECT ));
+#else
     s.replaceParam(1, menu_win->getItemNumberKeysName());
-    s.replaceParam(2, menu_win->getCommandKeyName(MCMD_OK) );
+#endif
+    s.replaceParam(2, menu_win->getCommandKeyName(MCMD_OK));
     s.replaceParam(3, menu_win->getCommandKeyName(MCMD_CANCEL) );
     menu_win->setStatusText( s );
     menu_win->setFullscreen( true );
@@ -1029,6 +1065,12 @@ void V3DocViewWin::showAboutDialog()
 
     addPropLine( txt, _("Custom info"), getDocText( getDocView()->getDocument(), "/FictionBook/description/custom-info", " " ) );
 
+#if defined(CR_PB_VERSION) && defined(CR_PB_BUILD_DATE)
+    lString8 progInfo;
+    addPropLine( progInfo, _("CoolReader for PocketBook"), Utf8ToUnicode(lString8(CR_PB_VERSION)));
+    addPropLine( progInfo, _("Build date"), Utf8ToUnicode(lString8(CR_PB_BUILD_DATE)));
+    addInfoSection( txt, progInfo, _("About program") );
+#endif
     txt << "</table>\n";
 
     //CRLog::trace(txt.c_str());
@@ -1036,8 +1078,8 @@ void V3DocViewWin::showAboutDialog()
     txt = CRViewDialog::makeFb2Xml(txt);
     CRViewDialog * dlg = new CRViewDialog( _wm, title, txt, lvRect(), true, true );
     dlg->getDocView()->setVisiblePageCount(1);
-    //int fs = _props->getIntDef( PROP_FILE_PROPS_FONT_SIZE, 26 );
-    //dlg->getDocView()->setFontSize(fs);
+    int fs = _props->getIntDef( PROP_FILE_PROPS_FONT_SIZE, 22 );
+    dlg->getDocView()->setFontSize(fs);
     _wm->activateWindow( dlg );
 }
 
@@ -1068,11 +1110,13 @@ bool V3DocViewWin::onCommand( int command, int params )
         return true;
     case MCMD_OPEN_RECENT_BOOK:
         _docview->swapToCache();
+        _docview->updateCache();
         _docview->getDocument()->updateMap();
         openRecentBook( params );
         return true;
     case MCMD_SWITCH_TO_RECENT_BOOK:
         _docview->swapToCache();
+        _docview->updateCache();
         _docview->getDocument()->updateMap();
         openRecentBook( 1 );
         return true;
@@ -1103,7 +1147,11 @@ bool V3DocViewWin::onCommand( int command, int params )
         return true;
     case DCMD_SAVE_TO_CACHE:
         _docview->swapToCache();
+        _docview->updateCache();
         _docview->getDocument()->updateMap();
+        return true;
+    case MCMD_CITES_LIST:
+        showCitesMenu();
         return true;
     case MCMD_BOOKMARK_LIST:
         showBookmarksMenu(false);
