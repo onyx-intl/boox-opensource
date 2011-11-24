@@ -7,6 +7,13 @@ SET(CR3_MOC_HDRS
   src/mainwindow.h      
   src/cr3widget.h
   src/search_tool.h
+
+  lcl_ui/advanced_actions.h
+  lcl_ui/settings_dialog.h
+  lcl_ui/info_dialog.h
+  lcl_ui/recent_books.h
+  lcl_ui/line_edit.h
+  lcl_ui/number_dialog.h
 )
 
 SET (CR3_SOURCES 
@@ -15,6 +22,13 @@ SET (CR3_SOURCES
   src/cr3widget.cpp        
   src/mainwindow.cpp
   src/search_tool.cpp
+
+  lcl_ui/advanced_actions.cpp
+  lcl_ui/settings_dialog.cpp
+  lcl_ui/info_dialog.cpp
+  lcl_ui/recent_books.cpp
+  lcl_ui/line_edit.cpp
+  lcl_ui/number_dialog.cpp
 )
 
 IF (UNIX)
@@ -127,9 +141,9 @@ TARGET_LINK_LIBRARIES(cr3 crengine ${EXTRA_LIBS}
 IF (UNIX)
 
 
-INSTALL(FILES ${man_gz}
-   DESTINATION "share/man/man1"
-   PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+    #INSTALL(FILES ${man_gz}
+    #DESTINATION "share/man/man1"
+    #PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
 
 INSTALL( TARGETS cr3 RUNTIME DESTINATION bin )
 INSTALL( DIRECTORY data/ DESTINATION share/cr3 
@@ -144,9 +158,9 @@ INSTALL( DIRECTORY data/backgrounds DESTINATION share/cr3/backgrounds )
 #INSTALL( FILES ${CR3_MAN_PAGES} DESTINATION share/doc/cr3 )
 INSTALL( FILES ${CR3_CHANGELOG} DESTINATION share/doc/cr3 )
 INSTALL( FILES ${QM_FILES} DESTINATION share/cr3/i18n )
-INSTALL( FILES src/desktop/cr3.desktop DESTINATION share/applications )
-INSTALL( FILES src/desktop/cr3.png DESTINATION share/pixmaps )
-INSTALL( FILES src/desktop/cr3.xpm DESTINATION share/pixmaps )
+#INSTALL( FILES src/desktop/cr3.desktop DESTINATION share/applications )
+#INSTALL( FILES src/desktop/cr3.png DESTINATION share/pixmaps )
+#INSTALL( FILES src/desktop/cr3.xpm DESTINATION share/pixmaps )
 
 ELSE()
 
