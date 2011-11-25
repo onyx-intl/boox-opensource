@@ -15,7 +15,10 @@
 #include <QDir>
 
  #include "onyx/screen/screen_update_watcher.h"
+ #include "onyx/base/base.h"
  #include "onyx/sys/sys.h"
+ #include "onyx/ui/ui.h"
+ #include "onyx/ui/languages.h"
 
 // prototypes
 void InitCREngineLog( const char * cfgfile );
@@ -166,6 +169,10 @@ int main(int argc, char *argv[])
                  QApplication::installTranslator(&myappTranslator);
              else
                 CRLog::error("Canot load translation file %s from dir %s", UnicodeToUtf8(qt2cr(trname)).c_str(), UnicodeToUtf8(qt2cr(translations)).c_str() );
+
+            // Make sure you load translator before main widget created.
+            ui::loadTranslator (QLocale::system().name());
+
             OnyxMainWindow w;
             //w.showMaximized();
             w.showFullScreen();

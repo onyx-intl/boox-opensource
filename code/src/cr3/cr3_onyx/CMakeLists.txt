@@ -112,16 +112,15 @@ ELSE()
     SET (EXTRA_LIBS ${QT_LIBRARIES} ${STD_LIBS} )
 ENDIF(UNIX)
 TARGET_LINK_LIBRARIES(cr3 crengine ${EXTRA_LIBS}
-                      dictionary
-                      tts
-                      sound
-                      onyx_base
-    		      onyx_screen
-    		      onyx_ui
-    		      onyx_data
-    		      onyx_sys
-    		      onyx_cms
-                      onyx_ui)
+    dictionary
+    tts
+    sound
+    onyx_base
+    onyx_screen
+    onyx_ui
+    onyx_data
+    onyx_sys
+    onyx_cms)
 
 
 IF (UNIX)
