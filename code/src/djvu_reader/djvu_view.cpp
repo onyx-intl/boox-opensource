@@ -7,6 +7,7 @@
 #include <QtGui/qwsdisplay_qws.h>
 #include <QtGui/qscreen_qws.h>
 #endif
+#include "onyx/ui/screen_rotation_dialog.h"
 
 namespace djvu_reader
 {
@@ -1967,6 +1968,8 @@ void DjvuView::stopSlideShow()
 
 void DjvuView::rotate()
 {
+    ScreenRotationDialog dialog;
+    dialog.popup();
     emit rotateScreen();
 
     RotateDegree degree = getSystemRotateDegree();

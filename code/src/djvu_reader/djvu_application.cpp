@@ -171,7 +171,7 @@ void DjvuApplication::onSystemIdleSignal()
 
 void DjvuApplication::onRotateScreen()
 {
-    SysStatus::instance().rotateScreen();
+    //SysStatus::instance().rotateScreen();
 }
 
 void DjvuApplication::onScreenSizeChanged(int)

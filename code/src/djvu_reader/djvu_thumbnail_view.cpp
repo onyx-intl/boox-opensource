@@ -5,6 +5,7 @@
 
 #include "djvu_thumbnail_view.h"
 #include "djvu_model.h"
+#include "onyx/ui/screen_rotation_dialog.h"
 
 using namespace ui;
 
@@ -599,7 +600,8 @@ void ThumbnailView::rotate()
         resize(600, 800);
     }
 #endif
-    SysStatus::instance().rotateScreen();
+    ScreenRotationDialog dialog;
+    dialog.popup();
 }
 
 void ThumbnailView::update(onyx::screen::ScreenProxy::Waveform waveform)
