@@ -8,6 +8,7 @@
 #include <onyx/ui/base_thumbnail.h>
 #include "onyx/ui/ui.h"
 #include <onyx/sys/sys.h>
+#include "onyx/ui/screen_rotation_dialog.h"
 
 #include "simsu.h"
 #include "board.h"
@@ -249,7 +250,8 @@ void Simsu::showMenu()
             break;
         case ROTATE_SCREEN:
             {
-                sys::SysStatus::instance().rotateScreen();
+                ScreenRotationDialog dialog;
+                dialog.popup();
                 update();
             }
             break;
