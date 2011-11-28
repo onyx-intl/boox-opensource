@@ -35,7 +35,6 @@ void MainWidget::keyReleaseEvent(QKeyEvent *ke)
     switch (ke->key())
     {
     case Qt::Key_Escape:
-        qDebug()<<"Escape";
         ke->accept();
         close();
         break;
@@ -101,7 +100,6 @@ void MainWidget::showMenu()
             break;
         case ROTATE_SCREEN:
             {
-                //sys::SysStatus::instance().rotateScreen();
                 ScreenRotationDialog dialog(this);
                 dialog.popup();
                 repaint();

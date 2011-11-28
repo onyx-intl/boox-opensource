@@ -32,7 +32,7 @@ GomokuWidget::GomokuWidget(QWidget *parent)
       isEnd(false),
       board(15)
 {
-    setWindowTitle(QString::fromUtf8("BOOX Gomoku"));
+    setWindowTitle(tr("BOOX Gomoku"));
     setStyleSheet("background-color: white;");
     setWindowFlags(Qt::FramelessWindowHint);
     //showMaximized();
@@ -104,14 +104,14 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
         painter.setFont(font);
         if(width() < height())
         {
-            QString s=QString::fromUtf8("Your points: ") + QString::number(board.getPoints(1))+
-                      QString::fromUtf8("        Boox’s points: ") + QString::number(board.getPoints(2));
+            QString s=tr("Your points: ") + QString::number(board.getPoints(1))+"        "+
+                      tr("Boox’s points: ") + QString::number(board.getPoints(2));
             painter.drawText(QRect(0, 60, width(), 30), Qt::AlignHCenter, s);
         }
         else
         {
-            painter.drawText(QRect(15, 65, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, "Your points: " + QString::number(board.getPoints(1)));
-            painter.drawText(QRect(15, 100, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, QString::fromUtf8("Boox’s points: ") + QString::number(board.getPoints(2)));
+            painter.drawText(QRect(15, 65, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, tr("Your points: ") + QString::number(board.getPoints(1)));
+            painter.drawText(QRect(15, 100, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, tr("Boox’s points: ") + QString::number(board.getPoints(2)));
         }
 
         painter.setOpacity(1);
@@ -123,22 +123,22 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
             if (wygral < 1)
                 painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, "...");
             else if (wygral == 1)
-                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, "You won!");
+                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, tr("You won!"));
             else if (wygral == 2)
-                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, "Boox won!");
+                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, tr("Boox won!"));
             else
-                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, "Draw.");
+                painter.drawText(0, 90, width(), 50, Qt::AlignHCenter, tr("Draw."));
         }
         else
         {
             if (wygral < 1)
                 painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, "...");
             else if (wygral == 1)
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, "You won!");
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("You won!"));
             else if (wygral == 2)
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, "Boox won!");
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("Boox won!"));
             else
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, "Draw.");
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("Draw."));
         }
     }
 
