@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource>
+    <file>images/gomoku.png</file>
+    <file>images/newgame.png</file>
+    <file>images/about.png</file>
+  </qresource>
+</RCC>
