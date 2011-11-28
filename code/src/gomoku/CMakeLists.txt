@@ -11,8 +11,8 @@ SET(SRCS ${HDRS} ${SRCS} ${MOC_SRCS})
 SET(RESOURCE_SRCS images.qrc)
 QT4_ADD_RESOURCES(IMAGES_RES ${RESOURCE_SRCS})
 
-ADD_EXECUTABLE(gomoku main.cpp ${SRCS} ${IMAGES_RES})
-TARGET_LINK_LIBRARIES(gomoku
+ADD_EXECUTABLE(gomoku.oar main.cpp ${SRCS} ${IMAGES_RES})
+TARGET_LINK_LIBRARIES(gomoku.oar
   onyxapp
   onyx_data
   onyx_screen
