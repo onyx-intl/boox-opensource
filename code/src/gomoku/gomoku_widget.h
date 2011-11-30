@@ -8,6 +8,8 @@
 
 class GomokuWidget : public QWidget
 {
+    Q_OBJECT
+
 private:
     int currentX;
     int currentY;
@@ -26,6 +28,12 @@ public:
 
     void refreshScreen();
     void newGame();
+
+Q_SIGNALS:
+    void popupMenu();
+
+public Q_SLOTS:
+    void onMouseLongPress(QPoint, QSize);
 
 private:
     int cellSize();

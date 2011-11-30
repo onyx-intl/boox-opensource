@@ -46,6 +46,11 @@ GomokuWidget::GomokuWidget(QWidget *parent)
     if (findFont("DejaVu Sans")) return;
 }
 
+void GomokuWidget::onMouseLongPress(QPoint point, QSize size)
+{
+    emit popupMenu();
+}
+
 void GomokuWidget::refreshScreen()
 {
     if (flashScreen)
@@ -105,7 +110,7 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
         if(width() < height())
         {
             QString s=tr("Your points: ") + QString::number(board.getPoints(1))+"        "+
-                      tr("Boox’s points: ") + QString::number(board.getPoints(2));
+                      tr("Boox's points: ") + QString::number(board.getPoints(2));
             painter.drawText(QRect(0, 60, width(), 30), Qt::AlignHCenter, s);
         }
         else

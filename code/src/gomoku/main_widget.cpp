@@ -7,12 +7,15 @@
 
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/screen_rotation_dialog.h"
+#include "onyx/sys/sys.h"
 
 MainWidget::MainWidget(QWidget *parent)
     :QWidget(parent)
 {
     setWindowTitle(tr("Gomoku"));
     setWindowFlags(Qt::FramelessWindowHint);
+    setAutoFillBackground(true);
+    setBackgroundRole(QPalette::Base);
     gomoku = new GomokuWidget(this);
     status_bar_ = new StatusBar(this, MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH);
     QVBoxLayout *layout = new QVBoxLayout;
@@ -23,6 +26,11 @@ MainWidget::MainWidget(QWidget *parent)
     onyx::screen::watcher().addWatcher(this);
     status_bar_->setFocusPolicy(Qt::NoFocus);
     connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
+
+    SysStatus & sys_status = SysStatus::instance();
+    connect( &sys_status, SIGNAL( mouseLongPress(QPoint, QSize) ),
+            gomoku, SLOT( onMouseLongPress(QPoint, QSize) ) );
+    connect( gomoku, SIGNAL( popupMenu() ), this, SLOT( showMenu() ) );
 }
 
 void MainWidget::keyPressEvent(QKeyEvent *ke)
