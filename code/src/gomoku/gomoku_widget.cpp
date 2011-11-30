@@ -103,20 +103,25 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
         QFont fontBit(fontName, 40, QFont::Normal);
         painter.setFont(fontBit);
         painter.setPen(QPen(Qt::black, 1.0));
-        painter.drawText(QRect(15, 0, (width() < height() ? width() : fromLeft()) - 20, 60), width() < height() ? Qt::AlignHCenter : Qt::AlignLeft, QString::fromUtf8("Gomoku"));
+        painter.drawText(QRect(15, 0, (width() < height() ? width() : fromLeft()) - 20, 60),
+                width() < height() ? Qt::AlignHCenter : Qt::AlignLeft, QString::fromUtf8("Gomoku"));
 
         QFont font(fontName, 24, QFont::Normal);
         painter.setFont(font);
+        QString your_point = tr("Your points: ");
+        QString boox_point = tr("Boox's points: ");
         if(width() < height())
         {
-            QString s=tr("Your points: ") + QString::number(board.getPoints(1))+"        "+
-                      tr("Boox's points: ") + QString::number(board.getPoints(2));
+            QString s= your_point + QString::number(board.getPoints(1))+"        "+
+                       boox_point + QString::number(board.getPoints(2));
             painter.drawText(QRect(0, 60, width(), 30), Qt::AlignHCenter, s);
         }
         else
         {
-            painter.drawText(QRect(15, 65, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, tr("Your points: ") + QString::number(board.getPoints(1)));
-            painter.drawText(QRect(15, 100, fromLeft() - cellSize()/2, 30), Qt::AlignLeft, tr("Boox’s points: ") + QString::number(board.getPoints(2)));
+            painter.drawText(QRect(15, 65, fromLeft() - cellSize()/2, 30),
+                    Qt::AlignLeft, your_point + QString::number(board.getPoints(1)));
+            painter.drawText(QRect(15, 100, fromLeft() - cellSize()/2, 30),
+                    Qt::AlignLeft, boox_point + QString::number(board.getPoints(2)));
         }
 
         painter.setOpacity(1);
@@ -137,13 +142,17 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
         else
         {
             if (wygral < 1)
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, "...");
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60,
+                        Qt::AlignLeft, "...");
             else if (wygral == 1)
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("You won!"));
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60,
+                        Qt::AlignLeft, tr("You won!"));
             else if (wygral == 2)
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("Boox won!"));
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60,
+                        Qt::AlignLeft, tr("Boox won!"));
             else
-                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60, Qt::AlignLeft, tr("Draw."));
+                painter.drawText(15, 160, fromLeft() - cellSize()/2, 60,
+                        Qt::AlignLeft, tr("Draw."));
         }
     }
 
