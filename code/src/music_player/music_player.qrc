@@ -14,5 +14,6 @@
         <file>player_icons/album.png</file>
         <file>player_icons/artist.png</file>
         <file>player_icons/title.png</file>
+        <file>player_icons/volume.png</file>
     </qresource>
 </RCC>

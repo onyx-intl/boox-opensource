@@ -17,6 +17,7 @@ enum MusicPlayerMenuType
     MENU_NEXT = 14,
     MENU_MINIMIZE = 15,
     MENU_EXIT = 16,
+    MENU_VOLUME = 17,
 };
 
 const static QSize MENU_ITEM_SIZE = QSize(60, 60);
@@ -285,9 +286,9 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap min_pixmap(":/player_icons/minimize.png");
-    dd->insert(TAG_COVER, min_pixmap);
-    dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
+    QPixmap vol_pixmap(":/player_icons/volume.png");
+    dd->insert(TAG_COVER, vol_pixmap);
+    dd->insert(TAG_MENU_TYPE, MENU_VOLUME);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
@@ -932,9 +933,9 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
         {
             onNextClicked(true);
         }
-        else if (MENU_MINIMIZE == menu_type)
+        else if (MENU_VOLUME == menu_type)
         {
-            minimize(true);
+            status_bar_.onVolumeClicked();
         }
         else if (MENU_EXIT == menu_type)
         {
