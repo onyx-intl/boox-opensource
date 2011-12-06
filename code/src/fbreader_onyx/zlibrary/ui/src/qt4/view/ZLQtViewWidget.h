@@ -163,6 +163,7 @@ private:
     void enableTextSelection(bool enable = true);
     bool isTextSelectionEnabled();
     bool adjustDictWidget();
+    bool moveDictWidget(bool up = true);
     void fastRefreshWindow(bool);
     void lookupAndUpdate();
 

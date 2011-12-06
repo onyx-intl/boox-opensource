@@ -1185,9 +1185,11 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             break;
         case Qt::Key_PageDown:
             triggerLargeScrollAction("largeScrollForward");
+            moveDictWidget(false);
             break;
         case Qt::Key_PageUp:
             triggerLargeScrollAction("largeScrollBackward");
+            moveDictWidget(false);
             break;
         }
     }
@@ -1471,6 +1473,24 @@ bool ZLQtViewWidget::adjustDictWidget()
     return dict_widget_->ensureVisible(selected_rect_);
 }
 
+bool ZLQtViewWidget::moveDictWidget(bool up)
+{
+    if (!dict_widget_)
+    {
+        return false;
+    }
+    if (up)
+    {
+        QRect rc(QPoint(0, myQWidget->height() - 100), QSize(100, 100));
+        dict_widget_->ensureVisible(rc);
+    }
+    else
+    {
+        QRect rc(QPoint(), QSize(myQWidget->width(), 100));
+        dict_widget_->ensureVisible(rc);
+    }
+}
+
 void ZLQtViewWidget::onDictClosed()
 {
     enableTextSelection(false);
@@ -1488,12 +1508,14 @@ void ZLQtViewWidget::nextPage()
     if (!isLastPage())
     {
         triggerLargeScrollAction("largeScrollForward");
+        moveDictWidget(false);
     }
 }
 
 void ZLQtViewWidget::prevPage()
 {
     triggerLargeScrollAction("largeScrollBackward");
+    moveDictWidget(false);
 }
 
 bool ZLQtViewWidget::isLastPage()
