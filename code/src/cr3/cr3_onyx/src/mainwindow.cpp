@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <QtGui/QFileDialog>
 #include <QtGui/QStyleFactory>
 #include <QClipboard>
@@ -19,6 +20,12 @@
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/number_dialog.h"
 
+#include "../lcl_ui/settings_dialog.h"
+#include "../lcl_ui/info_dialog.h"
+#include "../lcl_ui/recent_books.h"
+
+#include <cr3version.h>
+
 #define DOC_CACHE_SIZE 128 * 0x100000
 
 #ifndef ENABLE_BOOKMARKS_DIR
@@ -26,6 +33,70 @@
 #endif
 
 using namespace ui;
+
+lString16 getDocText( ldomDocument * doc, const char * path, const char * delim )
+{
+    lString16 res;
+    for ( int i=0; i<100; i++ ) {
+        lString8 p = lString8(path) + "[" + lString8::itoa(i+1) + "]";
+        //CRLog::trace("checking doc path %s", p.c_str() );
+        lString16 p16 = Utf8ToUnicode(p);
+        ldomXPointer ptr = doc->createXPointer( p16 );
+        if ( ptr.isNull() )
+            break;
+        lString16 s = ptr.getText( L' ' );
+        if ( s.empty() )
+            continue;
+        if ( !res.empty() && delim!=NULL )
+            res << Utf8ToUnicode( lString8( delim ) );
+        res << s;
+    }
+    return res;
+}
+
+lString16 getDocAuthors( ldomDocument * doc, const char * path, const char * delim )
+{
+    lString16 res;
+    for ( int i=0; i<100; i++ ) {
+        lString8 p = lString8(path) + "[" + lString8::itoa(i+1) + "]";
+        //CRLog::trace("checking doc path %s", p.c_str() );
+        lString16 firstName = getDocText( doc, (p + "/first-name").c_str(), " " );
+        lString16 lastName = getDocText( doc, (p + "/last-name").c_str(), " " );
+        lString16 middleName = getDocText( doc, (p + "/middle-name").c_str(), " " );
+        lString16 nickName = getDocText( doc, (p + "/nickname").c_str(), " " );
+        lString16 homePage = getDocText( doc, (p + "/homepage").c_str(), " " );
+        lString16 email = getDocText( doc, (p + "/email").c_str(), " " );
+        lString16 s = firstName;
+        if ( !middleName.empty() )
+            s << L" " << middleName;
+        if ( !lastName.empty() ) {
+            if ( !s.empty() )
+                s << L" ";
+            s << lastName;
+        }
+        if ( !nickName.empty() ) {
+            if ( !s.empty() )
+                s << L" ";
+            s << nickName;
+        }
+        if ( !homePage.empty() ) {
+            if ( !s.empty() )
+                s << L" ";
+            s << homePage;
+        }
+        if ( !email.empty() ) {
+            if ( !s.empty() )
+                s << L" ";
+            s << email;
+        }
+        if ( s.empty() )
+            continue;
+        if ( !res.empty() && delim!=NULL )
+            res << Utf8ToUnicode( lString8( delim ) );
+        res << s;
+    }
+    return res;
+}
 
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -39,17 +110,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     sys::SystemConfig conf;
     onyx::screen::watcher().addWatcher(this, conf.screenUpdateGCInterval());
 
-#ifdef _LINUX
-    QString homeDir = QDir::toNativeSeparators(QDir::homePath() + "/.cr3/");
-#else
-    QString homeDir = QDir::toNativeSeparators(QDir::homePath() + "/cr3/");
-#endif
-
-#ifdef _LINUX
+    QString homeDir = QDir::toNativeSeparators("/media/flash/cr3/");
     QString exeDir = QString(CR3_DATA_DIR);
-#else
-    QString exeDir = QDir::toNativeSeparators(qApp->applicationDirPath() + "/"); //QDir::separator();
-#endif
 
     QString cacheDir = homeDir + "cache";
     QString bookmarksDir = homeDir + "bookmarks";
@@ -265,6 +327,7 @@ void OnyxMainWindow::showContextMenu()
     menu.addGroup(&reading_style_actions_);
     //menu.addGroup(&zoom_setting_actions_);
     menu.addGroup(&reading_tool_actions_);
+    menu.addGroup(&advanced_actions_);
     menu.setSystemAction(&system_actions_);
 
     if (menu.popup() != QDialog::Accepted)
@@ -298,6 +361,10 @@ void OnyxMainWindow::showContextMenu()
     {
         processToolActions();
         return;
+    }
+    else if (group == advanced_actions_.category())
+    {
+        processAdvancedActions();
     }
     else if (group == system_actions_.category())
     {
@@ -418,6 +485,18 @@ bool OnyxMainWindow::updateActions()
     updateReadingStyleActions();
     updateToolActions();
 
+    advanced_actions_.clear();
+    std::vector<AdvancedType> advanced;
+    advanced.push_back(SETTINGS);
+    advanced.push_back(INFO);
+    advanced.push_back(RECENT_BOOKS);
+    advanced_actions_.generateActions(advanced, true);
+
+    advanced.clear();
+    advanced.push_back(ADD_CITE);
+    advanced.push_back(SHOW_ALL_CITES);
+    advanced_actions_.generateActions(advanced, true);
+
     // Font family.
     QFont font = currentFont();
     font_family_actions_.generateActions(font.family(), true);
@@ -457,6 +536,156 @@ const QFont & OnyxMainWindow::currentFont()
 bool OnyxMainWindow::isFullScreenByWidgetSize()
 {
     return !status_bar_->isVisible();
+}
+
+void OnyxMainWindow::processAdvancedActions()
+{
+    AdvancedType atype = advanced_actions_.selectedTool();
+    switch (atype) {
+        case SETTINGS: {
+            SettingsDialog sdialog(0);
+
+            QString prop_str;
+
+            props_ref_->getString(PROP_STATUS_LINE, prop_str);
+            sdialog.status_line = (prop_str == "0");
+
+            props_ref_->getString(PROP_SHOW_TIME, prop_str);
+            sdialog.show_time = (prop_str == "1");
+
+            props_ref_->getString(PROP_LANDSCAPE_PAGES, prop_str);
+            sdialog.two_pages_landscape = (prop_str == "2");
+
+            props_ref_->getString(PROP_FONT_SIZE, prop_str);
+            sdialog.font_size = prop_str;
+
+            props_ref_->getString(PROP_FONT_WEIGHT_EMBOLDEN, prop_str);
+            sdialog.font_bold = (prop_str == "1");
+
+            props_ref_->getString(PROP_FONT_ANTIALIASING, prop_str);
+            sdialog.font_aa = (prop_str == "1" || prop_str == "2");
+
+            props_ref_->getString(PROP_DISPLAY_INVERSE, prop_str);
+            sdialog.display_inverse = (prop_str == "1");
+
+            props_ref_->getString(PROP_PAGE_MARGIN_LEFT, prop_str);
+            sdialog.l_margin = prop_str;
+            props_ref_->getString(PROP_PAGE_MARGIN_RIGHT, prop_str);
+            sdialog.r_margin = prop_str;
+            props_ref_->getString(PROP_PAGE_MARGIN_TOP, prop_str);
+            sdialog.t_margin = prop_str;
+            props_ref_->getString(PROP_PAGE_MARGIN_BOTTOM, prop_str);
+            sdialog.b_margin = prop_str;
+
+            sdialog.exec();
+
+            if (!sdialog.save)
+                break;
+
+            prop_str = sdialog.status_line ? "0" : "2";
+            props_ref_->setString(PROP_STATUS_LINE, prop_str);
+
+            prop_str = sdialog.show_time ? "1" : "0";
+            props_ref_->setString(PROP_SHOW_TIME, prop_str);
+
+            prop_str = sdialog.two_pages_landscape ? "2" : "1";
+            props_ref_->setString(PROP_LANDSCAPE_PAGES, prop_str);
+
+            props_ref_->setString(PROP_FONT_SIZE, sdialog.font_size);
+
+            prop_str = sdialog.font_bold ? "1" : "0";
+            props_ref_->setString(PROP_FONT_WEIGHT_EMBOLDEN, prop_str);
+
+            prop_str = sdialog.font_aa ? "2" : "0";
+            props_ref_->setString(PROP_FONT_ANTIALIASING, prop_str);
+
+            prop_str = sdialog.display_inverse ? "1" : "0";
+            props_ref_->setString(PROP_DISPLAY_INVERSE, prop_str);
+
+            props_ref_->setString(PROP_PAGE_MARGIN_LEFT, sdialog.l_margin);
+            props_ref_->setString(PROP_PAGE_MARGIN_RIGHT, sdialog.r_margin);
+            props_ref_->setString(PROP_PAGE_MARGIN_TOP, sdialog.t_margin);
+            props_ref_->setString(PROP_PAGE_MARGIN_BOTTOM, sdialog.b_margin);
+
+            view_->setOptions(props_ref_);
+
+            break;
+                       }
+        case INFO: {
+            InfoDialog id(0);
+
+            view_->getDocView()->savePosition();
+            CRPropRef props = view_->getDocView()->getDocProps();
+
+            QString x;
+
+            id.addLine(QApplication::tr("Status"), true);
+            id.addLine(QApplication::tr("Cool Reader version: ") + QString(CR_ENGINE_VERSION));
+            id.addLine(QApplication::tr("Current page: ") + QString::number(view_->getDocView()->getCurPage()+1));
+            id.addLine(QApplication::tr("Total pages: ") + QString::number(view_->getDocView()->getPageCount()));
+            id.addLine(QApplication::tr("Current Time: ") + cr2qt(view_->getDocView()->getTimeString()));
+
+            id.addLine(QApplication::tr("File info"), true);
+            id.addLine(QApplication::tr("Archive name: ") + cr2qt(props->getStringDef(DOC_PROP_ARC_NAME)));
+            id.addLine(QApplication::tr("Archive path: ") + cr2qt(props->getStringDef(DOC_PROP_ARC_PATH)));
+            id.addLine(QApplication::tr("Archive size: ") + cr2qt(props->getStringDef(DOC_PROP_ARC_SIZE)));
+            id.addLine(QApplication::tr("File name: ") + cr2qt(props->getStringDef(DOC_PROP_FILE_NAME)));
+            id.addLine(QApplication::tr("File path: ") + cr2qt(props->getStringDef(DOC_PROP_FILE_PATH)));
+            id.addLine(QApplication::tr("File size: ") + cr2qt(props->getStringDef(DOC_PROP_FILE_SIZE)));
+            id.addLine(QApplication::tr("File format: ") + cr2qt(props->getStringDef(DOC_PROP_FILE_FORMAT)));
+
+            id.addLine(QApplication::tr("Book info"), true);
+            id.addLine(QApplication::tr("Title: ") + cr2qt(props->getStringDef(DOC_PROP_TITLE) ));
+            id.addLine(QApplication::tr("Author(s): ") + cr2qt(props->getStringDef(DOC_PROP_AUTHORS) ));
+            id.addLine(QApplication::tr("Series name: ") + cr2qt(props->getStringDef(DOC_PROP_SERIES_NAME) ));
+            id.addLine(QApplication::tr("Series number: ") + cr2qt(props->getStringDef(DOC_PROP_SERIES_NUMBER) ));
+            id.addLine(QApplication::tr("Date: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/title-info/date", ", " ) ));
+            id.addLine(QApplication::tr("Genres: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/title-info/genre", ", " ) ));
+            id.addLine(QApplication::tr("Translator: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/title-info/translator", ", " ) ));
+
+            id.addLine(QApplication::tr("Document info"), true);
+            id.addLine(QApplication::tr("Document author: ") + cr2qt(getDocAuthors( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/author", " " ) ));
+            id.addLine(QApplication::tr("Document date: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/date", " " ) ));
+            id.addLine(QApplication::tr("Document source URL: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/src-url", " " ) ));
+            id.addLine(QApplication::tr("OCR by: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/src-ocr", " " ) ));
+            id.addLine(QApplication::tr("Document version: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/version", " " ) ));
+            id.addLine(QApplication::tr("Change history: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/document-info/history", " " ) ));
+
+            id.addLine(QApplication::tr("Publication info"), true);
+            id.addLine(QApplication::tr("Publication name: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/publish-info/book-name", " " ) ));
+            id.addLine(QApplication::tr("Publisher: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/publish-info/publisher", " " ) ));
+            id.addLine(QApplication::tr("Publisher city: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/publish-info/city", " " ) ));
+            id.addLine(QApplication::tr("Publication year: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/publish-info/year", " " ) ));
+            id.addLine(QApplication::tr("ISBN: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/publish-info/isbn", " " ) ));
+
+            id.addLine(QApplication::tr("Information"), true);
+            id.addLine(QApplication::tr("Custom info: ") + cr2qt(getDocText( view_->getDocView()->getDocument(), "/FictionBook/description/custom-info", " " ) ));
+
+            id.popup(tr("Information"));
+            break;
+                   }
+        case RECENT_BOOKS: {
+            RecentBooks rb(0);
+            rb.books = view_->getRecentBooks();
+            if (rb.popup(tr("Recent Books")) != QDialog::Accepted)
+               break;
+
+            view_->openRecentBook(rb.selectedInfo() + 1);
+            break;
+                           }
+        case ADD_CITE:
+            addCite();
+            view_->restoreWindowPos(this, "MyBookmark");
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+            break;
+
+        case SHOW_ALL_CITES:
+            showAllCites();
+            break;
+
+        default:
+            break;
+    }
 }
 
 void OnyxMainWindow::processToolActions()
@@ -641,6 +870,82 @@ bool OnyxMainWindow::addBookmark()
     return true;
 }
 
+bool OnyxMainWindow::addCite()
+{
+    view_->createCite();
+    return true;
+}
+
+void OnyxMainWindow::showAllCites()
+{
+    QStandardItemModel model;
+    QModelIndex selected = model.invisibleRootItem()->index();
+    citeModel(model, selected);
+
+    TreeViewDialog bookmark_view(this);
+    bookmark_view.setModel(&model);
+    QVector<int> percentages;
+    percentages.push_back(80);
+    percentages.push_back(20);
+    bookmark_view.tree().setColumnWidth(percentages);
+
+    int ret = bookmark_view.popup(QCoreApplication::tr("Citations"));
+    // Returned from the bookmark view.
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
+    this->update();
+
+    if (ret != QDialog::Accepted)
+    {
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+        return;
+    }
+
+    CRBookmark *pos = (CRBookmark *)(model.data(bookmark_view.selectedItem(), Qt::UserRole + 1).toInt());
+    view_->goToBookmark(pos);
+}
+
+void OnyxMainWindow::citeModel(QStandardItemModel & model,
+                                   QModelIndex & selected)
+{
+    CRFileHistRecord * rec = view_->getDocView()->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+    model.setColumnCount(2);
+    int row = 0;
+    for(int i  = 0; i < list.length(); ++i)
+    {
+        // skip bookmarks
+        CRBookmark * bmk = list[i];
+        if (!bmk || (bmk->getType() != bmkt_comment && bmk->getType() != bmkt_correction))
+            continue;
+
+        //QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
+        QString t = cr2qt(list[i]->getPosText());
+        t.truncate(100);
+        QStandardItem *title = new QStandardItem(t);
+        title->setData((int)list[i]);
+        title->setEditable(false);
+        model.setItem(row, 0, title);
+
+        int pg = 1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() ));
+        QString str(tr("Page %1"));
+        str = str.arg(pg);
+        /*
+        double pos = list[i]->getPercent() / 100.0;
+        QString str(tr("Page %1 (%2%)"));
+        str = str.arg(pg);
+        str = str.arg(pos);
+        */
+        QStandardItem *page = new QStandardItem(str);
+        page->setTextAlignment(Qt::AlignCenter);
+        page->setEditable(false);
+        model.setItem(row, 1, page);
+
+        row++;
+    }
+}
+
 void OnyxMainWindow::showAllBookmarks()
 {
     QStandardItemModel model;
@@ -678,8 +983,13 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
     LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
     model.setColumnCount(2);
     int row = 0;
-    for(int i  = 0; i < list.length(); ++i, ++row)
+    for(int i  = 0; i < list.length(); ++i)
     {
+        // skip cites
+        CRBookmark * bmk = list[i];
+        if (!bmk || (bmk->getType() == bmkt_comment || bmk->getType() == bmkt_correction))
+            continue;
+
         QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
         t.truncate(100);
         QStandardItem *title = new QStandardItem(t);
@@ -694,6 +1004,8 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
         model.setItem(row, 1, page);
+
+        row++;
     }
 }
 

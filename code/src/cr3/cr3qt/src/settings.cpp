@@ -48,6 +48,7 @@ static void findBackgrounds( lString16Collection & baseDirs, lString16Collection
     }
 }
 
+static int interline_spaces[] = {75, 80, 85, 90, 95, 100, 110, 120, 140, 150};
 
 SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     QDialog(parent),
@@ -96,7 +97,7 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     }
     m_ui->cbPageSkin->clear();
     m_ui->cbPageSkin->addItems( bgFileLabels );
-    m_ui->cbPageSkin->setCurrentIndex(bgIndex);
+    m_ui->cbPageSkin->setCurrentIndex(bgIndex+1);
 
     optionToUi( PROP_WINDOW_FULLSCREEN, m_ui->cbWindowFullscreen );
     optionToUi( PROP_WINDOW_SHOW_MENU, m_ui->cbWindowShowMenu );
@@ -109,7 +110,15 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     optionToUi( PROP_SHOW_TIME, m_ui->cbShowClock );
     optionToUi( PROP_SHOW_TITLE, m_ui->cbShowBookName );
     optionToUi( PROP_TXT_OPTION_PREFORMATTED, m_ui->cbTxtPreFormatted );
+    optionToUi( PROP_FLOATING_PUNCTUATION, m_ui->cbFloatingPunctuation );
+
+    QString gamma = m_props->getStringDef(PROP_FONT_GAMMA, "");
+    if ( gamma=="" )
+        m_props->setString(PROP_FONT_GAMMA, "1.0");
+    optionToUiString(PROP_FONT_GAMMA, m_ui->cbFontGamma);
+
     optionToUiInversed( PROP_STATUS_LINE, m_ui->cbShowPageHeader );
+
     bool b = m_props->getIntDef( PROP_STATUS_LINE, 0 )==0;
     m_ui->cbShowBattery->setEnabled( b );
     m_ui->cbShowClock->setEnabled( b );
@@ -187,14 +196,11 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     //PROP_HYPHENATION_DICT
     QString v = QString("%1").arg(m_props->getIntDef(PROP_INTERLINE_SPACE, 100)) + "%";
     QStringList isitems;
-    isitems.append("90%");
-    isitems.append("100%");
-    isitems.append("110%");
-    isitems.append("120%");
-    isitems.append("140%");
+    for ( int i=0; i<sizeof(interline_spaces)/sizeof(int); i++ )
+        isitems.append(QString("%1").arg(interline_spaces[i]) + "%");
     m_ui->cbInterlineSpace->addItems(isitems);
     int isi = m_ui->cbInterlineSpace->findText(v);
-    m_ui->cbInterlineSpace->setCurrentIndex(isi>=0 ? isi : 1);
+    m_ui->cbInterlineSpace->setCurrentIndex(isi>=0 ? isi : 6);
 
     int hi = -1;
     v = m_props->getStringDef(PROP_HYPHENATION_DICT,"@algorithm"); //HYPH_DICT_ID_ALGORITHM;
@@ -204,9 +210,9 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
             hi = i;
         QString s = cr2qt( item->getTitle() );
         if ( item->getType()==HDT_NONE )
-            s = "[No hyphenation]";
+            s = tr("[No hyphenation]");
         else if ( item->getType()==HDT_ALGORITHM )
-            s = "[Algorythmic hyphenation]";
+            s = tr("[Algorythmic hyphenation]");
         m_ui->cbHyphenation->addItem( s );
     }
     m_ui->cbHyphenation->setCurrentIndex(hi>=0 ? hi : 1);
@@ -215,7 +221,7 @@ SettingsDlg::SettingsDlg(QWidget *parent, CR3View * docView ) :
     m_ui->crSample->setOptions( m_props );
     m_ui->crSample->getDocView()->setShowCover( false );
     m_ui->crSample->getDocView()->setViewMode( DVM_SCROLL, 1 );
-    QString testPhrase = "The quick brown fox jumps over the lazy dog. ";
+    QString testPhrase = tr("The quick brown fox jumps over the lazy dog. ");
     m_ui->crSample->getDocView()->createDefaultDocument( lString16(), qt2cr(testPhrase+testPhrase+testPhrase) );
 
     updateStyleSample();
@@ -263,6 +269,21 @@ void SettingsDlg::optionToUi( const char * optionName, QCheckBox * cb )
     int state = ( m_props->getIntDef( optionName, 1 ) != 0 ) ? 1 : 0;
     CRLog::debug("optionToUI(%s,%d)", optionName, state);
     cb->setCheckState( state ? Qt::Checked : Qt::Unchecked );
+}
+
+void SettingsDlg::optionToUiString( const char * optionName, QComboBox * cb )
+{
+    QString value = m_props->getStringDef( optionName, "" );
+    int index = -1;
+    for ( int i=0; i<cb->count(); i++ ) {
+        if ( cb->itemText(i)==value ) {
+            index = i;
+            break;
+        }
+    }
+    if ( index<0 )
+        index = 0;
+    cb->setCurrentIndex( index );
 }
 
 void SettingsDlg::optionToUiInversed( const char * optionName, QCheckBox * cb )
@@ -417,17 +438,17 @@ void SettingsDlg::colorDialog( const char * optionName, QString title )
 
 void SettingsDlg::on_btnTextColor_clicked()
 {
-    colorDialog( PROP_FONT_COLOR, "Text color" );
+    colorDialog( PROP_FONT_COLOR, tr("Text color") );
 }
 
 void SettingsDlg::on_btnBgColor_clicked()
 {
-    colorDialog( PROP_BACKGROUND_COLOR, "Background color" );
+    colorDialog( PROP_BACKGROUND_COLOR, tr("Background color") );
 }
 
 void SettingsDlg::on_btnHeaderTextColor_clicked()
 {
-    colorDialog( PROP_STATUS_FONT_COLOR, "Page header text color" );
+    colorDialog( PROP_STATUS_FONT_COLOR, tr("Page header text color") );
 }
 
 void SettingsDlg::on_cbLookAndFeel_currentIndexChanged( QString styleName )
@@ -484,8 +505,7 @@ void SettingsDlg::on_cbInterlineSpace_currentIndexChanged(int index)
 {
     if ( !initDone )
         return;
-    static int n[] = {90,100,110,120,140};
-    m_props->setInt( PROP_INTERLINE_SPACE, n[index] );
+    m_props->setInt( PROP_INTERLINE_SPACE, interline_spaces[index] );
     updateStyleSample();
 }
 
@@ -520,3 +540,13 @@ void SettingsDlg::on_cbPageSkin_currentIndexChanged(int index)
         m_props->setString( PROP_BACKGROUND_IMAGE, m_backgroundFiles[index] );
 }
 
+
+void SettingsDlg::on_cbFloatingPunctuation_stateChanged(int s)
+{
+    setCheck( PROP_FLOATING_PUNCTUATION, s );
+}
+
+void SettingsDlg::on_cbFontGamma_currentIndexChanged(QString s)
+{
+    m_props->setString( PROP_FONT_GAMMA, s );
+}

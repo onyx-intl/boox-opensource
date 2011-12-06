@@ -20,6 +20,7 @@ import org.coolreader.crengine.OPDSUtil.EntryInfo;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -55,6 +56,9 @@ public class FileBrowser extends ListView {
 		this.mScanner = scanner;
 		this.mInflater = LayoutInflater.from(activity);// activity.getLayoutInflater();
 		this.mHistory = history;
+		if ( DeviceInfo.FORCE_LIGHT_THEME ) {
+			setBackgroundColor(Color.WHITE);
+		}
         setFocusable(true);
         setFocusableInTouchMode(true);
         setLongClickable(true);
@@ -74,7 +78,7 @@ public class FileBrowser extends ListView {
 				FileInfo item = (FileInfo) getAdapter().getItem(position);
 				if ( item==null )
 					return false;
-				if ( item.isDirectory ) {
+				if (item.isDirectory && !item.isOPDSDir()) {
 					showDirectory(item, null);
 					return true;
 				}
@@ -93,7 +97,7 @@ public class FileBrowser extends ListView {
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		
-		if ( selectedItem==null || selectedItem.isDirectory )
+		if ( selectedItem==null || (selectedItem.isDirectory && !selectedItem.isOPDSDir()) )
 			return false;
 			
 		switch (item.getItemId()) {
@@ -139,8 +143,54 @@ public class FileBrowser extends ListView {
 			mActivity.getHistory().removeBookInfo(selectedItem, true, false);
 			showRecentBooks();
 			return true;
+		case R.id.catalog_add:
+			log.d("catalog_add menu item selected");
+			editOPDSCatalog(null);
+			return true;
+		case R.id.catalog_delete:
+			log.d("catalog_delete menu item selected");
+			if (selectedItem!=null && selectedItem.isOPDSDir()) {
+				mActivity.getDB().removeOPDSCatalog(selectedItem.id);
+				refreshOPDSRootDirectory();
+			}
+			return true;
+		case R.id.catalog_edit:
+			log.d("catalog_edit menu item selected");
+			editOPDSCatalog(selectedItem);
+			return true;
+		case R.id.catalog_open:
+			log.d("catalog_open menu item selected");
+			showOPDSDir(selectedItem, null);
+			return true;
 		}
 		return false;
+	}
+	
+	private void editOPDSCatalog(FileInfo opds) {
+		if (opds==null) {
+			opds = new FileInfo();
+			opds.isDirectory = true;
+			opds.pathname = FileInfo.OPDS_DIR_PREFIX + "http://";
+			opds.filename = "New Catalog";
+			opds.isListed = true;
+			opds.isScanned = true;
+			opds.parent = mScanner.getOPDSRoot();
+		}
+		OPDSCatalogEditDialog dlg = new OPDSCatalogEditDialog(mActivity, opds, new Runnable() {
+			@Override
+			public void run() {
+				refreshOPDSRootDirectory();
+			}
+		});
+		dlg.show();
+	}
+	
+	private void refreshOPDSRootDirectory() {
+		FileInfo opdsRoot = mScanner.getOPDSRoot();
+		if ( opdsRoot!=null ) {
+			mActivity.getDB().loadOPDSCatalogs(opdsRoot);
+			showDirectory(opdsRoot, null);
+		}
 	}
 	
 	@Override
@@ -151,6 +201,9 @@ public class FileBrowser extends ListView {
 	    if ( isRecentDir() ) {
 		    inflater.inflate(R.menu.cr3_file_browser_recent_context_menu, menu);
 		    menu.setHeaderTitle(mActivity.getString(R.string.context_menu_title_recent_book));
+	    } else if (selectedItem!=null && selectedItem.isOPDSDir()) {
+		    inflater.inflate(R.menu.cr3_file_browser_opds_context_menu, menu);
+		    menu.setHeaderTitle(mActivity.getString(R.string.menu_title_catalog));
 	    } else if (selectedItem!=null && selectedItem.isDirectory) {
 		    inflater.inflate(R.menu.cr3_file_browser_folder_context_menu, menu);
 		    menu.setHeaderTitle(mActivity.getString(R.string.context_menu_title_book));
@@ -340,6 +393,12 @@ public class FileBrowser extends ListView {
 		showDirectory(null, null);
 	}
 
+	public boolean isBookShownInRecentList(FileInfo book) {
+		if (currDirectory==null || !currDirectory.isRecentDir())
+			return false;
+		return currDirectory.findItemByPathName(book.getPathName())!=null;
+	}
+	
 	public void showLastDirectory()
 	{
 		if ( currDirectory==null || currDirectory==mScanner.getRoot() )
@@ -582,23 +641,7 @@ public class FileBrowser extends ListView {
 	
 	public void showDirectory( FileInfo fileOrDir, FileInfo itemToSelect )
 	{
-		if ( !BackgroundThread.instance().isGUIThread() ) {
-			try {
-				throw new Exception("showDirectory called from background thread!");
-			} catch ( Exception e ) {
-				log.e(e.getMessage(), e);
-			}
-			final FileInfo dir = fileOrDir;
-			final FileInfo item = itemToSelect;
-			BackgroundThread.instance().callGUI(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					showDirectory( dir, item );
-					return null;
-				}
-			});
-			return;
-		}
+		BackgroundThread.ensureGUI();
 		if ( fileOrDir!=null && fileOrDir.isOPDSDir() ) {
 			showOPDSDir(fileOrDir, itemToSelect);
 			return;
@@ -670,21 +713,7 @@ public class FileBrowser extends ListView {
 
 	private void showDirectoryInternal( final FileInfo dir, final FileInfo file )
 	{
-		if ( !BackgroundThread.instance().isGUIThread() ) {
-			try {
-				throw new Exception("showDirectoryInternal called from background thread!");
-			} catch ( Exception e ) {
-				log.e(e.getMessage(), e);
-			}
-			BackgroundThread.instance().callGUI(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					showDirectoryInternal( dir, file );
-					return null;
-				}
-			});
-			return;
-		}
+		BackgroundThread.ensureGUI();
 		currDirectory = dir;
 		if ( dir!=null )
 			log.i("Showing directory " + dir + " " + Thread.currentThread().getName());
@@ -892,6 +921,9 @@ public class FileBrowser extends ListView {
 					parentItem = currDirectory;
 				}
 				holder.setItem(item, parentItem);
+				if ( DeviceInfo.FORCE_LIGHT_THEME ) {
+					view.setBackgroundColor(Color.WHITE);
+				}
 				return view;
 			}
 

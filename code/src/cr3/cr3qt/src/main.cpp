@@ -109,19 +109,14 @@ int main(int argc, char *argv[])
         lString16 exefontpath = exedir + L"fonts";
         CRLog::info("main()");
         lString16Collection fontDirs;
-        fontDirs.add( lString16(L"/usr/local/share/crengine/fonts") );
-        fontDirs.add( lString16(L"/usr/local/share/fonts/truetype/freefont") );
+        //fontDirs.add( lString16(L"/usr/local/share/crengine/fonts") );
+        //fontDirs.add( lString16(L"/usr/local/share/fonts/truetype/freefont") );
         //fontDirs.add( lString16(L"/mnt/fonts") );
-        fontDirs.add( lString16(L"/usr/share/fonts/liberation") );
-        fontDirs.add( lString16(L"/usr/share/fonts/dejavu") );
-//        fontDirs.add( lString16(L"/usr/share/fonts") );
-#if 1
+#if 0
         fontDirs.add( exefontpath );
         fontDirs.add( lString16(L"/usr/share/fonts/truetype") );
-        fontDirs.add( lString16(L"/usr/share/fonts/liberation") );
-        fontDirs.add( lString16(L"/usr/share/fonts/dejavu") );
+        fontDirs.add( lString16(L"/usr/share/fonts/truetype/liberation") );
         fontDirs.add( lString16(L"/usr/share/fonts/truetype/freefont") );
-//        fontDirs.add( lString16(L"/usr/share/fonts") );
 #endif
         // TODO: use fontconfig instead
         //fontDirs.add( lString16(L"/root/fonts/truetype") );

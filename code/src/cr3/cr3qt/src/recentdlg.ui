@@ -11,26 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">Recent Books</string>
+   <string>Recent Books</string>
   </property>
   <property name="windowIcon">
    <iconset resource="cr3res.qrc">
     <normaloff>:/icons/action/icons/folder_favorite.png</normaloff>:/icons/action/icons/folder_favorite.png</iconset>
-  </property>
-  <property name="toolTip">
-   <string notr="true"/>
-  </property>
-  <property name="statusTip">
-   <string notr="true"/>
-  </property>
-  <property name="whatsThis">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleName">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleDescription">
-   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -38,16 +23,10 @@
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
     </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -59,45 +38,15 @@
   </layout>
   <action name="actionRemoveItem">
    <property name="text">
-    <string notr="true">Remove Item</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Remove Item</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Remove Item</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
+    <string>Remove Item</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Del</string>
+    <string>Del</string>
    </property>
   </action>
   <action name="actionClearAll">
    <property name="text">
-    <string notr="true">Clear All</string>
-   </property>
-   <property name="iconText">
-    <string notr="true">Clear All</string>
-   </property>
-   <property name="toolTip">
-    <string notr="true">Clear All</string>
-   </property>
-   <property name="statusTip">
-    <string notr="true"/>
-   </property>
-   <property name="whatsThis">
-    <string notr="true"/>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
-   </property>
-   <property name="autoRepeat">
-    <bool>false</bool>
+    <string>Clear All</string>
    </property>
   </action>
  </widget>
