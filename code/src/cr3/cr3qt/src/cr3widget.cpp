@@ -292,7 +292,7 @@ CR3View::CR3View( QWidget *parent)
         : QWidget( parent, Qt::WindowFlags() ), _scroll(NULL), _propsCallback(NULL)
         , _normalCursor(Qt::ArrowCursor), _linkCursor(Qt::PointingHandCursor)
         , _selCursor(Qt::IBeamCursor), _waitCursor(Qt::WaitCursor)
-        , _selecting(false), _selected(false), _editMode(false)
+        , _selecting(false), _selected(false), _editMode(false), _lastBatteryState(CR_BATTERY_STATE_NO_BATTERY)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -312,7 +312,8 @@ CR3View::CR3View( QWidget *parent)
     _docview->setFontSizes( sizes, false );
 
     _docview->setBatteryIcons( getBatteryIcons(0x000000) );
-    _docview->setBatteryState( -1 );
+    _docview->setBatteryState(CR_BATTERY_STATE_NO_BATTERY); // don't show battery
+    //_docview->setBatteryState( 75 ); // 75%
 //    LVStreamRef stream;
 //    stream = LVOpenFileStream("/home/lve/.cr3/textures/old_paper.png", LVOM_READ);
     //stream = LVOpenFileStream("/home/lve/.cr3/textures/tx_wood.jpg", LVOM_READ);
@@ -444,12 +445,12 @@ bool CR3View::loadDocument( QString fileName )
     clearSelection();
     bool res = _docview->LoadDocument( qt2cr(fileName).c_str() );
     if ( res ) {
-        _docview->swapToCache();
+        //_docview->swapToCache();
         QByteArray utf8 = fileName.toUtf8();
         CRLog::debug( "Trying to restore position for %s", utf8.constData() );
         _docview->restorePosition();
     } else {
-        _docview->createDefaultDocument( lString16(), qt2cr("Error while opening document " + fileName) );
+        _docview->createDefaultDocument( lString16(), qt2cr(tr("Error while opening document ") + fileName) );
     }
     update();
     return res;
@@ -485,10 +486,33 @@ void CR3View::resizeEvent ( QResizeEvent * event )
     _docview->Resize( sz.width(), sz.height() );
 }
 
+int getBatteryState()
+{
+#ifdef _WIN32
+    // update battery state
+    SYSTEM_POWER_STATUS bstatus;
+    BOOL pow = GetSystemPowerStatus(&bstatus);
+    if (bstatus.BatteryFlag & 128)
+        return CR_BATTERY_STATE_NO_BATTERY; // no system battery
+	if (bstatus.ACLineStatus==8 && bstatus.BatteryLifePercent<100 )
+		return CR_BATTERY_STATE_CHARGING; // charging
+    if (bstatus.BatteryLifePercent>=0 && bstatus.BatteryLifePercent<=100)
+		return bstatus.BatteryLifePercent;
+    return CR_BATTERY_STATE_NO_BATTERY;
+#else
+	return CR_BATTERY_STATE_NO_BATTERY;
+#endif
+}
+
 void CR3View::paintEvent ( QPaintEvent * event )
 {
     QPainter painter(this);
     QRect rc = rect();
+	int newBatteryState = getBatteryState();
+	if (_lastBatteryState != newBatteryState) {
+		_docview->setBatteryState( newBatteryState );
+		_lastBatteryState = newBatteryState;
+	}
     LVDocImageRef ref = _docview->getPageImage(0);
     if ( ref.isNull() ) {
         //painter.fillRect();
@@ -911,11 +935,17 @@ bool CR3View::updateSelection( ldomXPointer p )
         return false;
     r.sort();
     if ( !_editMode ) {
-        if ( !r.getStart().isVisibleWordStart() )
+        if ( !r.getStart().isVisibleWordStart() ) {
+            //CRLog::trace("calling prevVisibleWordStart : %s", LCSTR(r.getStart().toString()));
             r.getStart().prevVisibleWordStart();
+            //CRLog::trace("updated : %s", LCSTR(r.getStart().toString()));
+        }
         //lString16 start = r.getStart().toString();
-        if ( !r.getEnd().isVisibleWordEnd() )
+        if ( !r.getEnd().isVisibleWordEnd() ) {
+            //CRLog::trace("calling nextVisibleWordEnd : %s", LCSTR(r.getEnd().toString()));
             r.getEnd().nextVisibleWordEnd();
+            //CRLog::trace("updated : %s", LCSTR(r.getEnd().toString()));
+        }
     }
     if ( r.isNull() )
         return false;
@@ -1116,6 +1146,7 @@ void CR3View::OnFormatStart()
 void CR3View::OnFormatEnd()
 {
     setCursor( _normalCursor );
+    _docview->updateCache(); // save to cache
 }
 
 /// set bookmarks dir
@@ -1126,6 +1157,23 @@ void CR3View::setBookmarksDir( QString dirname )
 
 void CR3View::keyPressEvent ( QKeyEvent * event )
 {
+#if 0
+    // testing sentence navigation/selection
+    switch ( event->key() ) {
+    case Qt::Key_Z:
+        _docview->doCommand(DCMD_SELECT_FIRST_SENTENCE);
+        update();
+        return;
+    case Qt::Key_X:
+        _docview->doCommand(DCMD_SELECT_NEXT_SENTENCE);
+        update();
+        return;
+    case Qt::Key_C:
+        _docview->doCommand(DCMD_SELECT_PREV_SENTENCE);
+        update();
+        return;
+    }
+#endif
 #if WORD_SELECTOR_ENABLED==1
     if ( isWordSelection() ) {
         MoveDirection dir = DIR_ANY;
@@ -1223,7 +1271,7 @@ void CR3View::OnLoadFileFirstPagesReady()
         return;
     }
     CRLog::info( "OnLoadFileFirstPagesReady() - painting first page" );
-    _docview->setPageHeaderOverride(qt2cr("Loading: please wait..."));
+    _docview->setPageHeaderOverride(qt2cr(tr("Loading: please wait...")));
     //update();
     repaint();
     CRLog::info( "OnLoadFileFirstPagesReady() - painting done" );

@@ -11,25 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">Dialog</string>
-  </property>
-  <property name="toolTip">
-   <string notr="true"/>
-  </property>
-  <property name="statusTip">
-   <string notr="true"/>
-  </property>
-  <property name="whatsThis">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleName">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleDescription">
-   <string notr="true"/>
-  </property>
-  <property name="windowFilePath">
-   <string notr="true"/>
+   <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -37,75 +19,38 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string notr="true">Bookmark type</string>
+        <string>Bookmark type</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="cbType">
-       <property name="toolTip">
-        <string notr="true"/>
-       </property>
-       <property name="statusTip">
-        <string notr="true"/>
-       </property>
-       <property name="whatsThis">
-        <string notr="true"/>
-       </property>
-       <property name="accessibleName">
-        <string notr="true"/>
-       </property>
-       <property name="accessibleDescription">
-        <string notr="true"/>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="cbType"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string notr="true">Position</string>
+        <string>Position</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="lblPosition">
-       <property name="toolTip">
-        <string notr="true"/>
-       </property>
-       <property name="statusTip">
-        <string notr="true"/>
-       </property>
-       <property name="whatsThis">
-        <string notr="true"/>
-       </property>
-       <property name="accessibleName">
-        <string notr="true"/>
-       </property>
-       <property name="accessibleDescription">
-        <string notr="true"/>
-       </property>
        <property name="text">
-        <string notr="true">Page 1/10 10%</string>
+        <string>Page 1/10 10%</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
-       <property name="accessibleDescription">
-        <string notr="true"/>
-       </property>
        <property name="text">
-        <string notr="true">Position text</string>
+        <string>Position text</string>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="lblComment">
-       <property name="accessibleDescription">
-        <string notr="true"/>
-       </property>
        <property name="text">
-        <string notr="true">Comment</string>
+        <string>Comment</string>
        </property>
       </widget>
      </item>
@@ -118,14 +63,14 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string notr="true">Title</string>
+        <string>Title</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QLabel" name="lblTitle">
        <property name="text">
-        <string notr="true">sample title</string>
+        <string>sample title</string>
        </property>
       </widget>
      </item>
@@ -133,21 +78,6 @@
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="toolTip">
-      <string notr="true"/>
-     </property>
-     <property name="statusTip">
-      <string notr="true"/>
-     </property>
-     <property name="whatsThis">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleName">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

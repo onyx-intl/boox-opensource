@@ -48,6 +48,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         virtual ~CR3View();
 
         bool loadDocument( QString fileName );
+        vector<QString> getRecentBooks();
+        void openRecentBook(int index);
+
         bool loadLastDocument();
         void setDocumentText( QString text );
 
@@ -104,6 +107,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString getSelectionText() { return _selText; }
         /// create bookmark
         CRBookmark * createBookmark();
+        CRBookmark * createCite();
         /// go to bookmark and highlight it
         void goToBookmark( CRBookmark * bm );
         bool hasBookmark();

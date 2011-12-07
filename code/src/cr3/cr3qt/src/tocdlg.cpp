@@ -47,7 +47,7 @@ TocDlg::TocDlg(QWidget *parent, CR3View * docView) :
     setAttribute( Qt::WA_DeleteOnClose, true );
     m_ui->setupUi(this);
     m_ui->treeWidget->setColumnCount(2);
-    m_ui->treeWidget->setHeaderItem(new QTreeWidgetItem(QStringList() << "Title" <<"Page" ));
+    m_ui->treeWidget->setHeaderItem(new QTreeWidgetItem(QStringList() << tr("Title") << tr("Page") ));
     m_ui->treeWidget->header()->setStretchLastSection(false);
     m_ui->treeWidget->header()->setResizeMode( 0, QHeaderView::Stretch );
     m_ui->treeWidget->header()->setResizeMode( 1, QHeaderView::ResizeToContents );
