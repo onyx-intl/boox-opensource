@@ -670,7 +670,7 @@ void OnyxMainWindow::processAdvancedActions()
             if (rb.popup(tr("Recent Books")) != QDialog::Accepted)
                break;
 
-            view_->openRecentBook(rb.selectedInfo() + 1);
+            view_->openRecentBook(rb.selectedInfo());
             break;
                            }
         case ADD_CITE:

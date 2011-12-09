@@ -51,7 +51,9 @@ QStandardItemModel* RecentBooks::getInfos()
     QStandardItem *item;
     int i;
     for (i = 0; i < books.size(); i++) {
-        item = new QStandardItem(books.at(i));
+        QFileInfo file_info;
+        file_info.setFile(books.at(i));
+        item = new QStandardItem(file_info.fileName());
         item->setData( i );
         item_model.setItem( i, 0, item );
     }

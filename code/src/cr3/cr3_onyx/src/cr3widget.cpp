@@ -228,7 +228,7 @@ vector<QString> CR3View::getRecentBooks()
 
     for (int i = 0; i < files.length(); i++) {
         CRFileHistRecord * file = files.get( i );
-        lString16 fn = file->getFileName();
+        lString16 fn = file->getFilePathName();
         if ( LVFileExists(fn) )
             books.push_back(cr2qt(fn));
     }
@@ -244,7 +244,7 @@ void CR3View::openRecentBook( int index )
 
     _docview->savePosition();
     LVPtrVector<CRFileHistRecord> & files = _docview->getHistory()->getRecords();
-    if ( index >= 1 && index < files.length() ) {
+    if ( index >= 0 && index < files.length() ) {
         CRFileHistRecord * file = files.get( index );
         lString16 fn = file->getFilePathName();
         // TODO: check error
