@@ -41,9 +41,8 @@
  #ifndef CALCULATOR_H
  #define CALCULATOR_H
 
- #include <QDialog>
+#include <QDialog>
 #include "onyx/ui/catalog_view.h"
-#include "button_view.h"
 
 using namespace ui;
 

@@ -38,28 +38,25 @@
  **
  ****************************************************************************/
 
- #include <QtGui>
- #include <QCoreApplication>
+#include <QtGui>
+#include <QCoreApplication>
 
- #include <math.h>
+#include <math.h>
 
- #include "button.h"
- #include "calculator.h"
- #include "onyx/screen/screen_update_watcher.h"
+#include "calculator.h"
+#include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/keyboard_navigator.h"
-#include "button_view.h"
 #include "onyx/data/data_tags.h"
 
 using namespace ui;
-CalculatorFactory factory;
 
  Calculator::Calculator(QWidget *parent)
      : QDialog(parent, Qt::FramelessWindowHint)
-     , first_line_buttons_(&factory, this)
-     , second_line_buttons_(&factory, this)
-     , third_line_buttons_(&factory, this)
-     , fourth_line_buttons_(&factory, this)
-     , fifth_line_buttons_(&factory, this)
+     , first_line_buttons_(0)
+     , second_line_buttons_(0)
+     , third_line_buttons_(0)
+     , fourth_line_buttons_(0)
+     , fifth_line_buttons_(0)
  {
      sumInMemory = 0.0;
      sumSoFar = 0.0;
