@@ -9,6 +9,7 @@
 #include "onyx/ui/ui.h"
 #include <onyx/sys/sys.h>
 #include "onyx/ui/screen_rotation_dialog.h"
+#include "onyx/screen/screen_update_watcher.h"
 
 #include "simsu.h"
 #include "board.h"
@@ -26,7 +27,8 @@ namespace simsu
 
 Simsu::Simsu(QWidget *parent , Qt::WindowFlags f) : QWidget(parent, f),
     dialog_(new MDialog(parentWidget())),
-    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH)
+    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH),
+    enable_flush_flag_(true)
 {
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
@@ -61,7 +63,8 @@ Simsu::Simsu(QWidget *parent , Qt::WindowFlags f) : QWidget(parent, f),
 
 #ifndef BUILD_FOR_FB
     onyx::screen::instance().enableUpdate(true);
-    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
 #endif
 }
 
@@ -82,11 +85,11 @@ bool Simsu::event(QEvent *event)
 {
     bool ret = QWidget::event(event);
 #ifndef BUILD_FOR_FB
-    if(event->type() == QEvent::UpdateRequest /*&& global_update*/)
+    if(event->type() == QEvent::UpdateRequest && enable_flush_flag_)
     {
         QApplication::processEvents();
-        onyx::screen::instance().updateWidget(0,onyx::screen::instance().defaultWaveform(),true, onyx::screen::ScreenCommand::WAIT_NONE);
-        onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+        onyx::screen::instance().updateWidget(this, onyx::screen::instance().defaultWaveform(), onyx::screen::ScreenCommand::WAIT_NONE);
+        onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
     }
 #endif
     return ret;
@@ -95,7 +98,7 @@ bool Simsu::event(QEvent *event)
 
 
 /*****************************************************************************/
-void Simsu::keyPressEvent(QKeyEvent* event)
+void Simsu::keyReleaseEvent(QKeyEvent* event)
 {
     /**
     Menu    Qt::Key_Menu
@@ -131,17 +134,18 @@ void Simsu::keyPressEvent(QKeyEvent* event)
 
     case Qt::Key_Return:
         {
+            event->accept();
             showBoard();
         }
         break;
 
     default:
-        QWidget::keyPressEvent(event);
+        QWidget::keyReleaseEvent(event);
         break;
     }
 }
 
-void Simsu::keyReleaseEvent (QKeyEvent * event)
+void Simsu::keyPressEvent (QKeyEvent * event)
 {
     qint32 key = event->key();
     if (key == Qt::Key_Escape)
@@ -151,7 +155,7 @@ void Simsu::keyReleaseEvent (QKeyEvent * event)
         qApp->quit();
     }
 
-    QWidget::keyReleaseEvent(event);
+    QWidget::keyPressEvent(event);
 }
 
 void Simsu::showBoard()
@@ -164,7 +168,6 @@ void Simsu::showBoard()
 
         //TODO set position correctly
         //paitn rect
-        dialog_->hide();
         m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected(true);
         qint32 group_c = column/3;
         qint32 group_r = row/3;
@@ -186,17 +189,23 @@ void Simsu::showBoard()
             row = 3;
         }
         QPoint point = m_board->cell(column,row)->pos();
-        dialog_->move(point.x(),point.y());
+        enable_flush_flag_ = false;
+        dialog_->enableScreenUpdate(false);
+        onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
         dialog_->show();
+        dialog_->move(point.x(),point.y());
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_ALL);
+        dialog_->enableScreenUpdate(true);
         if(dialog_->exec() == QDialog::Accepted)
         {
             m_board->cell(m_board->getColumn(),m_board->getRow())->updateValue();
         }
-        dialog_->hide();
         m_board->cell(m_board->getColumn(),m_board->getRow())->setSelected(false);
+        repaint();
 #ifndef BUILD_FOR_FB
-        onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::INVALID);
+        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_ALL);
 #endif
+        enable_flush_flag_ =true;
     }
     return;
 }
@@ -213,8 +222,10 @@ void Simsu::showMenu()
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     menu.setSystemAction(&system_actions_);
+    enable_flush_flag_ = false;
     if(menu.popup() != QDialog::Accepted)
     {
+        enable_flush_flag_ = true;
         QApplication::processEvents();
         return;
     }
@@ -258,7 +269,7 @@ void Simsu::showMenu()
         case SCREEN_UPDATE_TYPE:
             {
 #ifndef BUILD_FOR_FB
-                onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+                onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
                 onyx::screen::instance().toggleWaveform();
 #endif
             }
@@ -276,6 +287,9 @@ void Simsu::showMenu()
             break;
         }
     }
+    enable_flush_flag_ = true;
+    onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GU);
+    update();
 }
 
 void Simsu::about()

@@ -1,99 +1,129 @@
 #include "mdialog.h"
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
-#include <QtGui/QButtonGroup>
-#include <QtCore/QSettings>
-#include <QtCore/QDebug>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
+#include <QtGui/QHBoxLayout>
 #include "onyx/screen/screen_proxy.h"
+#include "onyx/screen/screen_update_watcher.h"
+#include "onyx/data/data_tags.h"
 
-MDialog::MDialog(QWidget* parent):QDialog(parent) {
+MDialog::MDialog(QWidget* parent)
+    : QDialog(parent)
+    , mark_buttons_(0)
+    , set_buttons_(0)
+    , enable_flush_flag_(true)
+{
 #ifndef BUILD_FOR_FB
     onyx::screen::instance().enableUpdate ( true );
     onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
 #endif
+
     setBackgroundRole(QPalette::Light);
     setAutoFillBackground(true);
     setWindowFlags(Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint);
-    layout_key = new QGridLayout(this);
-    group_key = new QButtonGroup(this);
-    layout_key->setColumnMinimumWidth(3,32);
-    list_key.clear();
-    for ( qint32 i = 1; i < 10; ++i ) {
-        MToolButton *key = new MToolButton(this);
-        key->setText(QString::number(i));
-        key->setFont(QFont("sans",28,QFont::Black));
-        list_key.insert (i-1, key);
-        group_key->addButton ( key, i );
-        layout_key->addWidget ( key, (i - 1) / 3, (i - 1) % 3 );
-        connect(key, SIGNAL(clicked(bool)),this, SLOT(accept()));
-        MToolButton *mode = new MToolButton(this);
-        mode->setText(QString::number(i));
-        mode->setFont(QFont("mono",24,QFont::DemiBold));
-        list_key.insert(8+i, mode);
-        group_key->addButton ( mode, 9 + i );
-        layout_key->addWidget ( mode, (i - 1) / 3, (i - 1) % 3+4 );
-        connect(mode, SIGNAL(clicked(bool)),this, SLOT(accept()));
-    }
-    group_key->button ( qBound ( 1, QSettings().value ( "Key", 1 ).toInt(),18 ) )->click();
-    connect ( group_key, SIGNAL (buttonClicked(int)), this, SLOT ( setActiveKey ( int ) ) ); ///<will change keypad
-    setLayout(layout_key);
-    list_key.at(0)->setFocus();
+    setFixedSize(320, 160);
+
+    createLayout();
 }
 
-void MDialog::keyPressEvent(QKeyEvent* event) {
-//     update();
-    qint32 current_button_ =  list_key.indexOf(static_cast<MToolButton*> (focusWidget()));
-    switch (event->key()) {
-        case Qt::Key_Right:
-            if ((current_button_ - 11) % 3 == 0 ) {
-                current_button_ -= 11;
-                list_key.at(current_button_)->setFocus();
-            }
-            break;
-        case  Qt::Key_Left:
-            if ((current_button_ == 0 ) || (current_button_ == 3 ) || (current_button_ == 6 )) {
-                current_button_ += 11;
-                list_key.at(current_button_)->setFocus();
-            }
-            break;
-        case Qt::Key_Escape:
-            close();
-        default:
-            break;
-    }
-}
-
-void MDialog::mouseMoveEvent(QMouseEvent* event) {
-}
-
-
-void MDialog::setActiveKey(int k) {
-    if (k<10) {
-        emit ActiveKey(k);
-    } else {
-        setActiveModeKey(1+k%10);
-    }
-}
-
-void MDialog::setActiveModeKey(qint32 k)
+void MDialog::createKeysGroup(CatalogView &view, const int font_size)
 {
-    emit ActiveModeKey(k);
+    ODatas button_data;
+    view.setSubItemType(ButtonView::type());
+    view.setPreferItemSize(QSize(32, 32));
+
+    for (int i = 1; i <= 9; ++i)
+    {
+        OData * dd = new OData;
+        dd->insert(TAG_TITLE, QString::number(i));
+        dd->insert(TAG_ID, i);
+        dd->insert(TAG_FONT_SIZE, font_size);
+        button_data.push_back(dd);
+    }
+
+    view.setData(button_data);
+    view.setFixedGrid(3, 3);
+    view.setSpacing(3);
+    view.setFixedHeight(130);
+    view.setFixedWidth(130);
+
+    view.setSearchPolicy(CatalogView::NeighborFirst);
+    connect(&view, SIGNAL(itemActivated(CatalogView*,ContentView*,int)),
+            this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
 }
 
-bool MDialog::event(QEvent* e) {
+void MDialog::enableScreenUpdate(bool flag)
+{
+    enable_flush_flag_ = flag;
+}
+
+void MDialog::onItemActivated(CatalogView *catalog, ContentView *item, int user_data)
+{
+    int key=item->data()->value(TAG_ID).toInt();
+    if (catalog == &set_buttons_)
+    {
+        emit ActiveKey(key);
+    }
+    else
+    {
+        emit ActiveModeKey(key);
+    }
+    enable_flush_flag_ = false;
+    accept();
+}
+
+void MDialog::createLayout()
+{
+    createKeysGroup(mark_buttons_, 20);
+    createKeysGroup(set_buttons_, 32);
+
+    set_buttons_.setFocus();
+    set_buttons_.setFocusTo(0, 0);
+    set_buttons_.setCheckedTo(0, 0);
+    set_buttons_.setNeighbor(&mark_buttons_, CatalogView::RIGHT);
+    set_buttons_.setNeighbor(&mark_buttons_, CatalogView::RECYCLE_LEFT);
+
+    mark_buttons_.setNeighbor(&set_buttons_, CatalogView::LEFT);
+    set_buttons_.setNeighbor(&mark_buttons_, CatalogView::RECYCLE_RIGHT);
+
+    layout_ = new QHBoxLayout;
+    layout_->setContentsMargins(5, 5, 5, 5);
+    layout_->addWidget(&set_buttons_);
+    layout_->addSpacing(10);
+    layout_->addWidget(&mark_buttons_);
+
+    this->setLayout(layout_);
+}
+
+bool MDialog::event(QEvent* e)
+{
     bool ret = QDialog::event ( e );
 #ifndef BUILD_FOR_FB
-    if (e->type() == QEvent::UpdateRequest)
+    if (e->type() == QEvent::UpdateRequest && enable_flush_flag_)
     {
-        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, onyx::screen::ScreenCommand::WAIT_NONE);
+        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::DW, onyx::screen::ScreenCommand::WAIT_NONE);
     }
 #endif
     return ret;
+}
+
+void MDialog::keyReleaseEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+    case Qt::Key_Right:
+    case Qt::Key_Left:
+    case Qt::Key_Up:
+    case Qt::Key_Down:
+        e->accept();
+        break;
+
+    case Qt::Key_Escape:
+        e->accept();
+        close();
+
+    default:
+        break;
+    }
 }
 
 void MDialog::paintEvent(QPaintEvent* e)
@@ -102,9 +132,8 @@ void MDialog::paintEvent(QPaintEvent* e)
     painter.setRenderHint(QPainter::HighQualityAntialiasing,true);
     painter.setRenderHint(QPainter::Antialiasing,true);
     painter.setRenderHint(QPainter::TextAntialiasing,true);
-    painter.setBrush(QColor(96,96,96));
+    painter.setBrush(QColor(0, 0, 0));
     painter.drawRoundedRect(rect(),5,5);
     painter.setBrush(QColor(255,255,255));
     painter.drawRoundedRect(rect().adjusted(6,6,rect().x()-6,rect().y()-6),5,5);
 }
-

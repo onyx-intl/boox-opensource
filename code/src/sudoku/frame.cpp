@@ -45,9 +45,12 @@ void Frame::paintEvent ( QPaintEvent* event ) {
     }
 
     if ( m_highlight_border ) {
-        QBrush brush(Qt::gray);
+        QBrush brush(Qt::black);
         painter.setBrush ( brush );
-        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10), 5, 5 );
+        painter.drawRoundedRect ( QRectF ( 3, 3, width() - 6, height() - 6), 4, 4 );
+        brush.setColor(Qt::white);
+        painter.setBrush(brush);
+        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10), 4, 4 );
     }
 }
 
