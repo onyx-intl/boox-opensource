@@ -25,10 +25,11 @@ namespace onyx
 namespace simsu
 {
 
-Simsu::Simsu(QWidget *parent , Qt::WindowFlags f) : QWidget(parent, f),
-    dialog_(new MDialog(parentWidget())),
-    status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH),
-    enable_flush_flag_(true)
+Simsu::Simsu(QWidget *parent , Qt::WindowFlags f)
+    : QWidget(parent, f)
+    , dialog_(new MDialog(parentWidget()))
+    , status_bar_(parent,  MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH)
+    , enable_flush_flag_(true)
 {
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
