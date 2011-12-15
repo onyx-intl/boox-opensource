@@ -55,6 +55,9 @@ Simsu::Simsu(QWidget *parent , Qt::WindowFlags f)
     setLayout(m_layout);
     m_board->cell(0,0)->setFocus();
 
+    connect( &(SysStatus::instance()), SIGNAL(aboutToShutdown()), this, SLOT(close()) );
+    connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
+
     connect(m_board,SIGNAL(toShowBoard()),this, SLOT(showBoard()));
     connect(m_board, SIGNAL(win()), this, SLOT(onWin()));
     connect(dialog_, SIGNAL(ActiveKey(qint32)), m_board, SLOT(setActiveKey(qint32)));
