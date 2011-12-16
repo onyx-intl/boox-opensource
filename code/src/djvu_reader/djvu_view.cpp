@@ -1825,15 +1825,14 @@ void DjvuView::paintSelectPoint( QPainter & painter )
 {
     if ( begin_flag_ )
     {
-        painter.setPen(QPen(Qt::black, 3));;
+        painter.setPen(QPen(Qt::black, 2));;
+        painter.drawLine(begin_p+QPoint(-4, -4), begin_p+QPoint(4, 4));
+        painter.drawLine(begin_p+QPoint(-4, 4), begin_p+QPoint(4, -4));
+
         if(end_flag_)
         {
-            painter.drawRect(QRect(begin_p, end_p));
-        }
-        else
-        {
-            painter.drawLine(begin_p -QPoint(5, 0), begin_p+QPoint(5, 0));
-            painter.drawLine(begin_p -QPoint(0, 5), begin_p+QPoint(0, 5));
+            painter.drawLine(end_p+QPoint(-4, -4), end_p+QPoint(4, 4));
+            painter.drawLine(end_p+QPoint(-4, 4), end_p+QPoint(4, -4));;
         }
     }
     return;
