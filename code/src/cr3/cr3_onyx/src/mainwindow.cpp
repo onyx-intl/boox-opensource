@@ -101,6 +101,8 @@ lString16 getDocAuthors( ldomDocument * doc, const char * path, const char * del
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    resize(600, 800);
+
     view_ = new CR3View;
     setCentralWidget(view_);
 
