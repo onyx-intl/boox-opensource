@@ -546,8 +546,21 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (reading_tool_actions_.selectedTool() == TEXT_TO_SPEECH)
         {
-            onyx::screen::instance().updateWidget(widget(), onyx::screen::ScreenProxy::GU);
-            startTTS();
+            if (sys::SysStatus::instance().isMusicPlayerRunning())
+            {
+                onyx::screen::instance().updateWidget(widget(), onyx::screen::ScreenProxy::GU);
+                MessageDialog dialog(QMessageBox::Information,
+                                     tr("FBReader"),
+                                     tr("The Music player is running. "
+                                        "To use TTS, you must exit Music Player."),
+                                     QMessageBox::Ok);
+                dialog.exec();
+                onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true, onyx::screen::ScreenCommand::WAIT_ALL);
+            }
+            else
+            {
+                startTTS();
+            }
         }
         else if (reading_tool_actions_.selectedTool() == SEARCH_TOOL)
         {

@@ -713,7 +713,21 @@ void OnyxMainWindow::processToolActions()
 
     case ::ui::TEXT_TO_SPEECH:
         {
-            view_->startTTS();
+            if (sys::SysStatus::instance().isMusicPlayerRunning())
+            {
+                MessageDialog dialog(QMessageBox::Information,
+                                     tr("Cool Reader"),
+                                     tr("The Music player is running. "
+                                        "To use TTS, you must exit Music Player."),
+                                     QMessageBox::Ok);
+                dialog.exec();
+                repaint();
+                onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+            }
+            else
+            {
+                view_->startTTS();
+            }
         }
         break;
 
