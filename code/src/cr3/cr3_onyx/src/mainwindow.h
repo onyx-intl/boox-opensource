@@ -13,6 +13,7 @@
 #include "onyx/ui/font_family_actions.h"
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/ui/zoom_setting_actions.h"
+#include "../lcl_ui/advanced_actions.h"
 
 class QKeyEvent;
 
@@ -41,6 +42,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void showContextMenu();
     void onProgressClicked(const int, const int);
     bool addBookmark();
+    bool addCite();
     void updateScreen();
     void onScreenSizeChanged(int);
 
@@ -48,13 +50,17 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void toggleProperty( const char * name );
     bool isFullScreenByWidgetSize();
     void processToolActions();
+    void processAdvancedActions();
     void showClock();
     void gotoPage();
     void showTableOfContents();
     void setLineHeight(const unsigned int lineHeightPercentage);
 
     void showAllBookmarks();
+    void showAllCites();
     void bookmarkModel(QStandardItemModel & model,
+                       QModelIndex & selected);
+    void citeModel(QStandardItemModel & model,
                        QModelIndex & selected);
     QStandardItem * searchParent(const int index,
                                  std::vector<int> & entries,
@@ -68,6 +74,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
 
     CR3View *view_;
     ui::StatusBar *status_bar_;
+
     QString file_name_to_open_;
 
     QFont select_font_;
@@ -78,6 +85,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     ui::FontFamilyActions font_family_actions_;
     ui::FontActions font_actions_;
     ui::ReadingStyleActions reading_style_actions_;
+    ui::AdvancedActions advanced_actions_;
 
     PropsRef props_ref_;
 };

@@ -161,6 +161,7 @@ private:
     bool addBookmark();
     bool deleteBookmark();
 
+    void paintSelectPoint( QPainter & );
     // Reading history
     void saveReadingContext();
     void back();
@@ -237,6 +238,11 @@ private:
     QTimer                  flip_page_timer_;
     int                     auto_flip_current_page_;
     int                     auto_flip_step_;
+
+    bool begin_flag_;
+    bool end_flag_;
+    QPoint begin_p;
+    QPoint end_p;
 
     // current waveform
     onyx::screen::ScreenProxy::Waveform  current_waveform_;

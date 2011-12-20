@@ -45,6 +45,7 @@ class Simsu : public QWidget {
         StatusBar status_bar_;
         SystemActions system_actions_;
         SudokuActions sudoku_actions_;
+        bool enable_flush_flag_;
 };
 }
 }

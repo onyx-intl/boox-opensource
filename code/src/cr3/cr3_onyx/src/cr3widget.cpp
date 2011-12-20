@@ -22,6 +22,8 @@
 
 #include "onyx/screen/screen_update_watcher.h"
 
+using namespace std;
+
 static const int BEFORE_SEARCH = 0;
 static const int IN_SEARCHING  = 1;
 
@@ -217,6 +219,41 @@ bool CR3View::loadDocument( QString fileName )
     }
     update();
     return res;
+}
+
+vector<QString> CR3View::getRecentBooks()
+{
+    vector<QString> books;
+    LVPtrVector<CRFileHistRecord> & files = _docview->getHistory()->getRecords();
+
+    for (int i = 0; i < files.length(); i++) {
+        CRFileHistRecord * file = files.get( i );
+        lString16 fn = file->getFilePathName();
+        if ( LVFileExists(fn) )
+            books.push_back(cr2qt(fn));
+    }
+
+    return books;
+}
+
+void CR3View::openRecentBook( int index )
+{
+    _docview->swapToCache();
+    _docview->updateCache();
+    _docview->getDocument()->updateMap();
+
+    _docview->savePosition();
+    LVPtrVector<CRFileHistRecord> & files = _docview->getHistory()->getRecords();
+    if ( index >= 0 && index < files.length() ) {
+        CRFileHistRecord * file = files.get( index );
+        lString16 fn = file->getFilePathName();
+        // TODO: check error
+        if ( LVFileExists(fn) ) {
+            //showWaitIcon();
+            loadDocument( cr2qt(fn) );
+        }
+        //_docview->swapToCache();
+    }
 }
 
 void CR3View::wheelEvent( QWheelEvent * event )
@@ -439,7 +476,7 @@ void CR3View::zoomIn()
     }
     else
     {
-        props_ref->setString( PROP_FONT_SIZE, QString::number(size+2));
+        props_ref->setString( PROP_FONT_SIZE, QString::number(size+1));
         setOptions(props_ref);
     }
 }
@@ -455,7 +492,7 @@ void CR3View::zoomOut()
     }
     else
     {
-        props_ref->setString( PROP_FONT_SIZE, QString::number(size-2));
+        props_ref->setString( PROP_FONT_SIZE, QString::number(size-1));
         setOptions(props_ref);
     }
 }
@@ -836,7 +873,8 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
         }
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
-    stylusPan(event->pos(), begin_point_);
+    //FIXME: cite mode
+    //stylusPan(event->pos(), begin_point_);
 
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
     this->update();
@@ -855,11 +893,23 @@ void CR3View::OnExternalLink( lString16 url, ldomNode * node )
 CRBookmark * CR3View::createBookmark()
 {
     CRBookmark * bm = NULL;
+    /*
     if ( getSelectionText().length()>0 && !_selRange.isNull() ) {
         bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
     } else {
+    */
         bm = _docview->saveCurrentPageBookmark(lString16());
-    }
+    //}
+
+    return bm;
+}
+
+/// create cite
+CRBookmark * CR3View::createCite()
+{
+    CRBookmark * bm = NULL;
+    if ( getSelectionText().length()>0 && !_selRange.isNull() )
+        bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
 
     return bm;
 }
@@ -1115,6 +1165,10 @@ bool CR3View::hasBookmark()
 
     for(int i  = 0; i < list.length(); i++)
     {
+        CRBookmark * bmk = list[i];
+        if (!bmk || (bmk->getType() == bmkt_comment || bmk->getType() == bmkt_correction))
+            continue;
+
         ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
         ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
         if( _docview->getBookmarkPage(pt1) == now_page ||

@@ -11,54 +11,18 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string notr="true">Dialog</string>
-  </property>
-  <property name="toolTip">
-   <string notr="true"/>
-  </property>
-  <property name="statusTip">
-   <string notr="true"/>
-  </property>
-  <property name="whatsThis">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleName">
-   <string notr="true"/>
-  </property>
-  <property name="accessibleDescription">
-   <string notr="true"/>
-  </property>
-  <property name="windowFilePath">
-   <string notr="true"/>
+   <string>Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
      <property name="text">
-      <string notr="true">Export is in progress...</string>
+      <string>Export is in progress...</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QProgressBar" name="progressBar">
-     <property name="toolTip">
-      <string notr="true"/>
-     </property>
-     <property name="statusTip">
-      <string notr="true"/>
-     </property>
-     <property name="whatsThis">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleName">
-      <string notr="true"/>
-     </property>
-     <property name="accessibleDescription">
-      <string notr="true"/>
-     </property>
      <property name="value">
       <number>24</number>
      </property>

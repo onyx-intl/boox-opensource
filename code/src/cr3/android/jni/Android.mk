@@ -9,8 +9,9 @@ LOCAL_MODULE    := cr3engine-45-15
 # TODO: build libraries using separate makefiles
 
 CRFLAGS = -DLINUX=1 -D_LINUX=1 -DFOR_ANDROID=1 -DCR3_PATCH -DFT2_BUILD_LIBRARY=1 \
-     -DDOC_DATA_COMPRESSION_LEVEL=1 -DDOC_BUFFER_SIZE=0x600000 \
+     -DDOC_DATA_COMPRESSION_LEVEL=1 -DDOC_BUFFER_SIZE=0xA00000 \
      -DENABLE_CACHE_FILE_CONTENTS_VALIDATION=1 \
+     -DLDOM_USE_OWN_MEM_MAN=0 \
      -DCR3_ANTIWORD_PATCH=1 -DENABLE_ANTIWORD=1 \
      -DMAX_IMAGE_SCALE_MUL=2
 
@@ -177,7 +178,6 @@ ANTIWORD_SRC_FILES := \
     ../../thirdparty/antiword/chartrans.c \
     ../../thirdparty/antiword/datalist.c \
     ../../thirdparty/antiword/depot.c \
-    ../../thirdparty/antiword/dib2eps.c \
     ../../thirdparty/antiword/doclist.c \
     ../../thirdparty/antiword/fail.c \
     ../../thirdparty/antiword/finddata.c \
@@ -187,8 +187,6 @@ ANTIWORD_SRC_FILES := \
     ../../thirdparty/antiword/fonts_u.c \
     ../../thirdparty/antiword/hdrftrlist.c \
     ../../thirdparty/antiword/imgexam.c \
-    ../../thirdparty/antiword/imgtrans.c \
-    ../../thirdparty/antiword/jpeg2eps.c \
     ../../thirdparty/antiword/listlist.c \
     ../../thirdparty/antiword/misc.c \
     ../../thirdparty/antiword/notes.c \
@@ -196,7 +194,6 @@ ANTIWORD_SRC_FILES := \
     ../../thirdparty/antiword/out2window.c \
     ../../thirdparty/antiword/pdf.c \
     ../../thirdparty/antiword/pictlist.c \
-    ../../thirdparty/antiword/png2eps.c \
     ../../thirdparty/antiword/prop0.c \
     ../../thirdparty/antiword/prop2.c \
     ../../thirdparty/antiword/prop6.c \
@@ -222,7 +219,7 @@ ANTIWORD_SRC_FILES := \
 JNI_SRC_FILES := \
     cr3engine.cpp \
     cr3java.cpp \
-    readerview.cpp
+    docview.cpp
 
 LOCAL_SRC_FILES := \
     $(JNI_SRC_FILES) \

@@ -174,8 +174,12 @@ int main(int argc, char *argv[])
             ui::loadTranslator (QLocale::system().name());
 
             OnyxMainWindow w;
-            //w.showMaximized();
+#ifndef Q_WS_QWS
+            w.show();
+#else
             w.showFullScreen();
+#endif
+
             sys::SysStatus::instance().setSystemBusy(false);
             w.updateScreenManually();
 

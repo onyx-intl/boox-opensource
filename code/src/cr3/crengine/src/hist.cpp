@@ -67,6 +67,8 @@ public:
     virtual void OnTagBody()
     {
     }
+    /// add named BLOB data to document
+    virtual bool OnBlob(lString16 name, const lUInt8 * data, int size) { return true; }
     /// called on opening tag
     virtual ldomNode * OnTagOpen( const lChar16 * nsname, const lChar16 * tagname)
     {
@@ -238,6 +240,8 @@ public:
     /// destructor
     virtual ~CRHistoryFileParserCallback()
     {
+        if ( _curr_file )
+            delete _curr_file;
     }
 };
 
@@ -279,7 +283,7 @@ static void putBookmark( LVStream * stream, CRBookmark * bmk )
     sprintf( percent, "%d.%02d%%", bmk->getPercent()/100, bmk->getPercent()%100 );
     char bmktag[255];
     sprintf(bmktag, "bookmark type=\"%s\" percent=\"%s\" timestamp=\"%d\" shortcut=\"%d\" page=\"%d\"", tname, percent,
-            (int)bmk->getTimestamp(), bmk->getShortcut(), bmk->getBookmarkPage() );
+            (int)bmk->getTimestamp(), (int)bmk->getShortcut(), (int)bmk->getBookmarkPage() );
     putTag(stream, 3, bmktag);
     putTagValue( stream, 4, "start-point", bmk->getStartPos() );
     putTagValue( stream, 4, "end-point", bmk->getEndPos() );

@@ -32,6 +32,8 @@ DjvuView::DjvuView(QWidget *parent)
     , auto_flip_current_page_(1)
     , auto_flip_step_(5)
     , current_waveform_(onyx::screen::instance().defaultWaveform())
+    , begin_flag_(false)
+    , end_flag_(false)
 {
     connect(&slide_timer_, SIGNAL(timeout()), this, SLOT(slideShowNextPage()));
 
@@ -751,6 +753,7 @@ void DjvuView::onPopupMenu()
 
     if (menu.popup() != QDialog::Accepted)
     {
+        emit requestUpdateParent(true);
         QApplication::processEvents();
         return;
     }
@@ -955,6 +958,7 @@ void DjvuView::switchLayout(PageLayoutType mode)
 
 void DjvuView::mousePressEvent(QMouseEvent *me)
 {
+    me->accept();
     switch (me->button())
     {
     case Qt::LeftButton:
@@ -983,17 +987,33 @@ void DjvuView::mousePressEvent(QMouseEvent *me)
     default:
         break;
     }
-    me->accept();
-
 }
 
 void DjvuView::mouseReleaseEvent(QMouseEvent *me)
 {
     static const int MOVE_ERROR = 5;
+    me->accept();
     switch (me->button())
     {
     case Qt::LeftButton:
-        if (status_mgr_.isZoomIn())
+        if(begin_flag_)
+        {
+            if(end_flag_)
+            {
+                end_p = me->pos();
+                onRequestUpdateScreen();
+                begin_flag_ = end_flag_ = false;
+                zoomIn(QRect(begin_p, end_p));
+                onRequestUpdateScreen();
+            }
+            else
+            {
+                begin_p = me->pos();
+                onRequestUpdateScreen();
+                end_flag_ = true;
+            }
+        }
+        else if (status_mgr_.isZoomIn())
         {
             zoomInRelease(me);
         }
@@ -1021,7 +1041,6 @@ void DjvuView::mouseReleaseEvent(QMouseEvent *me)
     default:
         break;
     }
-    me->accept();
 }
 
 void DjvuView::mouseMoveEvent(QMouseEvent *me)
@@ -1316,6 +1335,7 @@ void DjvuView::paintEvent(QPaintEvent *pe)
         paintPage(painter, page);
     }
     paintBookmark(painter);
+    paintSelectPoint(painter);
 }
 
 /// update the current page
@@ -1454,6 +1474,7 @@ bool DjvuView::updateActions()
         if (SysStatus::instance().hasTouchScreen())
         {
             zoom_settings.push_back(ZOOM_SELECTION);
+            zoom_settings.push_back(ZOOM_BY_TWO_POINTS);
         }
         zoom_settings.push_back(10.0f);
         zoom_settings.push_back(20.0f);
@@ -1612,7 +1633,15 @@ bool DjvuView::zooming( double zoom_setting )
     }
     else if (zoom_setting == ZOOM_SELECTION)
     {
+        emit requestUpdateParent(true);
+        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, true);
         selectionZoom();
+        return false;
+    }
+    else if (zoom_setting == ZOOM_BY_TWO_POINTS)
+    {
+        onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GU, true);
+        begin_flag_ = true;
         return false;
     }
     else if (zoom_setting == ZOOM_HIDE_MARGIN)
@@ -1790,6 +1819,23 @@ void DjvuView::paintSketches( QPainter & painter, int page_no )
     page_key.setNum(page_no);
     sketch_proxy_.updatePageDisplayRegion(model_->path(), page_key, page_area);
     sketch_proxy_.paintPage(model_->path(), page_key, painter);
+}
+
+void DjvuView::paintSelectPoint( QPainter & painter )
+{
+    if ( begin_flag_ )
+    {
+        painter.setPen(QPen(Qt::black, 2));;
+        painter.drawLine(begin_p+QPoint(-4, -4), begin_p+QPoint(4, 4));
+        painter.drawLine(begin_p+QPoint(-4, 4), begin_p+QPoint(4, -4));
+
+        if(end_flag_)
+        {
+            painter.drawLine(end_p+QPoint(-4, -4), end_p+QPoint(4, 4));
+            painter.drawLine(end_p+QPoint(-4, 4), end_p+QPoint(4, -4));;
+        }
+    }
+    return;
 }
 
 void DjvuView::paintBookmark( QPainter & painter )

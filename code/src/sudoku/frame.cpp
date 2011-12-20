@@ -25,12 +25,16 @@ namespace simsu {
 /*****************************************************************************/
 
 Frame::Frame ( QWidget* parent )
-        : QWidget ( parent ), m_highlight ( false ), m_highlight_border ( false ) {
+    : QWidget ( parent )
+    , m_highlight ( false )
+    , m_highlight_border ( false )
+{
 }
 
 /*****************************************************************************/
 
-void Frame::paintEvent ( QPaintEvent* event ) {
+void Frame::paintEvent ( QPaintEvent* event )
+{
     QWidget::paintEvent ( event );
     QPainter painter ( this );
     painter.setRenderHint ( QPainter::Antialiasing, true );
@@ -38,16 +42,21 @@ void Frame::paintEvent ( QPaintEvent* event ) {
     painter.setBrush (Qt::white);
     painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() - 3, height() - 3 ), 5, 5);
 
-    if ( m_highlight ) {
+    if ( m_highlight )
+    {
         QBrush brush(Qt::black);
         painter.setBrush ( brush );
         painter.drawRoundedRect ( QRectF ( 1.5, 1.5, width() -3 , height() -3 ), 5, 5);
     }
 
-    if ( m_highlight_border ) {
-        QBrush brush(Qt::gray);
+    if ( m_highlight_border )
+    {
+        QBrush brush(Qt::black);
         painter.setBrush ( brush );
-        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10), 5, 5 );
+        painter.drawRoundedRect ( QRectF ( 3, 3, width() - 6, height() - 6), 4, 4 );
+        brush.setColor(Qt::white);
+        painter.setBrush(brush);
+        painter.drawRoundedRect ( QRectF ( 5, 5, width() - 10, height() - 10), 4, 4 );
     }
 }
 
