@@ -257,6 +257,7 @@ void ZLQtViewWidget::Widget::mouseDoubleClickEvent(QMouseEvent *event)
     {
         myHolder.lookup();
     }
+    event->accept();
 }
 
 void ZLQtViewWidget::Widget::keyReleaseEvent(QKeyEvent *event)
@@ -339,14 +340,17 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
     }
     else
     {
-        direction = sys::SystemConfig::whichArea(old, now);
-        if (direction > 0)
+        if (sys::isIRTouch())
         {
-            myHolder.nextPage();
-        }
-        else if (direction < 0)
-        {
-            myHolder.prevPage();
+            direction = sys::SystemConfig::whichArea(old, now);
+            if (direction > 0)
+            {
+                myHolder.nextPage();
+            }
+            else if (direction < 0)
+            {
+                myHolder.prevPage();
+            }
         }
     }
 }
