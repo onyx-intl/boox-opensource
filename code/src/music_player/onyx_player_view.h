@@ -90,7 +90,7 @@ private:
     void setSongListViewFixedGrid(int total_height);
     OData * getCurrentData(int row);
 
-    void setPlayPauseIcon();
+    void setPlayPauseIcon(bool playing);
 
     void setCheckedPlayingSong(const int current_page);
     int getStep(qint64 total, qint64 current);
@@ -141,7 +141,6 @@ private:
     bool single_repeat_mode_;
     bool shuffle_mode_;
     bool seeking_;
-    bool paused_;
     bool progress_bar_enabled_;
     int skips_;
     int previous_page_; ///< store the previous page in page view

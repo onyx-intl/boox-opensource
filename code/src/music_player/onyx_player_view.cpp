@@ -5,6 +5,7 @@
 #include "onyx/ui/ui_utils.h"
 #include "onyx/data/data_tags.h"
 #include "onyx/screen/screen_update_watcher.h"
+#include "onyx/sys/sys.h"
 
 namespace player
 {
@@ -55,7 +56,6 @@ OnyxPlayerView::OnyxPlayerView(QWidget *parent)
     , single_repeat_mode_(false)
     , shuffle_mode_(false)
     , seeking_(false)
-    , paused_(false)
     , progress_bar_enabled_(true)
     , skips_(0)
     , previous_page_(1)
@@ -286,9 +286,19 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    QPixmap vol_pixmap(":/player_icons/volume.png");
-    dd->insert(TAG_COVER, vol_pixmap);
-    dd->insert(TAG_MENU_TYPE, MENU_VOLUME);
+    bool has_touch = sys::SysStatus::instance().hasTouchScreen();
+    if (has_touch)
+    {
+        QPixmap vol_pixmap(":/player_icons/volume.png");
+        dd->insert(TAG_COVER, vol_pixmap);
+        dd->insert(TAG_MENU_TYPE, MENU_VOLUME);
+    }
+    else
+    {
+        QPixmap min_pixmap(":/player_icons/minimize.png");
+        dd->insert(TAG_COVER, min_pixmap);
+        dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
+    }
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
@@ -513,10 +523,12 @@ void OnyxPlayerView::play()
 {
     need_refresh_immediately_ = true;
 
+    setPlayPauseIcon(true);
+
     model_->doCurrentVisibleRequest();
     if (core_->state() == PlayerUtils::Paused)
     {
-        core_->pause();
+        pause();
         return;
     }
 
@@ -584,6 +596,7 @@ void OnyxPlayerView::play()
 void OnyxPlayerView::stop()
 {
     core_->stop();
+    setPlayPauseIcon(false);
 }
 
 void OnyxPlayerView::next()
@@ -610,9 +623,7 @@ void OnyxPlayerView::next()
         {
             stop();
         }
-        paused_ = false;
         play();
-        setPlayPauseIcon();
     }
     onyx::screen::watcher().enqueue(&song_list_view_, onyx::screen::ScreenProxy::GC);
 }
@@ -631,9 +642,7 @@ void OnyxPlayerView::previous()
         {
             stop();
         }
-        paused_ = false;
         play();
-        setPlayPauseIcon();
     }
     onyx::screen::watcher().enqueue(&song_list_view_, onyx::screen::ScreenProxy::GC);
 }
@@ -641,6 +650,7 @@ void OnyxPlayerView::previous()
 void OnyxPlayerView::pause()
 {
     core_->pause();
+    setPlayPauseIcon(false);
 }
 
 void OnyxPlayerView::close(bool)
@@ -723,13 +733,13 @@ void OnyxPlayerView::playModeClicked()
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
 }
 
-void OnyxPlayerView::setPlayPauseIcon()
+void OnyxPlayerView::setPlayPauseIcon(bool playing)
 {
     ContentView *play_pause = menu_view_.visibleSubItems().at(2);
     OData * data = play_pause->data();
     if (data && data->contains(TAG_COVER))
     {
-        data->insert(TAG_COVER, paused_? play_pixmap_ : pause_pixmap_);
+        data->insert(TAG_COVER, playing? pause_pixmap_ : play_pixmap_);
     }
     menu_view_.update();
     onyx::screen::watcher().enqueue(&menu_view_, onyx::screen::ScreenProxy::GC);
@@ -762,17 +772,13 @@ void OnyxPlayerView::onPlayPauseClicked(bool)
 {
     if (core_->state() == PlayerUtils::Playing)
     {
-        paused_ = true;
         pause();
     }
     else if (core_->state() == PlayerUtils::Paused ||
              core_->state() == PlayerUtils::Stopped)
     {
-        paused_ = false;
         play();
     }
-
-    setPlayPauseIcon();
 }
 
 void OnyxPlayerView::onNextClicked(bool)
@@ -933,6 +939,10 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
         {
             onNextClicked(true);
         }
+        else if (MENU_MINIMIZE == menu_type)
+        {
+            minimize(true);
+        }
         else if (MENU_VOLUME == menu_type)
         {
             status_bar_.onVolumeClicked();
@@ -948,6 +958,11 @@ void OnyxPlayerView::onItemActivated(CatalogView *catalog,
         QStandardItem *audio_item = model_->standardItemModel()->item(row, 0);
         if (0 != item)
         {
+            if (core_->state() == PlayerUtils::Paused)
+            {
+                core_->stop();
+            }
+
             model_->setCurrent(row);
             play();
             update();
