@@ -528,7 +528,7 @@ void OnyxPlayerView::play()
     model_->doCurrentVisibleRequest();
     if (core_->state() == PlayerUtils::Paused)
     {
-        pause();
+        core_->pause();
         return;
     }
 
@@ -993,7 +993,6 @@ void OnyxPlayerView::playFile(const QString & file_path)
 
     if (target_row >= 0 && target_row < size)
     {
-
         model_->setCurrent(target_row);
         play();
     }
