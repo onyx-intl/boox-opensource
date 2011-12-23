@@ -33,6 +33,7 @@ Simsu::Simsu(QWidget *parent , Qt::WindowFlags f)
 {
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(showMenu()));
     setWindowFlags(Qt::FramelessWindowHint);
+    setWindowTitle(QCoreApplication::tr("Sudoku"));
     QSettings settings;
     // Create board
     QWidget *contents = new QWidget ( this );
