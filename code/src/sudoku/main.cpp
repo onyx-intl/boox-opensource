@@ -18,8 +18,6 @@
  ***********************************************************************/
 /// Modified by bean, onyx-international.com
 
-
-
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
@@ -27,6 +25,7 @@
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/sys/sys_status.h"
 #include "simsu.h"
+#include "onyx/ui/languages.h"
 
 int main(int argc, char **argv)
 {
@@ -35,6 +34,7 @@ int main(int argc, char **argv)
     app.setApplicationName("sudoku");
     QTranslator translator;
     translator.load(":/sudoku_" + QLocale::system().name());
+    ui::loadTranslator (QLocale::system().name());
     app.installTranslator(&translator);
     Simsu simsuwin;
     simsuwin.show();
