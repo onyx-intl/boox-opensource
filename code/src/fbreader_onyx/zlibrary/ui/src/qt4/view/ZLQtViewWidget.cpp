@@ -436,15 +436,17 @@ void ZLQtViewWidget::updateActions()
 
     // Reading tools of bookmark.
     tools.clear();
-    tools.push_back(ADD_BOOKMARK);
-    tools.push_back(DELETE_BOOKMARK);
+    bool has_bookmark = hasBookmark();
+    if (has_bookmark)
+    {
+        tools.push_back(DELETE_BOOKMARK);
+    }
+    else
+    {
+        tools.push_back(ADD_BOOKMARK);
+    }
     tools.push_back(SHOW_ALL_BOOKMARKS);
     reading_tool_actions_.generateActions(tools, true);
-    bool has_bookmark = hasBookmark();
-    reading_tool_actions_.action(ADD_BOOKMARK)->setEnabled(!has_bookmark);
-    reading_tool_actions_.action(DELETE_BOOKMARK)->setEnabled(has_bookmark);
-
-
 
     // Reading tools of go to page.
     tools.clear();
