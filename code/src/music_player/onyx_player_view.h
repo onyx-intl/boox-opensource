@@ -97,6 +97,10 @@ private:
 
     void enqueueFullyRefresh(qint64 current);
 
+    void setPosition(unsigned long pos);
+    void seekBackward();
+    void seekForward();
+
 private:
     PlayListModel           *model_;
     scoped_ptr<SoundCore>   core_;
