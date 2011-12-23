@@ -337,7 +337,8 @@ void OnyxPlayerView::setPosition(unsigned long pos)
 
 void OnyxPlayerView::seekBackward()
 {
-    if (current_time_label_.text() == "00:00")
+    int current_time = progress_bar_.value()*1000;
+    if (current_time <= 0)
     {
         setPosition(0);
         return;
@@ -350,8 +351,8 @@ void OnyxPlayerView::seekBackward()
     double percentage = current / max;
     int value = (int) (total * percentage);
 
-    unsigned long pos = value - JUMP_INTERVAL;
-    if (pos < JUMP_INTERVAL && pos > total)
+    long pos = value - JUMP_INTERVAL;
+    if (pos < 0 || pos > total)
     {
         pos = 0;
     }
