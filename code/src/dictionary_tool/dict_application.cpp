@@ -22,6 +22,11 @@ DictApplication::~DictApplication(void)
 
 bool DictApplication::open()
 {
+    // set system busy to false before showing windows.
+#ifdef BUILD_WITH_TFT
+    sys::SysStatus::instance().setSystemBusy(false);
+#endif
+
     frame_->show();
     onyx::screen::watcher().addWatcher(frame_.get());
     frame_->setDefaultFocus();
