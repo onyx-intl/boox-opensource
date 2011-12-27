@@ -126,6 +126,8 @@ bool PlayerApplication::open(const QString &path_name)
         {
             model_->addDirectory(path_);
         }
+
+        model_->sort(PlayListModel::FILENAME);
     }
 
     view_.activateWindow();
