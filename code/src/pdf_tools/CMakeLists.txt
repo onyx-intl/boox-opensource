@@ -1,7 +1,7 @@
 ENABLE_QT()
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/boox-opensource/code/src/podofo)
-LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/boox-opensource/code/src/podofo)
+LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/boox-opensource/code/src/podofo/libs/imx31)
 INCLUDE_DIRECTORIES(include)
 
 # Header files.
