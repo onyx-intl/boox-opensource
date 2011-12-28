@@ -27,7 +27,6 @@ TARGET_LINK_LIBRARIES(pdf_tools
   onyx_screen
   podofo_static
   freetype
-  fontconfig
   jpeg
   expat
   ${QT_LIBRARIES}
