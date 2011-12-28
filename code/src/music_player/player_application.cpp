@@ -126,12 +126,15 @@ bool PlayerApplication::open(const QString &path_name)
         {
             model_->addDirectory(path_);
         }
+
+        model_->sort(PlayListModel::FILENAME);
     }
 
     view_.activateWindow();
 
     // load audio files from media db
     model_->readMediaInfos();
+    model_->sort(PlayListModel::FILENAME);
 
     sys::SysStatus::instance().setSystemBusy( false );
     onyx::screen::instance().enableUpdate(true);

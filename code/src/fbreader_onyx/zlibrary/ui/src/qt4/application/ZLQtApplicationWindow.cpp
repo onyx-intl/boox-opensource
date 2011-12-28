@@ -62,13 +62,19 @@ ZLQtApplicationWindow::ZLQtApplicationWindow(ZLApplication *application) :
 	myWasMaximized(true),
 	myCursorIsHyperlink(false) {
 
+    resize(600, 800);
+
 #ifdef Q_WS_QWS
     setWindowFlags(Qt::FramelessWindowHint);
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
 #endif
 
     menuBar()->hide();
+#ifdef Q_WS_QWS
     showMaximized();
+#else
+    show();
+#endif
 
 }
 

@@ -24,6 +24,7 @@ enum MusicPlayerMenuType
 const static QSize MENU_ITEM_SIZE = QSize(60, 60);
 const static QString TAG_ROW = "row";
 const static int AUDIO_INFO_SPACING = 40;
+const static int JUMP_INTERVAL = 30000;
 
 const static QString PROGRESS_BAR_STYLE = " \
 QProgressBar:horizontal                     \
@@ -324,6 +325,69 @@ void OnyxPlayerView::connectWithChildren()
             this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
 }
 
+void OnyxPlayerView::setPosition(unsigned long pos)
+{
+    progress_bar_.setValue(pos/1000);
+    current_time_label_.setText(timeMessage(pos));
+
+    current_time_label_.update();
+    onyx::screen::watcher().enqueue(&current_time_label_,
+            onyx::screen::ScreenProxy::GU);
+}
+
+void OnyxPlayerView::seekBackward()
+{
+    int current_time = progress_bar_.value()*1000;
+    if (current_time <= 0)
+    {
+        setPosition(0);
+        return;
+    }
+
+    qint64 total = core_->totalTime();
+
+    double current = (double)progress_bar_.value();
+    double max = (double)progress_bar_.maximum();
+    double percentage = current / max;
+    int value = (int) (total * percentage);
+
+    long pos = value - JUMP_INTERVAL;
+    if (pos < 0 || pos > total)
+    {
+        pos = 0;
+    }
+
+    core_->seek(pos);
+    if (core_->state() == PlayerUtils::Playing)
+    {
+        usleep(500 * 1000);
+    }
+    setPosition(pos);
+}
+
+void OnyxPlayerView::seekForward()
+{
+    double current = (double)progress_bar_.value();
+    double max = (double)progress_bar_.maximum();
+
+    qint64 total_time = core_->totalTime();
+    double percentage = current / max;
+    int value = (int) (total_time * percentage);
+
+    unsigned long pos = value + JUMP_INTERVAL;
+    if (pos > total_time)
+    {
+        pos = total_time;
+    }
+
+    core_->seek(pos);
+    if (core_->state() == PlayerUtils::Playing)
+    {
+        usleep(500 * 1000);
+    }
+    setPosition(pos);
+}
+
 void OnyxPlayerView::keyReleaseEvent(QKeyEvent * ke)
 {
     int key = ke->key();
@@ -350,6 +414,14 @@ void OnyxPlayerView::keyReleaseEvent(QKeyEvent * ke)
         onNextClicked(true);
         ke->accept();
         return;
+    }
+    else if (key == Qt::Key_MediaLast)
+    {
+        seekBackward();
+    }
+    else if (key == Qt::Key_Forward)
+    {
+        seekForward();
     }
 
     OnyxDialog::keyReleaseEvent(ke);
@@ -443,6 +515,12 @@ QString OnyxPlayerView::timeMessage(qint64 time)
 int OnyxPlayerView::getStep(qint64 total, qint64 current)
 {
     int step = 18;
+    int defined_delay = qgetenv("MUSIC_PROGRESS_DISPLAY_DELAY").toInt();
+    if (defined_delay > 0 && defined_delay < 18)
+    {
+        step = defined_delay;
+    }
+
     if ((total - current) / 1000 < 3)
     {
         step = 4;

@@ -866,6 +866,7 @@ void PlayListModel::doSort(int sort_mode,QList<PlayListItem*>& list_to_sort)
     default:
         compareLessFunc = _titleLessComparator;
         compareGreaterFunc = _titleGreaterComparator;
+        break;
     }
 
     static bool sorted_asc = false;
