@@ -109,8 +109,15 @@ bool PoDoFoAnnotationWriter::saveAs(std::string dstPath)
 
     assert(doc_);
 
-    std::string new_title = std::string(doc_->GetInfo()->GetTitle().GetString()) + " - " + PAUtil::getMergeMarkAsPostfix();
-    doc_->GetInfo()->SetTitle(new_title.c_str());
+    if (doc_->GetInfo() && doc_->GetInfo()->GetTitle().IsValid()) {
+        std::string utf8_title = doc_->GetInfo()->GetTitle().GetStringUtf8();
+        std::cout<<"original title: " << utf8_title <<std::endl;
+
+        std::string new_title = std::string(utf8_title) + " - " + PAUtil::getMergeMarkAsPostfix();
+
+        PoDoFo::PdfString dst_title((PoDoFo::pdf_utf8 *)new_title.c_str());
+        doc_->GetInfo()->SetTitle(dst_title);
+    }
 
     doc_->Write(dstPath.c_str());
 
