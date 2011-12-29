@@ -12,7 +12,7 @@
 MainWidget::MainWidget(QWidget *parent)
     :QWidget(parent)
 {
-    setWindowTitle(tr("Gomoku"));
+    setWindowTitle(QCoreApplication::tr("Gomoku"));
     setWindowFlags(Qt::FramelessWindowHint);
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Base);

@@ -9,6 +9,7 @@
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/sys/sys_status.h"
+#include "onyx/ui/languages.h"
 
 int main(int argc, char **argv)
 {
@@ -17,6 +18,7 @@ int main(int argc, char **argv)
     QTranslator translator;
     translator.load(":/gomoku_" + QLocale::system().name());
     app.installTranslator(&translator);
+    ui::loadTranslator (QLocale::system().name());
 
     sys::SysStatus::instance().setSystemBusy(false);
     MainWidget widget;
