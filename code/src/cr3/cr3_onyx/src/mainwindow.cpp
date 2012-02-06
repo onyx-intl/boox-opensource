@@ -19,6 +19,9 @@
 #include "onyx/ui/screen_rotation_dialog.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/number_dialog.h"
+#include "onyx/cms/content_manager.h"
+#include "onyx/cms/content_thumbnail.h"
+#include "onyx/data/configuration.h"
 
 #include "../lcl_ui/settings_dialog.h"
 #include "../lcl_ui/info_dialog.h"
@@ -178,6 +181,8 @@ void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 
 OnyxMainWindow::~OnyxMainWindow()
 {
+    storeThumbnail();
+    saveDocumentOptions(file_name_to_open_);
     delete status_bar_;
     delete view_;
 }
@@ -1038,4 +1043,25 @@ void OnyxMainWindow::onScreenSizeChanged(int)
     this->resize(qApp->desktop()->screenGeometry().size());
 
     onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
+}
+
+bool OnyxMainWindow::saveDocumentOptions(const QString &path)
+{
+    cms::ContentManager database;
+    vbf::Configuration conf_;
+    if (!vbf::openDatabase(path, database))
+    {
+        return false;
+    }
+
+    return vbf::saveDocumentOptions(database, path, conf_);
+}
+
+void OnyxMainWindow::storeThumbnail()
+{
+    QFileInfo info(file_name_to_open_);
+    QImage img=view_->getPageImage();
+    QPixmap pixmap=QPixmap::fromImage( img.scaled(thumbnailSize(), Qt::KeepAspectRatio) );
+    cms::ContentThumbnail thumbdb(info.absolutePath());
+    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::IgnoreAspectRatio).toImage());
 }

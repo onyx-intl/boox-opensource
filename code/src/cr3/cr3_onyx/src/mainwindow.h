@@ -56,6 +56,8 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void showTableOfContents();
     void setLineHeight(const unsigned int lineHeightPercentage);
 
+    bool saveDocumentOptions(const QString &path);
+    void storeThumbnail();
     void showAllBookmarks();
     void showAllCites();
     void bookmarkModel(QStandardItemModel & model,

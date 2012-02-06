@@ -66,6 +66,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         /// returns current page
         int getCurPage();
         inline QPoint getSelectWordPoint(){ return select_word_point_;}
+        inline QImage & getPageImage() { return img_; }
 
         /// load settings from file
         bool loadSettings( QString filename );
@@ -266,6 +267,8 @@ class CR3View : public QWidget, public LVDocViewCallback
         scoped_ptr<tts::TTSWidget> tts_widget_;
         QStringList text_to_speak_;
         int tts_paragraph_index_;
+
+        QImage img_;
 };
 
 #endif // CR3WIDGET_H

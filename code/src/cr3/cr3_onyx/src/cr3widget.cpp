@@ -299,9 +299,9 @@ void CR3View::paintEvent ( QPaintEvent * event )
     int dx = buf->GetWidth();
     int dy = buf->GetHeight();
     if ( buf->GetBitsPerPixel()==16 ) {
-        QImage img(dx, dy, QImage::Format_RGB16 );
+        img_ = QImage(dx, dy, QImage::Format_RGB16 );
         for ( int i=0; i<dy; i++ ) {
-            unsigned char * dst = img.scanLine( i );
+            unsigned char * dst = img_.scanLine( i );
             unsigned char * src = buf->GetScanLine(i);
             for ( int x=0; x<dx; x++ ) {
                 *dst++ = *src++;
@@ -311,11 +311,11 @@ void CR3View::paintEvent ( QPaintEvent * event )
 //                src++;
             }
         }
-        painter.drawImage( rc, img );
+        painter.drawImage( rc, img_ );
     } else if ( buf->GetBitsPerPixel()==32 ) {
-        QImage img(dx, dy, QImage::Format_RGB32 );
+        img_ = QImage(dx, dy, QImage::Format_RGB32 );
         for ( int i=0; i<dy; i++ ) {
-            unsigned char * dst = img.scanLine( i );
+            unsigned char * dst = img_.scanLine( i );
             unsigned char * src = buf->GetScanLine(i);
             for ( int x=0; x<dx; x++ ) {
                 *dst++ = *src++;
@@ -325,7 +325,7 @@ void CR3View::paintEvent ( QPaintEvent * event )
                 src++;
             }
         }
-        painter.drawImage( rc, img );
+        painter.drawImage( rc, img_ );
     }
     if ( _editMode ) {
     }
