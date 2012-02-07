@@ -253,7 +253,8 @@ void ZLQtViewWidget::Widget::mouseMoveEvent(QMouseEvent *event) {
 
 void ZLQtViewWidget::Widget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!sys::isIRTouch())
+    if (!sys::isIRTouch() &&
+        !qgetenv("DISABLE_DICT").toInt())
     {
         myHolder.lookup();
     }

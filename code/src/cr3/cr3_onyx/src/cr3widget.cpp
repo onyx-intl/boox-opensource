@@ -338,7 +338,8 @@ void CR3View::paintEvent ( QPaintEvent * event )
 
 void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if(!getSelectionText().isEmpty())
+    if(!getSelectionText().isEmpty() &&
+       !qgetenv("DISABLE_DICT").toInt())
     {
         select_word_point_ = event->pos();
         lookup();
