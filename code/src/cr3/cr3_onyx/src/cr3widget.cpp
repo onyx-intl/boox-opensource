@@ -877,8 +877,20 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     //FIXME: cite mode
     //stylusPan(event->pos(), begin_point_);
 
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
-    this->update();
+    if(dict_widget_.get() &&
+       dict_widget_->isVisible() &&
+       !getSelectionText().isEmpty() &&
+       !qgetenv("DISABLE_DICT").toInt())
+    {
+        select_word_point_ = event->pos();
+        update();
+        lookup();
+    }
+    else
+    {
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+        update();
+    }
 }
 
 /// Override to handle external links
@@ -1368,7 +1380,7 @@ void CR3View::onDictClosed()
 
 void CR3View::lookup()
 {
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
     if (!dict_widget_)
     {
         startDictLookup();
