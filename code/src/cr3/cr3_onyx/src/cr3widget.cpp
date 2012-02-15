@@ -875,7 +875,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     //FIXME: cite mode
-    //stylusPan(event->pos(), begin_point_);
+    stylusPan(event->pos(), begin_point_);
 
     if(dict_widget_.get() &&
        dict_widget_->isVisible() &&
@@ -1497,10 +1497,12 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 
     if (direction > 0)
     {
+        clearSelection();
         nextPageWithTTSChecking();
     }
     else if (direction < 0)
     {
+        clearSelection();
         prevPageWithTTSChecking();
     }
     else
