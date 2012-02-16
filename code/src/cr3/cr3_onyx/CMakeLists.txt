@@ -7,6 +7,7 @@ SET(CR3_MOC_HDRS
   src/mainwindow.h      
   src/cr3widget.h
   src/search_tool.h
+  src/crqtutil.h
 
   lcl_ui/advanced_actions.h
   lcl_ui/settings_dialog.h

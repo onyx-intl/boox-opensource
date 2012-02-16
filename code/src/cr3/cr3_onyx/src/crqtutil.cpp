@@ -3,6 +3,9 @@
 #include <QStringList>
 #include <QWidget>
 #include <QPoint>
+#include <QSize>
+
+#include "onyx/ui/ui_utils.h"
 
 lString16 qt2cr(QString str)
 {
@@ -183,4 +186,18 @@ void restoreWindowPosition( QWidget * window, CRPropRef props, const char * pref
             window->showMinimized();
         }
     }
+}
+
+bool is97inch()
+{
+    QSize s = ui::screenGeometry().size();
+    if (s.height() > 800)
+    {
+#ifdef WIN32
+        return false;
+#else
+        return true;
+#endif
+    }
+    return false;
 }

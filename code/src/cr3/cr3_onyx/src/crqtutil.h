@@ -61,4 +61,7 @@ void saveWindowPosition( QWidget * window, CRPropRef props, const char * prefix 
 /// restore window position from properties
 void restoreWindowPosition( QWidget * window, CRPropRef props, const char * prefix, bool allowFullscreen = false );
 
+// for checking if the screen size is 9.7 inch
+bool is97inch();
+
 #endif // CRQTUTIL_H

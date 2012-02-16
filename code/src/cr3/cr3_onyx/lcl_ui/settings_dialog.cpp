@@ -155,11 +155,12 @@ void SettingsDialog::createLayout()
     settings_dialog_layout.addLayout(le_layout);
 
     add_lineedit(font_size, QCoreApplication::tr("Font Size"), 60);
-    add_button(font_bold, QCoreApplication::tr("Bold font"));
     add_button(font_aa, QCoreApplication::tr("Font antialiasing"));
     add_button(status_line, QCoreApplication::tr("Show status line"));
-    add_button(show_time, QCoreApplication::tr("Show time"));
-    add_button(two_pages_landscape, QCoreApplication::tr("Two lanscape pages"));
+    if (is97inch())
+    {
+        add_button(two_pages_landscape, QCoreApplication::tr("Two lanscape pages"));
+    }
     add_button(display_inverse, QCoreApplication::tr("Inverse display"));
     add_lineedit(l_margin, QCoreApplication::tr("Left Margin"), 130);
     add_lineedit(r_margin, QCoreApplication::tr("Right Margin"), 130);
