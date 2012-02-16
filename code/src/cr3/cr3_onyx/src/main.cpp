@@ -150,25 +150,6 @@ int main(int argc, char *argv[])
 
             Q_INIT_RESOURCE(onyx_ui_images);
             Q_INIT_RESOURCE(tts_images);
-#ifdef _WIN32
-            QString exeDir = QDir::toNativeSeparators(qApp->applicationDirPath() + "/"); //QDir::separator();
-            QString translations = exeDir + "i18n";
-#else
-            QString exeDir = cr2qt(datadir);
-            QString translations = exeDir + "i18n/";
-#endif
-             QTranslator qtTranslator;
-             if (qtTranslator.load("qt_" + QLocale::system().name(),
-                     QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-                QApplication::installTranslator(&qtTranslator);
-
-             QTranslator myappTranslator;
-             QString trname = "cr3_" + QLocale::system().name();
-             CRLog::info("Using translation file %s from dir %s", UnicodeToUtf8(qt2cr(trname)).c_str(), UnicodeToUtf8(qt2cr(translations)).c_str() );
-             if ( myappTranslator.load(trname, translations) )
-                 QApplication::installTranslator(&myappTranslator);
-             else
-                CRLog::error("Canot load translation file %s from dir %s", UnicodeToUtf8(qt2cr(trname)).c_str(), UnicodeToUtf8(qt2cr(translations)).c_str() );
 
             // Make sure you load translator before main widget created.
             ui::loadTranslator (QLocale::system().name());
