@@ -24,6 +24,7 @@
 
 #include "../../../../core/src/view/ZLViewWidget.h"
 #include <ZLApplication.h>
+#include <QTimer>
 
 #include "onyx/ui/ui.h"
 #include "onyx/ui/reading_style_actions.h"
@@ -37,42 +38,50 @@
 
 class QGridLayout;
 class QScrollBar;
+class ZLQtViewWidget;
 using namespace ui;
 using namespace tts;
+
+class Widget : public QWidget {
+    Q_OBJECT
+public:
+    Widget(QWidget *parent, ZLQtViewWidget *holder);
+
+private slots:
+    void onTimeOut();
+
+private:
+    void paintEvent(QPaintEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+
+    int x(const QMouseEvent *event) const;
+    int y(const QMouseEvent *event) const;
+
+    void stylusPan(const QPoint &now, const QPoint &old);
+    void drawBookmark(QPainter &painter);
+
+private:
+    ZLQtViewWidget *myHolder;
+    QPoint last_pos_;
+    QPoint end_pos_;
+    QTimer timer;
+};
 
 class ZLQtViewWidget : public QObject, public ZLViewWidget {
     Q_OBJECT
 
 private:
-    class Widget : public QWidget {
-
-    public:
-        Widget(QWidget *parent, ZLQtViewWidget &holder);
-
-    private:
-        void paintEvent(QPaintEvent *event);
-        void mousePressEvent(QMouseEvent *event);
-        void mouseReleaseEvent(QMouseEvent *event);
-        void mouseMoveEvent(QMouseEvent *event);
-        void mouseDoubleClickEvent(QMouseEvent *event);
-        void keyReleaseEvent(QKeyEvent *event);
-
-        int x(const QMouseEvent *event) const;
-        int y(const QMouseEvent *event) const;
-
-        void stylusPan(const QPoint &now, const QPoint &old);
-        void drawBookmark(QPainter &painter);
-
-    private:
-        ZLQtViewWidget &myHolder;
-        QPoint last_pos_;
-    };
 
 public:
     ZLQtViewWidget(QWidget *parent, ZLApplication *application);
     ~ZLQtViewWidget();
     QWidget *widget();
 
+    friend class Widget;
 public Q_SLOTS:
     void popupMenu();
     void onProgressClicked(const int, const int);

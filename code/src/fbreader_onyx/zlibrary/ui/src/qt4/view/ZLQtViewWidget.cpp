@@ -93,7 +93,9 @@ static int shift(const int step)
     return SHIFT;
 }
 
-ZLQtViewWidget::Widget::Widget(QWidget *parent, ZLQtViewWidget &holder) : QWidget(parent), myHolder(holder) {
+Widget::Widget(QWidget *parent, ZLQtViewWidget *holder) : QWidget(parent), myHolder(holder) {
+    timer.setInterval(200);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(onTimeOut()));
     //setBackgroundMode(NoBackground);
 }
 
@@ -135,7 +137,7 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
     layout->setMargin(0);
     layout->setSpacing(0);
     myFrame->setLayout(layout);
-    myQWidget = new Widget(myFrame, *this);
+    myQWidget = new Widget(myFrame, this);
     layout->addWidget(myQWidget, 0, 0);
     layout->addWidget(addStatusBar(), 1, 0);
 
@@ -170,9 +172,9 @@ void ZLQtViewWidget::trackStylus(bool track) {
     myQWidget->setMouseTracking(track);
 }
 
-void ZLQtViewWidget::Widget::paintEvent(QPaintEvent*) {
-    ZLQtPaintContext &context = (ZLQtPaintContext&)myHolder.view()->context();
-    switch (myHolder.rotation()) {
+void Widget::paintEvent(QPaintEvent*) {
+    ZLQtPaintContext &context = (ZLQtPaintContext&)myHolder->view()->context();
+    switch (myHolder->rotation()) {
         default:
             context.setSize(width(), height());
             break;
@@ -181,9 +183,9 @@ void ZLQtViewWidget::Widget::paintEvent(QPaintEvent*) {
             context.setSize(height(), width());
             break;
     }
-    myHolder.view()->paint();
+    myHolder->view()->paint();
     QPainter realPainter(this);
-    switch (myHolder.rotation()) {
+    switch (myHolder->rotation()) {
         default:
             realPainter.drawPixmap(0, 0, context.pixmap());
             break;
@@ -200,50 +202,72 @@ void ZLQtViewWidget::Widget::paintEvent(QPaintEvent*) {
             realPainter.drawPixmap(-1, 1 - width(), context.pixmap());
             break;
     }
-    if (myHolder.hasBookmark())
+    if (myHolder->hasBookmark())
     {
         drawBookmark(realPainter);
     }
 
     // Store thumbnail if necessary.
     static bool checked = false;
-    if (!checked && !myHolder.myApplication->has_thumbnail && myHolder.myApplication->content_ready)
+    if (!checked && !myHolder->myApplication->has_thumbnail && myHolder->myApplication->content_ready)
     {
         checked = true;
-        myHolder.myApplication->has_thumbnail = true;
-        myHolder.storeThumbnail(context.pixmap());
+        myHolder->myApplication->has_thumbnail = true;
+        myHolder->storeThumbnail(context.pixmap());
     }
 }
 
-void ZLQtViewWidget::Widget::drawBookmark(QPainter &painter)
+void Widget::drawBookmark(QPainter &painter)
 {
     static QImage image(":/images/bookmark_flag.png");
     QPoint pt(rect().width()- image.width(), 0);
     painter.drawImage(pt, image);
 }
 
-void ZLQtViewWidget::Widget::mousePressEvent(QMouseEvent *event) {
+void Widget::mousePressEvent(QMouseEvent *event) {
     event->accept();
     last_pos_ = event->pos();
 
-    // myHolder.view()->onStylusMove(x(event), y(event));
-    // myHolder.view()->onStylusPress(x(event), y(event));
+    // myHolder->view()->onStylusMove(x(event), y(event));
+    // myHolder->view()->onStylusPress(x(event), y(event));
 }
 
-void ZLQtViewWidget::Widget::mouseReleaseEvent(QMouseEvent *event) {
-    // myHolder.view()->onStylusRelease(x(event), y(event));
+void Widget::mouseReleaseEvent(QMouseEvent *event) {
+    // myHolder->view()->onStylusRelease(x(event), y(event));
+    if (sys::isIRTouch())
+    {
+        if (timer.isActive())
+        {
+            timer.stop();
+            myHolder->view()->onStylusRelease(last_pos_.x(), last_pos_.y());
+            myHolder->lookup();
+        }
+        else
+        {
+            timer.start();
+            end_pos_ = event->pos();
+        }
+        return;
+    }
+
     stylusPan(event->pos(), last_pos_);
 }
 
-void ZLQtViewWidget::Widget::mouseMoveEvent(QMouseEvent *event) {
+void Widget::onTimeOut()
+{
+    timer.stop();
+    stylusPan(end_pos_, last_pos_);
+}
+
+void Widget::mouseMoveEvent(QMouseEvent *event) {
     event->accept();
     /*
     switch (event->buttons()) {
         case Qt::LeftButton:
-            myHolder.view()->onStylusMovePressed(x(event), y(event));
+            myHolder->view()->onStylusMovePressed(x(event), y(event));
             break;
         case Qt::NoButton:
-            myHolder.view()->onStylusMove(x(event), y(event));
+            myHolder->view()->onStylusMove(x(event), y(event));
             break;
         default:
             break;
@@ -251,24 +275,25 @@ void ZLQtViewWidget::Widget::mouseMoveEvent(QMouseEvent *event) {
     */
 }
 
-void ZLQtViewWidget::Widget::mouseDoubleClickEvent(QMouseEvent *event)
+void Widget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!sys::isIRTouch())
+    if (!sys::isIRTouch() &&
+        !qgetenv("DISABLE_DICT").toInt())
     {
-        myHolder.lookup();
+        myHolder->lookup();
     }
     event->accept();
 }
 
-void ZLQtViewWidget::Widget::keyReleaseEvent(QKeyEvent *event)
+void Widget::keyReleaseEvent(QKeyEvent *event)
 {
-    myHolder.view()->processKeyReleaseEvent(event->key());
+    myHolder->view()->processKeyReleaseEvent(event->key());
 }
 
-int ZLQtViewWidget::Widget::x(const QMouseEvent *event) const {
+int Widget::x(const QMouseEvent *event) const {
     const int maxX = width() - 1;
     const int maxY = height() - 1;
-    switch (myHolder.rotation()) {
+    switch (myHolder->rotation()) {
         default:
             return std::min(std::max(event->x(), 0), maxX);
         case ZLView::DEGREES90:
@@ -280,10 +305,10 @@ int ZLQtViewWidget::Widget::x(const QMouseEvent *event) const {
     }
 }
 
-int ZLQtViewWidget::Widget::y(const QMouseEvent *event) const {
+int Widget::y(const QMouseEvent *event) const {
     const int maxX = width() - 1;
     const int maxY = height() - 1;
-    switch (myHolder.rotation()) {
+    switch (myHolder->rotation()) {
         default:
             return std::min(std::max(event->y(), 0), maxY);
         case ZLView::DEGREES90:
@@ -305,37 +330,37 @@ bool ZLQtViewWidget::isTextSelectionEnabled()
     return myApplication->isTextSelectionEnabled();
 }
 
-void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
+void Widget::stylusPan(const QPoint &now, const QPoint &old)
 {
     int direction = sys::SystemConfig::direction(old, now);
 
     if (direction > 0)
     {
-        myHolder.nextPage();
+        myHolder->nextPage();
     }
     else if (direction < 0)
     {
-        myHolder.prevPage();
+        myHolder->prevPage();
     }
-    else if (myHolder.view()->onStylusMove(now.x(), now.y()))
+    else if (myHolder->view()->onStylusMove(now.x(), now.y()))
     {
-        ZLTextView *ptr = static_cast<ZLTextView *>(myHolder.view().get());
+        ZLTextView *ptr = static_cast<ZLTextView *>(myHolder->view().get());
         ptr->selectionModel().clear();
-        myHolder.hyperlink_selected_ = false;    
-        myHolder.view()->openInternalLink(now.x(), now.y());
+        myHolder->hyperlink_selected_ = false;
+        myHolder->view()->openInternalLink(now.x(), now.y());
         this->repaint();
-        onyx::screen::instance().updateWidget(myHolder.widget(),
+        onyx::screen::instance().updateWidget(myHolder->widget(),
                         onyx::screen::ScreenProxy::GC);
     }
-    else if (myHolder.isTextSelectionEnabled())
+    else if (myHolder->isTextSelectionEnabled())
     {
         onyx::screen::ScreenProxy::Waveform w = onyx::screen::instance().defaultWaveform();
         onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::DW);
-        bool ok = myHolder.view()->onStylusRelease(now.x(), now.y());
+        bool ok = myHolder->view()->onStylusRelease(now.x(), now.y());
         onyx::screen::instance().setDefaultWaveform(w);
         if (ok)
         {
-            myHolder.lookup();
+            myHolder->lookup();
         }
     }
     else
@@ -345,11 +370,11 @@ void ZLQtViewWidget::Widget::stylusPan(const QPoint &now, const QPoint &old)
             direction = sys::SystemConfig::whichArea(old, now);
             if (direction > 0)
             {
-                myHolder.nextPage();
+                myHolder->nextPage();
             }
             else if (direction < 0)
             {
-                myHolder.prevPage();
+                myHolder->prevPage();
             }
         }
     }

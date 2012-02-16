@@ -299,9 +299,9 @@ void CR3View::paintEvent ( QPaintEvent * event )
     int dx = buf->GetWidth();
     int dy = buf->GetHeight();
     if ( buf->GetBitsPerPixel()==16 ) {
-        QImage img(dx, dy, QImage::Format_RGB16 );
+        img_ = QImage(dx, dy, QImage::Format_RGB16 );
         for ( int i=0; i<dy; i++ ) {
-            unsigned char * dst = img.scanLine( i );
+            unsigned char * dst = img_.scanLine( i );
             unsigned char * src = buf->GetScanLine(i);
             for ( int x=0; x<dx; x++ ) {
                 *dst++ = *src++;
@@ -311,11 +311,11 @@ void CR3View::paintEvent ( QPaintEvent * event )
 //                src++;
             }
         }
-        painter.drawImage( rc, img );
+        painter.drawImage( rc, img_ );
     } else if ( buf->GetBitsPerPixel()==32 ) {
-        QImage img(dx, dy, QImage::Format_RGB32 );
+        img_ = QImage(dx, dy, QImage::Format_RGB32 );
         for ( int i=0; i<dy; i++ ) {
-            unsigned char * dst = img.scanLine( i );
+            unsigned char * dst = img_.scanLine( i );
             unsigned char * src = buf->GetScanLine(i);
             for ( int x=0; x<dx; x++ ) {
                 *dst++ = *src++;
@@ -325,7 +325,7 @@ void CR3View::paintEvent ( QPaintEvent * event )
                 src++;
             }
         }
-        painter.drawImage( rc, img );
+        painter.drawImage( rc, img_ );
     }
     if ( _editMode ) {
     }
@@ -338,7 +338,8 @@ void CR3View::paintEvent ( QPaintEvent * event )
 
 void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if(!getSelectionText().isEmpty())
+    if(!getSelectionText().isEmpty() &&
+       !qgetenv("DISABLE_DICT").toInt())
     {
         select_word_point_ = event->pos();
         lookup();
@@ -874,10 +875,22 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     //FIXME: cite mode
-    //stylusPan(event->pos(), begin_point_);
+    stylusPan(event->pos(), begin_point_);
 
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
-    this->update();
+    if(dict_widget_.get() &&
+       dict_widget_->isVisible() &&
+       !getSelectionText().isEmpty() &&
+       !qgetenv("DISABLE_DICT").toInt())
+    {
+        select_word_point_ = event->pos();
+        update();
+        lookup();
+    }
+    else
+    {
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+        update();
+    }
 }
 
 /// Override to handle external links
@@ -1367,7 +1380,7 @@ void CR3View::onDictClosed()
 
 void CR3View::lookup()
 {
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
     if (!dict_widget_)
     {
         startDictLookup();
@@ -1484,10 +1497,12 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 
     if (direction > 0)
     {
+        clearSelection();
         nextPageWithTTSChecking();
     }
     else if (direction < 0)
     {
+        clearSelection();
         prevPageWithTTSChecking();
     }
     else
