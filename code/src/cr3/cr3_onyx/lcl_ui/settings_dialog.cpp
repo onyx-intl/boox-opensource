@@ -3,6 +3,7 @@
 #include "onyx/ui/keyboard_navigator.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/label.h"
+#include "onyx/ui/ui_utils.h"
 #include "settings_dialog.h"
 #include "number_dialog.h"
 #include "line_edit.h"
