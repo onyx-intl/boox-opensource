@@ -1494,6 +1494,11 @@ bool ZLQtViewWidget::updateSearchWidget()
 
 void ZLQtViewWidget::lookup()
 {
+    if (qgetenv("DISABLE_DICT").toInt())
+    {
+        return;
+    }
+
     if (!dict_widget_)
     {
         startDictLookup();
