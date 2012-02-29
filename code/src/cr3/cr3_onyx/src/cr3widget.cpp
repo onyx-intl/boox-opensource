@@ -875,7 +875,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     //FIXME: cite mode
-    stylusPan(event->pos(), begin_point_);
+    //stylusPan(event->pos(), begin_point_);
 
     if(dict_widget_.get() &&
        dict_widget_->isVisible() &&
@@ -886,7 +886,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
         update();
         lookup();
     }
-    else
+    else if(!getSelectionText().isEmpty())
     {
         onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         update();
