@@ -95,9 +95,13 @@ void SettingsDialog::keyReleaseEvent(QKeyEvent *ke)
     switch (ke->key())
     {
     case Qt::Key_Up:
+        this->focusPreviousChild();
+        break;
+    case Qt::Key_Down:
+        this->focusNextChild();
+        break;
     case Qt::Key_Left:
     case Qt::Key_Right:
-    case Qt::Key_Down:
     case Qt::Key_PageDown:
     case Qt::Key_PageUp:
         wnd = ui::moveFocus(&content_widget_, ke->key());
