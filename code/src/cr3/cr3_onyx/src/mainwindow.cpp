@@ -481,6 +481,8 @@ void OnyxMainWindow::updateToolActions()
     reading_tool_actions_.generateActions(tools, true);
 
     tools.clear();
+    tools.push_back(::ui::PREVIOUS_VIEW);
+    tools.push_back(::ui::NEXT_VIEW);
     tools.push_back(::ui::GOTO_PAGE);
     tools.push_back(::ui::CLOCK_TOOL);
 
@@ -749,6 +751,18 @@ void OnyxMainWindow::processToolActions()
         showAllBookmarks();
         break;
 
+    case ::ui::PREVIOUS_VIEW:
+        {
+            view_->historyBack();
+            updateScreen();
+        }
+        break;
+    case ::ui::NEXT_VIEW:
+        {
+            view_->historyForward();
+            updateScreen();
+        }
+        break;
     case ::ui::GOTO_PAGE:
         {
             gotoPage();
@@ -808,6 +822,7 @@ void OnyxMainWindow::updateScreen()
 void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
     view_->gotoPageWithTTSChecking(value);
+    updateScreen();
 }
 
 void OnyxMainWindow::showTableOfContents()
