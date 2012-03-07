@@ -476,6 +476,8 @@ void ZLQtViewWidget::updateActions()
     // Reading tools of go to page.
     tools.clear();
     tools.push_back(GOTO_PAGE);
+    tools.push_back(PREVIOUS_VIEW);
+    tools.push_back(NEXT_VIEW);
     tools.push_back(CLOCK_TOOL);
     reading_tool_actions_.generateActions(tools, true);
     int total = (full_ >> shift(page_step_));
@@ -600,6 +602,16 @@ void ZLQtViewWidget::popupMenu()
         else if (reading_tool_actions_.selectedTool() == GOTO_PAGE)
         {
             showGotoPageDialog();
+        }
+        else if (reading_tool_actions_.selectedTool() == PREVIOUS_VIEW)
+        {
+            triggerLargeScrollAction("undo");
+            repaint();
+        }
+        else if (reading_tool_actions_.selectedTool() == NEXT_VIEW)
+        {
+            triggerLargeScrollAction("redo");
+            repaint();
         }
         else if (reading_tool_actions_.selectedTool() == CLOCK_TOOL)
         {
