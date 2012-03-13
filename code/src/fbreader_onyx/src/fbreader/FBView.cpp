@@ -22,6 +22,7 @@
 #include "FBView.h"
 #include "FBReader.h"
 #include "FBReaderActions.h"
+#include "onyx/ui/ui_utils.h"
 
 static const std::string OPTIONS = "Options";
 
@@ -43,6 +44,14 @@ FBIndicatorStyle::FBIndicatorStyle() :
 	HeightOption(ZLCategoryKey::LOOK_AND_FEEL, INDICATOR, "Height", 1, 100, 16),
 	OffsetOption(ZLCategoryKey::LOOK_AND_FEEL, INDICATOR, "Offset", 0, 100, 3),
 	FontSizeOption(ZLCategoryKey::LOOK_AND_FEEL, INDICATOR, "FontSize", 4, 72, 14) {
+	if (ui::screenGeometry().height() >= 1024)
+	{
+	    FontSizeOption.setValue(24);
+	}
+	else
+	{
+	    FontSizeOption.setValue(22);
+	}
 }
 
 ZLTextPositionIndicatorInfo::Type FBIndicatorStyle::type() const {

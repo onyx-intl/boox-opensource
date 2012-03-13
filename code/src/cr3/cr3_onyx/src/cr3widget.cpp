@@ -21,6 +21,7 @@
 #include "../crengine/include/props.h"
 
 #include "onyx/screen/screen_update_watcher.h"
+#include "onyx/ui/ui_utils.h"
 
 using namespace std;
 
@@ -541,8 +542,12 @@ bool CR3View::loadSettings( QString fn )
         res = true;
     } else {
         // when first load, give some default values. joy@onyx
-        const char* Default_Font_Size = "22";
-        _data->_props->setString( PROP_FONT_SIZE, Default_Font_Size);
+        const char* default_font_size = "26";
+        if( ui::screenGeometry().height() >= 1024 )
+        {
+            default_font_size = "28";
+        }
+        _data->_props->setString( PROP_FONT_SIZE, default_font_size);
 
         const unsigned int Default_Line_Height_Percentage = 130;
         _data->_props->setInt(PROP_INTERLINE_SPACE, Default_Line_Height_Percentage);
