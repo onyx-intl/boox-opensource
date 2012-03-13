@@ -188,16 +188,3 @@ void restoreWindowPosition( QWidget * window, CRPropRef props, const char * pref
     }
 }
 
-bool is97inch()
-{
-    QSize s = ui::screenGeometry().size();
-    if (s.height() > 800)
-    {
-#ifdef WIN32
-        return false;
-#else
-        return true;
-#endif
-    }
-    return false;
-}

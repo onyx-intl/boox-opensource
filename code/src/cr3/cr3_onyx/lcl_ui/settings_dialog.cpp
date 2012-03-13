@@ -3,6 +3,7 @@
 #include "onyx/ui/keyboard_navigator.h"
 #include "onyx/sys/sys_status.h"
 #include "onyx/ui/label.h"
+#include "onyx/ui/ui_utils.h"
 #include "settings_dialog.h"
 #include "number_dialog.h"
 #include "line_edit.h"
@@ -94,9 +95,13 @@ void SettingsDialog::keyReleaseEvent(QKeyEvent *ke)
     switch (ke->key())
     {
     case Qt::Key_Up:
+        this->focusPreviousChild();
+        break;
+    case Qt::Key_Down:
+        this->focusNextChild();
+        break;
     case Qt::Key_Left:
     case Qt::Key_Right:
-    case Qt::Key_Down:
     case Qt::Key_PageDown:
     case Qt::Key_PageUp:
         wnd = ui::moveFocus(&content_widget_, ke->key());
