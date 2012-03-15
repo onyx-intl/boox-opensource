@@ -1062,12 +1062,17 @@ void OnyxMainWindow::onScreenSizeChanged(int)
 
 bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 {
+    QString authors = cr2qt(view_->getDocView()->getAuthors());
+    QString title = cr2qt(view_->getDocView()->getTitle());
     cms::ContentManager database;
     vbf::Configuration conf_;
-    if (!vbf::openDatabase(path, database))
+    if (!vbf::openDatabase(path, database) && !vbf::loadDocumentOptions(database, path, conf_))
     {
         return false;
     }
+
+    conf_.info.mutable_authors() = authors;
+    conf_.info.mutable_title() = title;
 
     return vbf::saveDocumentOptions(database, path, conf_);
 }
