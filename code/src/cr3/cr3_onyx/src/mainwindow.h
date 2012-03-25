@@ -39,7 +39,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     virtual void keyReleaseEvent(QKeyEvent *ke);
 
   private slots:
-    void showContextMenu();
+    void popupMenu();
     void onProgressClicked(const int, const int);
     bool addBookmark();
     bool addCite();

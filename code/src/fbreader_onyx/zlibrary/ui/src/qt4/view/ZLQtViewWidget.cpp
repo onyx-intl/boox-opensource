@@ -494,6 +494,10 @@ void ZLQtViewWidget::updateActions()
         all.push_back(FULL_SCREEN);
     }
     all.push_back(MUSIC);
+    if (sys::isIRTouch() || ui::isLandscapeVolumeMapping())
+    {
+        all.push_back(SYSTEM_VOLUME);
+    }
 #ifdef BUILD_WITH_TFT
     all.push_back(BACKLIGHT_BRIGHTNESS);
 #endif
@@ -546,6 +550,10 @@ void ZLQtViewWidget::popupMenu()
             // Start or show music player.
             onyx::screen::instance().flush(widget(), onyx::screen::ScreenProxy::GU);
             sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
+        }
+        else if (system == SYSTEM_VOLUME)
+        {
+            status_bar_->onVolumeClicked();
         }
         else if (system == ROTATE_SCREEN)
         {

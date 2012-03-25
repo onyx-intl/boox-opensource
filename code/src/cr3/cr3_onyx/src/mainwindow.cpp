@@ -17,7 +17,9 @@
 #include "onyx/data/bookmark.h"
 #include "onyx/ui/menu.h"
 #include "onyx/ui/screen_rotation_dialog.h"
+#include "onyx/ui/ui_utils.h"
 #include "onyx/sys/sys_status.h"
+#include "onyx/sys/platform.h"
 #include "onyx/ui/number_dialog.h"
 #include "onyx/cms/content_manager.h"
 #include "onyx/cms/content_thumbnail.h"
@@ -163,8 +165,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     connect( &(SysStatus::instance()), SIGNAL(aboutToShutdown()), this, SLOT(close()) );
     connect( &(SysStatus::instance()), SIGNAL(forceQuit()), this, SLOT(close()) );
 
-    connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(showContextMenu()));
-    connect(&SysStatus::instance(), SIGNAL(mouseLongPress(QPoint, QSize)), this, SLOT(showContextMenu()));
+    connect(status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
+    connect(&SysStatus::instance(), SIGNAL(mouseLongPress(QPoint, QSize)), this, SLOT(popupMenu()));
 
     connect(view_, SIGNAL(updateProgress(int,int)), status_bar_, SLOT(setProgress(int,int)));
     connect(status_bar_, SIGNAL(progressClicked(int,int)), this ,SLOT(onProgressClicked(const int, const int)));
@@ -302,7 +304,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          break;
      case Qt::Key_Menu:
          {
-             showContextMenu();
+             popupMenu();
          }
          break;
      case Qt::Key_Escape:
@@ -324,7 +326,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
      QMainWindow::keyReleaseEvent(ke);
  }
 
-void OnyxMainWindow::showContextMenu()
+void OnyxMainWindow::popupMenu()
 {
     PopupMenu menu(this);
     updateActions();
@@ -398,6 +400,10 @@ void OnyxMainWindow::showContextMenu()
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
             this->update();
             sys::SysStatus::instance().requestMusicPlayer(sys::START_PLAYER);
+        }
+        else if (system == SYSTEM_VOLUME)
+        {
+            status_bar_->onVolumeClicked();
         }
         else if (system == ROTATE_SCREEN)
         {
@@ -526,6 +532,10 @@ bool OnyxMainWindow::updateActions()
     }
 
     all.push_back(MUSIC);
+    if (sys::isIRTouch() || ui::isLandscapeVolumeMapping())
+    {
+        all.push_back(SYSTEM_VOLUME);
+    }
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     return true;
