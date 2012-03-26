@@ -17,7 +17,7 @@ struct PARect {
     {
     }
 
-    void inflateTo(PAPoint dst)
+    PARect &inflateTo(const PAPoint &dst)
     {
         if (dst.x_ < ll_.x_) {
             ll_.x_ = dst.x_;
@@ -32,6 +32,13 @@ struct PARect {
         else if (dst.y_ > ur_.y_) {
             ur_.y_ = dst.y_;
         }
+
+        return *this;
+    }
+
+    PARect &unite(const PARect &rect)
+    {
+        return this->inflateTo(rect.ll_).inflateTo(rect.ur_);
     }
 
     const double getWidth() const

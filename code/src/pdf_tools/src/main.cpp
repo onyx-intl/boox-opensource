@@ -21,13 +21,15 @@ void printUsage()
 bool testCombinePageScribbles(std::string docPath)
 {
     std::vector<PageScribble> page_scribbles;
+    std::vector<anno::Annotation> page_annotations;
 
-    DeviceScribbleReader device_reader;
-    if (!device_reader.getDocumentScribbles(docPath, page_scribbles)) {
+    DeviceScribbleReader device_reader(docPath);
+    if (!device_reader.getDocumentScribbles(page_scribbles)) {
         return false;
     }
-
-    std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;
+    if (!device_reader.getDocumentAnnotations(page_annotations)) {
+        return false;
+    }
 
     PDFAnnotationWriterFactory factory;
     AbstractPDFAnnotationWriter* annot_writer = factory.getAnnotationWriter();
@@ -35,29 +37,18 @@ bool testCombinePageScribbles(std::string docPath)
         assert(false);
         return false;
     }
-
     if (!annot_writer->openPDF(docPath)) {
         return false;
     }
-
-    std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;
-    if (device_reader.getTransformer()) {
-        if (!annot_writer->writeScribbles(page_scribbles, device_reader.getTransformer())) {
-            return false;
-        }
+    if (!annot_writer->writeScribbles(page_scribbles, device_reader.getScribbleTransformer())) {
+        return false;
     }
-    else {
-        if (!annot_writer->writeScribbles(page_scribbles)) {
-            return false;
-        }
+    if (!annot_writer->writeAnnotations(page_annotations, device_reader.getAnnotationTransformer())) {
+        return false;
     }
-
-    std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;
     if (!annot_writer->saveAs(PAUtil::getSaveAsPath(docPath))) {
         return false;
     }
-
-    std::cout<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<std::endl;
 
     return true;
 }

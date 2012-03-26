@@ -15,12 +15,12 @@ public:
     Impl()
     {
         writer_ = new PoDoFoAnnotationWriter();
-    };
+    }
     virtual ~Impl()
     {
         delete writer_;
         writer_ = 0;
-    };
+    }
 
     PoDoFoAnnotationWriter *getWriter()
     {

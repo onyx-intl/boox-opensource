@@ -15,6 +15,8 @@
 #include <vector>
 #include <iostream>
 
+#include "onyx/data/annotation.h"
+
 #include "podofo/podofo.h"
 
 #include "GlobalDefines.h"
@@ -32,12 +34,15 @@ public:
     virtual ~PoDoFoAnnotationWriter();
 
 public:
-    bool openPDF(std::string docPath);
+    bool openPDF(const std::string &docPath);
     // write page scribbles infomation to PDF
     // because page scribbles coming from device, so may need transforming device's coor to PDF's
     // if so, pFuncDevCoortransformer is provided
-    bool writeScribbles(std::vector<PageScribble> pageScribbles, PFunc_DeviceCoorTransformer pFuncDevCoortransformer = 0);
-    bool saveAs(std::string dstPath);
+    bool writeScribbles(std::vector<PageScribble> &pageScribbles,
+                        PFunc_ScribbleDeviceCoorTransformer pFuncScribbleTransformer = 0);
+    bool writeAnnotations(std::vector<anno::Annotation> &pageAnnotations,
+                          PFunc_AnnotationDeviceCoorTransformer pFuncAnnotationTransformer = 0);
+    bool saveAs(const std::string &dstPath);
 
 private:
     bool closeCore();

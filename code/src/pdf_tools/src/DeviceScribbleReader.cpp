@@ -5,13 +5,20 @@
  *      Author: joy
  */
 
+#include <cassert>
 #include <vector>
 #include <string>
+
+#include <QList>
+#include <QRect>
 
 #include "onyx/data/sketch_document.h"
 #include "onyx/data/sketch_io.h"
 #include "onyx/data/sketch_stroke.h"
 #include "onyx/data/sketch_graphic_context.h"
+
+#include "onyx/data/annotation.h"
+#include "onyx/data/annotation_agent.h"
 
 #include "../include/DeviceScribbleReader.h"
 #include "../include/GlobalDefines.h"
@@ -21,25 +28,38 @@
 #include "../include/PARect.h"
 
 using namespace pdfanno;
+using namespace sketch;
+using namespace anno;
 
 static bool transformPointHelper(const PARect &cropBox, PAPoint &point);
-static bool tranformDeviceCoorToPDF(const PARect &cropBox, PageScribble &pageScribble);
+static bool transformScribbleFromDeviceCoorToPDF(const PARect &cropBox, PageScribble &scribble);
+static bool transformAnnotationFromDeviceCoorToPDF(const PARect &cropBox, anno::Annotation &annotation);
 
 static bool getDeviceScribblePages(SketchDocument &sketch_document, sketch::Pages &pages);
 static bool parseDeviceScribblePages(const sketch::Pages &pages, std::vector<PageScribble> &pageScribbles);
 static bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::SketchPagePtr &page, PageScribble &parsedScribble);
 
-bool DeviceScribbleReader::getDocumentScribbles(std::string docPath, std::vector<PageScribble> &pageScribbles)
+DeviceScribbleReader::DeviceScribbleReader(const std::string &docPath)
+    : doc_path_(docPath)
+{
+}
+
+bool DeviceScribbleReader::getDocumentScribbles(std::vector<PageScribble> &pageScribbles)
 {
     pageScribbles.clear();
 
-    QString doc_path = QString::fromLocal8Bit(docPath.c_str());
+    QString doc_path = QString::fromLocal8Bit(doc_path_.c_str());
 
     std::cout<<"sketch file path will be: "<<doc_path.toStdString()<<std::endl;
 
+    QFile f(doc_path);
+    if (!f.exists()) {
+        return true;
+    }
+
     SketchDocument sketch_document;
     if (!sketch_document.open(doc_path)) {
-        std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"open sketch data failed: "<<doc_path.toStdString()<<std::endl;
+        std::cerr<<"["<<__FILE__<<", "<<__func__<<", "<<__LINE__<<"]"<<"open sketch data failed: "<<doc_path_<<std::endl;
         return false;
     }
 
@@ -55,9 +75,61 @@ bool DeviceScribbleReader::getDocumentScribbles(std::string docPath, std::vector
     return true;
 }
 
-PFunc_DeviceCoorTransformer DeviceScribbleReader::getTransformer()
+bool DeviceScribbleReader::getDocumentAnnotations(std::vector<Annotation> &pageAnnotations)
 {
-    return (PFunc_DeviceCoorTransformer)tranformDeviceCoorToPDF;
+    pageAnnotations.clear();
+
+    QString doc_path = QString::fromLocal8Bit(doc_path_.c_str());
+
+    AnnotationAgent *annot_agent = new AnnotationAgent();
+    if (!annot_agent->loadAllPages(doc_path)) {
+        std::cerr<<"getDocumentAnnotations: open annotation data failed: " <<doc_path_<<std::endl;
+        return false;
+    }
+    AnnotationDocumentPtr annot_doc = annot_agent->getDocument(doc_path);
+    if (!annot_doc.get()) {
+        assert(false);
+        annot_agent->close();
+        delete annot_agent;
+        std::cerr<<"getDocumentAnnotations: get annotation doc failed: " <<doc_path_<<std::endl;
+        return false;
+    }
+
+    // get the annotations page by page
+    QList<AnnotationPagePtr> pages = annot_doc->pages().values();
+    for ( QList<AnnotationPagePtr>::iterator pit = pages.begin();
+          pit != pages.end();
+          pit++) {
+        AnnotationPagePtr page = *pit;
+
+        if ( page == 0 || page->annotations().empty() ) {
+            qDebug("empty page, continue");
+            continue;
+        }
+
+        for (AnnotationIter iter = page->annotations().begin();
+             iter != page->annotations().end();
+             iter++ ) {
+            pageAnnotations.push_back(*iter);
+            qDebug("add annotation ok.");
+        }
+    }
+    qDebug("read annotations ok.");
+
+    annot_agent->close();
+    delete annot_agent;
+
+    return true;
+}
+
+PFunc_ScribbleDeviceCoorTransformer DeviceScribbleReader::getScribbleTransformer()
+{
+    return (PFunc_ScribbleDeviceCoorTransformer)transformScribbleFromDeviceCoorToPDF;
+}
+
+PFunc_AnnotationDeviceCoorTransformer DeviceScribbleReader::getAnnotationTransformer()
+{
+    return (PFunc_AnnotationDeviceCoorTransformer)transformAnnotationFromDeviceCoorToPDF;
 }
 
 static bool getDeviceScribblePages(SketchDocument &sketch_document, sketch::Pages &pages)
@@ -80,13 +152,12 @@ static bool getDeviceScribblePages(SketchDocument &sketch_document, sketch::Page
     QMapIterator<PageKey, SketchPagePtr> it(pages);
     while (it.hasNext()) {
         it.next();
-        std::cout << "loading page " << i << std::endl;
         i++;
 
         SketchPagePtr page = it.value();
 
         if (!sketch_io->loadPageData(page)) {
-            std::cerr<<"loading page failed"<<std::endl;
+            std::cerr<<"getDeviceScribblePages: loading page failed"<<std::endl;
         }
     }
 
@@ -124,8 +195,6 @@ static bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::Sk
 
         int j = 0;
         for (PointsIter pit = points.begin(); pit != points.end(); pit++) {
-            std::cout<<"parsing point "<<j<<" ("<<pit->x() / stroke_zoom_factor<<", "<<
-                    pit->y() / stroke_zoom_factor<<")"<<std::endl;
             j++;
 
             pa_points.push_back(PAPoint(pit->x() / stroke_zoom_factor, pit->y() / stroke_zoom_factor));
@@ -141,7 +210,6 @@ static bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::Sk
         parsedScribble.strokes_.push_back(PageScribble::Stroke(pa_points, stroke_thickness));
 
         const PARect &rect = parsedScribble.strokes_.back().rect_;
-        std::cout<<"Rect: "<<rect.ll_.x_<<","<<rect.ll_.y_<<","<<rect.ur_.x_<<","<<rect.ur_.y_<<std::endl;
     }
 
     return true;
@@ -197,11 +265,11 @@ static bool transformPointHelper(const PARect &cropBox, PAPoint &point)
     return true;
 }
 
-// implementer of PFunc_DeviceCoorTransformer
-static bool tranformDeviceCoorToPDF(const PARect &cropBox, PageScribble &pageScribble)
+// implementer of PFunc_ScribbleDeviceCoorTransformer
+static bool transformScribbleFromDeviceCoorToPDF(const PARect &cropBox, PageScribble &scribble)
 {
-    for (std::vector<PageScribble::Stroke>::iterator it = pageScribble.strokes_.begin();
-            it != pageScribble.strokes_.end();
+    for (std::vector<PageScribble::Stroke>::iterator it = scribble.strokes_.begin();
+            it != scribble.strokes_.end();
             it++) {
         if (!transformPointHelper(cropBox, it->rect_.ll_)) {
             return false;
@@ -219,6 +287,32 @@ static bool tranformDeviceCoorToPDF(const PARect &cropBox, PageScribble &pageScr
                 return false;
             }
         }
+    }
+
+    return true;
+}
+
+// implementer of PFunc_AnnotationDeviceCoorTransformer
+static bool transformAnnotationFromDeviceCoorToPDF(const PARect &cropBox, anno::Annotation &annotation)
+{
+    for (QList<QRect>::iterator it = annotation.mutable_rect_list().begin();
+         it != annotation.mutable_rect_list().end();
+         it++) {
+        QRect &rect = *it;
+        qDebug("device rect: [%d %d %d %d]", rect.left(), rect.bottom(), rect.right(), rect.top());
+
+        PAPoint ll(rect.bottomLeft().x(), rect.bottomLeft().y());
+        if (!transformPointHelper(cropBox, ll)) {
+            return false;
+        }
+        PAPoint ur(rect.topRight().x(), rect.topRight().y());
+        if (!transformPointHelper(cropBox, ur)) {
+            return false;
+        }
+
+        (*it).setBottomLeft(QPoint(ll.x_, ll.y_));
+        (*it).setTopRight(QPoint(ur.x_, ur.y_));
+        qDebug("pdf rect: [%d %d %d %d]", rect.left(), rect.bottom(), rect.right(), rect.top());
     }
 
     return true;
