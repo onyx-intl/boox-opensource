@@ -206,7 +206,7 @@ static bool parseDeviceScribblePage(const sketch::PageKey &key, const sketch::Sk
             continue;
         }
 
-        const double stroke_thickness = sketch::getPointSize(it->get()->shape(), 1.0 / stroke_zoom_factor);
+        const double stroke_thickness = sketch::getPenSize(it->get()->shape()) / stroke_zoom_factor;
         const int GRAY_MAX = 0xFF;
         const double stroke_gray = sketch::getPenColor(it->get()->color()) / static_cast<double>(GRAY_MAX);
         parsedScribble.strokes_.push_back(PageScribble::Stroke(pa_points, stroke_thickness, stroke_gray));
