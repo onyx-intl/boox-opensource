@@ -181,12 +181,12 @@ static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfP
     const PARect &rect = stroke.rect_;
     const std::vector<PAPoint> &points = stroke.points_;
     const double thickness = stroke.thickness_;
+    const double gray = static_cast<double>(stroke.gray_);
 
     PdfRect pdf_rect(rect.ll_.x_, rect.ll_.y_, rect.getWidth(), rect.getHeight());
 
     PdfAnnotation *annot_polyline = page->CreateAnnotation(ePdfAnnotation_PolyLine, pdf_rect);
-    annot_polyline->SetColor(128, 0, 0);
-    //annot_polyline->SetFlags(4);
+    annot_polyline->SetColor(gray);
 
     PdfDictionary &dict = annot_polyline->GetObject()->GetDictionary();
     PdfArray *vertices = new PdfArray();
@@ -200,6 +200,7 @@ static bool createAnnotationPolyLine(PoDoFo::PdfDocument *document, PoDoFo::PdfP
     PdfPainter pnt;
     pnt.SetPage(xobj);
     pnt.SetStrokeWidth(thickness);
+    pnt.SetStrokingGray(gray);
     for (int i = 0; i < points.size() - 1; i++) {
         pnt.DrawLine(points[i].x_, points[i].y_, points[i + 1].x_, points[i + 1].y_);
     }
