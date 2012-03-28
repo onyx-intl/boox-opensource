@@ -185,6 +185,8 @@ public:
 	virtual bool isSelectionEnabled() const = 0;
 	const ZLTextElementArea *elementByCoordinates(int x, int y) const;
 
+        virtual void setMargins(int left, int right, int top, int bottom) = 0;
+
 protected:
 	bool onStylusPress(int x, int y);
 	bool onStylusMove(int x, int y);

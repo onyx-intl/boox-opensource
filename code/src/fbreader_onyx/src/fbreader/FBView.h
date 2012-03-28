@@ -96,6 +96,7 @@ public:
 	int rightMargin() const;
 	int topMargin() const;
 	int bottomMargin() const;
+        void setMargins(int left, int right, int top, int bottom);
 
 	bool isSelectionEnabled() const;
 

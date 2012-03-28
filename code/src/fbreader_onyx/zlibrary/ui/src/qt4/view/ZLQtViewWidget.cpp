@@ -45,6 +45,7 @@
 #include "onyx/ui/brightness_dialog.h"
 #include "onyx/ui/screen_rotation_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
+#include "setting_margin_dialog.h"
 
 using namespace cms;
 using namespace vbf;
@@ -480,6 +481,12 @@ void ZLQtViewWidget::updateActions()
     tools.push_back(NEXT_VIEW);
     tools.push_back(CLOCK_TOOL);
     reading_tool_actions_.generateActions(tools, true);
+
+    // Margin Setting
+    tools.clear();
+    tools.push_back(MARGIN_SETTING);
+    reading_tool_actions_.generateActions(tools, true);
+
     int total = (full_ >> shift(page_step_));
     reading_tool_actions_.action(GOTO_PAGE)->setEnabled(total > 1);
 
@@ -629,6 +636,19 @@ void ZLQtViewWidget::popupMenu()
         else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)
         {
             showTableOfContents();
+        }
+        else if (reading_tool_actions_.selectedTool() == MARGIN_SETTING)
+        {
+            MarginSettingDialog dialog;
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
+            if(dialog.exec() == QDialog::Accepted)
+            {
+                int value=dialog.getMarginValue();
+                ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+                ptr->setMargins(value, value, value, value);
+                this->repaint();
+            }
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
         }
         else
         {

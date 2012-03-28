@@ -196,6 +196,13 @@ int FBView::bottomMargin() const {
 	return margins().BottomMarginOption.value();
 }
 
+void FBView::setMargins(int left, int right, int top, int bottom){
+    margins().LeftMarginOption.setValue(left);
+    margins().RightMarginOption.setValue(right);
+    margins().TopMarginOption.setValue(top);
+    margins().BottomMarginOption.setValue(bottom);
+}
+
 ZLBooleanOption &FBView::selectionOption() {
 	if (!ourSelectionOption) {
           ourSelectionOption.reset(new ZLBooleanOption(ZLCategoryKey::LOOK_AND_FEEL, OPTIONS, "IsSelectionEnabled", true));
