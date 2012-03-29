@@ -639,12 +639,12 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (reading_tool_actions_.selectedTool() == MARGIN_SETTING)
         {
-            MarginSettingDialog dialog;
+            ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+            MarginSettingDialog dialog(ptr->topMargin());
             onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
             if(dialog.exec() == QDialog::Accepted)
             {
                 int value=dialog.getMarginValue();
-                ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
                 ptr->setMargins(value, value, value, value);
                 this->repaint();
             }

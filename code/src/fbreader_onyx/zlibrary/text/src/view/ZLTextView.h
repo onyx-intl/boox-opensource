@@ -186,6 +186,10 @@ public:
 	const ZLTextElementArea *elementByCoordinates(int x, int y) const;
 
         virtual void setMargins(int left, int right, int top, int bottom) = 0;
+        virtual int leftMargin() const = 0;
+        virtual int rightMargin() const = 0;
+        virtual int topMargin() const = 0;
+        virtual int bottomMargin() const = 0;
 
 protected:
 	bool onStylusPress(int x, int y);
@@ -209,11 +213,6 @@ protected:
 	bool empty() const;
 
 	virtual shared_ptr<PositionIndicator> createPositionIndicator(const ZLTextPositionIndicatorInfo&);
-
-	virtual int leftMargin() const = 0;
-	virtual int rightMargin() const = 0;
-	virtual int topMargin() const = 0;
-	virtual int bottomMargin() const = 0;
 
 private:
 	int lineStartMargin() const;

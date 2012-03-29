@@ -21,7 +21,7 @@ static const ItemStruct MARGINS[4]={ {"hide margin", 0},
                                       };
 static const int DISPLAY_COUNT = sizeof(MARGINS) / sizeof(ItemStruct);
 
-MarginSettingDialog::MarginSettingDialog(QWidget *parent)
+MarginSettingDialog::MarginSettingDialog(int value, QWidget *parent)
     : OnyxDialog(parent)
     , ver_layout_(&content_widget_)
     , margin_(0)
@@ -29,6 +29,7 @@ MarginSettingDialog::MarginSettingDialog(QWidget *parent)
 {
     setModal(true);
     resize(200, 300);
+    setSelectedValue(value);
     createLayout();
     onyx::screen::watcher().addWatcher(this);
 }
@@ -92,7 +93,7 @@ void MarginSettingDialog::createLayout()
     ver_layout_.addSpacing(10);
 
     // Create display items
-    buttons_.setSubItemType(ButtonView::type());
+    buttons_.setSubItemType(CheckBoxView::type());
     buttons_.setMargin(2, 2, 2, 2);
     buttons_.setPreferItemSize(QSize(0, ITEM_HEIGHT));
     ODatas d;
@@ -102,6 +103,10 @@ void MarginSettingDialog::createLayout()
         OData * item = new OData;
         item->insert(TAG_TITLE, qApp->translate(SCOPE, MARGINS[i].title));
         item->insert(TITLE_INDEX, MARGINS[i].size);
+        if (MARGINS[i].size == selected_value_)
+        {
+            item->insert(TAG_CHECKED, true);
+        }
         d.push_back(item);
     }
 
@@ -168,4 +173,18 @@ bool MarginSettingDialog::event(QEvent* qe)
 void MarginSettingDialog::onCancelClicked()
 {
     reject();
+}
+
+void MarginSettingDialog::setSelectedValue(int value)
+{
+    int i;
+    for(i=0; i < DISPLAY_COUNT; ++i)
+    {
+        if (MARGINS[i].size >= value)
+        {
+            break;
+        }
+    }
+    i = (i < DISPLAY_COUNT)? i :  DISPLAY_COUNT-1;
+    selected_value_ = MARGINS[i].size;
 }

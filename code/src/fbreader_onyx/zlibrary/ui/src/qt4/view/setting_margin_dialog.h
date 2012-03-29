@@ -13,7 +13,7 @@ class MarginSettingDialog : public OnyxDialog
     Q_OBJECT
 
 public:
-    MarginSettingDialog(QWidget *parent=0);
+    MarginSettingDialog(int value, QWidget *parent=0);
     ~MarginSettingDialog(void);
 
     int getMarginValue() { return margin_;}
@@ -27,6 +27,8 @@ private:
     void keyReleaseEvent(QKeyEvent *);
     bool event(QEvent*);
 
+    void setSelectedValue(int value);
+
 private Q_SLOTS:
     void onButtonChanged(CatalogView *catalog, ContentView *item, int user_data);
     void onCancelClicked();
@@ -36,6 +38,7 @@ private:
     CatalogView buttons_;
 
     int margin_;
+    int selected_value_;
 
     QHBoxLayout hor_layout_;
     CatalogView cancel_;
