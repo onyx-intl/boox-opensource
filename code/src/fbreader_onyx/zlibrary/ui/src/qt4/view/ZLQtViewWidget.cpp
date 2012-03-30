@@ -1711,7 +1711,7 @@ void ZLQtViewWidget::storeThumbnail(const QPixmap & pixmap)
 {
     QFileInfo info(myApplication->document_path);
     cms::ContentThumbnail thumbdb(info.absolutePath());
-    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::IgnoreAspectRatio).toImage());
+    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::KeepAspectRatio).toImage());
 }
 
 void ZLQtViewWidget::onVolumeChanged(int new_volume, bool is_mute)
