@@ -1091,7 +1091,6 @@ void OnyxMainWindow::storeThumbnail()
 {
     QFileInfo info(file_name_to_open_);
     QImage img=view_->getPageImage();
-    QPixmap pixmap=QPixmap::fromImage( img.scaled(thumbnailSize(), Qt::KeepAspectRatio) );
     cms::ContentThumbnail thumbdb(info.absolutePath());
-    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, pixmap.scaled(thumbnailSize(), Qt::IgnoreAspectRatio).toImage());
+    thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, img.scaled(thumbnailSize(), Qt::KeepAspectRatio));
 }
