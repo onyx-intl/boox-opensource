@@ -353,6 +353,9 @@ void RssReaderView::onStartUpdate()
 void RssReaderView::onSettings()
 {
     SettingsView view(this, rss_feeds_);
+    update();
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+
     connect(&view, SIGNAL(reloadFeedList()), this, SLOT(onReloadFeedList()));
     connect(&view, SIGNAL(addFeed(const CRSSFeedInfo &)), this, SLOT(onAddFeed(const CRSSFeedInfo &)));
     connect(&view, SIGNAL(removeFeed(int)), this, SLOT(onRemoveFeed(int)));
@@ -447,6 +450,7 @@ void RssReaderView::createLayout()
 
     // Connections.
     connect(&status_bar_, SIGNAL(menuClicked()), this, SLOT(popupMenu()));
+
 }
 
 void RssReaderView::createListView()
@@ -737,7 +741,7 @@ void RssReaderView::onItemActivated(CatalogView *catalog,
         {
             onSettings();
         }
-
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
     }
 }
 

@@ -31,7 +31,6 @@ Q_SIGNALS:
     void removeFeed(int i);
 
 protected:
-    bool event(QEvent * event);
     void paintEvent(QPaintEvent * event);
     void resizeEvent ( QResizeEvent * event ) ;
     void keyReleaseEvent(QKeyEvent *ke);

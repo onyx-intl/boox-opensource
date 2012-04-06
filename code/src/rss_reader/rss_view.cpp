@@ -451,10 +451,9 @@ void EditView::paintEvent(QPaintEvent * event)
             label_edit_.setVisible(true);
             label_remove_.setVisible(true);
         }
-
         drawTitle(painter, rect());
 
-        if (checkbox_.isChecked() && data()->value(TAG_ROW).toInt())
+        if (checkbox_.isChecked())
         {
             QPen pen;
             pen.setWidth(penWidth());

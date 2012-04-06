@@ -92,6 +92,7 @@ void SettingsView::createLayout()
 
     label_title_.setFixedHeight(80);
     label_title_.setWordWrap(true);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
 void SettingsView::createListView()
@@ -102,7 +103,7 @@ void SettingsView::createListView()
 
     list_data_.clear();
 
-    num_selected_ = 0; 
+    num_selected_ = 0;
     for (int i = 0; i < rss_feeds_.size(); i++)
     {
         CRSSFeedInfo * info = rss_feeds_.at(i);
@@ -120,6 +121,7 @@ void SettingsView::createListView()
     list_view_.setSpacing(2);
     list_view_.setData(list_data_);
     list_view_.setNeighbor(&button_view_, CatalogView::DOWN);
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
 void SettingsView::createButtonView()
@@ -154,7 +156,7 @@ void SettingsView::createButtonView()
     button_view_.setSearchPolicy(CatalogView::NeighborFirst
             | CatalogView::AutoHorRecycle);
     button_view_.setNeighbor(&list_view_, CatalogView::RECYCLE_UP);
-
+    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
     //button_view_.setBackgroundColor(QColor(229, 229, 229));
 }
 
@@ -186,6 +188,8 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
                 QKeyEvent keyEvent(QEvent::KeyRelease, Qt::Key_Return, Qt::NoModifier);
                 QApplication::sendEvent(item, &keyEvent);
             }
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
+
         }
         else if (user_data == EditView::EDIT)
         {
@@ -216,7 +220,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
                 return ;
             }
 
-            for (int i = 0; i < rss_feeds_.size(); ++i) 
+            for (int i = 0; i < rss_feeds_.size(); ++i)
             {
                 if (rss_feeds_.at(i) == feedInfo)
                 {
@@ -267,17 +271,6 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
             createListView();
         }
     }
-}
-
-bool SettingsView::event(QEvent* event)
-{
-    bool ret = QDialog::event(event);
-
-    if (event->type() == QEvent::UpdateRequest)
-    {
-        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW);
-    }
-    return ret;
 }
 
 int SettingsView::popup()
