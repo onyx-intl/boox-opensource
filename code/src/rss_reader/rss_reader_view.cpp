@@ -178,7 +178,7 @@ void RssReaderView::onReloadFeedList()
     sys::runScriptBlock("rm", arguments);
 
 #ifdef BUILD_FOR_ARM
-    QFile file("/etc/NewsFlash.ini");
+    QFile file("rss_reader_dir/NewsFlash.ini");
     if (file.exists())
     {
         QFile::remove(AppDir.absoluteFilePath(CONFIGFILE));
@@ -321,6 +321,7 @@ void RssReaderView::onDone()
         saveFeedList();
     }
 }
+
 
 void RssReaderView::onStartUpdate()
 {
@@ -654,7 +655,7 @@ bool RssReaderView::event(QEvent * event)
     {
         static int count = 0;
         qDebug("Update request %d", ++count);
-        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::DW);
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
         event->accept();
         return true;
     }
@@ -741,8 +742,8 @@ void RssReaderView::onItemActivated(CatalogView *catalog,
         {
             onSettings();
         }
-        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
     }
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, false, onyx::screen::ScreenCommand::WAIT_ALL);
 }
 
 bool RssReaderView::openInBrowser(const QString & str)

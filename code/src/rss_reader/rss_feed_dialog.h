@@ -65,7 +65,6 @@ private:
     ODataPtr url_data;
     QString feed_title_;
     QString feed_url_;
-
 };
 
 #endif // RSSFEEDDIALOG_H

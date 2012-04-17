@@ -29,7 +29,7 @@ extern RssFactory factory;
 
 SettingsView::SettingsView(QWidget *parent, QVector<CRSSFeedInfo * > & rss)
         : OnyxDialog(parent)
-        , label_title_(tr("Choose 1 to 6 RSS feed from list or add your own RSS source"))
+        , label_title_(tr("Choose 1 to 7 RSS feed from list or add your own RSS source"))
         , list_view_(&factory,this)
         , button_view_(&factory, this)
         , rss_feeds_(rss)
@@ -57,7 +57,6 @@ SettingsView::~SettingsView()
 void SettingsView::createLayout()
 {
     updateTitleIcon(QPixmap());
-    setFixedWidth(500);
 
     updateTitle(tr("Settings"));
     setContentsMargins(0, 0, 0, 0);
@@ -69,7 +68,9 @@ void SettingsView::createLayout()
     f.setBold(true);
     label_title_.setFont(f);
 
-    label_title_.setFixedSize(400, 50);
+    QWidget *p = ui::safeParentWidget(parentWidget());
+    int w = p->width();
+    label_title_.setFixedSize(w, 50);
 
     v_layout_.addWidget(&label_title_, 0);
     v_layout_.addWidget(&list_view_, 100);
@@ -121,7 +122,6 @@ void SettingsView::createListView()
     list_view_.setSpacing(2);
     list_view_.setData(list_data_);
     list_view_.setNeighbor(&button_view_, CatalogView::DOWN);
-    onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
 }
 
 void SettingsView::createButtonView()
@@ -188,8 +188,6 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
                 QKeyEvent keyEvent(QEvent::KeyRelease, Qt::Key_Return, Qt::NoModifier);
                 QApplication::sendEvent(item, &keyEvent);
             }
-            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
-
         }
         else if (user_data == EditView::EDIT)
         {
@@ -250,7 +248,6 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
         {
             RssFeedDialog dialog(tr("Add Feed"), this);
             int ret = dialog.popup();
-            onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC, onyx::screen::ScreenCommand::WAIT_ALL);
 
             if (ret == QDialog::Accepted && !dialog.title().isEmpty() && !dialog.url().isEmpty())
             {
@@ -271,6 +268,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
             createListView();
         }
     }
+    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
 }
 
 int SettingsView::popup()
@@ -281,8 +279,15 @@ int SettingsView::popup()
     QApplication::processEvents();
     //centerWidgetOnScreen(this);
 
+    QWidget *p = ui::safeParentWidget(parentWidget());
+    setFixedWidth(p->width());
+
+    int y_offset = (ui::screenGeometry().height() - height());
+    move(0, y_offset);
+
     button_view_.visibleSubItems().at(2)->setFocus();
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
+    onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU, false, onyx::screen::ScreenCommand::WAIT_ALL);
+
     int ret = exec();
     return ret;
 }
@@ -294,8 +299,6 @@ void SettingsView::paintEvent(QPaintEvent * event)
 
 void SettingsView::resizeEvent ( QResizeEvent * event ) 
 {
-    setFixedWidth(500);
-
     // list_view_.setFixedHeight(500);
     list_view_.setFixedGrid(4, 1);
 

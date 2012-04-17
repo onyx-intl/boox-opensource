@@ -4,7 +4,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/ui_utils.h"
 
-static const int LABEL_WIDTH = 150;
+static const int LABEL_WIDTH = 75;
 static int KEYBOARD_MENU_CANCLE = 10;
 
 // A password line edit will be provided on default. Need to specify an OData
@@ -77,8 +77,21 @@ bool RssFeedDialog::popup()
     if (isHidden())
     {
         show();
+
+        QWidget *p = ui::safeParentWidget(parentWidget());
+        resize(p->width(), parentWidget()->height());
+
+        int y_offset = (ui::screenGeometry().height() - height());
+        move(0, y_offset);
     }
-    resize(600, height());
+
+    if (0 == edit_view_group_.editList().size())
+    {
+        addLineEditsToGroup();
+    }
+
+    update();
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
 
     return exec();
 }
@@ -103,12 +116,13 @@ void RssFeedDialog::createLayout()
     content_widget_.setBackgroundRole(QPalette::Button);
     content_widget_.setContentsMargins(0, 0, 0, 0);
     big_layout_.setContentsMargins(2, 2, 2, 2);
-    big_layout_.setSpacing(0);
+    big_layout_.setSpacing(2);
 
     int sub_menu_width = defaultItemHeight()*5;
-    int line_edit_width = 520;
 
-    createLineEdits(line_edit_width);
+    QWidget *p = ui::safeParentWidget(parentWidget());
+    int w = p->width();
+    createLineEdits(w - LABEL_WIDTH);
     createSubMenu(sub_menu_width);
 
     int size = edit_list_.size();
@@ -231,7 +245,7 @@ void RssFeedDialog::createSubMenu(const int &sub_menu_width)
     sub_menu_datas_.push_back(dd);
 
     ODataPtr b(new OData);
-    b->insert(TAG_TITLE, tr("Cancle"));
+    b->insert(TAG_TITLE, tr("Cancel"));
     b->insert(TAG_MENU_TYPE, KEYBOARD_MENU_CANCLE);
     sub_menu_datas_.push_back(b);
 
