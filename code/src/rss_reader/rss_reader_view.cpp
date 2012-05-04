@@ -456,7 +456,7 @@ void RssReaderView::createLayout()
 
 void RssReaderView::createListView()
 {
-    const int height = defaultItemHeight() + 4 * SPACING;
+    const int height = defaultItemHeight() * 2 + 2 * SPACING;
     list_view_.setSubItemType(RssView::type());
     list_view_.setPreferItemSize(QSize(-1, height));
 
@@ -681,8 +681,15 @@ void RssReaderView::resizeEvent(QResizeEvent * event)
     setFixedSize(s);
 #endif
 
-    // list_view_.setFixedHeight(500);
-    list_view_.setFixedGrid(7, 1);
+    list_view_.setFixedHeight(s.height() - ui::statusBarHeight() - 100 - 60);
+    if (s.height() <= 600)
+    {
+        list_view_.setFixedGrid(5, 1);
+    }
+    else
+    {
+        list_view_.setFixedGrid(7, 1);
+    }
 
     button_view_.setSpacing(20);
     button_view_.setContentsMargins(0, 0, 20, 0);

@@ -77,12 +77,12 @@ bool RssFeedDialog::popup()
     if (isHidden())
     {
         show();
+        QRect rc = qApp->desktop()->screenGeometry();
+        resize(rc.width(), height());
 
-        QWidget *p = ui::safeParentWidget(parentWidget());
-        resize(p->width(), parentWidget()->height());
-
-        int y_offset = (ui::screenGeometry().height() - height());
+        int y_offset = (rc.height() - height() - 20);
         move(0, y_offset);
+
     }
 
     if (0 == edit_view_group_.editList().size())

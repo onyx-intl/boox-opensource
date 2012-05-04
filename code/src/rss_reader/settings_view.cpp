@@ -247,6 +247,7 @@ void SettingsView::onItemActivated(CatalogView* catalog, ContentView* item, int 
         else if (flag == ADD)
         {
             RssFeedDialog dialog(tr("Add Feed"), this);
+            dialog.setUrl("http://");
             int ret = dialog.popup();
 
             if (ret == QDialog::Accepted && !dialog.title().isEmpty() && !dialog.url().isEmpty())
@@ -279,10 +280,10 @@ int SettingsView::popup()
     QApplication::processEvents();
     //centerWidgetOnScreen(this);
 
-    QWidget *p = ui::safeParentWidget(parentWidget());
-    setFixedWidth(p->width());
+    QRect rc = qApp->desktop()->screenGeometry();
+    setFixedWidth(rc.width());
 
-    int y_offset = (ui::screenGeometry().height() - height());
+    int y_offset = (rc.height() - height());
     move(0, y_offset);
 
     button_view_.visibleSubItems().at(2)->setFocus();
