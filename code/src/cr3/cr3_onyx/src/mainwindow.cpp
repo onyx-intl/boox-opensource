@@ -369,6 +369,8 @@ void OnyxMainWindow::popupMenu()
     else if (group == reading_tool_actions_.category())
     {
         processToolActions();
+        update();
+        onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         return;
     }
     else if (group == advanced_actions_.category())
