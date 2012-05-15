@@ -1,5 +1,5 @@
 /*	NewsFlash
-		Copyright 2010 Daniel Goß (Flash Systems)
+		Copyright 2010 Daniel Goï¿½ (Flash Systems)
 
 		This file is part of NewsFlash
 
@@ -129,6 +129,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
     QUrl url(feed.Url);
     LOG("Downloading feed from " << url.toString());
     httpData=httpLoader.Get(url);
+
     if (httpLoader.GetLastError()!=QNetworkReply::NoError)
     {
         CStatus newStatus(httpLoader.GetLastErrorMessage(), 0, CStatus::sfFailed);
@@ -143,6 +144,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
     CRSSFeed rssFeed(httpData);
     rssFeed.SetLog(log.get());
     LOG("RSS elements:");
+
     while ((rssItem=rssFeed.NextItem())!=NULL)
     {
         LOG("Element\r\n  Title: " << rssItem->Title << "\r\n  Link: " << rssItem->Link  << "\r\n  Guid: " << rssItem->Guid << "\r\n  Timestamp: " << rssItem->Timestamp.toString(Qt::ISODate));
@@ -180,6 +182,10 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
         //-- Get the next item
         itemListIterator.previous();
         rssItem=itemListIterator.value();
+        if(feed.KeepDays == 0)
+        {
+            feed.KeepDays = 3;
+        }
 
         if (rssItem->IsInTime(feed.KeepDays))
         {			
@@ -193,7 +199,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
 
                     //-- Open an item store and download the linked page into it
                     //   add the item only to the index if the itemStore could be created successfully
-                    auto_ptr<CItemStore> itemStore(feedStore.AttachItem(rssItem));		
+                    auto_ptr<CItemStore> itemStore(feedStore.AttachItem(rssItem));
                     if (itemStore.get())
                     {
                         //-- Fetch the data and images for the summary attribute
@@ -215,6 +221,10 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
             //   If we're canceling add the already fetched items to the index, so they are still available
             if ((!Cancel)||(rssItem->Fetched))
             {
+                if(rssItem->Timestamp.toString() == "")
+                {
+                    rssItem->Timestamp = QDateTime::currentDateTime();
+                }
                 //-- Insert a divider between days
                 if (rssItem->GetDayId()!=currentDayId)
                 {
@@ -225,6 +235,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
 
                 //-- Increase the item count and increase the new item count if the item's timestamp is greater then the "last read" timestamp
                 itemCount++;
+
                 if (rssItem->Timestamp>=feed.LastReadTimestamp)
                     newItemCount++;
             }
@@ -253,7 +264,7 @@ void CRSSLoaderThread::UpdateFeeds()
     CRSSFeedInfo feed;
 
     Busy=true;
-
+    SysStatus::instance().enableIdle(false);
     //-- Now execute the UpdateFeed-Procedure for every feed in the list
     while (!FeedList.isEmpty())
     {
@@ -268,7 +279,7 @@ void CRSSLoaderThread::UpdateFeeds()
     }	
 
     emit sendDone();
-
+    SysStatus::instance().enableIdle(true);
     Busy=false;
     Cancel=false;
 }
