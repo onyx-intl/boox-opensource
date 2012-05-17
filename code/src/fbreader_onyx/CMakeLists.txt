@@ -141,7 +141,7 @@ target_link_libraries(onyx_reader fb_reader zlibrary expat bz2 linebreak
   onyx_sys
   wv2
   crypto
-  cryptopenssl
+  ssl
   ${ADD_LIB}
   ${QT_LIBRARIES})
 link_iconv(onyx_reader)
