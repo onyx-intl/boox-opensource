@@ -417,7 +417,7 @@ void CR3View::prevPage() { doCommand(DCMD_PAGEUP, 1); }
 
 void CR3View::gotoPage(const int dstPage)
 {
-    this->_docview->goToPage(dstPage - 1);
+	doCommand(DCMD_GO_PAGE, dstPage - 1);
 }
 
 void CR3View::nextPageWithTTSChecking()
