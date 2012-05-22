@@ -23,6 +23,7 @@ signals:
 protected:
     virtual bool event(QEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
+    virtual void keyPressEvent(QKeyEvent *);
     virtual void paintEvent(QPaintEvent* );
 
 private slots:

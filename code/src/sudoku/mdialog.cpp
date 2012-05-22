@@ -68,7 +68,7 @@ void MDialog::onItemActivated(CatalogView *catalog, ContentView *item, int user_
         emit ActiveModeKey(key);
     }
     enable_flush_flag_ = false;
-    accept();
+    hide();
 }
 
 void MDialog::createLayout()
@@ -106,6 +106,17 @@ bool MDialog::event(QEvent* e)
     return ret;
 }
 
+void MDialog::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Escape)
+    {
+        e->accept();
+        return;
+    }
+
+    QDialog::keyPressEvent(e);
+}
+
 void MDialog::keyReleaseEvent(QKeyEvent *e)
 {
     switch (e->key())
@@ -116,11 +127,12 @@ void MDialog::keyReleaseEvent(QKeyEvent *e)
     case Qt::Key_Down:
         e->accept();
         break;
-
     case Qt::Key_Escape:
-        e->accept();
-        close();
-
+        {
+            e->accept();
+            hide();
+        }
+        break;
     default:
         break;
     }
