@@ -68,6 +68,7 @@ void MDialog::onItemActivated(CatalogView *catalog, ContentView *item, int user_
         emit ActiveModeKey(key);
     }
     enable_flush_flag_ = false;
+    accept();
     hide();
 }
 
