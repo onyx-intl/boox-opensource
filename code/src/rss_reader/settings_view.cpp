@@ -70,7 +70,7 @@ void SettingsView::createLayout()
 
     QWidget *p = ui::safeParentWidget(parentWidget());
     int w = p->width();
-    label_title_.setFixedSize(w, 50);
+    label_title_.setFixedSize(w - 10, 50);
 
     v_layout_.addWidget(&label_title_, 0);
     v_layout_.addWidget(&list_view_, 100);
