@@ -161,6 +161,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         void historyForward();
         void zoomIn();
         void zoomOut();
+        void ableTurnPage();
 
         void startDictLookup();
         void showSearchWidget();
@@ -269,6 +270,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         int tts_paragraph_index_;
 
         QImage img_;
+        bool able_turn_page_;
 };
 
 #endif // CR3WIDGET_H

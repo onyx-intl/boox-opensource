@@ -105,6 +105,7 @@ lString16 getDocAuthors( ldomDocument * doc, const char * path, const char * del
 
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , able_go_to_page_(true)
 {
     resize(600, 800);
 
@@ -833,8 +834,26 @@ void OnyxMainWindow::updateScreen()
 
 void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
+    if(view_->ttsWidget().isVisible())
+    {
+        if(!able_go_to_page_)
+        {
+            return;
+        }
+        able_go_to_page_ = false;
+        QTimer::singleShot(800, this, SLOT(ableGoToPage()));
+        sys::SysStatus::instance().setSystemBusy(true);
+    }
+
     view_->gotoPageWithTTSChecking(value);
     updateScreen();
+}
+
+void OnyxMainWindow::ableGoToPage()
+{
+    able_go_to_page_ = true;
+    sys::SysStatus::instance().setSystemBusy(false);
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
 }
 
 void OnyxMainWindow::showTableOfContents()

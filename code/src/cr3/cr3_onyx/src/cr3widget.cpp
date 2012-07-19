@@ -55,6 +55,7 @@ CR3View::CR3View( QWidget *parent)
         , _selecting(false), _selected(false), _editMode(false)
         , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
+        , able_turn_page_(true)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -424,9 +425,16 @@ void CR3View::nextPageWithTTSChecking()
 {
     if ((tts_widget_) && (tts_widget_->isVisible()))
     {
+        QTimer::singleShot(600, this, SLOT(ableTurnPage()));
+        if(!able_turn_page_)
+        {
+            return;
+        }
+        able_turn_page_ = false;
+
         tts_engine_->stop();
         this->nextPage();
-        emit requestUpdateAll();
+//        emit requestUpdateAll();
         startTTS();
     }
     else {
@@ -437,15 +445,27 @@ void CR3View::nextPageWithTTSChecking()
 
 void CR3View::prevPageWithTTSChecking() {
     if ((tts_widget_) && (tts_widget_->isVisible())) {
+        QTimer::singleShot(500, this, SLOT(ableTurnPage()));
+        if(!able_turn_page_)
+        {
+            return;
+        }
+        able_turn_page_ = false;
+
         tts_engine_->stop();
         this->prevPage();
-        emit requestUpdateAll();
+//        emit requestUpdateAll();
         startTTS();
     }
     else {
         this->prevPage();
         emit requestUpdateAll();
     }
+}
+
+void CR3View::ableTurnPage()
+{
+    able_turn_page_ = true;
 }
 
 void CR3View::gotoPageWithTTSChecking(const int dstPage)
