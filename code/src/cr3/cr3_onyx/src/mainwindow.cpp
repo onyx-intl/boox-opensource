@@ -841,7 +841,7 @@ void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
             return;
         }
         able_go_to_page_ = false;
-        QTimer::singleShot(800, this, SLOT(ableGoToPage()));
+        QTimer::singleShot(1200, this, SLOT(ableGoToPage()));
         sys::SysStatus::instance().setSystemBusy(true);
     }
 

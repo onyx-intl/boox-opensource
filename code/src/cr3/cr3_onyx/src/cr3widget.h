@@ -171,6 +171,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         void startTTS();
         void onSpeakDone();
         void stopTTS();
+        void waitToStartTTS();
 
         void toggleFontEmbolden();
 

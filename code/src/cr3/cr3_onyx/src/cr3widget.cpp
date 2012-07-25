@@ -425,7 +425,7 @@ void CR3View::nextPageWithTTSChecking()
 {
     if ((tts_widget_) && (tts_widget_->isVisible()))
     {
-        QTimer::singleShot(600, this, SLOT(ableTurnPage()));
+        QTimer::singleShot(800, this, SLOT(ableTurnPage()));
         if(!able_turn_page_)
         {
             return;
@@ -445,7 +445,7 @@ void CR3View::nextPageWithTTSChecking()
 
 void CR3View::prevPageWithTTSChecking() {
     if ((tts_widget_) && (tts_widget_->isVisible())) {
-        QTimer::singleShot(500, this, SLOT(ableTurnPage()));
+        QTimer::singleShot(800, this, SLOT(ableTurnPage()));
         if(!able_turn_page_)
         {
             return;
@@ -1280,9 +1280,8 @@ void CR3View::onSpeakDone()
     {
         if ( (_docview->getCurPage()+1) != _docview->getPageCount())
         {
-            nextPage();
-            emit requestUpdateAll();
-            startTTS();
+            tts_engine_->stop();
+            QTimer::singleShot(800, this, SLOT(waitToStartTTS()));
         }
         else
         {
@@ -1293,6 +1292,13 @@ void CR3View::onSpeakDone()
     {
         tts().speak(text_to_speak_.at(tts_paragraph_index_++));
     }
+}
+
+void CR3View::waitToStartTTS()
+{
+    nextPage();
+    emit requestUpdateAll();
+    startTTS();
 }
 
 void CR3View::stopTTS()
