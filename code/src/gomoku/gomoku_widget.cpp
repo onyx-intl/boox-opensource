@@ -104,7 +104,7 @@ void GomokuWidget::paintEvent(QPaintEvent *e)
         painter.setFont(fontBit);
         painter.setPen(QPen(Qt::black, 1.0));
         painter.drawText(QRect(15, 0, (width() < height() ? width() : fromLeft()) - 20, 60),
-                width() < height() ? Qt::AlignHCenter : Qt::AlignLeft, QString::fromUtf8("Gomoku"));
+                width() < height() ? Qt::AlignHCenter : Qt::AlignLeft, tr("Gomoku"));
 
         QFont font(fontName, 24, QFont::Normal);
         painter.setFont(font);
