@@ -4,7 +4,6 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/ui_utils.h"
 
-static const int LABEL_WIDTH = 75;
 static int KEYBOARD_MENU_CANCLE = 10;
 
 // A password line edit will be provided on default. Need to specify an OData
@@ -112,6 +111,8 @@ QString RssFeedDialog::value(OData * d_index)
 
 void RssFeedDialog::createLayout()
 {
+    int label_width = 120;
+
     vbox_.setSpacing(0);
     content_widget_.setBackgroundRole(QPalette::Button);
     content_widget_.setContentsMargins(0, 0, 0, 0);
@@ -122,7 +123,7 @@ void RssFeedDialog::createLayout()
 
     QWidget *p = ui::safeParentWidget(parentWidget());
     int w = p->width();
-    createLineEdits(w - LABEL_WIDTH);
+    createLineEdits(w - label_width - 5);
     createSubMenu(sub_menu_width);
 
     int size = edit_list_.size();
@@ -135,7 +136,7 @@ void RssFeedDialog::createLayout()
         font.setPointSize(16);
         font.setBold(true);
         label->setFont(font);
-        label->setFixedWidth(70);
+        label->setFixedWidth(label_width);
         label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         line_edit_layout_ = new QHBoxLayout;
         line_edit_layout_->addWidget(label);
