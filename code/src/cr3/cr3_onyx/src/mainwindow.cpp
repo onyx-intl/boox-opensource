@@ -407,6 +407,11 @@ void OnyxMainWindow::popupMenu()
         {
             status_bar_->onVolumeClicked();
         }
+        else if (system == GLOW_LIGHT_SWITCH)
+        {
+            sys::SysStatus &status = sys::SysStatus::instance();
+            status.turnGlowLightOn(!status.glowLightOn(), true);
+        }
         else if (system == ROTATE_SCREEN)
         {
             ui::ScreenRotationDialog dialog;
@@ -538,6 +543,7 @@ bool OnyxMainWindow::updateActions()
     {
         all.push_back(SYSTEM_VOLUME);
     }
+    all.push_back(GLOW_LIGHT_SWITCH);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     return true;

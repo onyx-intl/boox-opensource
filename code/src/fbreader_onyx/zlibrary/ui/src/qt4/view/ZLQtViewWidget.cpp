@@ -508,6 +508,7 @@ void ZLQtViewWidget::updateActions()
 #ifdef BUILD_WITH_TFT
     all.push_back(BACKLIGHT_BRIGHTNESS);
 #endif
+    all.push_back(GLOW_LIGHT_SWITCH);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -561,6 +562,11 @@ void ZLQtViewWidget::popupMenu()
         else if (system == SYSTEM_VOLUME)
         {
             status_bar_->onVolumeClicked();
+        }
+        else if (system == GLOW_LIGHT_SWITCH)
+        {
+            sys::SysStatus &status = sys::SysStatus::instance();
+            status.turnGlowLightOn(!status.glowLightOn(), true);
         }
         else if (system == ROTATE_SCREEN)
         {
