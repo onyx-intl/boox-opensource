@@ -34,7 +34,10 @@ bool DictApplication::open()
     sys::SysStatus::instance().setSystemBusy(false);
 
     frame_->update();
-    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    QApplication::processEvents();
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
+//    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+
     return true;
 }
 
