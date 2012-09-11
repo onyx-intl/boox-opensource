@@ -27,16 +27,14 @@ bool DictApplication::open()
     sys::SysStatus::instance().setSystemBusy(false);
 #endif
 
-    frame_->show();
-    onyx::screen::watcher().addWatcher(frame_.get());
-    frame_->setDefaultFocus();
-    processEvents();
     sys::SysStatus::instance().setSystemBusy(false);
 
-    frame_->update();
-    QApplication::processEvents();
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, onyx::screen::ScreenCommand::WAIT_ALL);
-//    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    frame_->show();
+    frame_->setDefaultFocus();
+    onyx::screen::watcher().addWatcher(frame_.get());
+
+    processEvents();
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
 
     return true;
 }
