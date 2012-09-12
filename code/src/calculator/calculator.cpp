@@ -47,6 +47,7 @@
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/keyboard_navigator.h"
 #include "onyx/data/data_tags.h"
+#include "onyx/sys/sys.h"
 
 using namespace ui;
 
@@ -99,6 +100,9 @@ using namespace ui;
      setLayout(mainLayout);
 
      setWindowTitle(QCoreApplication::tr("Calculator"));
+
+     sys::SysStatus & sys_status = sys::SysStatus::instance();
+     connect(&sys_status, SIGNAL(aboutToShutdown()), this, SLOT(onAboutToShutDown()));
 }
 
 void Calculator::createAllButtons()
@@ -515,6 +519,11 @@ void Calculator::onItemActivated(CatalogView *catalog, ContentView *item, int us
         addToMemory();
         break;
     }
+}
+
+void Calculator::onAboutToShutDown()
+{
+    qApp->exit();
 }
 
 void Calculator::showEvent(QShowEvent *e)
