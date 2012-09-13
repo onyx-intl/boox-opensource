@@ -567,6 +567,8 @@ void ZLQtViewWidget::popupMenu()
         {
             sys::SysStatus &status = sys::SysStatus::instance();
             status.turnGlowLightOn(!status.glowLightOn(), true);
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC,
+                                           true, onyx::screen::ScreenCommand::WAIT_ALL);
         }
         else if (system == ROTATE_SCREEN)
         {
