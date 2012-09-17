@@ -12,5 +12,5 @@ add_subdirectory(clock)
 add_subdirectory(calendar)
 #add_subdirectory(podofo)
 add_subdirectory(gomoku)
-add_subdirectory(pdf_tools)
+#add_subdirectory(pdf_tools)
 
