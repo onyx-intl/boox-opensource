@@ -81,6 +81,7 @@ using namespace ui;
      void refreshScreen();
 
      void onItemActivated(CatalogView *catalog, ContentView *item, int user_data);
+     void onBack();
 
  private:
      void abortOperation();
@@ -106,6 +107,8 @@ using namespace ui;
      CatalogView third_line_buttons_;
      CatalogView fourth_line_buttons_;
      CatalogView fifth_line_buttons_;
+     QHBoxLayout back_layout_;
+     QPushButton back_;
  };
 
  #endif
