@@ -111,6 +111,7 @@ using namespace ui;
      CatalogView fifth_line_buttons_;
      QHBoxLayout back_layout_;
      QPushButton back_;
+
  };
 
  #endif
