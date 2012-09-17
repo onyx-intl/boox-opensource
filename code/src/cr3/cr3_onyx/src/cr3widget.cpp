@@ -1322,8 +1322,22 @@ tts::TTS & CR3View::tts()
 {
     if (!tts_engine_)
     {
+        sys::SysStatus::instance().setSystemBusy(true);
+        bool restore = false;
+        if (sys::SysStatus::instance().isIdleEnabled())
+        {
+            sys::SysStatus::instance().enableIdle(false);
+            restore = true;
+        }
+
         tts_engine_.reset(new tts::TTS(QLocale::system()));
         connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
+
+        if (restore)
+        {
+            sys::SysStatus::instance().enableIdle(true);
+        }
+        sys::SysStatus::instance().setSystemBusy(false);
     }
     return *tts_engine_;
 }
