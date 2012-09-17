@@ -142,7 +142,7 @@ void MainWidget::showMenu()
 void MainWidget::about()
 {
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
-    MessageDialog about(QMessageBox::Icon(QMessageBox::Information) , tr("About Gomoku"),
+    MessageDialog about(QMessageBox::Icon(QMessageBox::Information) , QCoreApplication::tr("About Gomoku"),
                         tr("<center>A basic gomoku game<br/>\
                           <small>Copyright &copy; 2011, Łukasz Świątkowski</small><br/>\
                           <small>www.lukesw.net</small></center><br/>"));

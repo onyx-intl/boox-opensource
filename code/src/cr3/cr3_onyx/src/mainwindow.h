@@ -45,6 +45,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     bool addCite();
     void updateScreen();
     void onScreenSizeChanged(int);
+    void ableGoToPage();
 
   private:
     void toggleProperty( const char * name );
@@ -90,6 +91,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     ui::AdvancedActions advanced_actions_;
 
     PropsRef props_ref_;
+    bool able_go_to_page_;
 };
 
 #endif // OnyxMainWindow_H

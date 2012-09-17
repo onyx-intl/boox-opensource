@@ -83,6 +83,8 @@ using namespace ui;
      void onItemActivated(CatalogView *catalog, ContentView *item, int user_data);
      void onBack();
 
+     void onAboutToShutDown();
+
  private:
      void abortOperation();
      bool calculate(double rightOperand, const QString &pendingOperator);

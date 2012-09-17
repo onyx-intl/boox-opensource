@@ -105,6 +105,7 @@ lString16 getDocAuthors( ldomDocument * doc, const char * path, const char * del
 
 OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , able_go_to_page_(true)
 {
     resize(600, 800);
 
@@ -407,6 +408,11 @@ void OnyxMainWindow::popupMenu()
         {
             status_bar_->onVolumeClicked();
         }
+        else if (system == GLOW_LIGHT_SWITCH)
+        {
+            sys::SysStatus &status = sys::SysStatus::instance();
+            status.turnGlowLightOn(!status.glowLightOn(), true);
+        }
         else if (system == ROTATE_SCREEN)
         {
             ui::ScreenRotationDialog dialog;
@@ -538,6 +544,7 @@ bool OnyxMainWindow::updateActions()
     {
         all.push_back(SYSTEM_VOLUME);
     }
+    all.push_back(GLOW_LIGHT_SWITCH);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     return true;
@@ -833,8 +840,26 @@ void OnyxMainWindow::updateScreen()
 
 void OnyxMainWindow::onProgressClicked(const int percentage, const int value)
 {
+    if(view_->ttsWidget().isVisible())
+    {
+        if(!able_go_to_page_)
+        {
+            return;
+        }
+        able_go_to_page_ = false;
+        QTimer::singleShot(1200, this, SLOT(ableGoToPage()));
+        sys::SysStatus::instance().setSystemBusy(true);
+    }
+
     view_->gotoPageWithTTSChecking(value);
     updateScreen();
+}
+
+void OnyxMainWindow::ableGoToPage()
+{
+    able_go_to_page_ = true;
+    sys::SysStatus::instance().setSystemBusy(false);
+    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
 }
 
 void OnyxMainWindow::showTableOfContents()

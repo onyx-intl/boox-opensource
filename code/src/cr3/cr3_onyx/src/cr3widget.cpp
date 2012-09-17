@@ -55,6 +55,7 @@ CR3View::CR3View( QWidget *parent)
         , _selecting(false), _selected(false), _editMode(false)
         , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
+        , able_turn_page_(true)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -424,9 +425,16 @@ void CR3View::nextPageWithTTSChecking()
 {
     if ((tts_widget_) && (tts_widget_->isVisible()))
     {
+        QTimer::singleShot(800, this, SLOT(ableTurnPage()));
+        if(!able_turn_page_)
+        {
+            return;
+        }
+        able_turn_page_ = false;
+
         tts_engine_->stop();
         this->nextPage();
-        emit requestUpdateAll();
+//        emit requestUpdateAll();
         startTTS();
     }
     else {
@@ -437,15 +445,27 @@ void CR3View::nextPageWithTTSChecking()
 
 void CR3View::prevPageWithTTSChecking() {
     if ((tts_widget_) && (tts_widget_->isVisible())) {
+        QTimer::singleShot(800, this, SLOT(ableTurnPage()));
+        if(!able_turn_page_)
+        {
+            return;
+        }
+        able_turn_page_ = false;
+
         tts_engine_->stop();
         this->prevPage();
-        emit requestUpdateAll();
+//        emit requestUpdateAll();
         startTTS();
     }
     else {
         this->prevPage();
         emit requestUpdateAll();
     }
+}
+
+void CR3View::ableTurnPage()
+{
+    able_turn_page_ = true;
 }
 
 void CR3View::gotoPageWithTTSChecking(const int dstPage)
@@ -1260,9 +1280,8 @@ void CR3View::onSpeakDone()
     {
         if ( (_docview->getCurPage()+1) != _docview->getPageCount())
         {
-            nextPage();
-            emit requestUpdateAll();
-            startTTS();
+            tts_engine_->stop();
+            QTimer::singleShot(800, this, SLOT(waitToStartTTS()));
         }
         else
         {
@@ -1273,6 +1292,13 @@ void CR3View::onSpeakDone()
     {
         tts().speak(text_to_speak_.at(tts_paragraph_index_++));
     }
+}
+
+void CR3View::waitToStartTTS()
+{
+    nextPage();
+    emit requestUpdateAll();
+    startTTS();
 }
 
 void CR3View::stopTTS()
@@ -1296,8 +1322,22 @@ tts::TTS & CR3View::tts()
 {
     if (!tts_engine_)
     {
+        sys::SysStatus::instance().setSystemBusy(true);
+        bool restore = false;
+        if (sys::SysStatus::instance().isIdleEnabled())
+        {
+            sys::SysStatus::instance().enableIdle(false);
+            restore = true;
+        }
+
         tts_engine_.reset(new tts::TTS(QLocale::system()));
         connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
+
+        if (restore)
+        {
+            sys::SysStatus::instance().enableIdle(true);
+        }
+        sys::SysStatus::instance().setSystemBusy(false);
     }
     return *tts_engine_;
 }

@@ -508,6 +508,7 @@ void ZLQtViewWidget::updateActions()
 #ifdef BUILD_WITH_TFT
     all.push_back(BACKLIGHT_BRIGHTNESS);
 #endif
+    all.push_back(GLOW_LIGHT_SWITCH);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -561,6 +562,13 @@ void ZLQtViewWidget::popupMenu()
         else if (system == SYSTEM_VOLUME)
         {
             status_bar_->onVolumeClicked();
+        }
+        else if (system == GLOW_LIGHT_SWITCH)
+        {
+            sys::SysStatus &status = sys::SysStatus::instance();
+            status.turnGlowLightOn(!status.glowLightOn(), true);
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC,
+                                           true, onyx::screen::ScreenCommand::WAIT_ALL);
         }
         else if (system == ROTATE_SCREEN)
         {
@@ -967,8 +975,22 @@ TTS & ZLQtViewWidget::tts()
 {
     if (!tts_engine_)
     {
+        sys::SysStatus::instance().setSystemBusy(true);
+        bool restore = false;
+        if (sys::SysStatus::instance().isIdleEnabled())
+        {
+            sys::SysStatus::instance().enableIdle(false);
+            restore = true;
+        }
+
         tts_engine_.reset(new TTS(QLocale::system()));
         connect(tts_engine_.get(), SIGNAL(speakDone()), this , SLOT(onSpeakDone()));
+
+        if (restore)
+        {
+            sys::SysStatus::instance().enableIdle(true);
+        }
+        sys::SysStatus::instance().setSystemBusy(false);
     }
     return *tts_engine_;
 }
