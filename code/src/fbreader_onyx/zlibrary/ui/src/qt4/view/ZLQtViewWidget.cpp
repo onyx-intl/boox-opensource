@@ -44,6 +44,7 @@
 #include "onyx/ui/tree_view_dialog.h"
 #include "onyx/ui/brightness_dialog.h"
 #include "onyx/ui/screen_rotation_dialog.h"
+#include "onyx/ui/glow_light_control_dialog.h"
 #include "onyx/cms/content_thumbnail.h"
 #include "setting_margin_dialog.h"
 
@@ -508,7 +509,7 @@ void ZLQtViewWidget::updateActions()
 #ifdef BUILD_WITH_TFT
     all.push_back(BACKLIGHT_BRIGHTNESS);
 #endif
-    all.push_back(GLOW_LIGHT_SWITCH);
+    all.push_back(GLOW_LIGHT_CONTROL);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
 }
@@ -563,12 +564,14 @@ void ZLQtViewWidget::popupMenu()
         {
             status_bar_->onVolumeClicked();
         }
-        else if (system == GLOW_LIGHT_SWITCH)
+        else if (system == GLOW_LIGHT_CONTROL)
         {
-            sys::SysStatus &status = sys::SysStatus::instance();
-            status.turnGlowLightOn(!status.glowLightOn(), true);
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC,
-                                           true, onyx::screen::ScreenCommand::WAIT_ALL);
+            ui::GlowLightControlDialog dialog(this);
+            dialog.exec();
+            QApplication::processEvents();
+            update();
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, true,
+                                            onyx::screen::ScreenCommand::WAIT_ALL);
         }
         else if (system == ROTATE_SCREEN)
         {
