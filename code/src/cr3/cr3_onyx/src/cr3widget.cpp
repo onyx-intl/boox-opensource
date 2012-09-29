@@ -900,7 +900,7 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
     }
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     //FIXME: cite mode
-    //stylusPan(event->pos(), begin_point_);
+    stylusPan(event->pos(), begin_point_);
 
     if(dict_widget_.get() &&
        dict_widget_->isVisible() &&
@@ -1534,7 +1534,10 @@ void CR3View::processKeyReleaseEvent(int key)
     }
 }
 
-
+bool CR3View::touchControlToNavigation()
+{
+    return qgetenv("CR3_TOUCH_CONTROL_NAVIGATION").toInt() > 0;
+}
 
 void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 {
@@ -1552,15 +1555,28 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
     }
     else
     {
-        if( dict_widget_ &&
-            dict_widget_->isVisible() &&
-            !getSelectionText().isEmpty())
+        bool to_turn_page = false;
+        if (!touchControlToNavigation())
         {
-            select_word_point_ = now;
-            update();
-            lookup();
+            if( dict_widget_ &&
+                    dict_widget_->isVisible() &&
+                    !getSelectionText().isEmpty())
+            {
+                select_word_point_ = now;
+                update();
+                lookup();
+            }
+            else
+            {
+                to_turn_page = true;
+            }
         }
         else
+        {
+            to_turn_page = true;
+        }
+
+        if (to_turn_page)
         {
             direction = sys::SystemConfig::whichArea(old, now);
             if (direction > 0)
