@@ -51,6 +51,21 @@
 
 using namespace ui;
 
+static const QString PUSH_BUTTON_STYLE =   "\
+QPushButton                             \
+{                                       \
+    background: white;                  \
+    font-size: 28px;                    \
+    border-width: 1px;                  \
+    border-color: black;                \
+    border-style: solid;                \
+    border-radius: 3;                   \
+    color: black;                       \
+    padding: 0px;                       \
+    min-width: 170px;                    \
+    min-height: 80px;                   \
+}";
+
  Calculator::Calculator(QWidget *parent)
      : QDialog(parent, Qt::FramelessWindowHint)
      , first_line_buttons_(0)
@@ -58,6 +73,7 @@ using namespace ui;
      , third_line_buttons_(0)
      , fourth_line_buttons_(0)
      , fifth_line_buttons_(0)
+     , back_(0)
  {
      sumInMemory = 0.0;
      sumSoFar = 0.0;
@@ -81,6 +97,12 @@ using namespace ui;
      mainLayout->setSizeConstraint(QLayout::SetMaximumSize);
      mainLayout->setSpacing(10);
 
+     back_.setStyleSheet(PUSH_BUTTON_STYLE);
+     back_.setText(tr("Back"));
+     back_layout_.setContentsMargins(400, 30, 0, 0);
+     back_layout_.addWidget(&back_);
+     connect(&back_, SIGNAL(clicked()), this, SLOT(onBack()) );
+
      mainLayout->addWidget(display);
 
      createAllButtons();
@@ -89,6 +111,7 @@ using namespace ui;
      mainLayout->addWidget(&third_line_buttons_);
      mainLayout->addWidget(&fourth_line_buttons_);
      mainLayout->addWidget(&fifth_line_buttons_);
+     mainLayout->addLayout(&back_layout_);
      mainLayout->addStretch();
 
      first_line_buttons_.setNeighbor(&second_line_buttons_, CatalogView::DOWN);
@@ -195,6 +218,11 @@ void Calculator::createAllButtons()
      view.setSearchPolicy(CatalogView::AutoHorRecycle|CatalogView::NeighborFirst);
      connect(&view, SIGNAL(itemActivated(CatalogView*,ContentView*,int)),
              this, SLOT(onItemActivated(CatalogView *, ContentView *, int)));
+ }
+
+ void Calculator::onBack()
+ {
+     reject();
  }
 
  void Calculator::keyPressEvent(QKeyEvent *ke)
