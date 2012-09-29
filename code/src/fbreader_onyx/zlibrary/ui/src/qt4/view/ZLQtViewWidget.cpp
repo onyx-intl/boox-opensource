@@ -566,10 +566,10 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (system == GLOW_LIGHT_CONTROL)
         {
-            ui::GlowLightControlDialog dialog(this);
+            ui::GlowLightControlDialog dialog(widget());
             dialog.exec();
             QApplication::processEvents();
-            update();
+            widget()->update();
             onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC, true,
                                             onyx::screen::ScreenCommand::WAIT_ALL);
         }
