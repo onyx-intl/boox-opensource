@@ -414,6 +414,7 @@ void OnyxMainWindow::popupMenu()
             ui::GlowLightControlDialog dialog(this);
             dialog.exec();
             QApplication::processEvents();
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
         else if (system == ROTATE_SCREEN)
         {
