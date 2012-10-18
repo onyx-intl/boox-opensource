@@ -21,6 +21,7 @@
 #include "onyx/sys/sys_status.h"
 #include "onyx/sys/platform.h"
 #include "onyx/ui/number_dialog.h"
+#include "onyx/ui/glow_light_control_dialog.h"
 #include "onyx/cms/content_manager.h"
 #include "onyx/cms/content_thumbnail.h"
 #include "onyx/data/configuration.h"
@@ -408,10 +409,12 @@ void OnyxMainWindow::popupMenu()
         {
             status_bar_->onVolumeClicked();
         }
-        else if (system == GLOW_LIGHT_SWITCH)
+        else if (system == GLOW_LIGHT_CONTROL)
         {
-            sys::SysStatus &status = sys::SysStatus::instance();
-            status.turnGlowLightOn(!status.glowLightOn(), true);
+            ui::GlowLightControlDialog dialog(this);
+            dialog.exec();
+            QApplication::processEvents();
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
         else if (system == ROTATE_SCREEN)
         {
@@ -544,7 +547,7 @@ bool OnyxMainWindow::updateActions()
     {
         all.push_back(SYSTEM_VOLUME);
     }
-    all.push_back(GLOW_LIGHT_SWITCH);
+    all.push_back(GLOW_LIGHT_CONTROL);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     return true;

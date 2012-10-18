@@ -224,6 +224,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         void paintBookmark( QPainter & painter );
         void hideHelperWidget(QWidget * wnd);
         bool updateSearchWidget();
+        bool touchControlToNavigation();
         void stylusPan(const QPoint &now, const QPoint &old);
 
         bool docToWindowRect(lvRect &rect);
