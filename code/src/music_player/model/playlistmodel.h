@@ -160,7 +160,7 @@ private:
     void setUpdatesEnabled(bool);
     bool updatesEnabled()const{ return !block_update_signals_; }
 
-private Q_SLOTS:
+public Q_SLOTS:
     void preparePlayState();
 
 private:
