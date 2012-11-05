@@ -135,6 +135,7 @@ bool PlayerApplication::open(const QString &path_name)
     // load audio files from media db
     model_->readMediaInfos();
     model_->sort(PlayListModel::FILENAME);
+    model_->preparePlayState();
 
     sys::SysStatus::instance().setSystemBusy( false );
     onyx::screen::instance().enableUpdate(true);
