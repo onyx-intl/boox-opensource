@@ -239,10 +239,11 @@ static bool createAnnotationHightlight(PoDoFo::PdfDocument *document, PoDoFo::Pd
                      bound_rect.getWidth(), bound_rect.getHeight());
     PdfAnnotation *annot_highlight = page->CreateAnnotation(ePdfAnnotation_Highlight, pdf_rect);
     if (!annot_highlight) {
+        qDebug() << "can not create highlight.";
         return false;
     }
 
-    annot_highlight->SetContents(PdfString((pdf_utf8*)annotation.title().toStdString().c_str()));
+    annot_highlight->SetContents(PdfString((pdf_utf8*)annotation.title().toUtf8().constData()));
     qDebug("SetContents");
 
     // default (1.0, 1.0, 0.0) is very obscure on device,
