@@ -78,7 +78,7 @@ using namespace ui;
      void setMemory();
      void addToMemory();
 
-     void refreshScreen();
+     void refreshScreen(bool full_update = false);
 
      void onItemActivated(CatalogView *catalog, ContentView *item, int user_data);
      void onBack();

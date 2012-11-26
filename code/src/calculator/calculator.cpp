@@ -250,12 +250,19 @@ void Calculator::createAllButtons()
      QDialog::keyReleaseEvent(ke);
  }
 
- void Calculator::refreshScreen()
+ void Calculator::refreshScreen(bool full_update)
  {
-    display->repaint();
+//    display->repaint();
     display->update();
     update();
-    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::DW);
+    if (full_update)
+    {
+        onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    }
+    else
+    {
+        onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::A2);
+    }
  }
 
  void Calculator::digitClicked(const QString &title)
@@ -431,7 +438,7 @@ void Calculator::createAllButtons()
      display->setText("0");
      waitingForOperand = true;
 
-     refreshScreen();
+     refreshScreen(true);
  }
 
  void Calculator::clearAll()
@@ -443,7 +450,7 @@ void Calculator::createAllButtons()
      display->setText("0");
      waitingForOperand = true;
 
-     refreshScreen();
+     refreshScreen(true);
  }
 
  void Calculator::clearMemory()
