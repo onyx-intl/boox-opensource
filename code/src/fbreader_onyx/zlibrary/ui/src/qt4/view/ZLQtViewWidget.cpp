@@ -1575,6 +1575,7 @@ void ZLQtViewWidget::lookup()
     ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
     selected_text_ = QString::fromUtf8(ptr->selectionModel().text().c_str());
     adjustDictWidget();
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     dict_widget_->lookup(selected_text_);
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
 }
