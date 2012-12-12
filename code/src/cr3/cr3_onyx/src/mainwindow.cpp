@@ -411,6 +411,7 @@ void OnyxMainWindow::popupMenu()
         }
         else if (system == GLOW_LIGHT_CONTROL)
         {
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
             ui::GlowLightControlDialog dialog(this);
             dialog.exec();
             QApplication::processEvents();
