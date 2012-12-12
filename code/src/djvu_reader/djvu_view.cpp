@@ -8,6 +8,7 @@
 #include <QtGui/qscreen_qws.h>
 #endif
 #include "onyx/ui/screen_rotation_dialog.h"
+#include "onyx/ui/glow_light_control_dialog.h"
 
 namespace djvu_reader
 {
@@ -913,6 +914,15 @@ void DjvuView::onPopupMenu()
         case ROTATE_SCREEN:
             rotate();
             break;
+        case GLOW_LIGHT_CONTROL:
+            {
+                onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
+                ui::GlowLightControlDialog dialog(this);
+                dialog.exec();
+                QApplication::processEvents();
+                onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
+            }
+            break;
         default:
             break;
         }
@@ -1555,6 +1565,7 @@ bool DjvuView::updateActions()
         all.push_back(FULL_SCREEN);
     }
     all.push_back(MUSIC);
+    all.push_back(GLOW_LIGHT_CONTROL);
     all.push_back(RETURN_TO_LIBRARY);
     system_actions_.generateActions(all);
     return true;
