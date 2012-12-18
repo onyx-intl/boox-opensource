@@ -1,0 +1,300 @@
+fbreader (0.12.7-1) stable; urgency=low
+
+  * Vietnamese localization has been added
+  * LitRes catalog browsing broken in 0.12.6 has been fixed
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 5 Mar 2010 00:39:00 +0300
+
+fbreader (0.12.6-1) stable; urgency=low
+
+  * A processing of ePub files with incorrect CRC/entry size information
+    has been fixed. Such files are available e.g. from the FictionWise site.
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 2 Mar 2010 20:53:00 +0300
+
+fbreader (0.12.5-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 21 Feb 2010 16:20:00 +0300
+
+fbreader (0.12.2-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 29 Jan 2010 19:53:00 +0300
+
+fbreader (0.12.1-2) stable; urgency=low
+
+  * cosmetical fixes
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 13 Dec 2009 11:41:00 +0300
+
+fbreader (0.12.1-1) stable; urgency=low
+
+  * new upstream version
+  * updated man page
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 13 Dec 2009 09:23:00 +0300
+
+fbreader (0.12.0-3) stable; urgency=low
+
+  * fixed rules file
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 6 Dec 2009 19:48:00 +0300
+
+fbreader (0.12.0-2) stable; urgency=low
+
+  * fixed dependencies list
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 6 Dec 2009 19:05:00 +0300
+
+fbreader (0.12.0-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 5 Dec 2009 03:40:00 +0300
+
+fbreader (0.11.2-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 20 Oct 2009 13:22:00 +0400
+
+fbreader (0.11.1-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 13 Oct 2009 23:38:00 +0400
+
+fbreader (0.11.0-2) stable; urgency=low
+
+  * fixed package dependencies in debian files
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 26 Sep 2009 11:23:00 +0400
+
+fbreader (0.11.0-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Vasiliy Bout <bout.vasiliy@gmail.com>  Wed, 16 Sep 2009 16:48:00 +0400
+
+fbreader (0.10.7-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Mon, 30 Mar 2009 13:29:00 +0400
+
+fbreader (0.10.6-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thu, 26 Mar 2009 22:15:00 +0200
+
+fbreader (0.10.5-1) stable; urgency=low
+
+  * new upstream version
+  * conflicts with ubuntu fbreader packages have been resolved
+  * dependencies for libzltext-dev have been fixed
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 20 Mar 2009 18:12:00 +0200
+
+fbreader (0.10.4-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Wed, 18 Mar 2009 23:33:00 +0200
+
+fbreader (0.10.3-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thu, 5 Feb 2009 01:11:00 +0200
+
+fbreader (0.10.2-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 17 Jan 2009 23:42:00 +0300
+
+fbreader (0.10.1-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 16 Jan 2009 12:31:00 +0300
+
+fbreader (0.10.0-1) stable; urgency=low
+
+  * new upstream version
+  * add-missing-headers.patch integrated into the upstream
+  * fix-centering-with-margins.patch integrated into the upstream
+  * use-sensible-browser.patch added to the upstream debian fileset
+  * remove-deprecated-fields-in-desktop-file.patch intgerated into the upstream
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 3 Aug 2008 19:01:00 +0400
+
+fbreader (0.8.17-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 23 Mar 2008 03:30:00 +0300
+
+fbreader (0.8.16-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 20 Mar 2008 03:10:00 +0300
+
+fbreader (0.8.15-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 26 Feb 2008 02:41:00 +0300
+
+fbreader (0.8.14-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 9 Feb 2008 22:48:00 +0300
+
+fbreader (0.8.13-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 24 Jan 2008 15:24:00 +0300
+
+fbreader (0.8.12-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 19 Jan 2008 03:47:00 +0300
+
+fbreader (0.8.11-1) stable; urgency=low
+
+  * new upstream version
+  * dependency rules have been changed
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 12 Jan 2008 22:27:00 +0300
+
+fbreader (0.8.10-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 4 Jan 2008 20:53:00 +0300
+
+fbreader (0.8.9-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 27 Dec 2007 07:13:00 +0300
+
+fbreader (0.8.8d-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Mon, 24 Dec 2007 10:27:00 +0300
+
+fbreader (0.8.8c-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sun, 23 Dec 2007 08:14:00 +0300
+
+fbreader (0.8.8a-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Mon, 17 Dec 2007 03:03:00 +0300
+
+fbreader (0.8.8-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 23 Nov 2007 22:55:00 +0300
+
+fbreader (0.8.7b-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 6 Nov 2007 22:55:00 +0300
+
+fbreader (0.8.7a-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Wed, 31 Oct 2007 00:00:00 +0400
+
+fbreader (0.8.7-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 5 Oct 2007 00:00:00 +0400
+
+fbreader (0.8.6c-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 30 Aug 2007 02:30:00 +0400
+
+fbreader (0.8.6a-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 8 Aug 2007 18:47:00 +0400
+
+fbreader (0.8.6-1) stable; urgency=low
+
+  * new upstream version
+  * added libzlibrary-dev package
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 5 Aug 2007 23:49:00 +0400
+
+fbreader (0.8.5c-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thr, 19 Jul 2007 15:20:00 +0400
+
+fbreader (0.8.5b-1) stable; urgency=low
+
+  * new upstream version
+  * almost all changes from the previous change are now included into
+    the upstream version: zlibrary shared objects moving, rpath deletion,
+    and the man page.
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Tue, 10 Jul 2007 21:50:00 +0400
+
+fbreader (0.8.5a-1) unstable; urgency=low
+
+  * First upload to Debian. Closes: #432274
+  * Misc debianisation changes.
+  * Move zlibrary shared object files to /usr/lib from /usr/share.
+  * Remove use of rpath.
+  * Use sensible-browser.
+  * Added a basic man page.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 09 Jul 2007 15:04:31 -0400
+
+fbreader (0.8.5-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Sat, 7 Jul 2007 02:12:00 +0400
+
+fbreader (0.8.4zz-1) stable; urgency=low
+
+  * new upstream version
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Thu, 5 Jul 2007 03:17:00 +0400
+
+fbreader (0.8.4z-2) stable; urgency=low
+
+  * postinst/postrm scripts were added
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 29 Jun 2007 21:23:00 +0400
+
+fbreader (0.8.4z-1) stable; urgency=low
+
+  * Initial release.
+
+ -- Nikolay Pultsin <geometer@fbreader.org>  Fri, 29 Jun 2007 17:53:00 +0400
