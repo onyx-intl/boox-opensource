@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
  */
 
 #include <ZLImage.h>
+#include <ZLLogger.h>
 
 #include "BookReader.h"
 #include "BookModel.h"
 
+#include "../library/Book.h"
+
 BookReader::BookReader(BookModel &model) : myModel(model) {
-  myCurrentTextModel.reset();
+	myCurrentTextModel = 0;
 	myLastTOCParagraphIsEmpty = false;
 
 	myTextParagraphExists = false;
@@ -45,13 +48,13 @@ void BookReader::setFootnoteTextModel(const std::string &id) {
 	if (it != myModel.myFootnotes.end()) {
 		myCurrentTextModel = (*it).second;
 	} else {
-          myCurrentTextModel.reset(new ZLTextPlainModel(8192));
-          myModel.myFootnotes.insert(std::pair<std::string,shared_ptr<ZLTextModel> >(id, myCurrentTextModel));
+		myCurrentTextModel = new ZLTextPlainModel(myModel.myBookTextModel->language(), 8192);
+		myModel.myFootnotes.insert(std::pair<std::string,shared_ptr<ZLTextModel> >(id, myCurrentTextModel));
 	}
 }
 
 void BookReader::unsetTextModel() {
-  myCurrentTextModel.reset();
+	myCurrentTextModel = 0;
 }
 
 void BookReader::pushKind(FBTextKind kind) {
@@ -130,6 +133,10 @@ void BookReader::addHyperlinkControl(FBTextKind kind, const std::string &label) 
 			myHyperlinkType.erase();
 			break;
 	}
+	ZLLogger::Instance().println(
+		"hyperlink",
+		" + control (" + myHyperlinkType + "): " + label
+	);
 	if (myTextParagraphExists) {
 		flushTextBufferToParagraph();
 		myCurrentTextModel->addHyperlinkControl(kind, label, myHyperlinkType);
@@ -138,7 +145,7 @@ void BookReader::addHyperlinkControl(FBTextKind kind, const std::string &label) 
 }
 
 void BookReader::addHyperlinkLabel(const std::string &label) {
-	if (myCurrentTextModel) {
+	if (!myCurrentTextModel.isNull()) {
 		int paragraphNumber = myCurrentTextModel->paragraphsNumber();
 		if (myTextParagraphExists) {
 			--paragraphNumber;
@@ -148,6 +155,10 @@ void BookReader::addHyperlinkLabel(const std::string &label) {
 }
 
 void BookReader::addHyperlinkLabel(const std::string &label, int paragraphNumber) {
+	ZLLogger::Instance().println(
+		"hyperlink",
+		" + label: " + label
+	);
 	myModel.myInternalHyperlinks.insert(
 		std::pair<std::string,BookModel::Label>(
 			label, BookModel::Label(myCurrentTextModel, paragraphNumber)
@@ -264,14 +275,4 @@ void BookReader::setReference(size_t contentsParagraphNumber, int referenceNumbe
 
 void BookReader::reset() {
 	myKindStack.clear();
-}
-
-void BookReader::setDRM(bool isDRM) const
-{
-    myModel.setDRM(isDRM);
-}
-
-void BookReader::setOpenStatus(int openStatus) const
-{
-    myModel.setOpenStatus((BookModel::OpenStatus)openStatus);
 }

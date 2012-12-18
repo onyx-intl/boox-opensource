@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,14 @@
 #include <ZLTextModel.h>
 #include <ZLTextParagraph.h>
 #include <ZLUserData.h>
-#include "../description/BookDescription.h"
 
 class ZLImage;
+class Book;
 
 class ContentsModel : public ZLTextTreeModel {
 
 public:
+	ContentsModel(const std::string &language);
 	void setReference(const ZLTextTreeParagraph *paragraph, int reference);
 	int reference(const ZLTextTreeParagraph *paragraph) const;
 
@@ -50,18 +51,18 @@ public:
 		const int ParagraphNumber;
 	};
 
-    enum OpenStatus {
-        OPEN_NORMAL = 0x01,
-        OPEN_DATE_INVALID = 0xFD,
-        OPEN_DECRYPTION_FAILED = 0xFE,
-        OPEN_UNKNOWN_ERROR = 0xFF,
-    };
+public:
+	class HyperlinkMatcher {
+
+	public:
+		virtual Label match(const std::map<std::string,Label> &lMap, const std::string &id) const = 0;
+	};
 
 public:
-	BookModel(const BookDescriptionPtr description);
+	BookModel(const shared_ptr<Book> book);
 	~BookModel();
 
-	const std::string &fileName() const;
+	void setHyperlinkMatcher(shared_ptr<HyperlinkMatcher> matcher);
 
 	shared_ptr<ZLTextModel> bookTextModel() const;
 	shared_ptr<ZLTextModel> contentsModel() const;
@@ -69,23 +70,16 @@ public:
 	const ZLImageMap &imageMap() const;
 	Label label(const std::string &id) const;
 
-	const BookDescriptionPtr description() const;
-
-	// for DRM content
-	bool drm() const;
-	OpenStatus openStatus() const;
-	void setDRM(bool isDRM);
-	void setOpenStatus(OpenStatus openStatus);
+	const shared_ptr<Book> book() const;
 
 private:
-	const BookDescriptionPtr myDescription;
+	const shared_ptr<Book> myBook;
 	shared_ptr<ZLTextModel> myBookTextModel;
 	shared_ptr<ZLTextModel> myContentsModel;
 	ZLImageMap myImages;
 	std::map<std::string,shared_ptr<ZLTextModel> > myFootnotes;
 	std::map<std::string,Label> myInternalHyperlinks;
-	bool isDRM;
-	OpenStatus myOpenStatus;
+	shared_ptr<HyperlinkMatcher> myHyperlinkMatcher;
 
 friend class BookReader;
 };
@@ -93,11 +87,5 @@ friend class BookReader;
 inline shared_ptr<ZLTextModel> BookModel::bookTextModel() const { return myBookTextModel; }
 inline shared_ptr<ZLTextModel> BookModel::contentsModel() const { return myContentsModel; }
 inline const ZLImageMap &BookModel::imageMap() const { return myImages; }
-inline const BookDescriptionPtr BookModel::description() const { return myDescription; }
-inline bool BookModel::drm() const { return isDRM; }
-inline BookModel::OpenStatus BookModel::openStatus() const
-{
-    return myOpenStatus;
-}
 
 #endif /* __BOOKMODEL_H__ */

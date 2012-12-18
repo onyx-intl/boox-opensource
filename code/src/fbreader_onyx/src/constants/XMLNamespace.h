@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,13 @@ private:
 public:
 	static const std::string DublinCorePrefix;
 	static const std::string DublinCoreLegacyPrefix;
+	static const std::string DublinCoreTerms;
 	static const std::string XLink;
+	static const std::string OpenPackagingFormat;
+	static const std::string Atom;
+	static const std::string OpenSearch;
+	static const std::string CalibreMetadata;
+	static const std::string Opds;
 };
 
 #endif /* __XMLNAMESPACE_H__ */
