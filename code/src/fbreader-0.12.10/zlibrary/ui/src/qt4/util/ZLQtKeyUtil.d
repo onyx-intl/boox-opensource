@@ -21,5 +21,5 @@ ZLQtKeyUtil.o: ZLQtKeyUtil.cpp /usr/include/qt4/QtGui/QKeyEvent \
  /usr/include/qt4/QtCore/qmetatype.h /usr/include/qt4/QtCore/qmap.h \
  /usr/include/qt4/QtCore/qhash.h /usr/include/qt4/QtCore/qpair.h \
  /usr/include/qt4/QtGui/qdrag.h /usr/include/qt4/QtCore/qset.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLUnicodeUtil.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLUnicodeUtil.h \
  ZLQtKeyUtil.h ../../../../core/src/util/ZLKeyUtil.h

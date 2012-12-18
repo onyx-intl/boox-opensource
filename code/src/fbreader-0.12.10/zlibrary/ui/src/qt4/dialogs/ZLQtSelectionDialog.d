@@ -51,7 +51,7 @@ ZLQtSelectionDialog.o: ZLQtSelectionDialog.cpp \
  /usr/include/qt4/QtCore/qmetatype.h /usr/include/qt4/QtCore/qmap.h \
  /usr/include/qt4/QtCore/qhash.h /usr/include/qt4/QtGui/qdrag.h \
  /usr/include/qt4/QtCore/qset.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
  ZLQtSelectionDialog.h /usr/include/qt4/QtGui/QDialog \
  /usr/include/qt4/QtGui/qdialog.h /usr/include/qt4/QtGui/QPainter \
  /usr/include/qt4/QtGui/qpainter.h /usr/include/qt4/QtGui/qtextoption.h \
@@ -71,15 +71,15 @@ ZLQtSelectionDialog.o: ZLQtSelectionDialog.cpp \
  /usr/include/qt4/QtGui/qtabbar.h /usr/include/qt4/QtGui/qtabwidget.h \
  /usr/include/qt4/QtGui/qrubberband.h \
  ../../../../core/src/desktop/dialogs/ZLDesktopSelectionDialog.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLSelectionDialog.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLSelectionDialog.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
  ZLQtDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOpenFileDialog.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogManager.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOpenFileDialog.h \
  ZLQtUtil.h /usr/include/qt4/QtCore/QString \
  /usr/include/qt4/QtCore/qstring.h

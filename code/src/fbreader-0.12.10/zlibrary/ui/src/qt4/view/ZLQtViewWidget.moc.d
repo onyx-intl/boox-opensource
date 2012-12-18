@@ -34,13 +34,13 @@ ZLQtViewWidget.moc.o: ZLQtViewWidget.moc.cpp ZLQtViewWidget.h \
  /usr/include/qt4/QtGui/qcursor.h /usr/include/qt4/QtGui/qkeysequence.h \
  ../../../../core/src/view/ZLViewWidget.h \
  ../../../../core/src/view/ZLView.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h

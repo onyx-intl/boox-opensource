@@ -36,10 +36,10 @@ ZLQtPaintContext.o: ZLQtPaintContext.cpp /usr/include/qt4/QtGui/QPainter \
  /usr/include/qt4/QtGui/QFontDatabase \
  /usr/include/qt4/QtGui/qfontdatabase.h /usr/include/qt4/QtGui/QImage \
  /usr/include/qt4/QtGui/qimage.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImage.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImage.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
  ZLQtPaintContext.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPaintContext.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImageManager.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPaintContext.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImageManager.h \
  ../image/ZLQtImageManager.h
