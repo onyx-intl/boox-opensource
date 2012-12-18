@@ -1,18 +1,18 @@
 Library.o: Library.cpp \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLibrary.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLStringUtil.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFile.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFileInfo.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDir.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLOpenFileDialog.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLibrary.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLStringUtil.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFile.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFileInfo.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDir.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDialogManager.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLRunnable.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLResource.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLOpenFileDialog.h \
  Library.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLBoolean3.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLOptions.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLBoolean3.h \
  Lists.h Comparators.h Book.h Author.h Tag.h ../formats/FormatPlugin.h \
  ../database/booksdb/BooksDBUtil.h \
  ../database/booksdb/../../library/Lists.h ../database/booksdb/BooksDB.h \

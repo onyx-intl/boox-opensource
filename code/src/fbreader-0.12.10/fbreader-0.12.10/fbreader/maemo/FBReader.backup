@@ -1,5 +1,0 @@
-<backup-configuration>
-  <locations>
-    <location type="dir" category="settings">$HOME/.FBReader</location>
-  </locations>
-</backup-configuration>

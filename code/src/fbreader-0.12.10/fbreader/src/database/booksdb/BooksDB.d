@@ -1,10 +1,10 @@
 BooksDB.o: BooksDB.cpp \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLibrary.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFile.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFileInfo.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDir.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLLanguageUtil.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLibrary.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFile.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLFileInfo.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLDir.h \
+ /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/ZLLanguageUtil.h \
  BooksDB.h ../sqldb/implsqlite/SQLiteDataBase.h \
  ../sqldb/implsqlite/../DataBase.h ../sqldb/implsqlite/../DBConnection.h \
  ../sqldb/implsqlite/../DBRunnable.h ../sqldb/implsqlite/../DBCommand.h \
