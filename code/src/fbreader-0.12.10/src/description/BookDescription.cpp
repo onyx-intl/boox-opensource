@@ -113,7 +113,7 @@ BookDescriptionPtr BookDescription::getDescription(const std::string &fileName, 
 
 	ZLFile bookFile(fileName);
 	FormatPlugin *plugin = PluginCollection::instance().plugin(bookFile, false);
-	if ((plugin == 0) || !plugin->readDescription(fileName, *description)) {
+	if ((plugin == 0) /*|| !plugin->readDescription(fileName, *description)*/) {
           return BookDescriptionPtr();
 	}
 

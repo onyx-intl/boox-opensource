@@ -29,8 +29,8 @@
 #include <ZLApplication.h>
 #include <ZLKeyBindings.h>
 
-#include "../../fbreader/src/library/Library.h"
-#include "../../fbreader/src/external/ProgramCollection.h"
+#include "../library/Library.h"
+#include "../external/ProgramCollection.h"
 
 class ZLMessageHandler;
 

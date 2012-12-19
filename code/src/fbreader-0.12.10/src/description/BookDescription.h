@@ -23,15 +23,15 @@
 #include <string>
 #include <map>
 
-#include <shared_ptr.h>
-//#include "onyx/base/shared_ptr.h"
+//#include <shared_ptr.h>
+#include "onyx/base/shared_ptr.h"
 
 #include <ZLOptions.h>
 
 #include "Author.h"
 
 class BookDescription;
-shared_ptr<BookDescription> BookDescriptionPtr;
+typedef base::shared_ptr<BookDescription> BookDescriptionPtr;
 
 struct BookInfo {
 	BookInfo(const std::string &fileName);

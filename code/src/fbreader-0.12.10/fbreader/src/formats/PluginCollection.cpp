@@ -38,7 +38,7 @@
 
 PluginCollection *PluginCollection::ourInstance = 0;
 
-PluginCollection &PluginCollection::Instance() {
+PluginCollection &PluginCollection::instance() {
 	if (ourInstance == 0) {
 		ourInstance = new PluginCollection();
 		ourInstance->myPlugins.push_back(new FB2Plugin());

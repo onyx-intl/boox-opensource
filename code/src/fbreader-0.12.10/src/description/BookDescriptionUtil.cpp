@@ -26,6 +26,7 @@
 #include "BookDescription.h"
 #include "../formats/FormatPlugin.h"
 #include "../options/FBOptions.h"
+#include "../options/FBCategoryKey.h"
 
 static const std::string SIZE = "Size";
 static const std::string ENTRY = "Entry";

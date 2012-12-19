@@ -375,7 +375,7 @@ void MyTextHandler::fieldEnd( const wvWare::FLD* fld, wvWare::SharedPtr<const wv
         }
         else if (fld->flt == 204)
         {
-            // data = 0x03276f2a " HYPERLINK \l "_Toc222239498" µÚÒ»ÕÂ  µ÷²é½éÉÜ	"
+            // data = 0x03276f2a " HYPERLINK \l "_Toc222239498" ï¿½ï¿½Ò»ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	"
             bookReader()->baseBookReader().addControl(CONTENTS_TABLE_ENTRY, false);
             parseHyperlink(text_, 0);
             addText(text_, chp);
@@ -416,8 +416,8 @@ void MyTextHandler::addText(const QString &s,  wvWare::SharedPtr<const wvWare::W
 {
     std::string t(s.toUtf8());
     ZLTextStyleEntry entry;
-    entry.setBold(chp->fBold);
-    entry.setItalic(chp->fItalic);
+//    entry.setBold(chp->fBold);
+//    entry.setItalic(chp->fItalic);
     bookReader()->baseBookReader().addControl(entry);
     bookReader()->baseBookReader().addData(t);
 }
