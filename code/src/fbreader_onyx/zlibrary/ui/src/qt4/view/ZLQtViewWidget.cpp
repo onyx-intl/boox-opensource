@@ -566,7 +566,6 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (system == GLOW_LIGHT_CONTROL)
         {
-            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
             ui::GlowLightControlDialog dialog(widget());
             dialog.exec();
             QApplication::processEvents();
