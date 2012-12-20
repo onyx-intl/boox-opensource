@@ -135,7 +135,26 @@ ZLTextLineInfoPtr ZLTextView::processTextLine(const ZLTextWordCursor &start, con
             }
             else
             {
-                info.LeftIndent = (int)(info.LeftIndent * 2.2 / 7);
+//                 {"hide margin", 0},
+//                 {"small", 8},
+//                 {"medium", 30},
+//                 {"big", 60}
+                float value;
+                switch (leftMargin()) {
+                    case 0:
+                        value = 1.6;
+                        break;
+                    case 8:
+                        value = 1.7;
+                        break;
+                    case 30:
+                        value = 1.8;
+                        break;
+                    case 60:
+                        value = 2.1;
+                        break;
+                }
+                info.LeftIndent = (int)(info.LeftIndent * value / 7);
             }
             
         }
