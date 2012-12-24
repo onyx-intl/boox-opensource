@@ -1,0 +1,11 @@
+make[1]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10'
+make -C zlibrary/core TARGET_ARCH=win32 UI_TYPE=win32
+make[2]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core'
+make[3]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/library'
+Compiling ZLibrary.o .../bin/sh: i586-mingw32msvc-gcc: not found
+make[3]: *** [ZLibrary.o] 错误 127
+make[3]:正在离开目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/library'
+make[2]: *** [.objects] 错误 1
+make[2]:正在离开目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core'
+make[1]: *** [build] 错误 2
+make[1]:正在离开目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10'
