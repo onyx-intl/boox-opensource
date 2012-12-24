@@ -12,6 +12,7 @@ ZLQtOptionView.moc.o: ZLQtOptionView.moc.cpp ZLQtOptionView.h \
  /usr/include/qt4/QtCore/qalgorithms.h \
  /usr/include/qt4/QtCore/qscopedpointer.h /usr/include/qt4/QtCore/QSize \
  /usr/include/qt4/QtCore/qsize.h \
+<<<<<<< HEAD
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptionsDialog.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
@@ -21,4 +22,15 @@ ZLQtOptionView.moc.o: ZLQtOptionView.moc.cpp ZLQtOptionView.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptionEntry.h \
+=======
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptionsDialog.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogContent.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptionEntry.h \
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.
  ../../../../core/src/dialogs/ZLOptionView.h

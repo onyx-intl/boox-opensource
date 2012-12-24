@@ -24,7 +24,11 @@
 
 #include <ZLRunnable.h>
 #include <ZLBoolean3.h>
+<<<<<<< HEAD
 #include "../network/ZLNetworkSSLCertificate.h"
+=======
+#include <ZLNetworkSSLCertificate.h>
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.
 
 #include "../network/NetworkItems.h"
 #include "../network/NetworkBookCollection.h"

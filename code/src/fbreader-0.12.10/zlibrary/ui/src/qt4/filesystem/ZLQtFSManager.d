@@ -8,6 +8,12 @@ ZLQtFSManager.o: ZLQtFSManager.cpp /usr/include/qt4/QtCore/QString \
  /usr/include/qt4/QtCore/qnamespace.h ZLQtFSManager.h \
  ../../../../core/src/unix/filesystem/ZLUnixFSManager.h \
  ../../../../core/src/unix/filesystem/../../filesystem/ZLFSManager.h \
+<<<<<<< HEAD
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLFileInfo.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLFile.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h
+=======
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLFileInfo.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLFile.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.

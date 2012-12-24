@@ -1,6 +1,10 @@
 BooksDB_BookTag.o: BooksDB_BookTag.cpp BooksDB.h \
  ../sqldb/implsqlite/SQLiteDataBase.h ../sqldb/implsqlite/../DataBase.h \
+<<<<<<< HEAD
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
+=======
+ /home/weihuahuang/downloads/fbreader-0.12.10/fbreader/../zlibrary/core/include/shared_ptr.h \
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.
  ../sqldb/implsqlite/../DBConnection.h \
  ../sqldb/implsqlite/../DBRunnable.h ../sqldb/implsqlite/../DBCommand.h \
  ../sqldb/implsqlite/../DBCommandParameter.h \

@@ -46,12 +46,18 @@ ZLQtViewWidget.o: ZLQtViewWidget.cpp /usr/include/qt4/QtGui/QLayout \
  /usr/include/qt4/QtCore/qvariant.h /usr/include/qt4/QtCore/qmap.h \
  /usr/include/qt4/QtCore/qhash.h /usr/include/qt4/QtGui/qdrag.h \
  /usr/include/qt4/QtCore/qset.h \
+<<<<<<< HEAD
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLLanguageUtil.h \
+=======
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLLanguageUtil.h \
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.
  ZLQtViewWidget.h /usr/include/qt4/QtGui/QWidget \
  /usr/include/qt4/QtGui/qwidget.h \
  ../../../../core/src/view/ZLViewWidget.h \
  ../../../../core/src/view/ZLView.h \
+<<<<<<< HEAD
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
@@ -65,3 +71,18 @@ ZLQtViewWidget.o: ZLQtViewWidget.cpp /usr/include/qt4/QtGui/QLayout \
  ZLQtPaintContext.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPaintContext.h \
  /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImageManager.h
+=======
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h \
+ ZLQtPaintContext.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPaintContext.h \
+ /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLImageManager.h
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.

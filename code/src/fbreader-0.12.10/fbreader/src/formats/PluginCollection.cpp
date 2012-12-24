@@ -38,7 +38,11 @@
 
 PluginCollection *PluginCollection::ourInstance = 0;
 
+<<<<<<< HEAD
 PluginCollection &PluginCollection::instance() {
+=======
+PluginCollection &PluginCollection::Instance() {
+>>>>>>> 6b8ee9d... add fbreader-0.12.10.
 	if (ourInstance == 0) {
 		ourInstance = new PluginCollection();
 		ourInstance->myPlugins.push_back(new FB2Plugin());
