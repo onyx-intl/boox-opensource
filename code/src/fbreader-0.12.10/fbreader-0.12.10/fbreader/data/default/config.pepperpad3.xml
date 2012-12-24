@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<group name="Style">
+		<option name="Base:fontFamily" value="Georgia"/>
+		<option name="Base:fontSize" value="16"/>
+	</group>
+  <group name="Scrollings">
+    <option name="Delay" value="0"/>
+  </group>
+  <group name="TapScrolling">
+    <option name="Enabled" value="false"/>
+  </group>
+  <group name="Options">
+    <option name="KeyDelay" value="0"/>
+    <option name="BookPath" value="~/FBooks:~/Books"/>
+    <option name="DownloadDirectory" value="~/FBooks"/>
+  </group>
+</config>

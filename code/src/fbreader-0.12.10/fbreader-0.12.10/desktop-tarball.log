@@ -1,0 +1,14 @@
+make[1]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10'
+make -C zlibrary/core TARGET_ARCH=desktop UI_TYPE=dummy
+make[2]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core'
+make[3]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/library'
+Compiling ZLibrary.o ... OK
+make[3]:正在离开目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/library'
+make[3]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/typeId'
+Compiling ZLTypeId.o ... OK
+make[3]:正在离开目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/typeId'
+make[3]: 正在进入目录 `/home/weihuahuang/downloads/fbreader-0.12.10/fbreader-0.12.10/zlibrary/core/src/util'
+Compiling ZLFileUtil.o ...make[3]: *** 正在删除文件“ZLFileUtil.o”
+make[3]: *** [ZLFileUtil.o] 中断
+make[2]: *** [.objects] 中断
+make[1]: *** [build] 中断
