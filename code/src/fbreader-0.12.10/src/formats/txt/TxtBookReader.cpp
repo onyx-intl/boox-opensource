@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@ TxtBookReader::TxtBookReader(BookModel &model, const PlainTextFormat &format, co
 
 void TxtBookReader::internalEndParagraph() {
 	if (!myLastLineIsEmpty) {
-		myLineFeedCounter = 0;
+		//myLineFeedCounter = 0;
+		myLineFeedCounter = -1; /* Fixed by Hatred: zero value was break LINE INDENT formater -
+		                           second line print with indent like new paragraf */
 	}
 	myLastLineIsEmpty = true;
 	endParagraph();
@@ -38,7 +40,11 @@ bool TxtBookReader::characterDataHandler(std::string &str) {
 	const char *end = ptr + str.length();
 	for (; ptr != end; ++ptr) {
 		if (isspace((unsigned char)*ptr)) {
-			++mySpaceCounter;
+			if (*ptr != '\t') {
+				++mySpaceCounter;
+			} else {
+				mySpaceCounter += myFormat.ignoredIndent() + 1; // TODO: implement single option in PlainTextFormat
+			}
 		} else {
 			myLastLineIsEmpty = false;
 			break;
@@ -72,7 +78,10 @@ bool TxtBookReader::newLineHandler() {
 		((myFormat.breakType() & PlainTextFormat::BREAK_PARAGRAPH_AT_EMPTY_LINE) && (myLineFeedCounter > 0));
 
 	if (myFormat.createContentsTable()) {
-		if (!myInsideContentsParagraph && (myLineFeedCounter == myFormat.emptyLinesBeforeNewSection() + 1)) {
+//		if (!myInsideContentsParagraph && (myLineFeedCounter == myFormat.emptyLinesBeforeNewSection() + 1)) {
+			/* Fixed by Hatred: remove '+ 1' for emptyLinesBeforeNewSection, it looks like very strange
+				 when we should point count of empty string decrised by 1 in settings dialog */
+		if (!myInsideContentsParagraph && (myLineFeedCounter == myFormat.emptyLinesBeforeNewSection())) {
 			myInsideContentsParagraph = true;
 			internalEndParagraph();
 			insertEndOfSectionParagraph();

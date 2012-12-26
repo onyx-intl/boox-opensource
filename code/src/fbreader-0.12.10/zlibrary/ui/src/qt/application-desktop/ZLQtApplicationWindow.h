@@ -30,83 +30,85 @@
 #include "../../../../core/src/desktop/application/ZLDesktopApplicationWindow.h"
 
 class ZLQtApplicationWindow : public QMainWindow, public ZLDesktopApplicationWindow {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	ZLQtApplicationWindow(ZLApplication *application);
-	~ZLQtApplicationWindow();
+    ZLQtApplicationWindow(ZLApplication *application);
+    ~ZLQtApplicationWindow();
 
-	void setFocusToMainWidget();
-
-private:
-	ZLViewWidget *createViewWidget();
-	void addToolbarItem(ZLToolbar::ItemPtr item);
-	void init();
-	void processAllEvents();
-	void close();
-
-	void grabAllKeys(bool grab);
-
-	void setCaption(const std::string &caption);
-
-	void setHyperlinkCursor(bool hyperlink);
-
-	bool isFullscreen() const;
-	void setFullscreen(bool fullscreen);
-
-	void closeEvent(QCloseEvent *event);
-	void keyPressEvent(QKeyEvent *event);
-	void wheelEvent(QWheelEvent *event);
-
-	void setToggleButtonState(const ZLToolbar::ToggleButtonItem &button);
-	void setToolbarItemState(ZLToolbar::ItemPtr item, bool visible, bool enabled);
+    void setFocusToMainWidget();
 
 private:
-	class QToolBar *myToolBar;
+    ZLViewWidget *createViewWidget();
+    void addToolbarItem(ZLToolbar::ItemPtr item);
+    void init();
+    void processAllEvents();
+    void close();
+
+    void grabAllKeys(bool grab);
+
+    void setCaption(const std::string &caption);
+
+    void setHyperlinkCursor(bool hyperlink);
+
+    bool isFullscreen() const;
+    void setFullscreen(bool fullscreen);
+
+    void closeEvent(QCloseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void wheelEvent(QWheelEvent *event);
+
+    void setToggleButtonState(const ZLToolbar::ToggleButtonItem &button);
+    void setToolbarItemState(ZLToolbar::ItemPtr item, bool visible, bool enabled);
+
+private:
+    class QToolBar *myToolBar;
 
 friend class ZLQtToolButton;
-	std::map<const ZLToolbar::Item*,QWidget*> myItemToWidgetMap;
-	std::map<const ZLToolbar::MenuButtonItem*,size_t> myPopupIdMap;
+    std::map<const ZLToolbar::Item*,QWidget*> myItemToWidgetMap;
+    std::map<const ZLToolbar::MenuButtonItem*,size_t> myPopupIdMap;
 
-	bool myFullScreen;
-	bool myWasMaximized;
+    bool myFullScreen;
+    bool myWasMaximized;
 
-	bool myCursorIsHyperlink;
-	QCursor myStoredCursor;
+    bool myCursorIsHyperlink;
+#ifndef QT_NO_CURSOR
+    QCursor myStoredCursor;
+#endif
 
 friend class ZLQtViewWidgetPositionInfo;
 
 private:
-	class LineEditParameter : public QLineEdit, public VisualParameter {
+    class LineEditParameter : public QLineEdit, public VisualParameter {
 
-	public:
-		LineEditParameter(QToolBar *toolbar, ZLQtApplicationWindow &window, const ZLToolbar::ParameterItem &textFieldItem);
+    public:
+        LineEditParameter(QToolBar *toolbar, ZLQtApplicationWindow &window, const ZLToolbar::ParameterItem &textFieldItem);
 
-	private:
-		void keyReleaseEvent(QKeyEvent *event);
+    private:
+        void keyReleaseEvent(QKeyEvent *event);
 
-		std::string internalValue() const;
-		void internalSetValue(const std::string &value);
-		void setValueList(const std::vector<std::string> &values) {}
+        std::string internalValue() const;
+        void internalSetValue(const std::string &value);
+        void setValueList(const std::vector<std::string> &values) {}
 
-	private:
-		ZLQtApplicationWindow &myWindow;
-		const std::string &myActionId;
-	};
+    private:
+        ZLQtApplicationWindow &myWindow;
+        const std::string &myActionId;
+    };
 };
 
 class ZLQtToolButton : public QToolButton {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	ZLQtToolButton(ZLQtApplicationWindow &window, ZLToolbar::AbstractButtonItem &item);
+    ZLQtToolButton(ZLQtApplicationWindow &window, ZLToolbar::AbstractButtonItem &item);
 
 private slots:
-	void onActivated();
+    void onActivated();
 
 private:
-	ZLQtApplicationWindow &myWindow;
-	ZLToolbar::AbstractButtonItem &myItem;
+    ZLQtApplicationWindow &myWindow;
+    ZLToolbar::AbstractButtonItem &myItem;
 };
 
 #endif /* __ZLQTAPPLICATIONWINDOW_H__ */

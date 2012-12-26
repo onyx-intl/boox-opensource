@@ -12,12 +12,6 @@ ZLQtTime.o: ZLQtTime.cpp ZLQtTime.h /usr/include/qt4/QtCore/QObject \
  /usr/include/qt4/QtCore/qscopedpointer.h \
  /usr/include/qt4/QtCore/QTimerEvent /usr/include/qt4/QtCore/qcoreevent.h \
  ../../../../core/src/unix/time/ZLUnixTime.h \
-<<<<<<< HEAD
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTimeManager.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h
-=======
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTimeManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTimeManager.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h

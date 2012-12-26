@@ -1,76 +1,37 @@
 ZLTextSelectionModel.o: ZLTextSelectionModel.cpp \
-<<<<<<< HEAD
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLApplication.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLBoolean3.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTime.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLMessage.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLView.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTypeId.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLUnicodeUtil.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLibrary.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLApplication.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/shared_ptr.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOptions.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLColor.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTime.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLResource.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLMessage.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLView.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTypeId.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLUnicodeUtil.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLibrary.h \
  ZLTextSelectionModel.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOpenFileDialog.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLDialogManager.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLRunnable.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOpenFileDialog.h \
  ZLTextParagraphCursor.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/allocator.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextModel.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraph.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextKind.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextAlignmentType.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextFontModifier.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextMark.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRowMemoryAllocator.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/allocator.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextModel.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraph.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextKind.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextAlignmentType.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextFontModifier.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextMark.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRowMemoryAllocator.h \
  ZLTextElement.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLImageManager.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLImageManager.h \
  ZLTextWord.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLPaintContext.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLPaintContext.h \
  ZLTextArea.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraphCursor.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRectangle.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextStyle.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextElement.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraphCursor.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRectangle.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextStyle.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextElement.h \
  ZLTextAreaStyle.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextArea.h
-=======
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLApplication.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLBoolean3.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTime.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLMessage.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLView.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLTypeId.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLUnicodeUtil.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLibrary.h \
- ZLTextSelectionModel.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLOpenFileDialog.h \
- ZLTextParagraphCursor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/allocator.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextModel.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraph.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextKind.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextAlignmentType.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextFontModifier.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextMark.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRowMemoryAllocator.h \
- ZLTextElement.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLImageManager.h \
- ZLTextWord.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/core/include/ZLPaintContext.h \
- ZLTextArea.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextParagraphCursor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextRectangle.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextStyle.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextElement.h \
- ZLTextAreaStyle.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextArea.h
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/text/../../zlibrary/text/include/ZLTextArea.h

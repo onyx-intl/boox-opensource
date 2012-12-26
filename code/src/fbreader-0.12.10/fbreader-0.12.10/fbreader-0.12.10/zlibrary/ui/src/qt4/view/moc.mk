@@ -1,1 +1,0 @@
-SRCMOC = ZLQtViewWidget.moc.cpp

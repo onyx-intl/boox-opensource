@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,22 +50,16 @@ public:
 	virtual bool readDocument(const std::string &fileName);
 
 protected:
-    enum DestinationType {
-        DESTINATION_NONE,
-        DESTINATION_SKIP,           ///< Skip text read
-        DESTINATION_INFO,
-        DESTINATION_TITLE,
-        DESTINATION_AUTHOR,
-        DESTINATION_PICTURE,
-        DESTINATION_FONTTBL,        ///< Font table
-        DESTINATION_COLORTBL,       ///< Color table
-        DESTINATION_STYLESHEET,     ///< Styel sheet table
-        DESTINATION_FOOTNOTE,
-        DESTINATION_TABLE,
-        DESTINATION_BULLET,
-        DESTINATION_DRAWING,
-        DESTINATION_SKIPGROUP      ///< \*
-    };
+	enum DestinationType {
+		DESTINATION_NONE,
+		DESTINATION_SKIP,
+		DESTINATION_INFO,
+		DESTINATION_TITLE,
+		DESTINATION_AUTHOR,
+		DESTINATION_PICTURE,
+		DESTINATION_STYLESHEET,
+		DESTINATION_FOOTNOTE,
+	};
 
 	enum FontProperty {
 		FONT_BOLD,

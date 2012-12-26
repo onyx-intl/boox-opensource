@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
  */
 
 #include <cctype>
-#include <string.h>
+#include <cstring>
 
 #include <ZLStringUtil.h>
 #include <ZLInputStream.h>
@@ -34,7 +34,7 @@ void StyleSheetTableParser::storeData(const std::string &tagName, const std::str
 
 shared_ptr<ZLTextStyleEntry> StyleSheetSingleStyleParser::parseString(const char *text) {
 	myReadState = ATTRIBUTE_NAME;
-	parse(text, strlen(text));
+	parse(text, strlen(text), true);
 	shared_ptr<ZLTextStyleEntry> control = StyleSheetTable::createControl(myMap);
 	reset();
 	return control;
@@ -71,7 +71,7 @@ void StyleSheetParser::parse(ZLInputStream &stream) {
 	}
 }
 
-void StyleSheetParser::parse(const char *text, int len) {
+void StyleSheetParser::parse(const char *text, int len, bool final) {
 	const char *start = text;
 	const char *end = text + len;
 	for (const char *ptr = start; ptr != end; ++ptr) {
@@ -94,6 +94,10 @@ void StyleSheetParser::parse(const char *text, int len) {
 	}
 	if (start < end) {
 		myWord.append(start, end - start);
+		if (final) {
+			processWord(myWord);
+			myWord.erase();
+		}
 	}
 }
 

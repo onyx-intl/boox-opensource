@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ inline static char convertXDigit(char d) {
 
 void RtfImage::read() const {
 	shared_ptr<ZLInputStream> stream = ZLFile(myFileName).inputStream();
-	if (stream && stream->open()) {
-          myData.reset(new std::string());
+	if (!stream.isNull() && stream->open()) {
+		myData = new std::string();
 		myData->reserve(myLength / 2);
 		stream->seek(myStartOffset, false);
 		const size_t bufferSize = 1024;
@@ -56,7 +56,7 @@ void RtfImage::read() const {
 }
 
 const shared_ptr<std::string> RtfImage::stringData() const {
-	if (!myData) {
+	if (myData.isNull()) {
 		read();
 	}
 	return myData;

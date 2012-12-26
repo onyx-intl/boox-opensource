@@ -56,60 +56,32 @@ ZLQtApplicationWindow.o: ZLQtApplicationWindow.cpp \
  /usr/include/qt4/QtCore/qset.h /usr/include/qt4/QtGui/QDockWidget \
  /usr/include/qt4/QtGui/qdockwidget.h /usr/include/qt4/QtCore/QObjectList \
  /usr/include/qt4/QtCore/qobject.h \
-<<<<<<< HEAD
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPopupData.h \
-=======
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPopupData.h \
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLibrary.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLPopupData.h \
  ZLQtApplicationWindow.h /usr/include/qt4/QtGui/QMainWindow \
  /usr/include/qt4/QtGui/qmainwindow.h /usr/include/qt4/QtGui/qtabwidget.h \
  /usr/include/qt4/QtGui/QAction /usr/include/qt4/QtGui/qaction.h \
  /usr/include/qt4/QtGui/QCursor /usr/include/qt4/QtGui/qcursor.h \
  ../../../../core/src/desktop/application/ZLDesktopApplicationWindow.h \
-<<<<<<< HEAD
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
  ../../../../core/src/desktop/application/../../application/ZLApplicationWindow.h \
  ../../../../core/src/desktop/application/../../application/ZLApplication.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
  ../../../../core/src/desktop/application/../../application/ZLToolbar.h \
  ../dialogs/ZLQtDialogManager.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOpenFileDialog.h \
-=======
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOptions.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLColor.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLBoolean3.h \
- ../../../../core/src/desktop/application/../../application/ZLApplicationWindow.h \
- ../../../../core/src/desktop/application/../../application/ZLApplication.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/shared_ptr.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTime.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLResource.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLMessage.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLView.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLTypeId.h \
- ../../../../core/src/desktop/application/../../application/ZLToolbar.h \
- ../dialogs/ZLQtDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogManager.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOpenFileDialog.h \
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLDialogManager.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLRunnable.h \
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLOpenFileDialog.h \
  ../view/ZLQtViewWidget.h /usr/include/qt4/QtGui/QWidget \
  /usr/include/qt4/QtGui/qwidget.h \
  ../view/../../../../core/src/view/ZLViewWidget.h \
  ../view/../../../../core/src/view/ZLView.h \
-<<<<<<< HEAD
- /home/weihuahuang/code/imx508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
-=======
- /home/weihuahuang/downloads/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+ /home/hejh/code/IMX508/boox-opensource/code/src/fbreader-0.12.10/zlibrary/ui/../../zlibrary/core/include/ZLApplication.h \
  ../util/ZLQtKeyUtil.h ../util/../../../../core/src/util/ZLKeyUtil.h

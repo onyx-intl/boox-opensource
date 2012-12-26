@@ -33,57 +33,57 @@ ZLQtProgressDialog::ZLQtProgressDialog(const ZLResourceKey &key) : ZLProgressDia
 }
 
 void ZLQtProgressDialog::run(ZLRunnable &runnable) {
-	myWaitMessage = new ZLQtWaitMessage(messageText());
-	runnable.run();
-	delete myWaitMessage;
-	myWaitMessage = 0;
+    myWaitMessage = new ZLQtWaitMessage(messageText());
+    runnable.run();
+    delete myWaitMessage;
+    myWaitMessage = 0;
 }
 
 void ZLQtProgressDialog::setMessage(const std::string &message) {
-	if (myWaitMessage == 0) {
-		return;
-	}
+    if (myWaitMessage == 0) {
+        return;
+    }
 
-	myWaitMessage->myLabel->setText(::qtString(message));
+    myWaitMessage->myLabel->setText(::qtString(message));
 
-	myWaitMessage->myLayout->invalidate();
-	myWaitMessage->repaint();
-	qApp->processEvents();
+    myWaitMessage->myLayout->invalidate();
+    myWaitMessage->repaint();
+    qApp->processEvents();
 }
 
 ZLQtWaitMessage::ZLQtWaitMessage(const std::string &message) : QWidget(0, Qt::SplashScreen) {
-	QWidget *main = qApp->activeWindow();
-	if (main != 0) {
-		myMainWidget = main;
-		myStoredCursor = main->cursor();
-		myMainWidget->setCursor(Qt::WaitCursor);
-	} else {
-		myMainWidget = 0;
-	}
-	setCursor(Qt::WaitCursor);
+    QWidget *main = qApp->activeWindow();
+    if (main != 0) {
+        myMainWidget = main;
+        //myStoredCursor = main->cursor();
+        //myMainWidget->setCursor(Qt::WaitCursor);
+    } else {
+        myMainWidget = 0;
+    }
+    //setCursor(Qt::WaitCursor);
 
-	qApp->processEvents();
+    qApp->processEvents();
 
-	myLayout = new QBoxLayout(QBoxLayout::LeftToRight, this);
-	myLabel = new QLabel(::qtString(message), this);
-	myLayout->addWidget(myLabel);
+    myLayout = new QBoxLayout(QBoxLayout::LeftToRight, this);
+    myLabel = new QLabel(::qtString(message), this);
+    myLayout->addWidget(myLabel);
 
-	if (main == 0) {
-		main = QApplication::desktop();
-	}
-	move(
-		main->x() + main->width() / 2 - myLabel->width() / 2 - 10,
-		main->y() + main->height() / 2 - myLabel->height() / 2 - 10
-	);
-	show();
+    if (main == 0) {
+        main = QApplication::desktop();
+    }
+    move(
+        main->x() + main->width() / 2 - myLabel->width() / 2 - 10,
+        main->y() + main->height() / 2 - myLabel->height() / 2 - 10
+    );
+    show();
 
-	qApp->processEvents();
-	usleep(5000);
-	qApp->processEvents();
+    qApp->processEvents();
+    usleep(5000);
+    qApp->processEvents();
 }
 
 ZLQtWaitMessage::~ZLQtWaitMessage() {
-	if (myMainWidget != 0) {
-		myMainWidget->setCursor(myStoredCursor);
-	}
+    if (myMainWidget != 0) {
+        //myMainWidget->setCursor(myStoredCursor);
+    }
 }

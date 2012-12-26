@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@
 
 EntityFilesCollector *EntityFilesCollector::ourInstance = 0;
 
-EntityFilesCollector &EntityFilesCollector::instance() {
+EntityFilesCollector &EntityFilesCollector::Instance() {
 	if (ourInstance == 0) {
 		ourInstance = new EntityFilesCollector();
 	}
 	return *ourInstance;
 }
-
+	
 const std::vector<std::string> &EntityFilesCollector::externalDTDs(const std::string &format) {
 	std::map<std::string,std::vector<std::string> >::const_iterator it = myCollections.find(format);
 	if (it != myCollections.end()) {
@@ -45,7 +45,7 @@ const std::vector<std::string> &EntityFilesCollector::externalDTDs(const std::st
 		ZLibrary::ApplicationDirectory() + ZLibrary::FileNameDelimiter +
 		"formats" + ZLibrary::FileNameDelimiter + format;
 	shared_ptr<ZLDir> dtdPath = ZLFile(directoryName).directory();
-	if (dtdPath) {
+	if (!dtdPath.isNull()) {
 		std::vector<std::string> files;
 		dtdPath->collectFiles(files, false);
 		for (std::vector<std::string>::const_iterator it = files.begin(); it != files.end(); ++it) {

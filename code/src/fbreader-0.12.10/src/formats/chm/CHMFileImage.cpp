@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ CHMFileImage::CHMFileImage(shared_ptr<CHMFileInfo> info, const std::string &entr
 
 shared_ptr<ZLInputStream> CHMFileImage::inputStream() const {
 	shared_ptr<ZLInputStream> baseStream = ZLFile(myInfo->fileName()).inputStream();
-	if (!baseStream || !baseStream->open()) {
-          return shared_ptr<ZLInputStream>();
+	if (baseStream.isNull() || !baseStream->open()) {
+		return 0;
 	}
 	return myInfo->entryStream(baseStream, myEntry);
 }

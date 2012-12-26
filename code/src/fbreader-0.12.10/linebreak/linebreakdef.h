@@ -4,7 +4,7 @@
  * Line breaking in a Unicode sequence.  Designed to be used in a
  * generic text renderer.
  *
- * Copyright (C) 2008-2009 Wu Yongwei <wuyongwei at gmail dot com>
+ * Copyright (C) 2008-2011 Wu Yongwei <wuyongwei at gmail dot com>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the author be held liable for any damages
@@ -30,9 +30,9 @@
  * Unicode 5.0.0:
  *		<URL:http://www.unicode.org/reports/tr14/tr14-19.html>
  *
- * This library has been updated according to Revision 22, for
- * Unicode 5.1.0:
- *		<URL:http://www.unicode.org/reports/tr14/tr14-22.html>
+ * This library has been updated according to Revision 26, for
+ * Unicode 6.0.0:
+ *		<URL:http://www.unicode.org/reports/tr14/tr14-26.html>
  *
  * The Unicode Terms of Use are available at
  *		<URL:http://www.unicode.org/copyright.html>
@@ -44,7 +44,7 @@
  * Definitions of internal data structures, declarations of global
  * variables, and function prototypes for the line breaking algorithm.
  *
- * @version	1.1.1, 2009/01/29
+ * @version	2.1, 2011/05/07
  * @author	Wu Yongwei
  */
 
@@ -56,7 +56,7 @@
 
 /**
  * Line break classes.  This is a direct mapping of Table 1 of Unicode
- * Standard Annex 14, Revision 19.
+ * Standard Annex 14, Revision 26.
  */
 enum LineBreakClass
 {
@@ -66,6 +66,7 @@ enum LineBreakClass
 	/* The following break classes are treated in the pair table. */
 	LBP_OP,			/**< Opening punctuation */
 	LBP_CL,			/**< Closing punctuation */
+	LBP_CP,			/**< Closing parenthesis */
 	LBP_QU,			/**< Ambiguous quotation */
 	LBP_GL,			/**< Glue */
 	LBP_NS,			/**< Non-starters */
@@ -127,8 +128,8 @@ struct LineBreakPropertiesLang
 };
 
 /**
- * Abstract function interface for #get_next_char_utf8,
- * #get_next_char_utf16, and #get_next_char_utf32.
+ * Abstract function interface for #lb_get_next_char_utf8,
+ * #lb_get_next_char_utf16, and #lb_get_next_char_utf32.
  */
 typedef utf32_t (*get_next_char_t)(const void *, size_t, size_t *);
 
@@ -136,65 +137,13 @@ typedef utf32_t (*get_next_char_t)(const void *, size_t, size_t *);
 extern struct LineBreakProperties lb_prop_default[];
 extern struct LineBreakPropertiesLang lb_prop_lang_map[];
 
-/* Function Prototypes */
-
-/**
- * Sets the line breaking information for a generic input string.
- *
- * @param[in]  s			input string
- * @param[in]  len			length of the input
- * @param[in]  lang			language of the input
- * @param[out] brks			pointer to the output breaking data,
- *							containing #LINEBREAK_MUSTBREAK,
- *							#LINEBREAK_ALLOWBREAK, #LINEBREAK_NOBREAK,
- *							or #LINEBREAK_INSIDEACHAR
- * @param[in] get_next_char	function to get the next UTF-32 character
- */
+/* Function Prototype */
+utf32_t lb_get_next_char_utf8(const utf8_t *s, size_t len, size_t *ip);
+utf32_t lb_get_next_char_utf16(const utf16_t *s, size_t len, size_t *ip);
+utf32_t lb_get_next_char_utf32(const utf32_t *s, size_t len, size_t *ip);
 void set_linebreaks(
 		const void *s,
 		size_t len,
 		const char *lang,
 		char *brks,
 		get_next_char_t get_next_char);
-
-/**
- * Gets the next Unicode character in a UTF-8 sequence.  The index will
- * be advanced to the next complete character.
- * <p><b>Nota bene:</b> <em>This function will be prefixed with \c lb_
- * in the future.</em></p>
- *
- * @param[in]     s		input UTF-8 string
- * @param[in]     len	length of the string in bytes
- * @param[in,out] ip	pointer to the index
- * @return				the Unicode character beginning at the index; or
- *						#EOS if end of input is encountered
- */
-utf32_t get_next_char_utf8(const utf8_t *s, size_t len, size_t *ip);
-
-/**
- * Gets the next Unicode character in a UTF-16 sequence.  The index will
- * be advanced to the next complete character.
- * <p><b>Nota bene:</b> <em>This function will be prefixed with \c lb_
- * in the future.</em></p>
- *
- * @param[in]     s		input UTF-16 string
- * @param[in]     len	length of the string in words
- * @param[in,out] ip	pointer to the index
- * @return				the Unicode character beginning at the index; or
- *						#EOS if end of input is encountered
- */
-utf32_t get_next_char_utf16(const utf16_t *s, size_t len, size_t *ip);
-
-/**
- * Gets the next Unicode character in a UTF-32 sequence.  The index will
- * be advanced to the next character.
- * <p><b>Nota bene:</b> <em>This function will be prefixed with \c lb_
- * in the future.</em></p>
- *
- * @param[in]     s		input UTF-32 string
- * @param[in]     len	length of the string in dwords
- * @param[in,out] ip	pointer to the index
- * @return				the Unicode character beginning at the index; or
- *						#EOS if end of input is encountered
- */
-utf32_t get_next_char_utf32(const utf32_t *s, size_t len, size_t *ip);

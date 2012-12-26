@@ -35,27 +35,27 @@ class ZLQtWaitMessage;
 class ZLQtProgressDialog : public ZLProgressDialog {
 
 public:
-	ZLQtProgressDialog(const ZLResourceKey &key);
+    ZLQtProgressDialog(const ZLResourceKey &key);
 
 private:
-	void run(ZLRunnable &runnable);
-	void setMessage(const std::string &message);
+    void run(ZLRunnable &runnable);
+    void setMessage(const std::string &message);
 
 private:
-	ZLQtWaitMessage *myWaitMessage;
+    ZLQtWaitMessage *myWaitMessage;
 };
 
 class ZLQtWaitMessage : public QWidget {
 
 public:
-	ZLQtWaitMessage(const std::string &message);
-	~ZLQtWaitMessage();
+    ZLQtWaitMessage(const std::string &message);
+    ~ZLQtWaitMessage();
 
 private:
-	QCursor myStoredCursor;
-	QWidget *myMainWidget;
-	QLayout *myLayout;
-	QLabel *myLabel;
+    //QCursor myStoredCursor;
+    QWidget *myMainWidget;
+    QLayout *myLayout;
+    QLabel *myLabel;
 
 friend class ZLQtProgressDialog;
 };

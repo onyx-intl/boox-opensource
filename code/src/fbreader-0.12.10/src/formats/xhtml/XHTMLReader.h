@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,10 +58,7 @@ private:
 
 public:
 	XHTMLReader(BookReader &modelReader);
-	bool readFile(const std::string &pathPrefix,
-	        const std::string &fileName, const std::string &referenceName,
-	        const std::string &aesKey = std::string());
-	bool readFile(const std::string &pathPrefix, shared_ptr<ZLInputStream> stream, const std::string &referenceName);
+	bool readFile(const std::string &filePath, const std::string &referenceName);
 
 private:
 	void startElementHandler(const char *tag, const char **attributes);
@@ -69,6 +66,8 @@ private:
 	void characterDataHandler(const char *text, size_t len);
 
 	const std::vector<std::string> &externalDTDs() const;
+
+	bool processNamespaces() const;
 
 	void beginParagraph();
 	void endParagraph();
@@ -78,6 +77,7 @@ private:
 	BookReader &myModelReader;
 	std::string myPathPrefix;
 	std::string myReferenceName;
+	std::string myReferenceDirName;
 	bool myPreformatted;
 	bool myNewParagraphInProgress;
 	StyleSheetTable myStyleSheetTable;
@@ -87,12 +87,20 @@ private:
 	std::vector<bool> myDoPageBreakAfterStack;
 	bool myCurrentParagraphIsEmpty;
 	StyleSheetSingleStyleParser myStyleParser;
+	shared_ptr<StyleSheetTableParser> myTableParser;
+	enum {
+		READ_NOTHING,
+		READ_STYLE,
+		READ_BODY
+	} myReadState;
 
 	friend class XHTMLTagAction;
+	friend class XHTMLTagStyleAction;
 	friend class XHTMLTagLinkAction;
 	friend class XHTMLTagHyperlinkAction;
 	friend class XHTMLTagPreAction;
 	friend class XHTMLTagParagraphAction;
+	friend class XHTMLTagBodyAction;
 	friend class XHTMLTagRestartParagraphAction;
 };
 

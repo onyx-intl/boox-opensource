@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,13 @@
 #define __HTMLDESCRIPTIONREADER_H__
 
 #include "HtmlReader.h"
-#include "../../description/BookDescription.h"
+
+class Book;
 
 class HtmlDescriptionReader : public HtmlReader {
 
 public:
-	HtmlDescriptionReader(BookDescription &description);
+	HtmlDescriptionReader(Book &book);
 	~HtmlDescriptionReader();
 
 protected:
@@ -38,7 +39,8 @@ protected:
 
 private:
 	bool myReadTitle;
-	WritableBookDescription myDescription;
+	std::string myBuffer;
+	Book &myBook;
 };
 
 inline HtmlDescriptionReader::~HtmlDescriptionReader() {}

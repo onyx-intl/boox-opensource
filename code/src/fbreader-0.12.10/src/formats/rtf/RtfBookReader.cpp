@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ static const size_t maxBufferSize = 1024;
 
 void RtfBookReader::addCharData(const char *data, size_t len, bool convert) {
 	if (myCurrentState.ReadText) {
-		if (convert || !myConverter) {
+		if (convert || myConverter.isNull()) {
 			myOutputBuffer.append(data, len);
 			if (myOutputBuffer.size() >= maxBufferSize) {
 				flushBuffer();
@@ -47,8 +47,8 @@ void RtfBookReader::addCharData(const char *data, size_t len, bool convert) {
 
 void RtfBookReader::flushBuffer() {
 	if (!myOutputBuffer.empty()) {
-		if (myCurrentState.ReadText) {
-			if (myConverter) {
+		if (myCurrentState.ReadText) {		
+			if (!myConverter.isNull()) {
 				static std::string newString;
 					myConverter->convert(newString, myOutputBuffer.data(), myOutputBuffer.data() + myOutputBuffer.length());
 				characterDataHandler(newString);
@@ -86,27 +86,27 @@ void RtfBookReader::switchDestination(DestinationType destination, bool on) {
 			if (on) {
 				std::string id;
 				ZLStringUtil::appendNumber(id, myFootnoteIndex++);
-
+			
 				myStateStack.push(myCurrentState);
 				myCurrentState.Id = id;
 				myCurrentState.ReadText = true;
-
-				myBookReader.addHyperlinkControl(FOOTNOTE, id);
+				
+				myBookReader.addHyperlinkControl(FOOTNOTE, id);				
 				myBookReader.addData(id);
 				myBookReader.addControl(FOOTNOTE, false);
-
+				
 				myBookReader.setFootnoteTextModel(id);
 				myBookReader.pushKind(REGULAR);
 				myBookReader.beginParagraph();
 			} else {
 				myBookReader.endParagraph();
 				myBookReader.popKind();
-
+				
 				if (!myStateStack.empty()) {
 					myCurrentState = myStateStack.top();
 					myStateStack.pop();
 				}
-
+				
 				if (myStateStack.empty()) {
 					myBookReader.setMainTextModel();
 				} else {
@@ -120,8 +120,8 @@ void RtfBookReader::switchDestination(DestinationType destination, bool on) {
 void RtfBookReader::insertImage(const std::string &mimeType, const std::string &fileName, size_t startOffset, size_t size) {
 	std::string id;
 	ZLStringUtil::appendNumber(id, myImageIndex++);
-	myBookReader.addImageReference(id);
-	myBookReader.addImage(id, shared_ptr<const ZLImage>(new RtfImage(mimeType, fileName, startOffset, size)));
+	myBookReader.addImageReference(id);	 
+	myBookReader.addImage(id, new RtfImage(mimeType, fileName, startOffset, size));
 }
 
 bool RtfBookReader::characterDataHandler(std::string &str) {
@@ -161,7 +161,7 @@ void RtfBookReader::setFontProperty(FontProperty property) {
 		return;
 	}
 	flushBuffer();
-
+					
 	switch (property) {
 		case FONT_BOLD:
 			if (myState.Bold) {
@@ -173,7 +173,7 @@ void RtfBookReader::setFontProperty(FontProperty property) {
 			break;
 		case FONT_ITALIC:
 			if (myState.Italic) {
-				if (!myState.Bold) {
+				if (!myState.Bold) {				
 					//DPRINT("add style emphasis.\n");
 					myBookReader.pushKind(EMPHASIS);
 					myBookReader.addControl(EMPHASIS, true);
@@ -181,14 +181,14 @@ void RtfBookReader::setFontProperty(FontProperty property) {
 					//DPRINT("add style emphasis and strong.\n");
 					myBookReader.popKind();
 					myBookReader.addControl(STRONG, false);
-
+					
 					myBookReader.pushKind(EMPHASIS);
 					myBookReader.addControl(EMPHASIS, true);
 					myBookReader.pushKind(STRONG);
 					myBookReader.addControl(STRONG, true);
 				}
 			} else {
-				if (!myState.Bold) {
+				if (!myState.Bold) {				
 					//DPRINT("remove style emphasis.\n");
 					myBookReader.addControl(EMPHASIS, false);
 					myBookReader.popKind();
@@ -198,7 +198,7 @@ void RtfBookReader::setFontProperty(FontProperty property) {
 					myBookReader.popKind();
 					myBookReader.addControl(EMPHASIS, false);
 					myBookReader.popKind();
-
+					
 					myBookReader.pushKind(STRONG);
 					myBookReader.addControl(STRONG, true);
 				}

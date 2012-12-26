@@ -23,7 +23,7 @@
 #include <vector>
 #include <string>
 
-#include <fribidi/lib/fribidi.h>
+#include "../fribidi/lib/fribidi.h"
 
 #include <ZLUnicodeUtil.h>
 
@@ -34,33 +34,33 @@ class ZLTextParagraph;
 class ZLTextParagraphBuilder {
 
 public:
-	ZLTextParagraphBuilder(const std::string &language, const ZLTextParagraph &paragraph, const std::vector<ZLTextMark> &marks, int index, ZLTextElementVector &elements);
-	void fill();
+    ZLTextParagraphBuilder(const std::string &language, const ZLTextParagraph &paragraph, const std::vector<ZLTextMark> &marks, int index, ZLTextElementVector &elements);
+    void fill();
 
 private:
-	void processTextEntry(const ZLTextEntry &textEntry);
-	void addWord(const char *ptr, int offset, int len);
-	void updateBidiLevel(FriBidiLevel bidiLevel);
-	void insertRSElement();
+    void processTextEntry(const ZLTextEntry &textEntry);
+    void addWord(const char *ptr, int offset, int len);
+    void updateBidiLevel(FriBidiLevel bidiLevel);
+    void insertRSElement();
 
 private:
-	const ZLTextParagraph &myParagraph;
-	ZLTextElementVector &myElements;
+    const ZLTextParagraph &myParagraph;
+    ZLTextElementVector &myElements;
 
-	std::vector<ZLTextMark>::const_iterator myFirstMark;
-	std::vector<ZLTextMark>::const_iterator myLastMark;
-	int myOffset;
+    std::vector<ZLTextMark>::const_iterator myFirstMark;
+    std::vector<ZLTextMark>::const_iterator myLastMark;
+    int myOffset;
 
-	const std::string myLanguage;
+    const std::string myLanguage;
 
-	std::vector<char> myBreaksTable;
+    std::vector<char> myBreaksTable;
 
-	FriBidiCharType myBidiCharType;
-	ZLUnicodeUtil::Ucs4String myUcs4String;
-	std::vector<FriBidiLevel> myBidiLevels;
-	const FriBidiLevel myBaseBidiLevel;
-	FriBidiLevel myCurrentBidiLevel;
-	FriBidiLevel myLatestBidiLevel;
+    FriBidiCharType myBidiCharType;
+    ZLUnicodeUtil::Ucs4String myUcs4String;
+    std::vector<FriBidiLevel> myBidiLevels;
+    const FriBidiLevel myBaseBidiLevel;
+    FriBidiLevel myCurrentBidiLevel;
+    FriBidiLevel myLatestBidiLevel;
 };
 
 #endif /* __ZLTEXTPARAGRAPHBUILDER_H__ */

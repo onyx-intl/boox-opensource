@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
-#include <stdlib.h>
-
+#include <cstring>
+#include <cstdlib>
 #include <algorithm>
 
 #include <ZLUnicodeUtil.h>
@@ -29,6 +28,7 @@
 #include "../xhtml/XHTMLReader.h"
 #include "../util/MiscUtil.h"
 #include "../../bookmodel/BookModel.h"
+#include "../../library/Book.h"
 
 ORBookReader::ORBookReader(BookModel &model) : myModelReader(model) {
 }
@@ -127,8 +127,9 @@ void ORBookReader::endElementHandler(const char *tag) {
 	}
 }
 
-bool ORBookReader::readBook(const std::string &fileName) {
-	myFilePrefix = MiscUtil::htmlDirectoryPrefix(fileName);
+bool ORBookReader::readBook() {
+	const std::string &filePath = myModelReader.model().book()->filePath();
+	myFilePrefix = MiscUtil::htmlDirectoryPrefix(filePath);
 
 	myResources.clear();
 	myCoverReference.erase();
@@ -138,7 +139,7 @@ bool ORBookReader::readBook(const std::string &fileName) {
 	myTOC.clear();
 	myState = READ_NONE;
 
-	if (!readDocument(fileName)) {
+	if (!readDocument(filePath)) {
 		return false;
 	}
 
@@ -151,7 +152,7 @@ bool ORBookReader::readBook(const std::string &fileName) {
 
 	for (std::vector<std::string>::const_iterator it = myHtmlFilesOrder.begin(); it != myHtmlFilesOrder.end(); ++it) {
 		myHtmlFileIDs.erase(*it);
-		XHTMLReader(myModelReader).readFile(myFilePrefix, myResources[*it], *it);
+		XHTMLReader(myModelReader).readFile(myFilePrefix + myResources[*it], *it);
 	}
 
 	int level = 1;
@@ -173,11 +174,11 @@ bool ORBookReader::readBook(const std::string &fileName) {
 	for (std::set<std::string>::const_iterator it = myHtmlFileIDs.begin(); it != myHtmlFileIDs.end(); ++it) {
 		myModelReader.setFootnoteTextModel(*it);
 		myModelReader.pushKind(REGULAR);
-		XHTMLReader(myModelReader).readFile(myFilePrefix, myResources[*it], *it);
+		XHTMLReader(myModelReader).readFile(myFilePrefix + myResources[*it], *it);
 	}
 
 	for (std::map<std::string,std::string>::const_iterator it = myImageIDs.begin(); it != myImageIDs.end(); ++it) {
-          myModelReader.addImage(it->first, shared_ptr<const ZLImage>(new ZLFileImage(it->second, myFilePrefix + myResources[it->first], 0)));
+		myModelReader.addImage(it->first, new ZLFileImage(it->second, myFilePrefix + myResources[it->first], 0));
 	}
 
 	return true;

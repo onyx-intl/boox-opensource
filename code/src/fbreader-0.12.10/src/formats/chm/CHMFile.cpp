@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
+#include <cstring>
 
 #include <ZLFile.h>
 #include <ZLStringUtil.h>
@@ -83,8 +83,8 @@ bool CHMInputStream::open() {
 	myOffset = 0;
 	myDoSkip = true;
 	myBaseIndex = myBaseStartIndex;
-	if (!myDecompressor) {
-          myDecompressor.reset(new LZXDecompressor(mySectionInfo.WindowSizeIndex));
+	if (myDecompressor.isNull()) {
+		myDecompressor = new LZXDecompressor(mySectionInfo.WindowSizeIndex);
 	} else {
 		myDecompressor->reset();
 	}
@@ -142,7 +142,7 @@ size_t CHMInputStream::do_read(char *buffer, size_t maxSize) {
 }
 
 void CHMInputStream::close() {
-  myDecompressor.reset();
+	myDecompressor = 0;
 }
 
 void CHMInputStream::seek(int offset, bool absoluteOffset) {
@@ -168,25 +168,25 @@ size_t CHMInputStream::sizeOfOpened() {
 shared_ptr<ZLInputStream> CHMFileInfo::entryStream(shared_ptr<ZLInputStream> base, const std::string &name) const {
 	RecordMap::const_iterator it = myRecords.find(ZLUnicodeUtil::toLower(name));
 	if (it == myRecords.end()) {
-          return shared_ptr<ZLInputStream>();
+		return 0;
 	}
 	const RecordInfo &recordInfo = it->second;
 	if (recordInfo.Length == 0) {
-          return shared_ptr<ZLInputStream>();
+		return 0;
 	}
 	if (recordInfo.Section == 0) {
 		// TODO: implement
-          return shared_ptr<ZLInputStream>();
+		return 0;
 	}
 	if (recordInfo.Section > mySectionInfos.size()) {
-          return shared_ptr<ZLInputStream>();
+		return 0;
 	}
 	const SectionInfo &sectionInfo = mySectionInfos[recordInfo.Section - 1];
 	if (recordInfo.Offset + recordInfo.Length > sectionInfo.UncompressedSize) {
-          return shared_ptr<ZLInputStream>();
+		return 0;
 	}
 
-	return shared_ptr<ZLInputStream>(new CHMInputStream(base, sectionInfo, recordInfo.Offset, recordInfo.Length));
+	return new CHMInputStream(base, sectionInfo, recordInfo.Offset, recordInfo.Length);
 }
 
 CHMFileInfo::CHMFileInfo(const std::string &fileName) : myFileName(fileName) {
@@ -228,7 +228,7 @@ bool CHMFileInfo::init(ZLInputStream &stream) {
 		// QWORD section 0 offset
 		// QWORD section 0 length
 		stream.seek(4 * 4 + 2 * 0x10 + 2 * 8, false);
-
+		
 		unsigned long long sectionOffset1 = readUnsignedQWord(stream);
 		unsigned long long sectionLength1 = readUnsignedQWord(stream);
 		mySection0Offset = sectionOffset1 + sectionLength1;
@@ -282,7 +282,7 @@ bool CHMFileInfo::init(ZLInputStream &stream) {
 						name = ZLUnicodeUtil::toLower(name);
 					}
 					myRecords.insert(
-						std::pair<std::string,CHMFileInfo::RecordInfo>(
+						std::make_pair(
 							name,
 							CHMFileInfo::RecordInfo(contentSection, offset, length)
 						)
@@ -432,7 +432,7 @@ bool CHMFileInfo::FileNames::empty() const {
 CHMFileInfo::FileNames CHMFileInfo::sectionNames(shared_ptr<ZLInputStream> base) const {
 	FileNames names;
 	shared_ptr<ZLInputStream> stringsStream = entryStream(base, "/#STRINGS");
-	if (stringsStream && stringsStream->open()) {
+	if (!stringsStream.isNull() && stringsStream->open()) {
 		std::vector<std::string> fileNames;
 		int tocIndex = -1;
 		int indexIndex = -1;

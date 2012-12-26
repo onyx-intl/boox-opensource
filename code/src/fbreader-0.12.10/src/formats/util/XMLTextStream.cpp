@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,12 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
+#include <cstring>
 
 #include <ZLXMLReader.h>
 #include <ZLUnicodeUtil.h>
+
+#include <ZLPlainAsynchronousInputStream.h>
 
 #include "XMLTextStream.h"
 
@@ -42,7 +44,7 @@ private:
 XMLTextReader::XMLTextReader(std::string &buffer, const std::string &startTag) : myStartTag(ZLUnicodeUtil::toLower(startTag)), myBuffer(buffer), myStarted(myStartTag.empty()) {
 }
 
-void XMLTextReader::startElementHandler(const char *tag, const char **attributes) {
+void XMLTextReader::startElementHandler(const char *tag, const char**) {
 	if (!myStarted && (myStartTag == ZLUnicodeUtil::toLower(tag))) {
 		myStarted = true;
 	}
@@ -55,7 +57,7 @@ void XMLTextReader::characterDataHandler(const char *text, size_t len) {
 }
 
 XMLTextStream::XMLTextStream(shared_ptr<ZLInputStream> base, const std::string &startTag) : myBase(base), myStreamBuffer(2048, '\0') {
-  myReader.reset(new XMLTextReader(myDataBuffer, startTag));
+	myReader = new XMLTextReader(myDataBuffer, startTag);
 }
 
 XMLTextStream::~XMLTextStream() {
@@ -63,10 +65,10 @@ XMLTextStream::~XMLTextStream() {
 
 bool XMLTextStream::open() {
 	close();
-	if (!myBase || !myBase->open()) {
-          return false;
+	if (myBase.isNull() || !myBase->open()) {
+		return false;
 	}
-	myReader->initialize();
+	myStream = new ZLPlainAsynchronousInputStream();
 	myOffset = 0;
 	return true;
 }
@@ -74,7 +76,14 @@ bool XMLTextStream::open() {
 size_t XMLTextStream::read(char *buffer, size_t maxSize) {
 	while (myDataBuffer.size() < maxSize) {
 		size_t len = myBase->read((char*)myStreamBuffer.data(), 2048);
-		if ((len == 0) || !myReader->readFromBuffer(myStreamBuffer.data(), len)) {
+		/*if ((len == 0) || !myReader->readFromBuffer(myStreamBuffer.data(), len)) {
+			break;
+		}*/
+		if (len == 0) {
+			break;
+		}
+		myStream->setBuffer(myStreamBuffer.data(), len);
+		if (!myReader->readDocument(myStream)) {
 			break;
 		}
 	}
@@ -88,7 +97,11 @@ size_t XMLTextStream::read(char *buffer, size_t maxSize) {
 }
 
 void XMLTextStream::close() {
-	myReader->shutdown();
+	if (!myStream.isNull()) {
+		myStream->setEof();
+		myReader->readDocument(myStream);
+		myStream.reset();
+	}
 	myBase->close();
 	myDataBuffer.erase();
 }

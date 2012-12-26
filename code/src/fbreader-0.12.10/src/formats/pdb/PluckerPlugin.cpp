@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@
 #include "PdbPlugin.h"
 #include "PluckerBookReader.h"
 #include "PluckerTextStream.h"
-#include "../../description/BookDescription.h"
+
+#include "../../library/Book.h"
 
 bool PluckerPlugin::providesMetaInfo() const {
 	return false;
@@ -32,20 +33,20 @@ bool PluckerPlugin::acceptsFile(const ZLFile &file) const {
 	return PdbPlugin::fileType(file) == "DataPlkr";
 }
 
-bool PluckerPlugin::readDescription(const std::string &path, BookDescription &description) const {
-	ZLFile file(path);
+bool PluckerPlugin::readMetaInfo(Book &book) const {
+	ZLFile file(book.filePath());
 
-	shared_ptr<ZLInputStream> stream(new PluckerTextStream(file));
-	detectEncodingAndLanguage(description, *stream);
-	if (description.encoding().empty()) {
+	shared_ptr<ZLInputStream> stream = new PluckerTextStream(file);
+	detectEncodingAndLanguage(book, *stream);
+	if (book.encoding().empty()) {
 		return false;
 	}
 
 	return true;
 }
 
-bool PluckerPlugin::readModel(const BookDescription &description, BookModel &model) const {
-	return PluckerBookReader(description.fileName(), model, description.encoding()).readDocument();
+bool PluckerPlugin::readModel(BookModel &model) const {
+	return PluckerBookReader(model).readDocument();
 }
 
 const std::string &PluckerPlugin::iconName() const {

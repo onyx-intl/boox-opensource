@@ -1,1 +1,0 @@
-../src/area/ZLTextWord.h

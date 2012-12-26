@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,6 @@ HtmlHeaderTagAction::HtmlHeaderTagAction(HtmlBookReader &reader, FBTextKind kind
 }
 
 void HtmlHeaderTagAction::run(const HtmlReader::HtmlTag &tag) {
-	bookReader().endParagraph();
 	myReader.myIsStarted = false;
 	if (tag.Start) {
 		if (myReader.myBuildTableOfContent && !myReader.myIgnoreTitles) {
@@ -179,7 +178,7 @@ void HtmlImageTagAction::run(const HtmlReader::HtmlTag &tag) {
 				if (ZLFile(filePath).exists()) {
 					bookReader().addImageReference(fileName);
 					bookReader().addImage(fileName,
-                                                              shared_ptr<const ZLImage>(new ZLFileImage("image/auto", filePath, 0))
+						new ZLFileImage("image/auto", filePath, 0)
 					);
 				}
 				break;
@@ -277,7 +276,7 @@ HtmlStyleTagAction::HtmlStyleTagAction(HtmlBookReader &reader) : HtmlTagAction(r
 }
 
 void HtmlStyleTagAction::run(const HtmlReader::HtmlTag &tag) {
-  myReader.myStyleSheetParser = tag.Start ? shared_ptr<StyleSheetTableParser>(new StyleSheetTableParser(myReader.myStyleSheetTable)) : shared_ptr<StyleSheetTableParser>();
+	myReader.myStyleSheetParser = tag.Start ? new StyleSheetTableParser(myReader.myStyleSheetTable) : 0;
 	/*
 	if (!tag.Start) {
 		myReader.myStyleSheetTable.dump();
@@ -287,77 +286,77 @@ void HtmlStyleTagAction::run(const HtmlReader::HtmlTag &tag) {
 
 shared_ptr<HtmlTagAction> HtmlBookReader::createAction(const std::string &tag) {
 	if (tag == "EM") {
-          return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, EMPHASIS));
+		return new HtmlControlTagAction(*this, EMPHASIS);
 	} else if (tag == "STRONG") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, STRONG));
+		return new HtmlControlTagAction(*this, STRONG);
 	} else if (tag == "B") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, BOLD));
+		return new HtmlControlTagAction(*this, BOLD);
 	} else if (tag == "I") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, ITALIC));
+		return new HtmlControlTagAction(*this, ITALIC);
 	} else if (tag == "TT") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, CODE));
+		return new HtmlControlTagAction(*this, CODE);
 	} else if (tag == "CODE") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, CODE));
+		return new HtmlControlTagAction(*this, CODE);
 	} else if (tag == "CITE") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, CITE));
+		return new HtmlControlTagAction(*this, CITE);
 	} else if (tag == "SUB") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, SUB));
+		return new HtmlControlTagAction(*this, SUB);
 	} else if (tag == "SUP") {
-		return shared_ptr<HtmlTagAction>(new HtmlControlTagAction(*this, SUP));
+		return new HtmlControlTagAction(*this, SUP);
 	} else if (tag == "H1") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H1));
+		return new HtmlHeaderTagAction(*this, H1);
 	} else if (tag == "H2") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H2));
+		return new HtmlHeaderTagAction(*this, H2);
 	} else if (tag == "H3") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H3));
+		return new HtmlHeaderTagAction(*this, H3);
 	} else if (tag == "H4") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H4));
+		return new HtmlHeaderTagAction(*this, H4);
 	} else if (tag == "H5") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H5));
+		return new HtmlHeaderTagAction(*this, H5);
 	} else if (tag == "H6") {
-		return shared_ptr<HtmlTagAction>(new HtmlHeaderTagAction(*this, H6));
+		return new HtmlHeaderTagAction(*this, H6);
 	} else if (tag == "HEAD") {
-		return shared_ptr<HtmlTagAction>(new HtmlIgnoreTagAction(*this));
+		return new HtmlIgnoreTagAction(*this);
 	} else if (tag == "TITLE") {
-		return shared_ptr<HtmlTagAction>(new HtmlIgnoreTagAction(*this));
+		return new HtmlIgnoreTagAction(*this);
 	} else if (tag == "STYLE") {
-		return shared_ptr<HtmlTagAction>(new HtmlStyleTagAction(*this));
+		return new HtmlStyleTagAction(*this);
 	} else if (tag == "SELECT") {
-		return shared_ptr<HtmlTagAction>(new HtmlIgnoreTagAction(*this));
+		return new HtmlIgnoreTagAction(*this);
 	} else if (tag == "SCRIPT") {
-		return shared_ptr<HtmlTagAction>(new HtmlIgnoreTagAction(*this));
+		return new HtmlIgnoreTagAction(*this);
 	} else if (tag == "A") {
-		return shared_ptr<HtmlTagAction>(new HtmlHrefTagAction(*this));
+		return new HtmlHrefTagAction(*this);
 	} else if (tag == "TD") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END));
+		//return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END);
 	} else if (tag == "TR") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END));
+		return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END);
 	} else if (tag == "DIV") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END));
+		return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_END);
 	} else if (tag == "DT") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START));
+		return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START);
 	} else if (tag == "P") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START_AND_AT_END));
+		return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START_AND_AT_END);
 	} else if (tag == "BR") {
-		return shared_ptr<HtmlTagAction>(new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START_AND_AT_END));
+		return new HtmlBreakTagAction(*this, HtmlBreakTagAction::BREAK_AT_START_AND_AT_END);
 	} else if (tag == "IMG") {
-		return shared_ptr<HtmlTagAction>(new HtmlImageTagAction(*this));
+		return new HtmlImageTagAction(*this);
 	} else if (tag == "UL") {
-		return shared_ptr<HtmlTagAction>(new HtmlListTagAction(*this, 0));
+		return new HtmlListTagAction(*this, 0);
 	} else if (tag == "MENU") {
-		return shared_ptr<HtmlTagAction>(new HtmlListTagAction(*this, 0));
+		return new HtmlListTagAction(*this, 0);
 	} else if (tag == "DIR") {
-		return shared_ptr<HtmlTagAction>(new HtmlListTagAction(*this, 0));
+		return new HtmlListTagAction(*this, 0);
 	} else if (tag == "OL") {
-		return shared_ptr<HtmlTagAction>(new HtmlListTagAction(*this, 1));
+		return new HtmlListTagAction(*this, 1);
 	} else if (tag == "LI") {
-		return shared_ptr<HtmlTagAction>(new HtmlListItemTagAction(*this));
+		return new HtmlListItemTagAction(*this);
 	} else if (tag == "PRE") {
 		if (myProcessPreTag) {
-			return shared_ptr<HtmlTagAction>(new HtmlPreTagAction(*this));
+			return new HtmlPreTagAction(*this);
 		}
 	} else if (tag == "TABLE") {
-		return shared_ptr<HtmlTagAction>(new HtmlTableTagAction(*this));
+		return new HtmlTableTagAction(*this);
 	}
 	/*
 	} else if (tag == "DD") {
@@ -387,7 +386,7 @@ shared_ptr<HtmlTagAction> HtmlBookReader::createAction(const std::string &tag) {
 	} else if (tag == "BODY") {
 		return 0;
 	*/
-	return shared_ptr<HtmlTagAction>(new DummyHtmlTagAction(*this));
+	return new DummyHtmlTagAction(*this);
 }
 
 void HtmlBookReader::setBuildTableOfContent(bool build) {
@@ -436,10 +435,10 @@ bool HtmlBookReader::tagHandler(const HtmlTag &tag) {
 		if (tag.Attributes[i].Name == "ID") {
 			myBookReader.addHyperlinkLabel(tag.Attributes[i].Value);
 			break;
-		}
+		}	
 	}
 	shared_ptr<HtmlTagAction> action = myActionMap[tag.Name];
-	if (!action) {
+	if (action.isNull()) {
 		action = createAction(tag.Name);
 		myActionMap[tag.Name] = action;
 	}
@@ -521,7 +520,7 @@ void HtmlBookReader::preformattedCharacterDataHandler(const char *text, size_t l
 }
 
 bool HtmlBookReader::characterDataHandler(const char *text, size_t len, bool convert) {
-	if (myStyleSheetParser) {
+	if (!myStyleSheetParser.isNull()) {
 		myStyleSheetParser->parse(text, len);
 		return true;
 	}
@@ -571,7 +570,7 @@ void HtmlBookReader::startDocumentHandler() {
 	myIsStarted = false;
 	myIgnoreTitles = false;
 
-	myStyleSheetParser.reset();
+	myStyleSheetParser = 0;
 
 	mySpaceCounter = -1;
 	myBreakCounter = 0;

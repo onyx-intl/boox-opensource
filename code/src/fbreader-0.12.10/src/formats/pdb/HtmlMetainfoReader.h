@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@
 #define __HTMLMETAINFOREADER_H__
 
 #include "../html/HtmlReader.h"
-#include "../../description/BookDescription.h"
+
+class Book;
 
 class HtmlMetainfoReader : public HtmlReader {
 
@@ -36,7 +37,7 @@ public:
 	};
 
 public:
-	HtmlMetainfoReader(BookDescription &description, ReadType readType);
+	HtmlMetainfoReader(Book &book, ReadType readType);
 
 private:
 	void startDocumentHandler();
@@ -46,7 +47,7 @@ private:
 	bool characterDataHandler(const char *text, size_t len, bool convert);
 
 private:
-	WritableBookDescription myDescription;
+	Book &myBook;
 	const ReadType myReadType;
 
 	bool myReadTitle;

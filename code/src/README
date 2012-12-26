@@ -5,3 +5,19 @@ License.
 
 For information about closed-source commercial applications, please
 contact us: support@onyx-international.com
+
+add_executable(new_fbreader src/onyx_reader_main.cpp ${moc_new_fb_reader_app_srcs})
+target_link_libraries(new_fbreader new_fbreader_lib zlibrary expat bz2 linebreak
+  onyx_data
+  onyx_cms
+  onyx_ui
+  dictionary
+  tts
+  sound
+  onyx_screen
+  onyx_sys
+  crypto
+  ssl
+  ${ADD_LIB}
+  ${QT_LIBRARIES})
+link_iconv(new_fbreader)

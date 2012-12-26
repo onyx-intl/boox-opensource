@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,22 @@
 #include <ZLFile.h>
 
 #include "PdbPlugin.h"
-#include "MobipocketStream.h"
+#include "PalmDocStream.h"
+#include "PalmDocLikeStream.h"
+
+#include "../../library/Book.h"
 
 bool PalmDocLikePlugin::providesMetaInfo() const {
 	return true;
 }
 
 shared_ptr<ZLInputStream> PalmDocLikePlugin::createStream(ZLFile &file) const {
-  return shared_ptr<ZLInputStream>(new MobipocketStream(file));
+	return new PalmDocStream(file);
 }
 
 const std::string &PalmDocLikePlugin::tryOpen(const std::string &path) const {
 	ZLFile file(path);
-	MobipocketStream stream(file);
+	PalmDocStream stream(file);
 	stream.open();
 	return stream.error();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
-
+#include <cstring>
 #include <cctype>
 #include <algorithm>
 
@@ -63,11 +62,7 @@ bool TextFormatDetector::isHtml(ZLInputStream &stream) const {
 	}
 	stream.close();
 	delete[] buffer;
-#ifdef _WINDOWS
-	return stricmp(sixBytes, "<html>") == 0;
-#else
-    return strcasecmp(sixBytes, "<html>") == 0;
-#endif
+	return strcasecmp(sixBytes, "<html>") == 0;
 }
 
 bool TextFormatDetector::isPPL(ZLInputStream &stream) const {

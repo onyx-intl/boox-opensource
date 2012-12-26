@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,13 @@
 #include <string>
 
 #include "RtfReader.h"
-#include "../../description/BookDescription.h"
+
+class Book;
 
 class RtfDescriptionReader : public RtfReader {
 
 public:
-	RtfDescriptionReader(BookDescription &description);
+	RtfDescriptionReader(Book &book);
 	~RtfDescriptionReader();
 
 	bool readDocument(const std::string &fileName);
@@ -43,7 +44,7 @@ public:
 	void newParagraph();
 
 private:
-	WritableBookDescription myDescription;
+	Book &myBook;
 
 	bool myDoRead;
 	std::string myBuffer;

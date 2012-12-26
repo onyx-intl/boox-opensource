@@ -4,7 +4,7 @@
  * Line breaking in a Unicode sequence.  Designed to be used in a
  * generic text renderer.
  *
- * Copyright (C) 2008 Wu Yongwei <wuyongwei at gmail dot com>
+ * Copyright (C) 2008-2011 Wu Yongwei <wuyongwei at gmail dot com>
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the author be held liable for any damages
@@ -30,9 +30,9 @@
  * Unicode 5.0.0:
  *		<URL:http://www.unicode.org/reports/tr14/tr14-19.html>
  *
- * This library has been updated according to Revision 22, for
- * Unicode 5.1.0:
- *		<URL:http://www.unicode.org/reports/tr14/tr14-22.html>
+ * This library has been updated according to Revision 26, for
+ * Unicode 6.0.0:
+ *		<URL:http://www.unicode.org/reports/tr14/tr14-26.html>
  *
  * The Unicode Terms of Use are available at
  *		<URL:http://www.unicode.org/copyright.html>
@@ -43,7 +43,7 @@
  *
  * Definition of language-specific data.
  *
- * @version	1.0, 2008/12/31
+ * @version	2.1, 2011/05/07
  * @author	Wu Yongwei
  */
 
@@ -55,7 +55,6 @@
  */
 static struct LineBreakProperties lb_prop_English[] = {
 	{ 0x2018, 0x2018, LBP_OP },	/* Left single quotation mark: opening */
-	{ 0x2019, 0x2019, LBP_CL },	/* Right single quotation mark: closing */
 	{ 0x201C, 0x201C, LBP_OP },	/* Left double quotation mark: opening */
 	{ 0x201D, 0x201D, LBP_CL },	/* Right double quotation mark: closing */
 	{ 0, 0, LBP_Undefined }
@@ -81,7 +80,6 @@ static struct LineBreakProperties lb_prop_Spanish[] = {
 	{ 0x00AB, 0x00AB, LBP_OP },	/* Left double angle quotation mark: opening */
 	{ 0x00BB, 0x00BB, LBP_CL },	/* Right double angle quotation mark: closing */
 	{ 0x2018, 0x2018, LBP_OP },	/* Left single quotation mark: opening */
-	{ 0x2019, 0x2019, LBP_CL },	/* Right single quotation mark: closing */
 	{ 0x201C, 0x201C, LBP_OP },	/* Left double quotation mark: opening */
 	{ 0x201D, 0x201D, LBP_CL },	/* Right double quotation mark: closing */
 	{ 0x2039, 0x2039, LBP_OP },	/* Left single angle quotation mark: opening */
@@ -96,7 +94,6 @@ static struct LineBreakProperties lb_prop_French[] = {
 	{ 0x00AB, 0x00AB, LBP_OP },	/* Left double angle quotation mark: opening */
 	{ 0x00BB, 0x00BB, LBP_CL },	/* Right double angle quotation mark: closing */
 	{ 0x2018, 0x2018, LBP_OP },	/* Left single quotation mark: opening */
-	{ 0x2019, 0x2019, LBP_CL },	/* Right single quotation mark: closing */
 	{ 0x201C, 0x201C, LBP_OP },	/* Left double quotation mark: opening */
 	{ 0x201D, 0x201D, LBP_CL },	/* Right double quotation mark: closing */
 	{ 0x2039, 0x2039, LBP_OP },	/* Left single angle quotation mark: opening */

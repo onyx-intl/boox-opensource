@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
-
+#include <cstring>
 #include <algorithm>
 
 #include <ZLFile.h>
@@ -35,7 +34,7 @@ TcrStream::~TcrStream() {
 
 bool TcrStream::open() {
 	close();
-	if (!myBase || !myBase->open()) {
+	if (myBase.isNull() || !myBase->open()) {
 		return false;
 	}
 
@@ -62,7 +61,7 @@ bool TcrStream::open() {
 }
 
 void TcrStream::close() {
-	if (myBase) {
+	if (!myBase.isNull()) {
 		myBase->close();
 	}
 	for (int i = 0; i < 256; ++i) {

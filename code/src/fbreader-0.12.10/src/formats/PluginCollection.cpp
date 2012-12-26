@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
  */
 
 #include <ZLibrary.h>
-#include <ZLStringUtil.h>
+#include <ZLFile.h>
 
 #include "FormatPlugin.h"
+
+#include "../library/Book.h"
 
 #include "fb2/FB2Plugin.h"
 //#include "docbook/DocBookPlugin.h"
@@ -33,11 +35,10 @@
 #include "rtf/RtfPlugin.h"
 #include "openreader/OpenReaderPlugin.h"
 //#include "pdf/PdfPlugin.h"
-#include "doc/DocPlugin.h"
 
 PluginCollection *PluginCollection::ourInstance = 0;
 
-PluginCollection &PluginCollection::instance() {
+PluginCollection &PluginCollection::Instance() {
 	if (ourInstance == 0) {
 		ourInstance = new PluginCollection();
 		ourInstance->myPlugins.push_back(new FB2Plugin());
@@ -47,13 +48,13 @@ PluginCollection &PluginCollection::instance() {
 		ourInstance->myPlugins.push_back(new PluckerPlugin());
 		ourInstance->myPlugins.push_back(new PalmDocPlugin());
 		ourInstance->myPlugins.push_back(new MobipocketPlugin());
+		ourInstance->myPlugins.push_back(new EReaderPlugin());
 		ourInstance->myPlugins.push_back(new ZTXTPlugin());
 		ourInstance->myPlugins.push_back(new TcrPlugin());
 		ourInstance->myPlugins.push_back(new CHMPlugin());
 		ourInstance->myPlugins.push_back(new OEBPlugin());
 		ourInstance->myPlugins.push_back(new RtfPlugin());
 		ourInstance->myPlugins.push_back(new OpenReaderPlugin());
-        ourInstance->myPlugins.push_back(new DocPlugin());
 		//ourInstance->myPlugins.push_back(new PdfPlugin());
 	}
 	return *ourInstance;
@@ -72,14 +73,12 @@ PluginCollection::PluginCollection() :
 	DefaultEncodingOption(ZLCategoryKey::CONFIG, "Format", "DefaultEncoding", "UTF-8") {
 }
 
-PluginCollection::~PluginCollection() {
-	for (std::vector<FormatPlugin*>::const_iterator it = myPlugins.begin(); it != myPlugins.end(); ++it) {
-		delete *it;
-	}
+shared_ptr<FormatPlugin> PluginCollection::plugin(const Book &book) {
+	return plugin(ZLFile(book.filePath()), false);
 }
 
-FormatPlugin *PluginCollection::plugin(const ZLFile &file, bool strong) {
-	for (std::vector<FormatPlugin*>::iterator it = myPlugins.begin(); it != myPlugins.end(); ++it) {
+shared_ptr<FormatPlugin> PluginCollection::plugin(const ZLFile &file, bool strong) {
+	for (std::vector<shared_ptr<FormatPlugin> >::const_iterator it = myPlugins.begin(); it != myPlugins.end(); ++it) {
 		if ((!strong || (*it)->providesMetaInfo()) && (*it)->acceptsFile(file)) {
 			return *it;
 		}

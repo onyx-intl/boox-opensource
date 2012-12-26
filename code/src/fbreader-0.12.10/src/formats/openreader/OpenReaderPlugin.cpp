@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include "ORDescriptionReader.h"
 #include "ORBookReader.h"
 
+#include "../../library/Book.h"
+
 OpenReaderPlugin::~OpenReaderPlugin() {
 }
 
@@ -36,12 +38,12 @@ bool OpenReaderPlugin::acceptsFile(const ZLFile &file) const {
 	return file.extension() == "orb";
 }
 
-bool OpenReaderPlugin::readDescription(const std::string &path, BookDescription &description) const {
-	return ORDescriptionReader(description).readDescription(path);
+bool OpenReaderPlugin::readMetaInfo(Book &book) const {
+	return ORDescriptionReader(book).readMetaInfo();
 }
 
-bool OpenReaderPlugin::readModel(const BookDescription &description, BookModel &model) const {
-	return ORBookReader(model).readBook(description.fileName());
+bool OpenReaderPlugin::readModel(BookModel &model) const {
+	return ORBookReader(model).readBook();
 }
 
 const std::string &OpenReaderPlugin::iconName() const {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@
 #include <ZLOptions.h>
 
 #include "PdbPlugin.h"
-#include "../../description/BookDescriptionUtil.h"
-#include "../../options/FBOptions.h"
+#include "../../options/FBCategoryKey.h"
+
+#include "../../database/booksdb/BooksDBUtil.h"
+#include "../../database/booksdb/BooksDB.h"
 
 PdbPlugin::~PdbPlugin() {
 }
@@ -34,16 +36,17 @@ std::string PdbPlugin::fileType(const ZLFile &file) {
 		return "";
 	}
 
-	std::string fileName = file.path();
-	int index = fileName.find(':');
-	ZLFile baseFile = (index == -1) ? file : ZLFile(fileName.substr(0, index));
-	bool upToDate = BookDescriptionUtil::checkInfo(baseFile);
+	const std::string &fileName = file.path();
+	//int index = fileName.find(':');
+	//ZLFile baseFile = (index == -1) ? file : ZLFile(fileName.substr(0, index));
+	ZLFile baseFile(file.physicalFilePath());
+	bool upToDate = BooksDBUtil::checkInfo(baseFile);
 
-	ZLStringOption palmTypeOption(FBCategoryKey::BOOKS, file.path(), "PalmType", "");
-	std::string palmType = palmTypeOption.value();
+	//ZLStringOption palmTypeOption(FBCategoryKey::BOOKS, file.path(), "PalmType", "");
+	std::string palmType = BooksDB::Instance().getPalmType(fileName);
 	if ((palmType.length() != 8) || !upToDate) {
 		shared_ptr<ZLInputStream> stream = file.inputStream();
-		if (!stream || !stream->open()) {
+		if (stream.isNull() || !stream->open()) {
 			return "";
 		}
 		stream->seek(60, false);
@@ -52,9 +55,10 @@ std::string PdbPlugin::fileType(const ZLFile &file) {
 		stream->close();
 		palmType = std::string(id, 8);
 		if (!upToDate) {
-			BookDescriptionUtil::saveInfo(baseFile);
+			BooksDBUtil::saveInfo(baseFile);
 		}
-		palmTypeOption.setValue(palmType);
+		//palmTypeOption.setValue(palmType);
+		BooksDB::Instance().setPalmType(fileName, palmType);
 	}
 	return palmType;
 }

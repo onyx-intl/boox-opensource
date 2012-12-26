@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 #include "EncodedTextReader.h"
 
 EncodedTextReader::EncodedTextReader(const std::string &encoding) {
-  ZLEncodingCollection &collection = ZLEncodingCollection::instance();
-  ZLEncodingConverterInfoPtr info = collection.info(encoding);
-  myConverter = info ? info->createConverter() : collection.defaultConverter();
+	ZLEncodingCollection &collection = ZLEncodingCollection::Instance();
+	ZLEncodingConverterInfoPtr info = collection.info(encoding);
+	myConverter = (!info.isNull()) ? info->createConverter() : collection.defaultConverter();
 }
 
 EncodedTextReader::~EncodedTextReader() {

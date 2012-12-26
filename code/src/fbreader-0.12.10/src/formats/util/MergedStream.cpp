@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,22 +24,24 @@ bool MergedStream::open() {
 	resetToStart();
 	myOffset = 0;
 	myCurrentStream = nextStream();
-	return myCurrentStream && myCurrentStream->open();
+	return !myCurrentStream.isNull() && myCurrentStream->open();
 }
 
 size_t MergedStream::read(char *buffer, size_t maxSize) {
 	size_t bytesToRead = maxSize;
-	while ((bytesToRead > 0) && myCurrentStream) {
+	while ((bytesToRead > 0) && !myCurrentStream.isNull()) {
 		size_t len = myCurrentStream->read(buffer, bytesToRead);
 		bytesToRead -= len;
 		if (buffer != 0) {
 			buffer += len;
 		}
 		if (bytesToRead != 0) {
-			*buffer++ = '\n';
+			if (buffer != 0) {
+				*buffer++ = '\n';
+			}
 			bytesToRead--;
 			myCurrentStream = nextStream();
-			if (!myCurrentStream || !myCurrentStream->open()) {
+			if (myCurrentStream.isNull() || !myCurrentStream->open()) {
 				break;
 			}
 		}

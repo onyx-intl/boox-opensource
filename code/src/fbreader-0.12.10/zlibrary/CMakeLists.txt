@@ -1,5 +1,12 @@
 # include directories.
 # zlibrary core
+INCLUDE_DIRECTORIES(../bzip2)
+INCLUDE_DIRECTORIES(../fribidi)
+INCLUDE_DIRECTORIES(../fribidi/charset)
+INCLUDE_DIRECTORIES(../fribidi/lib)
+INCLUDE_DIRECTORIES(../linebreak)
+INCLUDE_DIRECTORIES(core/include)
+INCLUDE_DIRECTORIES(text/include)
 INCLUDE_DIRECTORIES(core/src)
 INCLUDE_DIRECTORIES(core/src/application)
 INCLUDE_DIRECTORIES(core/src/desktop)
@@ -20,18 +27,15 @@ INCLUDE_DIRECTORIES(core/src/runnable)
 INCLUDE_DIRECTORIES(core/src/splittedView)
 INCLUDE_DIRECTORIES(core/src/time)
 INCLUDE_DIRECTORIES(core/src/view)
+
 INCLUDE_DIRECTORIES(core/src/blockTreeView)
 INCLUDE_DIRECTORIES(core/src/logger)
+INCLUDE_DIRECTORIES(core/src/optionEntries)
 INCLUDE_DIRECTORIES(core/src/typeId)
-
-file(GLOB_RECURSE zlibrary_core_block_reeView_hdrs core/src/blockTreeView/*.h)
-file(GLOB_RECURSE zlibrary_core_block_reeView_srcs core/src/blockTreeView/*.cpp)
-
-file(GLOB_RECURSE zlibrary_core_typeId_hdrs core/src/typeId/*.h)
-file(GLOB_RECURSE zlibrary_core_typeId_srcs core/src/typeId/*.cpp)
-
-file(GLOB_RECURSE zlibrary_core_logger_hdrs core/src/logger/*.h)
-file(GLOB_RECURSE zlibrary_core_logger_srcs core/src/logger/*.cpp)
+INCLUDE_DIRECTORIES(core/src/unix)
+INCLUDE_DIRECTORIES(core/src/util)
+INCLUDE_DIRECTORIES(core/src/view)
+INCLUDE_DIRECTORIES(core/src/xml)
 
 file(GLOB zlibrary_core_library_hdrs core/src/library/*.h)
 file(GLOB zlibrary_core_library_srcs core/src/library/*.cpp)
@@ -105,9 +109,6 @@ FILE(GLOB_RECURSE zlibrary_text_headers text/*.h)
 FILE(GLOB_RECURSE zlibrary_text_srcs text/*.cpp)
 
 set(zlibrary_core_hdrs
-    ${zlibrary_core_block_reeView_hdrs}
-    ${zlibrary_core_logger_hdrs}
-    ${zlibrary_core_typeId_hdrs}
     ${zlibrary_core_library_hdrs}
     ${zlibrary_core_util_hdrs}
     ${zlibrary_core_fs_hdrs}
@@ -132,9 +133,6 @@ set(zlibrary_core_hdrs
 )
 
 set(zlibrary_core_srcs
-    ${zlibrary_core_block_reeView_srcs}
-    ${zlibrary_core_logger_srcs}
-    ${zlibrary_core_typeId_srcs}
     ${zlibrary_core_library_srcs}
     ${zlibrary_core_util_srcs}
     ${zlibrary_core_fs_srcs}
@@ -156,12 +154,20 @@ set(zlibrary_core_srcs
     ${zlibrary_core_desktop_app_srcs}
     ${zlibrary_core_desktop_dlg_srcs}
 )
+FILE(GLOB_RECURSE zlibrary_heads core/*.h)
+FILE(GLOB_RECURSE zlibrary_src core/*.cpp)
+ADD_DEFINITIONS(-DINSTALLDIR="install")
 
+ADD_DEFINITIONS(-DBASEDIR="/usr/share/onyx_reader")
+ADD_DEFINITIONS(-DLIBDIR="libdir")
+ADD_DEFINITIONS(-DIMAGEDIR="image")
+ADD_DEFINITIONS(-DAPPIMAGEDIR="app")
+ADD_DEFINITIONS(-DUNICODE)
 add_library(zlibrary
-  ${zlibrary_core_hdrs} ${zlibrary_core_srcs}
+  ${zlibrary_heads} ${zlibrary_src}
   ${zlibrary_ui_qt4_hdrs} ${zlibrary_ui_qt4_srcs}
   ${zlibrary_ui_sys_hdrs} ${zlibrary_ui_sys_srcs}
   ${zlibrary_text_headers} ${zlibrary_text_srcs}
   ${zlibrary_ui_sys_headers} ${ZLIBRARY_ui_sys_srcs}
   ${moc_zlibrary_ui_srcs})
-target_link_libraries(zlibrary ${QT_LIBRARIES} )
+target_link_libraries(zlibrary bz2 curl linebreak fribidi ${QT_LIBRARIES} )

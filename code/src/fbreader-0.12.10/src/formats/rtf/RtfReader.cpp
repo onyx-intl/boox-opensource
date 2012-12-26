@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
  * 02110-1301, USA.
  */
 
-#include <stdlib.h>
-
+#include <cstdlib>
 #include <cctype>
 
 #include <ZLFile.h>
@@ -104,7 +103,7 @@ void RtfDestinationCommand::run(RtfReader &reader, int*) const {
 void RtfStyleCommand::run(RtfReader &reader, int*) const {
 	if (reader.myState.Destination == RtfReader::DESTINATION_STYLESHEET) {
 		//std::cerr << "Add style index: " << val << "\n";
-
+		
 		//sprintf(style_attributes[0], "%i", val);
 	} else /*if (myState.Destination == rdsContent)*/ {
 		//std::cerr << "Set style index: " << val << "\n";
@@ -179,7 +178,7 @@ void RtfReader::fillKeywordMap() {
 		addAction("bullet",	new RtfCharCommand("\xE2\x80\xA2"));		 // &bullet;
 		addAction("endash",	new RtfCharCommand("\xE2\x80\x93"));		 // &ndash;
 		addAction("emdash",	new RtfCharCommand("\xE2\x80\x94"));		 // &mdash;
-		addAction("~",	new RtfCharCommand("\xC0\xA0"));							// &nbsp;
+		addAction("~",	new RtfCharCommand("\xC0\xA0"));					// &nbsp;
 		addAction("enspace",	new RtfCharCommand("\xE2\x80\x82"));		// &emsp;
 		addAction("emspace",	new RtfCharCommand("\xE2\x80\x83"));		// &ensp;
 		addAction("lquote",	new RtfCharCommand("\xE2\x80\x98"));		 // &lsquo;
@@ -263,19 +262,19 @@ bool RtfReader::parseDocument() {
 							if (myStateStack.empty()) {
 								return false;
 							}
-
+							
 							if (myState.Destination != myStateStack.top().Destination) {
 								switchDestination(myState.Destination, false);
 								switchDestination(myStateStack.top().Destination, true);
 							}
-
+							
 							bool oldItalic = myState.Italic;
 							bool oldBold = myState.Bold;
 							bool oldUnderlined = myState.Underlined;
 							ZLTextAlignmentType oldAlignment = myState.Alignment;
 							myState = myStateStack.top();
 							myStateStack.pop();
-
+					
 							if (myState.Italic != oldItalic) {
 								setFontProperty(RtfReader::FONT_ITALIC);
 							}
@@ -288,7 +287,7 @@ bool RtfReader::parseDocument() {
 							if (myState.Alignment != oldAlignment) {
 								setAlignment();
 							}
-
+							
 							break;
 						}
 						case '\\':
@@ -318,7 +317,7 @@ bool RtfReader::parseDocument() {
 				case READ_HEX_SYMBOL:
 					hexString += *ptr;
 					if (hexString.size() == 2) {
-						char ch = strtol(hexString.c_str(), 0, 16);
+						char ch = strtol(hexString.c_str(), 0, 16); 
 						hexString.erase();
 						processCharData(&ch, 1);
 						parserState = READ_NORMAL_DATA;
@@ -388,7 +387,7 @@ bool RtfReader::parseDocument() {
 			}
 		}
 	}
-
+	
 	return myIsInterrupted || myStateStack.empty();
 }
 
@@ -400,7 +399,7 @@ void RtfReader::processKeyword(const std::string &keyword, int *parameter) {
 	}
 
 	std::map<std::string, RtfCommand*>::const_iterator it = ourKeywordMap.find(keyword);
-
+	
 	if (it == ourKeywordMap.end()) {
 		if (wasSpecialMode)
 			myState.Destination = RtfReader::DESTINATION_SKIP;
@@ -424,14 +423,14 @@ void RtfReader::interrupt() {
 bool RtfReader::readDocument(const std::string &fileName) {
 	myFileName = fileName;
 	myStream = ZLFile(fileName).inputStream();
-	if (!myStream || !myStream->open()) {
+	if (myStream.isNull() || !myStream->open()) {
 			return false;
 	}
 
 	fillKeywordMap();
 
 	myStreamBuffer = new char[rtfStreamBufferSize];
-
+	
 	myIsInterrupted = false;
 
 	mySpecialMode = false;
@@ -448,9 +447,9 @@ bool RtfReader::readDocument(const std::string &fileName) {
 	while (!myStateStack.empty()) {
 		myStateStack.pop();
 	}
-
+	
 	delete[] myStreamBuffer;
 	myStream->close();
-
+	
 	return code;
 }

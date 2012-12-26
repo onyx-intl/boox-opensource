@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ bool ZTXTPlugin::acceptsFile(const ZLFile &file) const {
 }
 
 shared_ptr<ZLInputStream> ZTXTPlugin::createStream(ZLFile &file) const {
-  return shared_ptr<ZLInputStream>(new ZTXTStream(file));
+	return new ZTXTStream(file);
 }
 
 const std::string &ZTXTPlugin::iconName() const {

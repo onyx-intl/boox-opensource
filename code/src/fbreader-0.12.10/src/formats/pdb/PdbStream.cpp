@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * 02110-1301, USA.
  */
 
-#include <string.h>
+#include <cstring>
 
 #include <ZLFile.h>
 
@@ -32,12 +32,14 @@ PdbStream::~PdbStream() {
 
 bool PdbStream::open() {
 	close();
-	if (!myBase || !myBase->open() || !myHeader.read(myBase)) {
+	if (myBase.isNull() || !myBase->open() || !myHeader.read(myBase)) {
 		return false;
 	}
-
+	// myBase offset: startOffset + 78 + 8 * records number ( myHeader.Offsets.size() )
+	
 	myBase->seek(myHeader.Offsets[0], true);
-
+	// myBase offset: Offset[0] - zero record
+	
 	myBufferLength = 0;
 	myBufferOffset = 0;
 
@@ -53,6 +55,7 @@ size_t PdbStream::read(char *buffer, size_t maxSize) {
 			break;
 		}
 		size_t size = std::min((size_t)(maxSize - realSize), (size_t)(myBufferLength - myBufferOffset));
+		
 		if (size > 0) {
 			if (buffer != 0) {
 				memcpy(buffer + realSize, myBuffer + myBufferOffset, size);
@@ -61,19 +64,19 @@ size_t PdbStream::read(char *buffer, size_t maxSize) {
 			myBufferOffset += size;
 		}
 	}
-
+			
 	myOffset += realSize;
 	return realSize;
 }
 
 void PdbStream::close() {
-  if (myBase) {
-    myBase->close();
-  }
-  if (myBuffer != 0) {
-    delete[] myBuffer;
-    myBuffer = 0;
-  }
+	if (!myBase.isNull()) {
+		myBase->close();
+	}
+	if (myBuffer != 0) {
+		delete[] myBuffer;
+		myBuffer = 0;
+	}
 }
 
 void PdbStream::seek(int offset, bool absoluteOffset) {
@@ -98,4 +101,9 @@ size_t PdbStream::offset() const {
 size_t PdbStream::sizeOfOpened() {
 	// TODO: implement
 	return 0;
+}
+
+size_t PdbStream::recordOffset(size_t index) const {
+	return index < myHeader.Offsets.size() ? 
+		myHeader.Offsets[index] : myBase->sizeOfOpened();
 }

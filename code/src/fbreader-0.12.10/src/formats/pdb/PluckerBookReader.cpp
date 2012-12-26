@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,9 @@
 #include "DocDecompressor.h"
 #include "PluckerImages.h"
 #include "../../bookmodel/BookModel.h"
+#include "../../library/Book.h"
 
-PluckerBookReader::PluckerBookReader(const std::string &filePath, BookModel &model, const std::string &encoding) : BookReader(model), EncodedTextReader(encoding), myFilePath(filePath), myFont(FT_REGULAR) {
+PluckerBookReader::PluckerBookReader(BookModel &model) : BookReader(model), EncodedTextReader(model.book()->encoding()), myFilePath(model.book()->filePath()), myFont(FT_REGULAR) {
 	myCharBuffer = new char[65535];
 	myForcedEntry = 0;
 }
@@ -168,16 +169,16 @@ void PluckerBookReader::changeFont(FontType font) {
 /*
 static void listParameters(char *ptr) {
 	int argc = ((unsigned char)*ptr) % 8;
-	std::cerr << (int)(unsigned char)*ptr << "(";
+	std::cerr << (int)(unsigned char)*ptr << "(";	
 	for (int i = 0; i < argc - 1; ++i) {
 		++ptr;
-		std::cerr << (int)*ptr << ", ";
+		std::cerr << (int)*ptr << ", ";	
 	}
 	if (argc > 0) {
 		++ptr;
-		std::cerr << (int)*ptr;
+		std::cerr << (int)*ptr;	
 	}
-	std::cerr << ")\n";
+	std::cerr << ")\n";	
 }
 */
 
@@ -252,7 +253,7 @@ void PluckerBookReader::processTextFunction(char *ptr) {
 		case 0x38:
 			safeEndParagraph();
 			break;
-		case 0x40:
+		case 0x40: 
 			safeAddControl(EMPHASIS, true);
 			break;
 		case 0x48:
@@ -271,7 +272,7 @@ void PluckerBookReader::processTextFunction(char *ptr) {
 			break;
 		case 0x78: // strike-through text is ignored
 			break;
-		case 0x83:
+		case 0x83: 
 		case 0x85:
 		{
 			ZLUnicodeUtil::Ucs4Char symbol =
@@ -439,7 +440,7 @@ void PluckerBookReader::readRecord(size_t recordSize) {
 					image = new ZCompressedFileImage(mime, myFilePath, myStream->offset() + 2, recordSize - 10);
 				}
 				if (image != 0) {
-                                  addImage(fromNumber(uid), shared_ptr<ZLImage>(image));
+					addImage(fromNumber(uid), image);
 				}
 				break;
 			}
@@ -470,7 +471,7 @@ void PluckerBookReader::readRecord(size_t recordSize) {
 					PdbUtil::readUnsignedShort(*myStream, us);
 					image->addId(fromNumber(us));
 				}
-				addImage(fromNumber(uid), shared_ptr<ZLImage>(image));
+				addImage(fromNumber(uid), image);
 				break;
 			}
 			default:
@@ -482,7 +483,7 @@ void PluckerBookReader::readRecord(size_t recordSize) {
 
 bool PluckerBookReader::readDocument() {
 	myStream = ZLFile(myFilePath).inputStream();
-	if (!myStream || !myStream->open()) {
+	if (myStream.isNull() || !myStream->open()) {
 		return false;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class ORBookReader : public ZLXMLReader {
 
 public:
 	ORBookReader(BookModel &model);
-	bool readBook(const std::string &fileName);
+	bool readBook();
 
 	void startElementHandler(const char *tag, const char **attributes);
 	void endElementHandler(const char *tag);

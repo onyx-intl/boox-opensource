@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ void FB2TagInfoReader::endElementHandler(const char *tag) {
 
 FB2TagManager *FB2TagManager::ourInstance = 0;
 
-const FB2TagManager &FB2TagManager::instance() {
+const FB2TagManager &FB2TagManager::Instance() {
 	if (ourInstance == 0) {
 		ourInstance = new FB2TagManager();
 	}

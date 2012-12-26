@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,45 +18,32 @@
  */
 
 #include <ZLFile.h>
+#include <ZLImage.h>
 
 #include "FB2Plugin.h"
-#include "FB2DescriptionReader.h"
+#include "FB2MetaInfoReader.h"
 #include "FB2BookReader.h"
-#include "../../description/BookDescription.h"
+#include "FB2CoverReader.h"
+
+#include "../../database/booksdb/BooksDBUtil.h"
 
 bool FB2Plugin::acceptsFile(const ZLFile &file) const {
-    std::string ext = file.extension();
-    if (ext == "fb2")
-    {
-        return true;
-    }
-
-    if (ext.empty())
-    {
-        std::string name = file.name(false);
-        int pos = name.find_last_of("fb2");
-        return pos > 0;
-    }
-    return false;
+	return file.extension() == "fb2";
 }
 
-bool FB2Plugin::readDescription(const std::string &path, BookDescription &description) const {
-	return FB2DescriptionReader(description).readDescription(path);
+bool FB2Plugin::readMetaInfo(Book &book) const {
+	return FB2MetaInfoReader(book).readMetaInfo();
 }
 
-static const std::string AUTO = "auto";
-
-bool FB2Plugin::readModel(const BookDescription &description, BookModel &model) const {
-	// this code fixes incorrect config entry created by fbreader of version <= 0.6.1
-	// makes no sense if old fbreader was not used
-	if (description.encoding() != AUTO) {
-		BookInfo(description.fileName()).EncodingOption.setValue(AUTO);
-	}
-
-	return FB2BookReader(model).readBook(description.fileName());
+bool FB2Plugin::readModel(BookModel &model) const {
+	return FB2BookReader(model).readBook();
 }
 
 const std::string &FB2Plugin::iconName() const {
 	static const std::string ICON_NAME = "fb2";
 	return ICON_NAME;
+}
+
+shared_ptr<ZLImage> FB2Plugin::coverImage(const Book &book) const {
+	return FB2CoverReader(book).readCover();
 }

@@ -22,7 +22,7 @@
 
 #include <ZLOptionEntry.h>
 #include <ZLOptionsDialog.h>
-#include "../network/ZLNetworkManager.h"
+#include <ZLNetworkManager.h>
 #include <optionEntries/ZLSimpleOptionEntry.h>
 #include <optionEntries/ZLToggleBooleanOptionEntry.h>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,18 +45,26 @@ void TxtReader::readDocument(ZLInputStream &stream) {
 		char *start = buffer;
 		const char *end = buffer + length;
 		for (char *ptr = start; ptr != end; ++ptr) {
-			if (*ptr == '\n') {
+			if (*ptr == '\n' || *ptr == '\r') {
+				bool skipNewLine = false;
+				if (*ptr == '\r' && (ptr + 1) != end && *(ptr + 1) == '\n') {
+					skipNewLine = true;
+					*ptr = '\n';
+				}
 				if (start != ptr) {
 					str.erase();
 					myConverter->convert(str, start, ptr + 1);
 					characterDataHandler(str);
 				}
+				if (skipNewLine) {
+					++ptr;
+				}
 				start = ptr + 1;
 				newLineHandler();
-			} else if (*ptr == '\r') {
-				continue;
 			} else if (isspace((unsigned char)*ptr)) {
-				*ptr = ' ';
+				if (*ptr != '\t') {
+					*ptr = ' ';
+				}
 			} else {
 			}
 		}

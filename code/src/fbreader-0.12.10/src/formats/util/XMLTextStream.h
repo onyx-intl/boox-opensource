@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 
 #include <shared_ptr.h>
 #include <ZLInputStream.h>
+#include <ZLAsynchronousInputStream.h>
 
 class XMLTextReader;
 
@@ -42,6 +43,7 @@ private:
 private:
 	shared_ptr<ZLInputStream> myBase;
 	shared_ptr<XMLTextReader> myReader;
+	shared_ptr<ZLAsynchronousInputStream> myStream;
 	std::string myStreamBuffer;
 	std::string myDataBuffer;
 	size_t myOffset;

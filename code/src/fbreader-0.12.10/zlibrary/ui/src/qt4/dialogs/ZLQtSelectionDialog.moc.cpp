@@ -1,11 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ZLQtSelectionDialog.h'
 **
-<<<<<<< HEAD
-** Created: Tue Dec 18 14:38:03 2012
-=======
-** Created: Tue Dec 18 10:26:44 2012
->>>>>>> 6b8ee9d... add fbreader-0.12.10.
+** Created: Mon Dec 24 15:59:22 2012
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.0)
 **
 ** WARNING! All changes made in this file will be lost!

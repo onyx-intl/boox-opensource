@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
  * 02110-1301, USA.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <algorithm>
 
 #include "HtmlReaderStream.h"
@@ -84,7 +84,7 @@ HtmlReaderStream::~HtmlReaderStream() {
 }
 
 bool HtmlReaderStream::open() {
-	if (!myBase || !myBase->open()) {
+	if (myBase.isNull() || !myBase->open()) {
 		return false;
 	}
 	myBuffer = new char[mySize];
@@ -98,7 +98,9 @@ bool HtmlReaderStream::open() {
 
 size_t HtmlReaderStream::read(char *buffer, size_t maxSize) {
 	maxSize = std::min(maxSize, mySize - myOffset);
-	memcpy(buffer, myBuffer, maxSize);
+	if (buffer != 0) {
+		memcpy(buffer, myBuffer, maxSize);
+	}
 	myOffset += maxSize;
 	return maxSize;
 }

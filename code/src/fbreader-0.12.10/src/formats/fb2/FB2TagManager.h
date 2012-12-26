@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2008-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ private:
 	static FB2TagManager *ourInstance;
 
 public:
-	static const FB2TagManager &instance();
+	static const FB2TagManager &Instance();
 
 private:
 	FB2TagManager();

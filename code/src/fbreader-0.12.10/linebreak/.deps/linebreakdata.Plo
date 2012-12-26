@@ -1,0 +1,8 @@
+linebreakdata.lo: linebreakdata.c linebreak.h \
+ /usr/lib/gcc/i686-linux-gnu/4.4.5/include/stddef.h linebreakdef.h
+
+linebreak.h:
+
+/usr/lib/gcc/i686-linux-gnu/4.4.5/include/stddef.h:
+
+linebreakdef.h:

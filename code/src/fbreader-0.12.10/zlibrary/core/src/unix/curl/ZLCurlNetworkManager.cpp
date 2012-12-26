@@ -91,7 +91,7 @@ void ZLCurlNetworkManager::createInstance() {
 	ourInstance = new ZLCurlNetworkManager();
 }
 
-
+#define VERSION "0.12.10"
 void ZLCurlNetworkManager::setStandardOptions(CURL *handle, const std::string &proxy) const {
 	static const std::string AGENT_NAME = std::string("FBReader/") + VERSION;
 

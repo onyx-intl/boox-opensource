@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009 Geometer Plus <contact@geometerplus.com>
+ * Copyright (C) 2004-2010 Geometer Plus <contact@geometerplus.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,9 @@
 const shared_ptr<std::string> ZCompressedFileImage::stringData() const {
 	shared_ptr<ZLInputStream> stream = ZLFile(myPath).inputStream();
 
-	shared_ptr<std::string> imageData(new std::string());
+	shared_ptr<std::string> imageData = new std::string();
 
-	if (stream && stream->open()) {
+	if (!stream.isNull() && stream->open()) {
 		stream->seek(myOffset, false);
 		ZLZDecompressor decompressor(myCompressedSize);
 
@@ -57,9 +57,9 @@ const shared_ptr<std::string> ZCompressedFileImage::stringData() const {
 const shared_ptr<std::string> DocCompressedFileImage::stringData() const {
 	shared_ptr<ZLInputStream> stream = ZLFile(myPath).inputStream();
 
-	shared_ptr<std::string> imageData(new std::string());
+	shared_ptr<std::string> imageData = new std::string();
 
-	if (stream && stream->open()) {
+	if (!stream.isNull() && stream->open()) {
 		stream->seek(myOffset, false);
 		char *buffer = new char[65535];
 		size_t uncompressedSize = DocDecompressor().decompress(*stream, buffer, myCompressedSize, 65535);
@@ -73,9 +73,8 @@ const shared_ptr<std::string> DocCompressedFileImage::stringData() const {
 shared_ptr<const ZLImage> PluckerMultiImage::subImage(unsigned int row, unsigned int column) const {
 	unsigned int index = row * myColumns + column;
 	if (index >= myIds.size()) {
-          return shared_ptr<ZLImage>();
+		return 0;
 	}
 	ZLImageMap::const_iterator entry = myImageMap.find(myIds[index]);
-	return (entry != myImageMap.end())
-            ? entry->second : shared_ptr<const ZLImage>();
+	return (entry != myImageMap.end()) ? entry->second : 0;
 }
