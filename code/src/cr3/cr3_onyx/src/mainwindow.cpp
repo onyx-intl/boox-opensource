@@ -24,7 +24,6 @@
 #include "onyx/ui/glow_light_control_dialog.h"
 #include "onyx/cms/content_manager.h"
 #include "onyx/cms/content_thumbnail.h"
-#include "onyx/data/configuration.h"
 
 #include "../lcl_ui/settings_dialog.h"
 #include "../lcl_ui/info_dialog.h"
@@ -176,6 +175,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
 
     view_->restoreWindowPos( this, "main.", true );
+
+    loadDocumentOptions(file_name_to_open_);
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
@@ -1101,12 +1102,22 @@ void OnyxMainWindow::onScreenSizeChanged(int)
     onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 }
 
+bool OnyxMainWindow::loadDocumentOptions(const QString &path)
+{
+    ContentManager database;
+    if (!vbf::openDatabase(path, database))
+    {
+        return false;
+    }
+
+    return vbf::loadDocumentOptions(database, path, conf_);
+}
+
 bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 {
     QString authors = cr2qt(view_->getDocView()->getAuthors());
     QString title = cr2qt(view_->getDocView()->getTitle());
     cms::ContentManager database;
-    vbf::Configuration conf_;
     if (!vbf::openDatabase(path, database) && !vbf::loadDocumentOptions(database, path, conf_))
     {
         return false;
