@@ -661,9 +661,12 @@ bool ZLTextSelectionModel::selectWord(const ZLTextElementArea & area, int x, int
                     ZLUnicodeUtil::Ucs4Char ch = ucs4string[startIndex];
 
                     // TODO: Get rid of non-letter character.
-                    while (!ZLUnicodeUtil::isLetter(ch) && ++startIndex < word.Length)
+                    if( (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
                     {
-                        ch = ucs4string[startIndex];
+                        while (!ZLUnicodeUtil::isLetter(ch) && ++startIndex < word.Length)
+                        {
+                            ch = ucs4string[startIndex];
+                        }
                     }
                     if (startIndex >= word.Length)
                     {
