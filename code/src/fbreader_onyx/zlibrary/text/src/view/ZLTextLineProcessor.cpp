@@ -161,6 +161,9 @@ ZLTextLineInfoPtr ZLTextView::processTextLine(const ZLTextWordCursor &start, con
             case 60:
                 value = 2.1;
                 break;
+            default:
+                value = 1.7;
+                break;
             }
             info.LeftIndent = (int)(info.LeftIndent * value / 7 /divisor);
         }

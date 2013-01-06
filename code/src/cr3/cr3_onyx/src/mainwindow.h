@@ -14,6 +14,7 @@
 #include "onyx/ui/reading_style_actions.h"
 #include "onyx/ui/zoom_setting_actions.h"
 #include "../lcl_ui/advanced_actions.h"
+#include "onyx/data/configuration.h"
 
 class QKeyEvent;
 
@@ -57,6 +58,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void showTableOfContents();
     void setLineHeight(const unsigned int lineHeightPercentage);
 
+    bool loadDocumentOptions(const QString &);
     bool saveDocumentOptions(const QString &path);
     void storeThumbnail();
     void showAllBookmarks();
@@ -81,6 +83,7 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     QString file_name_to_open_;
 
     QFont select_font_;
+    vbf::Configuration conf_;
 
     ui::SystemActions system_actions_;
     ui::ReadingToolsActions reading_tool_actions_;
