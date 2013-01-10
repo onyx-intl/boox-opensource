@@ -79,7 +79,8 @@ void ZLTextStyleReader::startElementHandler(const char *tag, const char **attrib
 	static const std::string STYLE = "style";
 
 	if (BASE == tag) {
-          myCollection.myBaseStyle.reset(new ZLTextBaseStyle(attributeValue(attributes, "family"), intValue(attributes, "fontSize")));
+          myCollection.myBaseStyle.reset(new ZLTextBaseStyle(getenv("DEFAULT_FONT_FAMILY")!=NULL?getenv("DEFAULT_FONT_FAMILY"):"DejaVu Sans", 24)); 
+          //myCollection.myBaseStyle.reset(new ZLTextBaseStyle(attributeValue(attributes, "family"), intValue(attributes, "fontSize")));
 	} else if (STYLE == tag) {
 		const char *idString = attributeValue(attributes, "id");
 		const char *name = attributeValue(attributes, "name");
@@ -140,7 +141,7 @@ ZLTextStyleCollection::ZLTextStyleCollection() :
 	myBaseStyle() {
 	ZLTextStyleReader(*this).readDocument(ZLibrary::DefaultFilesPathPrefix() + "styles.xml");
 	if (!myBaseStyle) {
-          myBaseStyle.reset(new ZLTextBaseStyle("", 26));
+          myBaseStyle.reset(new ZLTextBaseStyle(getenv("DEFAULT_FONT_FAMILY")!=NULL?getenv("DEFAULT_FONT_FAMILY"):"DejaVu Sans", 24));
 	}
 }
 
