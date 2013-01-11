@@ -920,7 +920,7 @@ void ZLQtViewWidget::loadConf()
         onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
     }
 
-    status_bar_->setVisible(conf.options[CONFIG_FULLSCREEN].toBool());
+    status_bar_->setVisible(!conf.options[CONFIG_FULLSCREEN].toBool());
 }
 
 void ZLQtViewWidget::saveConf()
@@ -945,7 +945,7 @@ void ZLQtViewWidget::saveConf()
     }
     conf.info.mutable_progress() = progress.arg(pos).arg(total);
     conf.options[CONFIG_FLASH_TYPE] = onyx::screen::instance().defaultWaveform();
-    conf.options[CONFIG_FULLSCREEN] = status_bar_->isVisible();
+    conf.options[CONFIG_FULLSCREEN] = !status_bar_->isVisible();
 }
 
 void ZLQtViewWidget::closeDocument()
