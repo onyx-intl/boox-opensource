@@ -14,7 +14,8 @@ AdvancedActions::~AdvancedActions(void)
 {
 }
 
-void AdvancedActions::generateActions(const vector<AdvancedType> & values, bool append)
+void AdvancedActions::generateActions(const vector<AdvancedType> & values, bool append,
+                                      bool citation_mode)
 {
     category()->setText(QCoreApplication::tr("Advanced"));
     if ( !append )
@@ -60,9 +61,23 @@ void AdvancedActions::generateActions(const vector<AdvancedType> & values, bool 
                 act->setIcon(QIcon(QPixmap(":/images/system.png")));
             }
             break;
+        case CITATION_MODE:
+            {
+                if (!citation_mode)
+                {
+                    act->setText(QCoreApplication::tr("Citation Mode"));
+                }
+                else
+                {
+                    act->setText(QCoreApplication::tr("Exit Citation Mode"));
+                }
+                act->setIcon(QIcon(QPixmap(":/images/citation_mode.png")));
+            }
+            break;
         case ADD_CITE:
             {
                 act->setText(QCoreApplication::tr("Add Citation"));
+                act->setEnabled(citation_mode);
                 act->setIcon(QIcon(QPixmap(":/images/add_bookmark.png")));
             }
             break;
