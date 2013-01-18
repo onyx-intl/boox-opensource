@@ -242,6 +242,8 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool selectDownWord();
         void handleMouseReleaseInCitationMode(QMouseEvent * event);
 
+        bool isDictionaryMode();
+
     private:
         DocViewData * _data; // to hide non-qt implementation
         LVDocView * _docview;
