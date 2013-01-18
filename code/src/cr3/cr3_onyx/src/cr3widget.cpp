@@ -839,7 +839,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
 {
     begin_point_ = event->pos();
 
-    if (!_citation_mode_)
+    if (!_citation_mode_ && !isDictionaryMode())
     {
         return;
     }
@@ -907,9 +907,18 @@ void CR3View::handleMouseReleaseInCitationMode(QMouseEvent * event)
     }
 }
 
+bool CR3View::isDictionaryMode()
+{
+    if (dict_widget_.get() && dict_widget_->isVisible())
+    {
+        return true;
+    }
+    return false;
+}
+
 void CR3View::mouseReleaseEvent ( QMouseEvent * event )
 {
-    if (_citation_mode_)
+    if (_citation_mode_ || isDictionaryMode())
     {
         handleMouseReleaseInCitationMode(event);
     }
