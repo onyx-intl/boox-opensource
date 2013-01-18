@@ -613,6 +613,7 @@ void OnyxMainWindow::processAdvancedActions()
             sdialog.b_margin = prop_str;
 
             sdialog.exec();
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 
             if (!sdialog.save)
                 break;
