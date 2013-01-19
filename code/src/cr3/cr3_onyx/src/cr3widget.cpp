@@ -1452,13 +1452,14 @@ void CR3View::onDictClosed()
 
 void CR3View::lookup()
 {
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
     if (!dict_widget_)
     {
         startDictLookup();
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     }
 
     adjustDictWidget();
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     dict_widget_->lookup(getSelectionText());
 }
 
