@@ -185,6 +185,10 @@ public:
 	virtual bool isSelectionEnabled() const = 0;
 	const ZLTextElementArea *elementByCoordinates(int x, int y) const;
 
+	void setHyphenation(bool enable) { enable_hyphenation_ = enable; }
+	bool isHyphenation() { return enable_hyphenation_; }
+	void repaintView(bool strong) { rebuildPaintInfo(strong); }
+
         virtual void setMargins(int left, int right, int top, int bottom) = 0;
         virtual int leftMargin() const = 0;
         virtual int rightMargin() const = 0;
@@ -308,6 +312,8 @@ private:
 		int X;
 		int Y;
 	} myDoubleClickInfo;
+
+	bool enable_hyphenation_;
 
 friend class ZLTextSelectionModel;
 };

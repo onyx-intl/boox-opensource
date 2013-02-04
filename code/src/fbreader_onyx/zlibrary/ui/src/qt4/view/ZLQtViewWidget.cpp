@@ -447,7 +447,12 @@ void ZLQtViewWidget::updateActions()
 
     // TODO: John: add toc later.
     tools.push_back(TOC_VIEW_TOOL);
+    tools.push_back(DISPLAY_HYPHENATION);
     reading_tool_actions_.generateActions(tools);
+    if(static_cast<ZLTextView *>(view().get())->isHyphenation())
+    {
+        reading_tool_actions_.setActionStatus(DISPLAY_HYPHENATION, true);
+    }
 
     // Reading style
     ZLIntegerOption &option = ZLTextStyleCollection::instance().baseStyle().LineSpacePercentOption;
@@ -647,6 +652,14 @@ void ZLQtViewWidget::popupMenu()
         else if (reading_tool_actions_.selectedTool() == TOC_VIEW_TOOL)
         {
             showTableOfContents();
+        }
+        else if (reading_tool_actions_.selectedTool() == DISPLAY_HYPHENATION)
+        {
+            ZLTextView *ptr = static_cast<ZLTextView *>(view().get());
+            ptr->setHyphenation(!ptr->isHyphenation());
+            ptr->repaintView(true);
+            repaint();
+            onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
         }
         else if (reading_tool_actions_.selectedTool() == MARGIN_SETTING)
         {
@@ -920,7 +933,7 @@ void ZLQtViewWidget::loadConf()
         onyx::screen::instance().setDefaultWaveform(onyx::screen::ScreenProxy::GC);
     }
 
-    status_bar_->setVisible(conf.options[CONFIG_FULLSCREEN].toBool());
+    status_bar_->setVisible(!conf.options[CONFIG_FULLSCREEN].toBool());
 }
 
 void ZLQtViewWidget::saveConf()
@@ -945,7 +958,8 @@ void ZLQtViewWidget::saveConf()
     }
     conf.info.mutable_progress() = progress.arg(pos).arg(total);
     conf.options[CONFIG_FLASH_TYPE] = onyx::screen::instance().defaultWaveform();
-    conf.options[CONFIG_FULLSCREEN] = status_bar_->isVisible();
+    conf.options[CONFIG_FULLSCREEN] = !status_bar_->isVisible();
+    conf.options[CONFIG_HYPHENATION] = static_cast<ZLTextView *>(view().get())->isHyphenation();
 }
 
 void ZLQtViewWidget::closeDocument()
