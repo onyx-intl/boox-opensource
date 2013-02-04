@@ -114,6 +114,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool hasBookmark();
         void deleteBookmark();
 
+        bool citationMode() { return _citation_mode_; }
+        bool setCitationMode(bool enable) { _citation_mode_ = enable; }
+
         /// rotate view, +1 = 90` clockwise, -1 = 90` counterclockwise
         void rotate( int angle );
         /// Override to handle external links
@@ -224,7 +227,6 @@ class CR3View : public QWidget, public LVDocViewCallback
         void paintBookmark( QPainter & painter );
         void hideHelperWidget(QWidget * wnd);
         bool updateSearchWidget();
-        bool touchControlToNavigation();
         void stylusPan(const QPoint &now, const QPoint &old);
 
         bool docToWindowRect(lvRect &rect);
@@ -238,7 +240,11 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool selectNextWord();
         bool selectUpWord();
         bool selectDownWord();
+        void handleMouseReleaseInCitationMode(QMouseEvent * event);
 
+        bool isDictionaryMode();
+
+    private:
         DocViewData * _data; // to hide non-qt implementation
         LVDocView * _docview;
         QScrollBar * _scroll;
@@ -273,6 +279,9 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         QImage img_;
         bool able_turn_page_;
+
+        bool _citation_mode_;
+
 };
 
 #endif // CR3WIDGET_H

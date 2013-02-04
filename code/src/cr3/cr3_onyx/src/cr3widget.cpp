@@ -56,6 +56,7 @@ CR3View::CR3View( QWidget *parent)
         , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
         , able_turn_page_(true)
+        , _citation_mode_(false)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -836,10 +837,16 @@ bool CR3View::updateSelection(ldomXRange *range)
 
 void CR3View::mousePressEvent ( QMouseEvent * event )
 {
-    bool left = event->button() == Qt::LeftButton;
+    begin_point_ = event->pos();
+
+    if (!_citation_mode_ && !isDictionaryMode())
+    {
+        return;
+    }
+
     //bool right = event->button() == Qt::RightButton;
     //bool mid = event->button() == Qt::MidButton;
-    begin_point_ = event->pos();
+    bool left = event->button() == Qt::LeftButton;
     lvPoint pt (event->x(), event->y());
     ldomXPointer p = _docview->getNodeByPoint( pt );
     lString16 path;
@@ -870,7 +877,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
     //CRLog::debug("mousePressEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
 }
 
-void CR3View::mouseReleaseEvent ( QMouseEvent * event )
+void CR3View::handleMouseReleaseInCitationMode(QMouseEvent * event)
 {
     bool left = event->button() == Qt::LeftButton;
     //bool right = event->button() == Qt::RightButton;
@@ -898,9 +905,29 @@ void CR3View::mouseReleaseEvent ( QMouseEvent * event )
             //    update();
         }
     }
+}
+
+bool CR3View::isDictionaryMode()
+{
+    if (dict_widget_.get() && dict_widget_->isVisible())
+    {
+        return true;
+    }
+    return false;
+}
+
+void CR3View::mouseReleaseEvent ( QMouseEvent * event )
+{
+    if (_citation_mode_ || isDictionaryMode())
+    {
+        handleMouseReleaseInCitationMode(event);
+    }
+    else
+    {
     //CRLog::debug("mouseReleaseEvent - doc pos (%d,%d), buttons: %d %d %d", pt.x, pt.y, (int)left, (int)right, (int)mid);
     //FIXME: cite mode
-    stylusPan(event->pos(), begin_point_);
+        stylusPan(event->pos(), begin_point_);
+    }
 
     if(dict_widget_.get() &&
        dict_widget_->isVisible() &&
@@ -1425,13 +1452,14 @@ void CR3View::onDictClosed()
 
 void CR3View::lookup()
 {
-    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU);
     if (!dict_widget_)
     {
         startDictLookup();
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     }
 
     adjustDictWidget();
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     dict_widget_->lookup(getSelectionText());
 }
 
@@ -1534,11 +1562,6 @@ void CR3View::processKeyReleaseEvent(int key)
     }
 }
 
-bool CR3View::touchControlToNavigation()
-{
-    return qgetenv("CR3_TOUCH_CONTROL_NAVIGATION").toInt() > 0;
-}
-
 void CR3View::stylusPan(const QPoint &now, const QPoint &old)
 {
     int direction = sys::SystemConfig::direction(old, now);
@@ -1555,38 +1578,24 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
     }
     else
     {
-        bool to_turn_page = false;
-        if (!touchControlToNavigation())
+        if( dict_widget_ &&
+                dict_widget_->isVisible() &&
+                !getSelectionText().isEmpty())
         {
-            if( dict_widget_ &&
-                    dict_widget_->isVisible() &&
-                    !getSelectionText().isEmpty())
-            {
-                select_word_point_ = now;
-                update();
-                lookup();
-            }
-            else
-            {
-                to_turn_page = true;
-            }
-        }
-        else
-        {
-            to_turn_page = true;
+            select_word_point_ = now;
+            update();
+            lookup();
+            return;
         }
 
-        if (to_turn_page)
+        direction = sys::SystemConfig::whichArea(old, now);
+        if (direction > 0)
         {
-            direction = sys::SystemConfig::whichArea(old, now);
-            if (direction > 0)
-            {
-                nextPageWithTTSChecking();
-            }
-            else if (direction < 0)
-            {
-                prevPageWithTTSChecking();
-            }
+            nextPageWithTTSChecking();
+        }
+        else if (direction < 0)
+        {
+            prevPageWithTTSChecking();
         }
     }
 }

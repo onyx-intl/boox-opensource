@@ -306,6 +306,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          }
          break;
      case Qt::Key_Menu:
+     case Qt::Key_F10:
          {
              popupMenu();
          }
@@ -521,9 +522,10 @@ bool OnyxMainWindow::updateActions()
     advanced_actions_.generateActions(advanced, true);
 
     advanced.clear();
+    advanced.push_back(CITATION_MODE);
     advanced.push_back(ADD_CITE);
     advanced.push_back(SHOW_ALL_CITES);
-    advanced_actions_.generateActions(advanced, true);
+    advanced_actions_.generateActions(advanced, true, view_->citationMode());
 
     // Font family.
     QFont font = currentFont();
@@ -611,6 +613,7 @@ void OnyxMainWindow::processAdvancedActions()
             sdialog.b_margin = prop_str;
 
             sdialog.exec();
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 
             if (!sdialog.save)
                 break;
@@ -706,9 +709,17 @@ void OnyxMainWindow::processAdvancedActions()
             view_->openRecentBook(rb.selectedInfo());
             break;
                            }
+        case CITATION_MODE:
+            {
+                view_->setCitationMode(!view_->citationMode());
+                break;
+            }
         case ADD_CITE:
             addCite();
             view_->restoreWindowPos(this, "MyBookmark");
+
+            // the citation mode only use once, need to activate again if needed
+            view_->setCitationMode(false);
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
             break;
 
