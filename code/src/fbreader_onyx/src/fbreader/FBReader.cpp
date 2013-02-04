@@ -227,6 +227,8 @@ bool FBReader::initWindow() {
         }
     }
     ZLApplication::content_ready = true;
+
+    ((ZLTextView&)*myBookTextView).setHyphenation(conf().options[CONFIG_HYPHENATION].toBool());
     refreshWindow();
     return true;
 }
