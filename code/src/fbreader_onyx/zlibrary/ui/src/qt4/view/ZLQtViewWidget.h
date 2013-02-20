@@ -57,6 +57,7 @@ private:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+    bool isUpRightCornerAndManipulateBookmarks(const QPoint &now, const QPoint &old);
 
     int x(const QMouseEvent *event) const;
     int y(const QMouseEvent *event) const;
@@ -128,6 +129,9 @@ public Q_SLOTS:
     void onMultiTouchPressDetected(QRect r1, QRect r2);
     void onMultiTouchReleaseDetected(QRect r1, QRect r2);
 
+    bool addBookmark();
+    bool hasBookmark();
+    bool removeBookmarks();
 
 private:
     bool isWidgetVisible(QWidget * wnd);
@@ -139,11 +143,8 @@ private:
     void showSearchWidget();
     bool updateSearchCriteria();
 
-    bool addBookmark();
-    bool removeBookmarks();
     bool clearBookmarks();
     void showAllBookmarks();
-    bool hasBookmark();
     void bookmarkModel(QStandardItemModel & model, QModelIndex & selected);
     void processBookmarks(ReadingToolsActions & actions);
 

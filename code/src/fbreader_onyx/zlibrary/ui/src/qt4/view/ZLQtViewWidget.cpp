@@ -370,7 +370,19 @@ void Widget::stylusPan(const QPoint &now, const QPoint &old)
         if (sys::isIRTouch())
         {
             direction = sys::SystemConfig::whichArea(old, now);
-            if (direction > 0)
+            if (isUpRightCornerAndManipulateBookmarks(now, old))
+            {
+                if (myHolder->hasBookmark())
+                {
+                    myHolder->removeBookmarks();
+                }
+                else
+                {
+                    myHolder->addBookmark();
+                }
+                return;
+            }
+            else if (direction > 0)
             {
                 myHolder->nextPage();
             }
@@ -380,6 +392,19 @@ void Widget::stylusPan(const QPoint &now, const QPoint &old)
             }
         }
     }
+}
+
+
+bool Widget::isUpRightCornerAndManipulateBookmarks(const QPoint &now, const QPoint &old)
+{
+    int MAYBE_ERROR = 100;
+    QPoint mouse_point = rect().topRight() -now;
+
+    if(mouse_point.x() < MAYBE_ERROR && mouse_point.y() >-MAYBE_ERROR)
+    {
+        return true;
+    }
+    return false;
 }
 
 void ZLQtViewWidget::repaint()
@@ -1034,7 +1059,7 @@ QStandardItem * ZLQtViewWidget::searchParent(const int index,
 void ZLQtViewWidget::showTableOfContents()
 {
     std::vector<int> paragraphs;
-    std::vector<std::string> titles; 
+    std::vector<std::string> titles;
     myApplication->loadTreeModelData(paragraphs,titles);
 
     std::vector<QStandardItem *> ptrs;
@@ -1074,7 +1099,7 @@ void ZLQtViewWidget::showTableOfContents()
         return;
     }
     int pos = model.data(index, Qt::UserRole + 100).toInt();
-  
+
     myApplication->gotoParagraph(pos);
     ::myDelay();
     onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
@@ -1317,7 +1342,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             case Qt::Key_Escape:
                 if (hyperlink_selected_)
                 {
-                    hyperlink_selected_ = false;    
+                    hyperlink_selected_ = false;
                     ptr->selectionModel().clear();
                     myApplication->refreshWindow();
                 }
@@ -1334,7 +1359,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 }
             case Qt::Key_PageUp:
                 {
-                    hyperlink_selected_ = false;    
+                    hyperlink_selected_ = false;
                     ptr->selectionModel().clear();
                     triggerLargeScrollAction("largeScrollBackward");
 
@@ -1348,7 +1373,7 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
                 }
             case Qt::Key_PageDown:
                 {
-                    hyperlink_selected_ = false;    
+                    hyperlink_selected_ = false;
                     ptr->selectionModel().clear();
                     triggerLargeScrollAction("largeScrollForward");
 
@@ -1807,7 +1832,7 @@ void ZLQtViewWidget::findHyperlink(bool next)
             {
                 view()->onStylusRelease(start_area.XStart ,start_area.YStart);
             }
-            else 
+            else
             {
                 if (start_area.XStart <= stop_area->XStart || start_area.YStart <= stop_area->YStart)
                 {
@@ -1912,7 +1937,7 @@ void ZLQtViewWidget::onMultiTouchReleaseDetected(QRect r1, QRect r2)
     QRect r = r1.united(r2);
 
     float diagonal_length_changed = sqrt(static_cast<float>(r.width() * r.width() + r.height() * r.height())) - sqrt(static_cast<float>(rect_pressed_.width() * rect_pressed_.width() + rect_pressed_.height() * rect_pressed_.height()));
-    float diagonal_length_per_fontsize = 100 / 2; // 100 pixel for 2 fontsize 
+    float diagonal_length_per_fontsize = 100 / 2; // 100 pixel for 2 fontsize
 
     ZLIntegerRangeOption &sizeOption = ZLTextStyleCollection::instance().baseStyle().FontSizeOption;
     int fontSizeChanged = (int) (diagonal_length_changed / diagonal_length_per_fontsize);
