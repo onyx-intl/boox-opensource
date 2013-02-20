@@ -394,7 +394,6 @@ void Widget::stylusPan(const QPoint &now, const QPoint &old)
     }
 }
 
-
 bool Widget::isUpRightCornerAndManipulateBookmarks(const QPoint &now, const QPoint &old)
 {
     int MAYBE_ERROR = 100;
