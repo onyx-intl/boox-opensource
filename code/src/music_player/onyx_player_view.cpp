@@ -287,19 +287,9 @@ void OnyxPlayerView::createMenuView()
     menu_view_datas_.push_back(dd);
 
     dd = new OData;
-    bool has_touch = sys::SysStatus::instance().hasTouchScreen();
-    if (has_touch)
-    {
-        QPixmap vol_pixmap(":/player_icons/volume.png");
-        dd->insert(TAG_COVER, vol_pixmap);
-        dd->insert(TAG_MENU_TYPE, MENU_VOLUME);
-    }
-    else
-    {
-        QPixmap min_pixmap(":/player_icons/minimize.png");
-        dd->insert(TAG_COVER, min_pixmap);
-        dd->insert(TAG_MENU_TYPE, MENU_MINIMIZE);
-    }
+    QPixmap vol_pixmap(":/player_icons/volume.png");
+    dd->insert(TAG_COVER, vol_pixmap);
+    dd->insert(TAG_MENU_TYPE, MENU_VOLUME);
     menu_view_datas_.push_back(dd);
 
     dd = new OData;

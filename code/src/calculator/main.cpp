@@ -43,10 +43,18 @@
  #include "calculator.h"
  #include "onyx/screen/screen_update_watcher.h"
  #include "onyx/sys/sys.h"
+#include "onyx/ui/languages.h"
 
  int main(int argc, char *argv[])
  {
      QApplication app(argc, argv);
+
+     app.setApplicationName("calculator");
+     QTranslator translator;
+     translator.load(":/calculator" + QLocale::system().name());
+     app.installTranslator(&translator);
+     ui::loadTranslator (QLocale::system().name());
+
      Calculator calc;
      onyx::screen::watcher().addWatcher(&calc);
      calc.showMaximized();

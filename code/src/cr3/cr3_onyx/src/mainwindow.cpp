@@ -24,7 +24,6 @@
 #include "onyx/ui/glow_light_control_dialog.h"
 #include "onyx/cms/content_manager.h"
 #include "onyx/cms/content_thumbnail.h"
-#include "onyx/data/configuration.h"
 
 #include "../lcl_ui/settings_dialog.h"
 #include "../lcl_ui/info_dialog.h"
@@ -176,6 +175,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
 
     view_->restoreWindowPos( this, "main.", true );
+
+    loadDocumentOptions(file_name_to_open_);
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
@@ -305,6 +306,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          }
          break;
      case Qt::Key_Menu:
+     case Qt::Key_F10:
          {
              popupMenu();
          }
@@ -411,9 +413,11 @@ void OnyxMainWindow::popupMenu()
         }
         else if (system == GLOW_LIGHT_CONTROL)
         {
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
             ui::GlowLightControlDialog dialog(this);
             dialog.exec();
             QApplication::processEvents();
+            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GC);
         }
         else if (system == ROTATE_SCREEN)
         {
@@ -518,9 +522,10 @@ bool OnyxMainWindow::updateActions()
     advanced_actions_.generateActions(advanced, true);
 
     advanced.clear();
+    advanced.push_back(CITATION_MODE);
     advanced.push_back(ADD_CITE);
     advanced.push_back(SHOW_ALL_CITES);
-    advanced_actions_.generateActions(advanced, true);
+    advanced_actions_.generateActions(advanced, true, view_->citationMode());
 
     // Font family.
     QFont font = currentFont();
@@ -608,6 +613,7 @@ void OnyxMainWindow::processAdvancedActions()
             sdialog.b_margin = prop_str;
 
             sdialog.exec();
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 
             if (!sdialog.save)
                 break;
@@ -703,9 +709,17 @@ void OnyxMainWindow::processAdvancedActions()
             view_->openRecentBook(rb.selectedInfo());
             break;
                            }
+        case CITATION_MODE:
+            {
+                view_->setCitationMode(!view_->citationMode());
+                break;
+            }
         case ADD_CITE:
             addCite();
             view_->restoreWindowPos(this, "MyBookmark");
+
+            // the citation mode only use once, need to activate again if needed
+            view_->setCitationMode(false);
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
             break;
 
@@ -1099,12 +1113,22 @@ void OnyxMainWindow::onScreenSizeChanged(int)
     onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GC);
 }
 
+bool OnyxMainWindow::loadDocumentOptions(const QString &path)
+{
+    ContentManager database;
+    if (!vbf::openDatabase(path, database))
+    {
+        return false;
+    }
+
+    return vbf::loadDocumentOptions(database, path, conf_);
+}
+
 bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 {
     QString authors = cr2qt(view_->getDocView()->getAuthors());
     QString title = cr2qt(view_->getDocView()->getTitle());
     cms::ContentManager database;
-    vbf::Configuration conf_;
     if (!vbf::openDatabase(path, database) && !vbf::loadDocumentOptions(database, path, conf_))
     {
         return false;

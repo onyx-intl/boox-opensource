@@ -206,7 +206,7 @@ void Calculator::createAllButtons()
          OData * dd = new OData;
          dd->insert(TAG_TITLE, button_list[i].first);
          dd->insert(TAG_ID, button_list[i].second);
-         dd->insert(TAG_FONT_SIZE, 32);
+         dd->insert(TAG_FONT_SIZE, 26);
          button_data.push_back(dd);
      }
 
@@ -250,12 +250,19 @@ void Calculator::createAllButtons()
      QDialog::keyReleaseEvent(ke);
  }
 
- void Calculator::refreshScreen()
+ void Calculator::refreshScreen(bool full_update)
  {
-    display->repaint();
+//    display->repaint();
     display->update();
     update();
-    onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::DW);
+    if (full_update)
+    {
+        onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GC);
+    }
+    else
+    {
+        onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::A2);
+    }
  }
 
  void Calculator::digitClicked(const QString &title)
@@ -431,7 +438,7 @@ void Calculator::createAllButtons()
      display->setText("0");
      waitingForOperand = true;
 
-     refreshScreen();
+     refreshScreen(true);
  }
 
  void Calculator::clearAll()
@@ -443,7 +450,7 @@ void Calculator::createAllButtons()
      display->setText("0");
      waitingForOperand = true;
 
-     refreshScreen();
+     refreshScreen(true);
  }
 
  void Calculator::clearMemory()
