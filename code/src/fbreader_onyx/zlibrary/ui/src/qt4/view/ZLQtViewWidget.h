@@ -130,6 +130,7 @@ public Q_SLOTS:
     void onMouseLongPress(QPoint, QSize);
     void onMultiTouchPressDetected(QRect r1, QRect r2);
     void onMultiTouchReleaseDetected(QRect r1, QRect r2);
+    void onHideDictWidget();
 
 
 private:
