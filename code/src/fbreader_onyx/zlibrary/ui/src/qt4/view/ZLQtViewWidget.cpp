@@ -157,7 +157,7 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
     connect(&sys_status_, SIGNAL(multiTouchPressDetected(QRect, QRect)), this, SLOT(onMultiTouchPressDetected(QRect, QRect)));
     connect(&sys_status_, SIGNAL(multiTouchReleaseDetected(QRect, QRect)), this, SLOT(onMultiTouchReleaseDetected(QRect, QRect)));
 
-    connect(myQWidget, SIGNAL(hideDictWidget()), this, SLOT(onHideDictWidget()));
+    connect(myQWidget, SIGNAL(hideDictWidget()), this, SLOT(onDictClosed()));
 
 
     // Load conf.
@@ -831,7 +831,6 @@ void ZLQtViewWidget::onProgressClicked(const int percentage,
     }
     // John: ask framework to update status bar, so we don't need to process it here.
     // updateProgress(full_, from_, to_);
-    onHideDictWidget();
     onScrollbarMoved(ZLView::VERTICAL, full_, from_, to_);
 }
 
@@ -1627,14 +1626,6 @@ bool ZLQtViewWidget::moveDictWidget(bool up)
     {
         QRect rc(QPoint(), QSize(myQWidget->width(), 100));
         dict_widget_->ensureVisible(rc);
-    }
-}
-
-void ZLQtViewWidget::onHideDictWidget()
-{
-    if(dict_widget_ && dict_widget_->isVisible())
-    {
-        onDictClosed();
     }
 }
 
