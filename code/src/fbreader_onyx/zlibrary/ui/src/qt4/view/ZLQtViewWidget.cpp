@@ -157,6 +157,9 @@ ZLQtViewWidget::ZLQtViewWidget(QWidget *parent, ZLApplication *application)
     connect(&sys_status_, SIGNAL(multiTouchPressDetected(QRect, QRect)), this, SLOT(onMultiTouchPressDetected(QRect, QRect)));
     connect(&sys_status_, SIGNAL(multiTouchReleaseDetected(QRect, QRect)), this, SLOT(onMultiTouchReleaseDetected(QRect, QRect)));
 
+    connect(myQWidget, SIGNAL(hideDictWidget()), this, SLOT(onDictClosed()));
+
+
     // Load conf.
     loadConf();
 }
@@ -338,10 +341,12 @@ void Widget::stylusPan(const QPoint &now, const QPoint &old)
 
     if (direction > 0)
     {
+        emit hideDictWidget();
         myHolder->nextPage();
     }
     else if (direction < 0)
     {
+        emit hideDictWidget();
         myHolder->prevPage();
     }
     else if (myHolder->view()->onStylusMove(now.x(), now.y()))
@@ -1310,12 +1315,12 @@ void ZLQtViewWidget::processKeyReleaseEvent(int key)
             stopDictLookup();
             break;
         case Qt::Key_PageDown:
+            onDictClosed();
             triggerLargeScrollAction("largeScrollForward");
-            moveDictWidget(false);
             break;
         case Qt::Key_PageUp:
+            onDictClosed();
             triggerLargeScrollAction("largeScrollBackward");
-            moveDictWidget(false);
             break;
         }
     }
