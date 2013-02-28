@@ -50,9 +50,6 @@ public:
 private slots:
     void onTimeOut();
 
-Q_SIGNALS:
-    void hideDictWidget();
-
 private:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
