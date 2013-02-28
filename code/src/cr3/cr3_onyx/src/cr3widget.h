@@ -180,7 +180,6 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         tts::TTSWidget & ttsWidget();
         tts::TTS & tts();
-        void hideDictWidget();
 
     signals:
         //void fileNameChanged( const QString & );

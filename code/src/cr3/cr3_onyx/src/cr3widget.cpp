@@ -439,7 +439,6 @@ void CR3View::nextPageWithTTSChecking()
         startTTS();
     }
     else {
-        hideDictWidget();
         this->nextPage();
         emit requestUpdateAll();
     }
@@ -460,7 +459,6 @@ void CR3View::prevPageWithTTSChecking() {
         startTTS();
     }
     else {
-        hideDictWidget();
         this->prevPage();
         emit requestUpdateAll();
     }
@@ -480,7 +478,6 @@ void CR3View::gotoPageWithTTSChecking(const int dstPage)
         startTTS();
     }
     else {
-        hideDictWidget();
         this->gotoPage(dstPage);
         emit requestUpdateAll();
     }
@@ -1370,14 +1367,6 @@ tts::TTS & CR3View::tts()
         sys::SysStatus::instance().setSystemBusy(false);
     }
     return *tts_engine_;
-}
-
-void CR3View::hideDictWidget()
-{
-    if(dict_widget_ && dict_widget_->isVisible())
-    {
-        onDictClosed();
-    }
 }
 
 void CR3View::hideHelperWidget(QWidget * wnd)
