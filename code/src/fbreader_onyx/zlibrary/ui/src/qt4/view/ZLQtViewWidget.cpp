@@ -1622,6 +1622,7 @@ bool ZLQtViewWidget::moveDictWidget(bool up)
         QRect rc(QPoint(), QSize(myQWidget->width(), 100));
         dict_widget_->ensureVisible(rc);
     }
+    onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::A2);
 }
 
 void ZLQtViewWidget::onDictClosed()
