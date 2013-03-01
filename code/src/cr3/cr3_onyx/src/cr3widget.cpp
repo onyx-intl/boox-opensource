@@ -1530,9 +1530,11 @@ void CR3View::processKeyReleaseEvent(int key)
         onDictClosed();
         break;
     case Qt::Key_PageDown:
+        moveDictWidget();
         nextPageWithTTSChecking();
         break;
     case Qt::Key_PageUp:
+        moveDictWidget();
         prevPageWithTTSChecking();
         break;
     default:
@@ -1597,6 +1599,15 @@ void CR3View::stylusPan(const QPoint &now, const QPoint &old)
         {
             prevPageWithTTSChecking();
         }
+    }
+}
+
+void CR3View::moveDictWidget()
+{
+    if (dict_widget_ && dict_widget_->isVisible())
+    {
+        QRect rc(QPoint(), QSize(this->width(), 100));
+        dict_widget_->ensureVisible(rc);
     }
 }
 
