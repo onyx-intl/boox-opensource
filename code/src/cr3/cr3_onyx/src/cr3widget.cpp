@@ -1435,7 +1435,7 @@ void CR3View::showSearchWidget()
         connect(search_widget_.get(), SIGNAL(closeClicked()), this, SLOT(onSearchClosed()));
 
         sys::SystemConfig conf;
-        onyx::screen::watcher().addWatcher(this, conf.screenUpdateGCInterval());
+        onyx::screen::watcher().addWatcher(search_widget_.get());
     }
 
     search_context_.userData() = BEFORE_SEARCH;
