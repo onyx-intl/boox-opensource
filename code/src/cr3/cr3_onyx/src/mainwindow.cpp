@@ -1136,6 +1136,9 @@ bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 
     conf_.info.mutable_authors() = authors;
     conf_.info.mutable_title() = title;
+    QString progress("%1 / %2");
+    conf_.info.mutable_progress() = progress.arg(QString::number(view_->getDocView()->getCurPage()))
+            .arg(QString::number(view_->getDocView()->getPageCount()));
 
     return vbf::saveDocumentOptions(database, path, conf_);
 }
