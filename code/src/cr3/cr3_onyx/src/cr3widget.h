@@ -109,6 +109,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         /// create bookmark
         CRBookmark * createBookmark();
         CRBookmark * createCite();
+        void paintCite();
         /// go to bookmark and highlight it
         void goToBookmark( CRBookmark * bm );
         bool hasBookmark();

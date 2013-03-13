@@ -2440,7 +2440,7 @@ void LVDocView::selectRange(const ldomXRange & range) {
 		if (range == *sel[0])
 			return; // the same range is set
 	}
-	sel.clear();
+//	sel.clear();
 	sel.add(new ldomXRange(range));
 	updateSelections();
 }

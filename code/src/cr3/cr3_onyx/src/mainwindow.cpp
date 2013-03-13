@@ -177,6 +177,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     view_->restoreWindowPos( this, "main.", true );
 
     loadDocumentOptions(file_name_to_open_);
+
+    view_->paintCite();
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
