@@ -40,6 +40,7 @@
 
 #include "onyx/screen/screen_proxy.h"
 #include "onyx/sys/platform.h"
+#include "onyx/sys/sys_status.h"
 
 static bool support16GrayScale()
 {
@@ -67,6 +68,8 @@ ZLQtApplicationWindow::ZLQtApplicationWindow(ZLApplication *application) :
 #ifdef Q_WS_QWS
     setWindowFlags(Qt::FramelessWindowHint);
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
+    connect(&SysStatus::instance(), SIGNAL(taskActivated(const QString &)), this, SLOT(onTaskActivated(const QString &)));    
+  
 #endif
 
     menuBar()->hide();
@@ -320,3 +323,9 @@ void ZLQtApplicationWindow::onScreenSizeChanged(int)
     onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GC);
 }
 
+void ZLQtApplicationWindow::onTaskActivated(const QString &)
+{
+  qDebug() << "Path activated use activate main window in fb reader.";                           
+  raise(); 
+  activateWindow();  
+}

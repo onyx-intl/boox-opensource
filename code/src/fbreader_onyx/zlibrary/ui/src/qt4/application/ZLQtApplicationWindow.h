@@ -71,7 +71,7 @@ private:
 
 private Q_SLOTS:
     void onScreenSizeChanged(int);
-
+    void onTaskActivated(const QString &);
 private:
 	QDockWidget *myDocWidget;
 
