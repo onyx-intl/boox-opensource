@@ -68,7 +68,7 @@ ZLQtApplicationWindow::ZLQtApplicationWindow(ZLApplication *application) :
 #ifdef Q_WS_QWS
     setWindowFlags(Qt::FramelessWindowHint);
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
-    connect(&SysStatus::instance(), SIGNAL(taskActivated(const QString &)), this, SLOT(onTaskActivated(const QString &)));    
+    connect(&SysStatus::instance(), SIGNAL(taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));    
   
 #endif
 
@@ -323,9 +323,10 @@ void ZLQtApplicationWindow::onScreenSizeChanged(int)
     onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GC);
 }
 
-void ZLQtApplicationWindow::onTaskActivated(const QString &)
+void ZLQtApplicationWindow::onTaskActivated(const QStringList & list)
 {
-  qDebug() << "Path activated use activate main window in fb reader.";                           
+  // check if it's the document
+  qDebug() << "Path activated use activate main window in fb reader." << list;                           
   raise(); 
   activateWindow();  
 }
