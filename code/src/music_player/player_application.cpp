@@ -25,6 +25,7 @@ PlayerApplication::PlayerApplication(int &argc, char **argv)
     connect( &sys_status, SIGNAL( sdCardChangedSignal( bool ) ), this, SLOT( onSDChangedSignal( bool ) ) );
     connect(&sys_status, SIGNAL(aboutToSuspend()), this, SLOT(onAboutToSuspend()));
     connect(&sys_status, SIGNAL(wakeup()), this, SLOT(onWakeUp()));
+    connect(&sys_status, SIGNAL(taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));
 
 #ifdef Q_WS_QWS
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
@@ -205,6 +206,25 @@ void PlayerApplication::onSDChangedSignal(bool inserted)
         qApp->exit();
     }
 }
+
+void PlayerApplication::onTaskActivated(const QStringList & list)
+{
+  qDebug() << "Path activated use activate main window in fb reader." << list;
+  if (list.contains(path_))
+    {
+      // check if it's the document
+      qDebug() << "Path detected, show window.";
+      view_.show();
+      view_.raise();
+      view_.activateWindow();
+    }
+  else
+    {
+      qDebug() << "hide window.";
+      view_.hide();
+    }
+}
+
 
 int PlayerApplicationAdaptor::state()
 {

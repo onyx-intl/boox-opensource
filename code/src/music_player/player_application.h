@@ -33,6 +33,8 @@ public Q_SLOTS:
     void onAboutToSuspend();
     void onWakeUp();
 
+    void onTaskActivated(const QStringList & list);
+
 private Q_SLOTS:
     void onTestReload();
     void onResetTime();
