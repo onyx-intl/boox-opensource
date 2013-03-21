@@ -34,6 +34,8 @@
 //-- Defines a helper macro for loging
 #define LOG(__line) if (log.get()) (*log) << __line << "\r\n";
 
+static const int MAX_ITME_COUNT = 29;
+
 using namespace std;
 
 ///<summary>Konstruktor</summary>
@@ -72,6 +74,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
     int itemCount=0;
     int newItemCount=0;
     int currentDayId=-1;
+    QVector<CRSSItem*> item_vector;
 
     //-- Prevent idling
     Working();
@@ -116,7 +119,8 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
     {
         guidList+=rssItem->Guid;
         rssItem->SetLog(log.get());
-        itemList.insert(rssItem->Timestamp, rssItem);	
+        itemList.insert(rssItem->Timestamp, rssItem);
+        item_vector.push_back(rssItem);
 
         LOG("Loaded " << rssItem->Title << " from store.");
     }
@@ -155,6 +159,7 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
         {
             guidList+=rssItem->Guid;
             itemList.insert(rssItem->Timestamp, rssItem);
+            item_vector.push_back(rssItem);
         }
         else
             delete rssItem;
@@ -174,17 +179,24 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
     QMapIterator<QDateTime, CRSSItem*> itemListIterator(itemList);
     iItemIndex=0;
     itemListIterator.toBack();
-    while (itemListIterator.hasPrevious())
+
+    for(int i = 0; i < item_vector.size(); i++)
     {
+        if(i > MAX_ITME_COUNT)
+            break;
         iItemIndex++;
         Working();
 
         //-- Get the next item
-        itemListIterator.previous();
-        rssItem=itemListIterator.value();
+
+        rssItem = item_vector.at(i);
         if(feed.KeepDays == 0)
         {
             feed.KeepDays = 3;
+        }
+        if(rssItem->Timestamp.toString() == "")
+        {
+            rssItem->Timestamp = QDateTime::currentDateTime();
         }
 
         if (rssItem->IsInTime(feed.KeepDays))
@@ -221,10 +233,6 @@ void CRSSLoaderThread::UpdateFeed(CRSSFeedInfo& feed)
             //   If we're canceling add the already fetched items to the index, so they are still available
             if ((!Cancel)||(rssItem->Fetched))
             {
-                if(rssItem->Timestamp.toString() == "")
-                {
-                    rssItem->Timestamp = QDateTime::currentDateTime();
-                }
                 //-- Insert a divider between days
                 if (rssItem->GetDayId()!=currentDayId)
                 {
