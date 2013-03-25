@@ -55,14 +55,8 @@ void PlayerApplication::onAboutToSuspend()
 
 void PlayerApplication::onWakeUp()
 {
-    PlayListItem* current_item = model_->currentItem();
-    QString path = current_item->fileInfo()->path();
-    current_time_ = view_.elapsed();
-
-    if (!path.isEmpty() && open(path))
-    {
-        QTimer::singleShot(300, this, SLOT(onResetTime()));
-    }
+    //if the parametric is a empty string, open() method will handle play progress.
+    open(QString());
     hide_view_on_waking_up = false;
 }
 
