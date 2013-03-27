@@ -827,6 +827,8 @@ void ZLQtViewWidget::onProgressClicked(const int percentage,
     // John: ask framework to update status bar, so we don't need to process it here.
     // updateProgress(full_, from_, to_);
     onScrollbarMoved(ZLView::VERTICAL, full_, from_, to_);
+    qDebug() << "  full_= " << full_ << "  from = " << from_ << "   to = " << to_;
+
 }
 
 void ZLQtViewWidget::onSetEncoding(std::string encoding)
@@ -1028,8 +1030,21 @@ TTSWidget & ZLQtViewWidget::ttsWidget()
 
 void ZLQtViewWidget::showGotoPageDialog()
 {
-    onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
-    status_bar_->onMessageAreaClicked();
+    int current_page = (to_ >> shift(page_step_));
+    if (current_page <= 0)
+    {
+        current_page = 1;
+    }
+    int total_pages = (full_ >> shift(page_step_));
+    NumberDialog dialog(0);
+    if (dialog.popup(current_page, total_pages) != QDialog::Accepted)
+    {
+        onyx::screen::instance().updateWidget(0, onyx::screen::ScreenProxy::GU);
+        return;
+    }
+
+    int current = dialog.value();
+    this->onProgressClicked(1, current);
 }
 
 QStandardItem * ZLQtViewWidget::searchParent(const int index,
