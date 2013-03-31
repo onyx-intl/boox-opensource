@@ -32,6 +32,7 @@ public Q_SLOTS:
     void onSDChangedSignal(bool inserted);
     void onAboutToSuspend();
     void onWakeUp();
+    void onTaskActivated(const QStringList & list);
 
     void onTaskActivated(const QStringList & list);
 

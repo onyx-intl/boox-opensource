@@ -67,6 +67,25 @@ void PlayerApplication::onWakeUp()
     hide_view_on_waking_up = false;
 }
 
+
+void PlayerApplication::onTaskActivated(const QStringList &list)
+{
+    qDebug() << "Path activated use activate main window in music player." << list;
+    if (list.contains(path_))
+    {
+        // check if it's the document
+        qDebug() << "Path detected, show window.";
+        view_.show();
+        view_.raise();
+        view_.activateWindow();
+    }
+    else
+    {
+        qDebug() << "hide window.";
+        view_.hide();
+    }
+}
+
 void PlayerApplication::onResetTime()
 {
     view_.setProgress(current_time_);
