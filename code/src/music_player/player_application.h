@@ -34,7 +34,6 @@ public Q_SLOTS:
     void onWakeUp();
     void onTaskActivated(const QStringList & list);
 
-    void onTaskActivated(const QStringList & list);
 
 private Q_SLOTS:
     void onTestReload();

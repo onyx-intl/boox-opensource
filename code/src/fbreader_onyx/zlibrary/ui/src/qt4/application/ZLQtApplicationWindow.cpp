@@ -323,10 +323,23 @@ void ZLQtApplicationWindow::onScreenSizeChanged(int)
     onyx::screen::instance().updateWidget(this, onyx::screen::ScreenProxy::GC);
 }
 
-void ZLQtApplicationWindow::onTaskActivated(const QStringList & list)
+
+void ZLQtApplicationWindow::onTaskActivated(const QStringList &list)
 {
-  // check if it's the document
-  qDebug() << "Path activated use activate main window in fb reader." << list;                           
-  raise(); 
-  activateWindow();  
+  qDebug() << "Path activated use activate main window in fb reader." << list;
+  if (list.contains(application().document_path))
+    {
+      // check if it's the document
+      qDebug() << "Path detected, show window.";
+      show();
+      raise();
+      activateWindow();
+    }
+  else
+    {
+      qDebug() << "hide window.";
+      hide();
+    }
 }
+
+

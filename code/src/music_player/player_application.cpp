@@ -226,25 +226,6 @@ void PlayerApplication::onSDChangedSignal(bool inserted)
     }
 }
 
-void PlayerApplication::onTaskActivated(const QStringList & list)
-{
-  qDebug() << "Path activated use activate main window in fb reader." << list;
-  if (list.contains(path_))
-    {
-      // check if it's the document
-      qDebug() << "Path detected, show window.";
-      view_.show();
-      view_.raise();
-      view_.activateWindow();
-    }
-  else
-    {
-      qDebug() << "hide window.";
-      view_.hide();
-    }
-}
-
-
 int PlayerApplicationAdaptor::state()
 {
     PlayerUtils::State state = app_->view()->state();

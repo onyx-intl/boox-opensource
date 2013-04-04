@@ -516,6 +516,7 @@ void ZLQtViewWidget::updateActions()
 #endif
     all.push_back(GLOW_LIGHT_CONTROL);
     all.push_back(RETURN_TO_LIBRARY);
+    all.push_back(SHOW_TASK_LIST);
     system_actions_.generateActions(all);
 }
 
@@ -587,6 +588,10 @@ void ZLQtViewWidget::popupMenu()
             ui::BrightnessDialog dialog(widget());
             dialog.exec();
         }
+        else if (system == SHOW_TASK_LIST)
+	  {
+	    status_bar_->showTaskManagementDialog();
+	  }
         return;
     }
 
