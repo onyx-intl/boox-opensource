@@ -338,7 +338,7 @@ void ZLQtApplicationWindow::onTaskActivated(const QStringList &list)
   else
     {
       qDebug() << "hide window.";
-      hide();
+      lower();
     }
 }
 
