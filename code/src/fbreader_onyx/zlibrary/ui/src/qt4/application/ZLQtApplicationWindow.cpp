@@ -69,7 +69,8 @@ ZLQtApplicationWindow::ZLQtApplicationWindow(ZLApplication *application) :
     setWindowFlags(Qt::FramelessWindowHint);
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
     connect(&SysStatus::instance(), SIGNAL(taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));    
-  
+    connect(&SysStatus::instance(), SIGNAL(taskCloseRequest(const QStringList &)), this, SLOT(onReceivedTaskCloseRequest(const QStringList &)));
+
 #endif
 
     menuBar()->hide();
@@ -342,4 +343,12 @@ void ZLQtApplicationWindow::onTaskActivated(const QStringList &list)
     }
 }
 
+void ZLQtApplicationWindow::onReceivedTaskCloseRequest(const QStringList & list)
+{
+  qDebug() << "Path activated use activate main window in fb reader." << list;                                        
+    if (list.contains(application().document_path))                                                                   
+      {
+	close();
+    }        
+}
 
