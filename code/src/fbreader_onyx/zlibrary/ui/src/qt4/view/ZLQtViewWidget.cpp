@@ -108,7 +108,7 @@ QWidget * ZLQtViewWidget::addStatusBar()
 #ifdef BUILD_WITH_TFT
         status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|VOLUME|CLOCK);
 #else
-        status_bar_ = new StatusBar(widget(), ui::MENU|PROGRESS|SCREEN_REFRESH|VOLUME|CLOCK|BATTERY);
+        status_bar_ = new StatusBar(widget(), ui::MENU|TASK_MANAGEMENT|PROGRESS|SCREEN_REFRESH|VOLUME|CLOCK|BATTERY);
 #endif
     }
     else
