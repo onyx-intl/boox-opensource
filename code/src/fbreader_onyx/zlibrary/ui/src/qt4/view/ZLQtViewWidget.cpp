@@ -590,7 +590,7 @@ void ZLQtViewWidget::popupMenu()
         }
         else if (system == SHOW_TASK_LIST)
 	  {
-	    status_bar_->showTaskManagementDialog();
+	    status_bar_->showTaskManagementDialog("onyx_reader");
 	  }
         return;
     }
