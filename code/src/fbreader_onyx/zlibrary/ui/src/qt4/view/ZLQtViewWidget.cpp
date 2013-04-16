@@ -581,6 +581,10 @@ void ZLQtViewWidget::popupMenu()
         else if (system == ROTATE_SCREEN)
         {
             rotateScreen();
+            if(search_widget_)
+            {
+                QTimer::singleShot(50, this, SLOT(showSearchWidget()));
+            }
         }
         else if (system == BACKLIGHT_BRIGHTNESS)
         {

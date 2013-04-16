@@ -284,6 +284,11 @@ void CR3View::wheelEvent( QWheelEvent * event )
 
 void CR3View::resizeEvent ( QResizeEvent * event )
 {
+    if(search_widget_ && search_widget_->isVisible())
+    {
+        QTimer::singleShot(0, this, SLOT(showSearchWidget()));
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
+    }
 
     QSize sz = event->size();
     _docview->Resize( sz.width(), sz.height() );
