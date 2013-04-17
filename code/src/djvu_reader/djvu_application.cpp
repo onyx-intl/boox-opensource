@@ -281,26 +281,26 @@ bool DjvuApplicationAdaptor::flip(int direction)
 }
 
 
-void DjvuApplicationAdaptor::onTaskActivated(const QStringList &list)
+void DjvuApplication::onTaskActivated(const QStringList &list)
 {
     qDebug() << "Path activated use activate main window djvu reader." << list;
     if (list.contains(model_.path()))
     {
-        main_window_->show();
-        main_window_->raise();
-        main_window_->activateWindow();
+        main_window_.show();
+        main_window_.raise();
+        main_window_.activateWindow();
     }
     else
     {
-        main_window_->lower();
+        main_window_.lower();
     }
 }
 
-void DjvuApplicationAdaptor::onReceivedTaskCloseRequest(const QStringList & list)
+void DjvuApplication::onReceivedTaskCloseRequest(const QStringList & list)
 {
     if (list.contains(model_.path()))
     {
-        close();
+      close(model_.path());
     }
 }
 

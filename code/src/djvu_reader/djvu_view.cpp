@@ -337,7 +337,7 @@ void DjvuView::attachMainWindow(MainWindow *main_window)
     connect(main_window, SIGNAL(popupContextMenu()),
             this, SLOT(onPopupMenu()));
 
-    status_bar_ = main_window.getStatusBar();
+    status_bar_ = main_window->getStatusBar();
     status_mgr_.setStatus(ID_PAN, FUNC_SELECTED);
 }
 
