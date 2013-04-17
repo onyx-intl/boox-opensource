@@ -46,6 +46,10 @@ public Q_SLOTS:
 
     bool flip(int);
 
+    void onTaskActivated(const QStringList & list);
+    void onReceivedTaskCloseRequest(const QStringList &);
+
+
 private:
     MainWindow main_window_;
     DjvuModel  model_;            // Djvu model instance

@@ -54,6 +54,10 @@ bool DjvuApplication::open( const QString &path_name )
     connect(&sys_status, SIGNAL( multiTouchReleaseDetected(QRect, QRect) ),
             view, SLOT( onMultiTouchReleaseDetected(QRect, QRect) ));
 
+    connect( &sys_status, SIGNAL( taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));
+    connect( &sys_status, SIGNAL(taskCloseRequest(const QStringList &)), this, SLOT(onReceivedTaskCloseRequest(const QStringList &)));
+
+
 #ifdef Q_WS_QWS
     connect(qApp->desktop(), SIGNAL(resized(int)), this, SLOT(onScreenSizeChanged(int)), Qt::QueuedConnection);
 #endif
@@ -275,5 +279,30 @@ bool DjvuApplicationAdaptor::flip(int direction)
 {
     return app_->flip(direction);
 }
+
+
+void DjvuApplicationAdaptor::onTaskActivated(const QStringList &list)
+{
+    qDebug() << "Path activated use activate main window djvu reader." << list;
+    if (list.contains(model_.path()))
+    {
+        main_window_->show();
+        main_window_->raise();
+        main_window_->activateWindow();
+    }
+    else
+    {
+        main_window_->lower();
+    }
+}
+
+void DjvuApplicationAdaptor::onReceivedTaskCloseRequest(const QStringList & list)
+{
+    if (list.contains(model_.path()))
+    {
+        close();
+    }
+}
+
 
 }

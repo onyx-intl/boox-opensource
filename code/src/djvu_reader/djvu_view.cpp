@@ -35,6 +35,7 @@ DjvuView::DjvuView(QWidget *parent)
     , current_waveform_(onyx::screen::instance().defaultWaveform())
     , begin_flag_(false)
     , end_flag_(false)
+    , status_bar_(0)
 {
     connect(&slide_timer_, SIGNAL(timeout()), this, SLOT(slideShowNextPage()));
 
@@ -336,6 +337,7 @@ void DjvuView::attachMainWindow(MainWindow *main_window)
     connect(main_window, SIGNAL(popupContextMenu()),
             this, SLOT(onPopupMenu()));
 
+    status_bar_ = main_window.getStatusBar();
     status_mgr_.setStatus(ID_PAN, FUNC_SELECTED);
 }
 
@@ -921,6 +923,14 @@ void DjvuView::onPopupMenu()
                 dialog.exec();
                 QApplication::processEvents();
                 onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
+            }
+            break;
+        case SHOW_TASK_LIST:
+            {
+                if (status_bar_)
+                {
+                    status_bar_->showTaskManagementDialog("");
+                }
             }
             break;
         default:

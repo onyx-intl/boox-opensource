@@ -87,6 +87,8 @@ Q_SIGNALS:
     void popupJumpPageDialog();
     void fullScreen(bool need_full_screen);
 
+    void taskManagementRequest();
+
     void testSuspend();
     void testWakeUp();
 
@@ -253,6 +255,7 @@ private:
 
     //Slide Show time interval
     int slide_time_interval;
+    ui::StatusBar * status_bar_;
 };
 
 /// clear all of the visible pages
