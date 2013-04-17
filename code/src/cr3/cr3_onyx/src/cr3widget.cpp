@@ -286,7 +286,7 @@ void CR3View::resizeEvent ( QResizeEvent * event )
 {
     if(search_widget_ && search_widget_->isVisible())
     {
-        QTimer::singleShot(0, this, SLOT(showSearchWidget()));
+        search_widget_->adjustSizeAndPosition();
         onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
     }
 
