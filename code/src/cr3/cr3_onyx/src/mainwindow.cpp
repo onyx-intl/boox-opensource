@@ -186,7 +186,7 @@ void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 
 OnyxMainWindow::~OnyxMainWindow()
 {
-    storeThumbnail();
+//    storeThumbnail();
     saveDocumentOptions(file_name_to_open_);
     delete status_bar_;
     delete view_;

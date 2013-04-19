@@ -282,7 +282,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool able_turn_page_;
 
         bool _citation_mode_;
-
+        QString file_name_;
 };
 
 #endif // CR3WIDGET_H
