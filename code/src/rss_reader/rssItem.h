@@ -1,5 +1,5 @@
 /*	NewsFlash
-		Copyright 2010 Daniel Goß (Flash Systems)
+		Copyright 2010 Daniel Goï¿½ (Flash Systems)
 
 		This file is part of NewsFlash
 
@@ -51,6 +51,7 @@ private:
 	int CountMatches(const QString &inputString, const QString &regExp);
 	int CreateSectionList(CSectionNode* &rootNode, QString& inputString, const QString& hint, int threshold, volatile bool* cancelPtr);
 	void WriteNodes(QString &resultPage, QString &inputString, CSectionNode* node, int threshold, int linkThreshold);
+	char* parseEncoding(const QByteArray & data);
 	
 //-- Private properties
 private:
