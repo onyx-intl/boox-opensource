@@ -279,7 +279,7 @@ ZLTextLineInfoPtr ZLTextView::processTextLine(const ZLTextWordCursor &start, con
                 int hyphenationPosition = word.Length - 1;
                 int subwordWidth = 0;
                 for (; hyphenationPosition > startCharIndex; --hyphenationPosition) {
-                    if (hyphenationInfo.isHyphenationPossible(hyphenationPosition) || enable_hyphenation_) {
+                    if (hyphenationInfo.isHyphenationPossible(hyphenationPosition) && enable_hyphenation_) {
                         subwordWidth = myStyle.wordWidth(word, startCharIndex, hyphenationPosition - startCharIndex, ucs4string[hyphenationPosition - 1] != '-');
                         if (subwordWidth <= spaceLeft) {
                             break;
