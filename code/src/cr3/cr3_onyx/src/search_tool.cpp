@@ -72,9 +72,9 @@ bool SearchTool::FindNext()
 {
     bool found = false;
 
-    found = findText(_lastPattern, 1, _forwardOption , false);
+    found = findText(_lastPattern, 1, _forwardOption , true);
     if ( !found )
-        found = findText(_lastPattern, -1, _forwardOption, false);
+        found = findText(_lastPattern, -1, _forwardOption, true);
     if ( !found ) {
         return false;
     } else {

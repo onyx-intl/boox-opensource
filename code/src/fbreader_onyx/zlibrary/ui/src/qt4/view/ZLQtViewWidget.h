@@ -127,7 +127,7 @@ public Q_SLOTS:
     void onMouseLongPress(QPoint, QSize);
     void onMultiTouchPressDetected(QRect r1, QRect r2);
     void onMultiTouchReleaseDetected(QRect r1, QRect r2);
-
+    void showSearchWidget();
 
 private:
     bool isWidgetVisible(QWidget * wnd);
@@ -136,7 +136,6 @@ private:
     void startDictLookup();
     void stopDictLookup();
 
-    void showSearchWidget();
     bool updateSearchCriteria();
 
     bool addBookmark();

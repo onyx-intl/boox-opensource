@@ -22,6 +22,7 @@
 
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/ui_utils.h"
+#include "onyx/cms/content_thumbnail.h"
 
 using namespace std;
 
@@ -209,6 +210,7 @@ bool CR3View::loadLastDocument()
 
 bool CR3View::loadDocument( QString fileName )
 {
+    file_name_ = fileName;
     _docview->savePosition();
     clearSelection();
     bool res = _docview->LoadDocument( qt2cr(fileName).c_str() );
@@ -284,6 +286,11 @@ void CR3View::wheelEvent( QWheelEvent * event )
 
 void CR3View::resizeEvent ( QResizeEvent * event )
 {
+    if(search_widget_ && search_widget_->isVisible())
+    {
+        search_widget_->adjustSizeAndPosition();
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
+    }
 
     QSize sz = event->size();
     _docview->Resize( sz.width(), sz.height() );
@@ -337,6 +344,14 @@ void CR3View::paintEvent ( QPaintEvent * event )
         paintBookmark(painter);
     }
     updateScroll();
+
+    QFileInfo info(file_name_);
+    QImage img = getPageImage();
+    cms::ContentThumbnail thumbdb(info.absolutePath());
+    if(!thumbdb.hasThumbnail(info.fileName(), cms::THUMBNAIL_LARGE))
+    {
+        thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, img.scaled(cms::thumbnailSize(), Qt::KeepAspectRatio));
+    }
 }
 
 void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
