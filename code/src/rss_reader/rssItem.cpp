@@ -452,18 +452,20 @@ char* CRSSItem::parseEncoding(const QByteArray &data)
     for(int i = 0; i < node_lists.length(); i++)
     {
         QDomNode node = node_lists.item(i);
-        encoding_str =  node.toElement().attribute("content");
-        int index = encoding_str.indexOf("charset");
+        QString str =  node.toElement().attribute("content");
+        int index = str.indexOf("charset");
         if(index > 0)
         {
-            encoding_str = encoding_str.right(encoding_str.length() - index - QString("charset=").length());
+            str = str.right(str.length() - index - QString("charset=").length());
+            if(!str.isEmpty() && str.length() < 20 && str.length() > 5)
+            {
+                encoding_str = str;
+                break;
+            }
         }
-        if(!encoding_str.isEmpty())
-            break;
-
     }
 
-    if( encoding_str.isEmpty())
+    if(encoding_str.isEmpty())
     {
         QString data_str(data);
         data_str.replace("doctype", "DOCTYPE");
@@ -474,9 +476,12 @@ char* CRSSItem::parseEncoding(const QByteArray &data)
         for(int i = 0; i < node_lists.length(); i++)
         {
             QDomNode node = node_lists.item(i);
-            encoding_str =  node.toElement().attribute(QString("charset"));
-            if(!encoding_str.isEmpty())
+            QString str =  node.toElement().attribute("charset");
+            if(!str.isEmpty() && str.length() < 20 && str.length() > 5)
+            {
+                encoding_str = str;
                 break;
+            }
         }
     }
 
