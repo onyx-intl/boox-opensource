@@ -36,6 +36,10 @@ public Q_SLOTS:
     void onRotateScreen();
     void onScreenSizeChanged(int);
 
+    void onTaskActivated(const QStringList & list);
+    void onReceivedTaskCloseRequest(const QStringList &);
+
+
 private:
     tts::TTS                tts_engine_;
     DictionaryManager       dict_mgr_;

@@ -22,6 +22,10 @@ DictApplication::~DictApplication(void)
 
 bool DictApplication::open()
 {
+    connect( &sys::SysStatus::instance(), SIGNAL( taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));
+    connect( &sys::SysStatus::instance(), SIGNAL(taskCloseRequest(const QStringList &)), this, SLOT(onReceivedTaskCloseRequest(const QStringList &)));
+
+
     // set system busy to false before showing windows.
 #ifdef BUILD_WITH_TFT
     sys::SysStatus::instance().setSystemBusy(false);
@@ -104,5 +108,29 @@ void DictApplication::onRotateScreen()
 void DictApplication::onScreenSizeChanged(int)
 {
 }
+
+static const QString appName = "dict_tool";
+void DictApplication::onTaskActivated(const QStringList & list)
+{
+    if (list.contains(appName))
+    {
+        frame_->show();
+        frame_->raise();
+        frame_->activateWindow();
+    }
+    else
+    {
+        frame_->lower();
+    }
+}
+
+void DictApplication::onReceivedTaskCloseRequest(const QStringList &)
+{
+    if (list.contains(appName))
+    {
+        qApp->exit();
+    }
+}
+
 
 }
