@@ -124,7 +124,7 @@ void DictApplication::onTaskActivated(const QStringList & list)
     }
 }
 
-void DictApplication::onReceivedTaskCloseRequest(const QStringList &)
+void DictApplication::onReceivedTaskCloseRequest(const QStringList &list)
 {
     if (list.contains(appName))
     {
