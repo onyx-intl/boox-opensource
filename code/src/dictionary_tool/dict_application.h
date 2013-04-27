@@ -39,7 +39,6 @@ public Q_SLOTS:
     void onTaskActivated(const QStringList & list);
     void onReceivedTaskCloseRequest(const QStringList &);
 
-
 private:
     tts::TTS                tts_engine_;
     DictionaryManager       dict_mgr_;

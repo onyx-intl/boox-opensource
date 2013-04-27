@@ -13,6 +13,10 @@ DictApplication::DictApplication(int &argc, char **argv)
     ui::loadTranslator(QLocale::system().name());
     frame_.reset(new OnyxDictFrame(0, dict_mgr_, &tts_engine_));
     connect(frame_.get(), SIGNAL(closeClicked()), this, SLOT(close()));
+
+    connect( &sys::SysStatus::instance(), SIGNAL( taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));
+    connect( &sys::SysStatus::instance(), SIGNAL(taskCloseRequest(const QStringList &)), this, SLOT(onReceivedTaskCloseRequest(const QStringList &)));
+
 }
 
 DictApplication::~DictApplication(void)
@@ -22,8 +26,6 @@ DictApplication::~DictApplication(void)
 
 bool DictApplication::open()
 {
-    connect( &sys::SysStatus::instance(), SIGNAL( taskActivated(const QStringList &)), this, SLOT(onTaskActivated(const QStringList &)));
-    connect( &sys::SysStatus::instance(), SIGNAL(taskCloseRequest(const QStringList &)), this, SLOT(onReceivedTaskCloseRequest(const QStringList &)));
 
 
     // set system busy to false before showing windows.
