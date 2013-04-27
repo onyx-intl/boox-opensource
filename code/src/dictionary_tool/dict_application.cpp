@@ -116,12 +116,14 @@ void DictApplication::onTaskActivated(const QStringList & list)
 {
     if (list.contains(appName))
     {
+        onyx::screen::watcher().addWatcher(frame_.get());
         frame_->show();
         frame_->raise();
         frame_->activateWindow();
     }
     else
     {
+        onyx::screen::watcher().removeWatcher(frame_.get());
         frame_->lower();
     }
 }
