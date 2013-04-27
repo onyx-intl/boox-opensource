@@ -300,7 +300,8 @@ void DjvuApplication::onReceivedTaskCloseRequest(const QStringList & list)
 {
     if (list.contains(model_.path()))
     {
-      close(model_.path());
+        close(model_.path());
+        qApp->exit();
     }
 }
 
