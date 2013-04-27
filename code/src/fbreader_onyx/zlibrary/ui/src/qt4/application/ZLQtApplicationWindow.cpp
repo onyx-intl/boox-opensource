@@ -345,10 +345,10 @@ void ZLQtApplicationWindow::onTaskActivated(const QStringList &list)
 
 void ZLQtApplicationWindow::onReceivedTaskCloseRequest(const QStringList & list)
 {
-  qDebug() << "Path activated use activate main window in fb reader." << list;                                        
-    if (list.contains(application().document_path))                                                                   
-      {
-	close();
-    }        
+    qDebug() << "Path activated use activate main window in fb reader." << list;
+    if (list.contains(application().document_path))
+    {
+        close();
+    }
 }
 
