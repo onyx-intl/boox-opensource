@@ -91,6 +91,16 @@ CR3View::CR3View( QWidget *parent)
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     search_tool_ = new SearchTool(this, this);
+
+    SysStatus & sys_status = SysStatus::instance();
+    connect(&sys_status,
+            SIGNAL(batterySignal(int, int)),
+            this,
+            SLOT(onBatterySignal(int, int)));
+
+    int cur = 100, status = BATTERY_STATUS_NORMAL;
+    sys_status.batteryStatus(cur, status);
+    onBatterySignal(cur, status);
 }
 
 void CR3View::updateDefProps()
@@ -296,8 +306,83 @@ void CR3View::resizeEvent ( QResizeEvent * event )
     _docview->Resize( sz.width(), sz.height() );
 }
 
+
+static int index(int value)
+{
+    int key = value / 20 + 1;
+    if (key < 0 || value <= 10)
+    {
+        key = 0;
+    }
+    else if (key > 5)
+    {
+        key = 5;
+    }
+    return key;
+}
+
+QImage & CR3View::image()
+{
+    int key = index(value_);
+    if (status_ & BATTERY_STATUS_CHARGING)
+    {
+        key |= (1 << 16);
+    }
+
+    if (!images_.contains(key))
+    {
+        images_.insert(key, QImage(resourcePath()));
+    }
+    return images_[key];
+}
+
+QString CR3View::resourcePath()
+{
+    QString image_path = "/usr/share/ui/cool_reader_title_bar/images/";
+    if (status_ & BATTERY_STATUS_CHARGING)
+    {
+        image_path.append("battery_charge_%1.png");
+        image_path = image_path.arg(index(value_));
+        return image_path;
+    }
+    else
+    {
+        image_path.append("battery_%1.png");
+        image_path = image_path.arg(index(value_));
+        return image_path;
+    }
+    return QString();
+}
+
+void CR3View::onBatterySignal(int value, int status)
+{
+    bool update_battery = false;
+    if (value_ != value)
+    {
+        value_ = value;
+        update_battery = true;
+    }
+    if (status_ != status)
+    {
+        status_ = status;
+        update_battery = true;
+    }
+    if(update_battery)
+    {
+        repaint();
+        onyx::screen::instance().flush();
+        onyx::screen::instance().updateWidgetRegion(
+            0,
+            battery_rcet_,
+            onyx::screen::ScreenProxy::A2,
+            false,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
+}
+
 void CR3View::paintEvent ( QPaintEvent * event )
 {
+    _docview->setFullScreen(is_full_screen_);
     QPainter painter(this);
     QRect rc = rect();
     LVDocImageRef ref = _docview->getPageImage(0);
@@ -343,6 +428,26 @@ void CR3View::paintEvent ( QPaintEvent * event )
     {
         paintBookmark(painter);
     }
+
+    if(!_docview->isCoverPage() && (qgetenv("COOL_READER_FULL_SCREEN").toInt()) > 0 && is_full_screen_)
+    {
+        QRect date_time_rect(width() - _docview->rightSpace() , 2, 65, 30);
+        QFont font;
+        font.setPointSize(22);
+        painter.setFont(font);
+        painter.drawText(date_time_rect, QDateTime::currentDateTime().toString("hh:mm"));
+
+        QImage battery_image = image();
+        battery_rcet_ = QRect(width() - _docview->rightSpace() + date_time_rect.width() + 10, 0, battery_image.width(), 30);
+        painter.drawImage(battery_rcet_, battery_image);
+        onyx::screen::instance().updateWidgetRegion(
+            0,
+            QRect(0, 0, width(), 30),
+            onyx::screen::ScreenProxy::A2,
+            false,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
+
     updateScroll();
 
     QFileInfo info(file_name_);
@@ -1262,7 +1367,7 @@ bool CR3View::hasBookmark()
 
 void CR3View::paintBookmark( QPainter & painter )
 {
-    QPoint pt(rect().width()- bookmark_image_.width(), 0);
+    QPoint pt(rect().width()- bookmark_image_.width()-10, 30);
     painter.drawImage(pt, bookmark_image_);
 }
 
