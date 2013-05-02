@@ -313,16 +313,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          break;
      case Qt::Key_Escape:
          {
-             if (this->isFullScreenByWidgetSize())
-             {
-                 status_bar_->show();
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-             }
-             else
-             {
-                 this->close();
-             }
+             this->close();
          }
          break;
      }
@@ -390,12 +381,16 @@ void OnyxMainWindow::popupMenu()
         }
         else if (system == FULL_SCREEN)
         {
+            view_->setFullScreen(true);
+            view_->update();
             status_bar_->hide();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
         else if (system == EXIT_FULL_SCREEN)
         {
+            view_->setFullScreen(false);
+            view_->update();
             status_bar_->show();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
@@ -1120,8 +1115,19 @@ bool OnyxMainWindow::loadDocumentOptions(const QString &path)
     {
         return false;
     }
+    if(!vbf::loadDocumentOptions(database, path, conf_))
+    {
+        return false;
+    }
 
-    return vbf::loadDocumentOptions(database, path, conf_);
+    bool full = qgetenv("COOL_READER_FULL_SCREEN").toInt();
+    if (conf_.options.contains(vbf::CONFIG_FULLSCREEN))
+    {
+        full = conf_.options[vbf::CONFIG_FULLSCREEN].toBool();
+    }
+    view_->setFullScreen(full);
+    status_bar_->setVisible(!full);
+    return true;
 }
 
 bool OnyxMainWindow::saveDocumentOptions(const QString &path)
@@ -1136,7 +1142,7 @@ bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 
     conf_.info.mutable_authors() = authors;
     conf_.info.mutable_title() = title;
-
+    conf_.options[vbf::CONFIG_FULLSCREEN] = !status_bar_->isVisibleTo(this);
     return vbf::saveDocumentOptions(database, path, conf_);
 }
 

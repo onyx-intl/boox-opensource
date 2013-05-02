@@ -412,6 +412,9 @@ private:
     bool m_backgroundTiled;
     bool m_highlightBookmarks;
     LVPtrVector<LVBookMarkPercentInfo> m_bookmarksPercents;
+    int right_space_;
+    bool is_cover_page_;
+    bool is_full_screen_;
 
 protected:
     lString16 m_last_clock;
@@ -959,6 +962,10 @@ public:
     LVDocView( int bitsPerPixel=-1 );
     /// Destructor
     virtual ~LVDocView();
+
+    int rightSpace(){ return right_space_; }
+    bool isCoverPage(){ return is_cover_page_; }
+    void setFullScreen(bool full) { is_full_screen_ = full; }
 };
 
 

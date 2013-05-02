@@ -117,6 +117,8 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool citationMode() { return _citation_mode_; }
         bool setCitationMode(bool enable) { _citation_mode_ = enable; }
 
+        void setFullScreen(bool full) { is_full_screen_ = full;}
+
         /// rotate view, +1 = 90` clockwise, -1 = 90` counterclockwise
         void rotate( int angle );
         /// Override to handle external links
@@ -212,6 +214,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         void onSearchClosed();
         void onSearch(OnyxSearchContext& context);
         void processKeyReleaseEvent(int key);
+        void onBatterySignal(int value, int status);
 
     private:
         void updateDefProps();
@@ -244,6 +247,9 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         bool isDictionaryMode();
         void moveDictWidget();
+
+        QImage & image();
+        QString resourcePath();
 
     private:
         DocViewData * _data; // to hide non-qt implementation
@@ -283,6 +289,12 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         bool _citation_mode_;
         QString file_name_;
+
+        Images images_;
+        int value_;
+        int status_;
+        bool is_full_screen_;
+        QRect battery_rcet_;
 };
 
 #endif // CR3WIDGET_H
