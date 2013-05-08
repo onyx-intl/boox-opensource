@@ -57,7 +57,8 @@ CR3View::CR3View( QWidget *parent)
         , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
         , able_turn_page_(true)
-        , _citation_mode_(false)
+        , enable_add_citation_(false)
+        , enable_delete_citation_(false)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -561,6 +562,7 @@ void CR3View::nextPageWithTTSChecking()
     else {
         this->nextPage();
         emit requestUpdateAll();
+        paintCitation();
     }
 }
 
@@ -581,6 +583,7 @@ void CR3View::prevPageWithTTSChecking() {
     else {
         this->prevPage();
         emit requestUpdateAll();
+        paintCitation();
     }
 }
 
@@ -874,7 +877,7 @@ void CR3View::mouseMoveEvent ( QMouseEvent * event )
 
 void CR3View::clearSelection()
 {
-    if ( _selected ) {
+    if ( _selected && isDictionaryMode()) {
         _docview->clearSelection();
         update();
     }
@@ -959,7 +962,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
 {
     begin_point_ = event->pos();
 
-    if (!_citation_mode_ && !isDictionaryMode())
+    if (!enable_add_citation_ && !isDictionaryMode())
     {
         return;
     }
@@ -1038,9 +1041,25 @@ bool CR3View::isDictionaryMode()
 
 void CR3View::mouseReleaseEvent ( QMouseEvent * event )
 {
-    if (_citation_mode_ || isDictionaryMode())
+    if(enable_delete_citation_)
+    {
+        deleteCitation(event);
+        enableDeleteCitation(false);
+        return;
+    }
+
+    if (enable_add_citation_ || isDictionaryMode())
     {
         handleMouseReleaseInCitationMode(event);
+        if(enable_add_citation_)
+        {
+            update();
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
+            QApplication::processEvents();
+
+            createCitation();
+            enableAddCitation(false);
+        }
     }
     else
     {
@@ -1090,13 +1109,74 @@ CRBookmark * CR3View::createBookmark()
 }
 
 /// create cite
-CRBookmark * CR3View::createCite()
+CRBookmark * CR3View::createCitation()
 {
     CRBookmark * bm = NULL;
     if ( getSelectionText().length()>0 && !_selRange.isNull() )
         bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
 
     return bm;
+}
+
+void CR3View::deleteCitation(QMouseEvent *event)
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getEndPos() );
+
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
+        {
+
+            ldomXRange range(pt1 , pt2);
+            lvPoint pt (event->x(), event->y());
+            ldomXPointerEx p = _docview->getNodeByPoint( pt );
+
+            if(range.isInside(p))
+            {
+                list.remove(i);
+                _docview->clearSelection();
+                update();
+                paintCitation();
+                onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::A2);
+            }
+        }
+    }
+}
+
+void CR3View::paintCitation()
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        CRBookmark * bmk = list[i];
+        if (!bmk || (bmk->getType() != bmkt_comment || bmk->getType() == bmkt_correction))
+            continue;
+
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getEndPos() );
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
+        {
+            if ( pt1.isNull() || pt2.isNull())
+                continue;
+
+            ldomXRange r( pt1, pt2 );
+            this->updateSelection(&r);
+        }
+    }
 }
 
 void CR3View::goToBookmark( CRBookmark * bm )
