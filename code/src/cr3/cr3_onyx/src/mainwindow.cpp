@@ -178,7 +178,7 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
 
     loadDocumentOptions(file_name_to_open_);
 
-    view_->paintCite();
+    view_->paintCitation();
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
@@ -519,10 +519,10 @@ bool OnyxMainWindow::updateActions()
     advanced_actions_.generateActions(advanced, true);
 
     advanced.clear();
-    advanced.push_back(CITATION_MODE);
-    advanced.push_back(ADD_CITE);
+    advanced.push_back(ADD_CITATION);
+    advanced.push_back(DELETE_CITE);
     advanced.push_back(SHOW_ALL_CITES);
-    advanced_actions_.generateActions(advanced, true, view_->citationMode());
+    advanced_actions_.generateActions(advanced, true);
 
     // Font family.
     QFont font = currentFont();
@@ -706,18 +706,13 @@ void OnyxMainWindow::processAdvancedActions()
             view_->openRecentBook(rb.selectedInfo());
             break;
                            }
-        case CITATION_MODE:
+        case ADD_CITATION:
             {
-                view_->setCitationMode(!view_->citationMode());
+                view_->enableAddCitation(true);
                 break;
             }
-        case ADD_CITE:
-            addCite();
-            view_->restoreWindowPos(this, "MyBookmark");
-
-            // the citation mode only use once, need to activate again if needed
-            view_->setCitationMode(false);
-            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+        case DELETE_CITE:
+            view_->enableDeleteCitation(true);
             break;
 
         case SHOW_ALL_CITES:
@@ -958,7 +953,7 @@ bool OnyxMainWindow::addBookmark()
 
 bool OnyxMainWindow::addCite()
 {
-    view_->createCite();
+    view_->createCitation();
     return true;
 }
 

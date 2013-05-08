@@ -108,15 +108,16 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString getSelectionText() { return _selText; }
         /// create bookmark
         CRBookmark * createBookmark();
-        CRBookmark * createCite();
-        void paintCite();
+        CRBookmark * createCitation();
+        void deleteCitation(QMouseEvent * evnet);
+        void paintCitation();
         /// go to bookmark and highlight it
         void goToBookmark( CRBookmark * bm );
         bool hasBookmark();
         void deleteBookmark();
 
-        bool citationMode() { return _citation_mode_; }
-        bool setCitationMode(bool enable) { _citation_mode_ = enable; }
+        void enableAddCitation(bool enable) { enable_add_citation_ = enable; }
+        void enableDeleteCitation(bool enable) { enable_delete_citation_ = enable; }
 
         void setFullScreen(bool full) { is_full_screen_ = full;}
 
@@ -296,6 +297,9 @@ class CR3View : public QWidget, public LVDocViewCallback
         int status_;
         bool is_full_screen_;
         QRect battery_rcet_;
+
+        bool enable_add_citation_;
+        bool enable_delete_citation_;
 };
 
 #endif // CR3WIDGET_H
