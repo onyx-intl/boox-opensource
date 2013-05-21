@@ -441,12 +441,6 @@ void CR3View::paintEvent ( QPaintEvent * event )
         QImage battery_image = image();
         battery_rcet_ = QRect(width() - _docview->rightSpace() + date_time_rect.width() + 10, 0, battery_image.width(), 30);
         painter.drawImage(battery_rcet_, battery_image);
-        onyx::screen::instance().updateWidgetRegion(
-            0,
-            QRect(0, 0, width(), 30),
-            onyx::screen::ScreenProxy::A2,
-            false,
-            onyx::screen::ScreenCommand::WAIT_ALL);
     }
 
     updateScroll();
