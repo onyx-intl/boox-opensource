@@ -240,6 +240,7 @@ private:
     std::string last_id_;
 
     QRect rect_pressed_;
+    scoped_ptr<ui::PopupMenu> menu_;
 
 };
 

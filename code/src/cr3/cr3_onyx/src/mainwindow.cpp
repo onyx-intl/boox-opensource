@@ -325,25 +325,31 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
 
 void OnyxMainWindow::popupMenu()
 {
-    PopupMenu menu(this);
+    if(menu_ && menu_->isVisible())
+    {
+        return;
+    }
+
+    menu_.reset(new PopupMenu(this));
+
     updateActions();
 
-    menu.addGroup(&font_family_actions_);
-    menu.addGroup(&font_actions_);
-    menu.addGroup(&reading_style_actions_);
+    menu_->addGroup(&font_family_actions_);
+    menu_->addGroup(&font_actions_);
+    menu_->addGroup(&reading_style_actions_);
     //menu.addGroup(&zoom_setting_actions_);
-    menu.addGroup(&reading_tool_actions_);
-    menu.addGroup(&advanced_actions_);
-    menu.setSystemAction(&system_actions_);
+    menu_->addGroup(&reading_tool_actions_);
+    menu_->addGroup(&advanced_actions_);
+    menu_->setSystemAction(&system_actions_);
 
-    if (menu.popup() != QDialog::Accepted)
+    if (menu_->popup() != QDialog::Accepted)
     {
         //onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GC);
         QApplication::processEvents();
         return;
     }
 
-    QAction * group = menu.selectedCategory();
+    QAction * group = menu_->selectedCategory();
     if (group == zoom_setting_actions_.category())
     {
         //processZoomingActions();

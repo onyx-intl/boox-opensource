@@ -521,22 +521,26 @@ void ZLQtViewWidget::updateActions()
 
 void ZLQtViewWidget::popupMenu()
 {
-    ui::PopupMenu menu(widget());
+    if(menu_ && menu_->isVisible())
+    {
+        return;
+    }
+    menu_.reset(new ui::PopupMenu(widget()));
     updateActions();
-    menu.addGroup(&font_family_actions_);
-    menu.addGroup(&font_actions_);
-    menu.addGroup(&reading_style_actions_);
-    menu.addGroup(&encoding_actions_);
-    menu.addGroup(&reading_tool_actions_);
-    menu.setSystemAction(&system_actions_);
-    if (menu.popup() != QDialog::Accepted)
+    menu_->addGroup(&font_family_actions_);
+    menu_->addGroup(&font_actions_);
+    menu_->addGroup(&reading_style_actions_);
+    menu_->addGroup(&encoding_actions_);
+    menu_->addGroup(&reading_tool_actions_);
+    menu_->setSystemAction(&system_actions_);
+    if (menu_->popup() != QDialog::Accepted)
     {
         return;
     }
 
     ::myDelay();
 
-    QAction * group = menu.selectedCategory();
+    QAction * group = menu_->selectedCategory();
     if (group == system_actions_.category())
     {
         SystemAction system = system_actions_.selected();
