@@ -105,6 +105,11 @@ OnyxPlayerView::~OnyxPlayerView()
 void OnyxPlayerView::loadSettings()
 {
     int volume = sys::SysStatus::instance().volume();
+    if(volume == 0)
+    {
+        // 0 isn't minimum sound;
+        volume = 1;
+    }
     qDebug("Read volume in sys conf:%d", volume);
     core_->setVolume(volume, volume);
 
