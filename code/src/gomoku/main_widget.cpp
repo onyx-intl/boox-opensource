@@ -17,7 +17,7 @@ MainWidget::MainWidget(QWidget *parent)
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Base);
     gomoku = new GomokuWidget(this);
-    status_bar_ = new StatusBar(this, MENU |CONNECTION | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH);
+    status_bar_ = new StatusBar(this, MENU | BATTERY | MESSAGE | CLOCK | SCREEN_REFRESH);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->addWidget(gomoku);
