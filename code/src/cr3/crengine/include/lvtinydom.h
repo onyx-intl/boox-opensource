@@ -2195,8 +2195,10 @@ private:
     lString16 codeBasePrefix;
     lString16 stylesheetFile;
     lString16 tmpStylesheetFile;
+    lString16 embeddedStyle;
     bool insideTag;
     int styleDetectionState;
+    int embeddedStyleDetectionState;
     LVHashTable<lString16, lString16> pathSubstitutions;
 
     ldomNode * baseElement;
@@ -2254,6 +2256,8 @@ public:
     {
         if ( insideTag )
             parent->OnText( text, len, flags );
+        else if( embeddedStyleDetectionState == 2 )
+            embeddedStyle += lString16(text, len);
     }
     /// add named BLOB data to document
     virtual bool OnBlob(lString16 name, const lUInt8 * data, int size) { return parent->OnBlob(name, data, size); }
@@ -2262,7 +2266,7 @@ public:
     /// constructor
     ldomDocumentFragmentWriter( LVXMLParserCallback * parentWriter, lString16 baseTagName, lString16 baseTagReplacementName, lString16 fragmentFilePath )
     : parent(parentWriter), baseTag(baseTagName), baseTagReplacement(baseTagReplacementName),
-    insideTag(false), styleDetectionState(0), pathSubstitutions(100), baseElement(NULL), lastBaseElement(NULL)
+    insideTag(false), styleDetectionState(0), embeddedStyleDetectionState(0), pathSubstitutions(100), baseElement(NULL), lastBaseElement(NULL)
     {
         setCodeBase( fragmentFilePath );
     }
