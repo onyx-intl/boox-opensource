@@ -49,7 +49,7 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         bool loadDocument( QString fileName );
         vector<QString> getRecentBooks();
-        void openRecentBook(int index);
+        QString openRecentBook(int index);
 
         bool loadLastDocument();
         void setDocumentText( QString text );

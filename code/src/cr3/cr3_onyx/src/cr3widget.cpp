@@ -252,8 +252,10 @@ vector<QString> CR3View::getRecentBooks()
     return books;
 }
 
-void CR3View::openRecentBook( int index )
+QString CR3View::openRecentBook( int index )
 {
+    QString fnRecent;
+
     _docview->swapToCache();
     _docview->updateCache();
     _docview->getDocument()->updateMap();
@@ -266,10 +268,13 @@ void CR3View::openRecentBook( int index )
         // TODO: check error
         if ( LVFileExists(fn) ) {
             //showWaitIcon();
-            loadDocument( cr2qt(fn) );
+            fnRecent = cr2qt(fn);
+            loadDocument( fnRecent );
         }
         //_docview->swapToCache();
     }
+
+    return fnRecent;
 }
 
 void CR3View::wheelEvent( QWheelEvent * event )
