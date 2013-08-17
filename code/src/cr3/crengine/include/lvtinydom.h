@@ -1258,9 +1258,9 @@ public:
 	}
 #if BUILD_LITE!=1
     /// returns caret rectangle for pointer inside formatted document
-    bool getRect(lvRect & rect) const;
+    bool getRect(lvRect & rect, bool linkTarget = false) const;
     /// returns coordinates of pointer inside formatted document
-    lvPoint toPoint() const;
+    lvPoint toPoint(bool linkTarget = false) const;
 #endif
     /// converts to string
 	lString16 toString();

@@ -187,12 +187,12 @@ LVTocItem * CR3View::getToc()
 }
 
 /// go to position specified by xPointer string
-void CR3View::goToXPointer(QString xPointer)
+void CR3View::goToXPointer(QString xPointer, bool linkTarget)
 {
     ldomXPointer p = _docview->getDocument()->createXPointer(qt2cr(xPointer));
     _docview->savePosToNavigationHistory();
     //if ( _docview->getViewMode() == DVM_SCROLL ) {
-    doCommand( DCMD_GO_POS, p.toPoint().y );
+    doCommand( DCMD_GO_POS, p.toPoint(linkTarget).y );
     //} else {
     //    doCommand( DCMD_GO_PAGE, item->getPage() );
     //}
