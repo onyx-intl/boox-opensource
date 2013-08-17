@@ -55,6 +55,11 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
     void processAdvancedActions();
     void showClock();
     void gotoPage();
+    void addToTableOfContents(std::vector<int>& paragraphs,
+                              std::vector<int>& pages,
+                              std::vector<QString>& titles,
+                              std::vector<QString>& paths,
+                              LVTocItem * tocItem) const;
     void showTableOfContents();
     void setLineHeight(const unsigned int lineHeightPercentage);
 
