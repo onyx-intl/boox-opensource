@@ -876,6 +876,23 @@ void OnyxMainWindow::ableGoToPage()
     onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
 }
 
+void OnyxMainWindow::addToTableOfContents(std::vector<int>& paragraphs,
+                                          std::vector<int>& pages,
+                                          std::vector<QString>& titles,
+                                          std::vector<QString>& paths,
+                                          LVTocItem * tocItem) const
+{
+	if( !tocItem ) return;
+
+    paragraphs.push_back(tocItem->getLevel());
+    titles.push_back( cr2qt(tocItem->getName()));
+    paths.push_back(cr2qt(tocItem->getPath()));
+    pages.push_back(tocItem->getPage());
+
+    for ( int i=0; i<tocItem->getChildCount(); i++ )
+    	addToTableOfContents(paragraphs, pages, titles, paths, tocItem->getChild(i));
+}
+
 void OnyxMainWindow::showTableOfContents()
 {
     std::vector<int> paragraphs;
@@ -885,21 +902,7 @@ void OnyxMainWindow::showTableOfContents()
     LVTocItem * root = this->view_->getToc();
 
     for ( int i=0; i<root->getChildCount(); i++ )
-    {
-        LVTocItem *n = root->getChild(i);
-        paragraphs.push_back(n->getLevel());
-        titles.push_back( cr2qt(n->getName()));
-        paths.push_back(cr2qt(n->getPath()));
-        pages.push_back(n->getPage());
-        for ( int j=0; j<n->getChildCount(); j++ )
-        {
-            LVTocItem *m = n->getChild(j);
-            paragraphs.push_back(m->getLevel());
-            titles.push_back( cr2qt(m->getName()));
-            paths.push_back(cr2qt(m->getPath()));
-            pages.push_back(m->getPage());
-        }
-    }
+        addToTableOfContents(paragraphs, pages, titles, paths, root->getChild(i));
 
     std::vector<QStandardItem *> ptrs;
     QStandardItemModel model;
