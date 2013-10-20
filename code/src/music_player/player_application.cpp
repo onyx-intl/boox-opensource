@@ -85,7 +85,8 @@ void PlayerApplication::onTaskActivated(const QStringList &list)
     else
     {
         qDebug() << "hide window.";
-        view_.hide();
+        view_.minimize(true);
+        //view_.hide();
     }
 }
 
