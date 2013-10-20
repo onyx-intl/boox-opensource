@@ -70,12 +70,12 @@ void PlayerApplication::onWakeUp()
 
 void PlayerApplication::onTaskActivated(const QStringList &list)
 {
-    qDebug() << "Path activated use activate main window in music player." << list;
     QString appName = "";
     if (list.size() >= 3) {
         appName = list.at(2);
     }
-    if (list.contains(path_) || appName == "music_player") {
+    qDebug() << "Path activated in music player." << list << "app name " << appName << path_;
+    if (appName == "music_player") {
         // check if it's the document
         qDebug() << "Path detected, show window.";
         view_.show();
@@ -85,7 +85,7 @@ void PlayerApplication::onTaskActivated(const QStringList &list)
     else
     {
         qDebug() << "hide window.";
-        view_.minimize(true);
+        view_.lower();
         //view_.hide();
     }
 }

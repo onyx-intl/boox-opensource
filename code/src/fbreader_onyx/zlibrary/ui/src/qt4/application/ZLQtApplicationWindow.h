@@ -46,7 +46,6 @@ private:
     void addToolbarItem(ZLToolbar::ItemPtr item) {}
 	void init();
 	void processAllEvents();
-    void updateScreen();
 	void close();
 
     bool eventFilter(QObject *obj, QEvent *event);
@@ -70,6 +69,7 @@ private:
 	void wheelEvent(QWheelEvent *event);
 
 private Q_SLOTS:
+    void updateScreen();
     void onScreenSizeChanged(int);
     void onTaskActivated(const QStringList &);
     void onReceivedTaskCloseRequest(const QStringList &);

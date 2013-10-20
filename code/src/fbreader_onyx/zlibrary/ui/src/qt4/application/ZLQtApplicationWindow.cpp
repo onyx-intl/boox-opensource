@@ -335,6 +335,7 @@ void ZLQtApplicationWindow::onTaskActivated(const QStringList &list)
       show();
       raise();
       activateWindow();
+      QTimer::singleShot(500, this, SLOT(updateScreen()));
     }
   else
     {
