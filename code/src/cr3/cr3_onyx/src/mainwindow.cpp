@@ -1088,8 +1088,15 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         model.setItem(row, 0, title);
 
         int pos = list[i]->getPercent();
-        QString str(tr("%1"));
-        str = str.arg(pos);
+        QString str(tr("%1%"));
+        qDebug() << "page number: " << (1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() )));
+        qDebug() << "page count: " << view_->getDocView()->getPageCount();
+
+        double percentage = pos;
+        percentage = percentage/100;
+        qDebug() << "percentage: " << percentage;
+
+        str = str.arg(percentage);
         QStandardItem *page = new QStandardItem(str);
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
