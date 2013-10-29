@@ -1018,15 +1018,13 @@ void OnyxMainWindow::citeModel(QStandardItemModel & model,
         title->setEditable(false);
         model.setItem(row, 0, title);
 
-        int pg = 1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() ));
-        QString str(tr("Page %1"));
-        str = str.arg(pg);
-        /*
-        double pos = list[i]->getPercent() / 100.0;
-        QString str(tr("Page %1 (%2%)"));
-        str = str.arg(pg);
-        str = str.arg(pos);
-        */
+        int pos = list[i]->getPercent();
+        QString str("%1%");
+        double percentage = pos;
+        percentage = percentage/100;
+        qDebug() << "percentage: " << percentage;
+        str = str.arg(percentage);
+
         QStandardItem *page = new QStandardItem(str);
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
@@ -1088,15 +1086,14 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         model.setItem(row, 0, title);
 
         int pos = list[i]->getPercent();
-        QString str(tr("%1%"));
+        QString str("%1%");
         qDebug() << "page number: " << (1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() )));
         qDebug() << "page count: " << view_->getDocView()->getPageCount();
-
         double percentage = pos;
         percentage = percentage/100;
         qDebug() << "percentage: " << percentage;
-
         str = str.arg(percentage);
+
         QStandardItem *page = new QStandardItem(str);
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
