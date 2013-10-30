@@ -1010,8 +1010,8 @@ void OnyxMainWindow::citeModel(QStandardItemModel & model,
         if (!bmk || (bmk->getType() != bmkt_comment && bmk->getType() != bmkt_correction))
             continue;
 
-        //QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
         QString t = cr2qt(list[i]->getPosText());
+        qDebug() << "citation, get position text: " << t;
         t.truncate(100);
         QStandardItem *title = new QStandardItem(t);
         title->setData((int)list[i]);
@@ -1078,7 +1078,8 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         if (!bmk || (bmk->getType() == bmkt_comment || bmk->getType() == bmkt_correction))
             continue;
 
-        QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
+        QString t = cr2qt(bmk->getPosText());
+        qDebug() << "bookmark, get position text: " << t;
         t.truncate(100);
         QStandardItem *title = new QStandardItem(t);
         title->setData((int)list[i]);

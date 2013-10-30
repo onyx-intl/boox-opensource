@@ -1091,13 +1091,12 @@ void CR3View::OnExternalLink( lString16 url, ldomNode * node )
 CRBookmark * CR3View::createBookmark()
 {
     CRBookmark * bm = NULL;
-    /*
+
     if ( getSelectionText().length()>0 && !_selRange.isNull() ) {
         bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
     } else {
-    */
         bm = _docview->saveCurrentPageBookmark(lString16());
-    //}
+    }
 
     return bm;
 }
