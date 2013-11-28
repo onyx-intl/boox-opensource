@@ -100,7 +100,6 @@ class OnyxMainWindow : public QMainWindow, public PropsChangeCallback
 
     PropsRef props_ref_;
     bool able_go_to_page_;
-    scoped_ptr<PopupMenu> menu_;
 };
 
 #endif // OnyxMainWindow_H
