@@ -22,6 +22,7 @@
 
 #include "onyx/screen/screen_update_watcher.h"
 #include "onyx/ui/ui_utils.h"
+#include "onyx/cms/content_thumbnail.h"
 
 using namespace std;
 
@@ -56,7 +57,8 @@ CR3View::CR3View( QWidget *parent)
         , select_word_point_(0, 0)
         , bookmark_image_(":/images/bookmark_flag.png")
         , able_turn_page_(true)
-        , _citation_mode_(false)
+        , enable_add_citation_(false)
+        , enable_delete_citation_(false)
 {
 #if WORD_SELECTOR_ENABLED==1
     _wordSelector = NULL;
@@ -90,6 +92,16 @@ CR3View::CR3View( QWidget *parent)
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     search_tool_ = new SearchTool(this, this);
+
+    SysStatus & sys_status = SysStatus::instance();
+    connect(&sys_status,
+            SIGNAL(batterySignal(int, int)),
+            this,
+            SLOT(onBatterySignal(int, int)));
+
+    int cur = 100, status = BATTERY_STATUS_NORMAL;
+    sys_status.batteryStatus(cur, status);
+    onBatterySignal(cur, status);
 }
 
 void CR3View::updateDefProps()
@@ -209,6 +221,7 @@ bool CR3View::loadLastDocument()
 
 bool CR3View::loadDocument( QString fileName )
 {
+    file_name_ = fileName;
     _docview->savePosition();
     clearSelection();
     bool res = _docview->LoadDocument( qt2cr(fileName).c_str() );
@@ -284,13 +297,93 @@ void CR3View::wheelEvent( QWheelEvent * event )
 
 void CR3View::resizeEvent ( QResizeEvent * event )
 {
+    if(search_widget_ && search_widget_->isVisible())
+    {
+        search_widget_->adjustSizeAndPosition();
+        onyx::screen::instance().flush(0, onyx::screen::ScreenProxy::GU, true);
+    }
 
     QSize sz = event->size();
     _docview->Resize( sz.width(), sz.height() );
 }
 
+
+static int index(int value)
+{
+    int key = value / 20 + 1;
+    if (key < 0 || value <= 10)
+    {
+        key = 0;
+    }
+    else if (key > 5)
+    {
+        key = 5;
+    }
+    return key;
+}
+
+QImage & CR3View::image()
+{
+    int key = index(value_);
+    if (status_ & BATTERY_STATUS_CHARGING)
+    {
+        key |= (1 << 16);
+    }
+
+    if (!images_.contains(key))
+    {
+        images_.insert(key, QImage(resourcePath()));
+    }
+    return images_[key];
+}
+
+QString CR3View::resourcePath()
+{
+    QString image_path = "/usr/share/ui/cool_reader_title_bar/images/";
+    if (status_ & BATTERY_STATUS_CHARGING)
+    {
+        image_path.append("battery_charge_%1.png");
+        image_path = image_path.arg(index(value_));
+        return image_path;
+    }
+    else
+    {
+        image_path.append("battery_%1.png");
+        image_path = image_path.arg(index(value_));
+        return image_path;
+    }
+    return QString();
+}
+
+void CR3View::onBatterySignal(int value, int status)
+{
+    bool update_battery = false;
+    if (value_ != value)
+    {
+        value_ = value;
+        update_battery = true;
+    }
+    if (status_ != status)
+    {
+        status_ = status;
+        update_battery = true;
+    }
+    if(update_battery)
+    {
+        repaint();
+        onyx::screen::instance().flush();
+        onyx::screen::instance().updateWidgetRegion(
+            0,
+            battery_rcet_,
+            onyx::screen::ScreenProxy::A2,
+            false,
+            onyx::screen::ScreenCommand::WAIT_ALL);
+    }
+}
+
 void CR3View::paintEvent ( QPaintEvent * event )
 {
+    _docview->setFullScreen(is_full_screen_);
     QPainter painter(this);
     QRect rc = rect();
     LVDocImageRef ref = _docview->getPageImage(0);
@@ -336,7 +429,29 @@ void CR3View::paintEvent ( QPaintEvent * event )
     {
         paintBookmark(painter);
     }
+
+    if(!_docview->isCoverPage() && (qgetenv("COOL_READER_FULL_SCREEN").toInt()) > 0 && is_full_screen_)
+    {
+        QRect date_time_rect(width() - _docview->rightSpace() , 2, 65, 30);
+        QFont font;
+        font.setPointSize(22);
+        painter.setFont(font);
+        painter.drawText(date_time_rect, QDateTime::currentDateTime().toString("hh:mm"));
+
+        QImage battery_image = image();
+        battery_rcet_ = QRect(width() - _docview->rightSpace() + date_time_rect.width() + 10, 0, battery_image.width(), 30);
+        painter.drawImage(battery_rcet_, battery_image);
+    }
+
     updateScroll();
+
+    QFileInfo info(file_name_);
+    QImage img = getPageImage();
+    cms::ContentThumbnail thumbdb(info.absolutePath());
+    if(!thumbdb.hasThumbnail(info.fileName(), cms::THUMBNAIL_LARGE))
+    {
+        thumbdb.storeThumbnail(info.fileName(), cms::THUMBNAIL_LARGE, img.scaled(cms::thumbnailSize(), Qt::KeepAspectRatio));
+    }
 }
 
 void CR3View::mouseDoubleClickEvent(QMouseEvent *event)
@@ -441,6 +556,7 @@ void CR3View::nextPageWithTTSChecking()
     else {
         this->nextPage();
         emit requestUpdateAll();
+        paintCitation();
     }
 }
 
@@ -461,6 +577,7 @@ void CR3View::prevPageWithTTSChecking() {
     else {
         this->prevPage();
         emit requestUpdateAll();
+        paintCitation();
     }
 }
 
@@ -754,7 +871,7 @@ void CR3View::mouseMoveEvent ( QMouseEvent * event )
 
 void CR3View::clearSelection()
 {
-    if ( _selected ) {
+    if ( _selected && isDictionaryMode()) {
         _docview->clearSelection();
         update();
     }
@@ -839,7 +956,7 @@ void CR3View::mousePressEvent ( QMouseEvent * event )
 {
     begin_point_ = event->pos();
 
-    if (!_citation_mode_ && !isDictionaryMode())
+    if (!enable_add_citation_ && !isDictionaryMode())
     {
         return;
     }
@@ -918,9 +1035,25 @@ bool CR3View::isDictionaryMode()
 
 void CR3View::mouseReleaseEvent ( QMouseEvent * event )
 {
-    if (_citation_mode_ || isDictionaryMode())
+    if(enable_delete_citation_)
+    {
+        deleteCitation(event);
+        enableDeleteCitation(false);
+        return;
+    }
+
+    if (enable_add_citation_ || isDictionaryMode())
     {
         handleMouseReleaseInCitationMode(event);
+        if(enable_add_citation_)
+        {
+            update();
+            onyx::screen::instance().flush(this, onyx::screen::ScreenProxy::GU);
+            QApplication::processEvents();
+
+            createCitation();
+            enableAddCitation(false);
+        }
     }
     else
     {
@@ -958,25 +1091,85 @@ void CR3View::OnExternalLink( lString16 url, ldomNode * node )
 CRBookmark * CR3View::createBookmark()
 {
     CRBookmark * bm = NULL;
-    /*
+
     if ( getSelectionText().length()>0 && !_selRange.isNull() ) {
         bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
     } else {
-    */
         bm = _docview->saveCurrentPageBookmark(lString16());
-    //}
+    }
 
     return bm;
 }
 
 /// create cite
-CRBookmark * CR3View::createCite()
+CRBookmark * CR3View::createCitation()
 {
     CRBookmark * bm = NULL;
     if ( getSelectionText().length()>0 && !_selRange.isNull() )
         bm = _docview->saveRangeBookmark( _selRange, bmkt_comment, lString16() );
 
     return bm;
+}
+
+void CR3View::deleteCitation(QMouseEvent *event)
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getEndPos() );
+
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
+        {
+
+            ldomXRange range(pt1 , pt2);
+            lvPoint pt (event->x(), event->y());
+            ldomXPointerEx p = _docview->getNodeByPoint( pt );
+
+            if(range.isInside(p))
+            {
+                list.remove(i);
+                _docview->clearSelection();
+                update();
+                paintCitation();
+                onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::A2);
+            }
+        }
+    }
+}
+
+void CR3View::paintCitation()
+{
+    int now_page = getCurPage();
+    CRFileHistRecord * rec = _docview->getCurrentFileHistRecord();
+    if ( !rec )
+        return;
+    LVPtrVector<CRBookmark> & list( rec->getBookmarks() );
+
+    for(int i  = 0; i < list.length(); i++)
+    {
+        CRBookmark * bmk = list[i];
+        if (!bmk || (bmk->getType() != bmkt_comment || bmk->getType() == bmkt_correction))
+            continue;
+
+        ldomXPointer pt1 = _docview->getDocument()->createXPointer( list[i]->getStartPos() );
+        ldomXPointer pt2 = _docview->getDocument()->createXPointer( list[i]->getEndPos() );
+        if( _docview->getBookmarkPage(pt1) == now_page ||
+            _docview->getBookmarkPage(pt2) == now_page )
+        {
+            if ( pt1.isNull() || pt2.isNull())
+                continue;
+
+            ldomXRange r( pt1, pt2 );
+            this->updateSelection(&r);
+        }
+    }
 }
 
 void CR3View::goToBookmark( CRBookmark * bm )
@@ -1247,7 +1440,7 @@ bool CR3View::hasBookmark()
 
 void CR3View::paintBookmark( QPainter & painter )
 {
-    QPoint pt(rect().width()- bookmark_image_.width(), 0);
+    QPoint pt(rect().width()- bookmark_image_.width()-10, 30);
     painter.drawImage(pt, bookmark_image_);
 }
 

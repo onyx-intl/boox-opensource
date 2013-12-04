@@ -1,5 +1,5 @@
 /*	NewsFlash
-		Copyright 2010 Daniel Goß (Flash Systems)
+		Copyright 2010 Daniel Goï¿½ (Flash Systems)
 
 		This file is part of NewsFlash
 
@@ -434,7 +434,7 @@ bool CRSSItem::FetchImages(QUrl baseUrl, CItemStore* itemStore, CSyncHttp* syncH
 	{
 		si.next();
 		page.replace(si.key(), si.value());
-		
+
 		//-- Allow canceling
 		if (CANCELED())
 			return false;
@@ -443,13 +443,66 @@ bool CRSSItem::FetchImages(QUrl baseUrl, CItemStore* itemStore, CSyncHttp* syncH
 	return true;
 }
 
+char* CRSSItem::parseEncoding(const QByteArray &data)
+{
+    QDomDocument dom;
+    dom.setContent(data);
+    QString encoding_str;
+    QDomNodeList node_lists = dom.elementsByTagName("meta");
+    for(int i = 0; i < node_lists.length(); i++)
+    {
+        QDomNode node = node_lists.item(i);
+        QString str =  node.toElement().attribute("content");
+        int index = str.indexOf("charset");
+        if(index > 0)
+        {
+            str = str.right(str.length() - index - QString("charset=").length());
+            if(!str.isEmpty() && str.length() < 20 && str.length() > 5)
+            {
+                encoding_str = str;
+                break;
+            }
+        }
+    }
+
+    if(encoding_str.isEmpty())
+    {
+        QString data_str(data);
+        data_str.replace("doctype", "DOCTYPE");
+
+        QDomDocument dom;
+        dom.setContent(data_str.toLatin1());
+        QDomNodeList node_lists = dom.elementsByTagName("meta");
+        for(int i = 0; i < node_lists.length(); i++)
+        {
+            QDomNode node = node_lists.item(i);
+            QString str =  node.toElement().attribute("charset");
+            if(!str.isEmpty() && str.length() < 20 && str.length() > 5)
+            {
+                encoding_str = str;
+                break;
+            }
+        }
+    }
+
+    //  if the result of parse is empty or the length out of range then using default the encoding
+    if(encoding_str.isEmpty() || encoding_str.length() > 20 || encoding_str.length() < 5)
+    {
+        encoding_str = "utf-8";
+    }
+    qDebug() << "encoding_str  = " << encoding_str;
+
+    QByteArray ba = encoding_str.toLatin1();
+    return ba.data();
+}
+
 ///<summary>Tries to detect the codec for the content in QByteArray and converts it into a Unicode string</summary>
 ///<param name="data">Byte data for analysis and conversion</param>
 ///<returns>Returns the content of the HTML page inside the QByteArray instance as a QString instance.</returns>
 ///<remarks>This function is neccessary because codecForHtml is not working on all feeds</remarks> 
 QString CRSSItem::ConvertToUnicode(QByteArray data)
 {
-	QTextCodec* defaultCodec=QTextCodec::codecForName("ISO-8859-1");
+	QTextCodec* defaultCodec=QTextCodec::codecForName(parseEncoding(data));
 	QTextCodec* codec=QTextCodec::codecForHtml(data, defaultCodec);
 	QString convResult;
 	

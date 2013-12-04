@@ -108,14 +108,18 @@ class CR3View : public QWidget, public LVDocViewCallback
         QString getSelectionText() { return _selText; }
         /// create bookmark
         CRBookmark * createBookmark();
-        CRBookmark * createCite();
+        CRBookmark * createCitation();
+        void deleteCitation(QMouseEvent * evnet);
+        void paintCitation();
         /// go to bookmark and highlight it
         void goToBookmark( CRBookmark * bm );
         bool hasBookmark();
         void deleteBookmark();
 
-        bool citationMode() { return _citation_mode_; }
-        bool setCitationMode(bool enable) { _citation_mode_ = enable; }
+        void enableAddCitation(bool enable) { enable_add_citation_ = enable; }
+        void enableDeleteCitation(bool enable) { enable_delete_citation_ = enable; }
+
+        void setFullScreen(bool full) { is_full_screen_ = full;}
 
         /// rotate view, +1 = 90` clockwise, -1 = 90` counterclockwise
         void rotate( int angle );
@@ -212,6 +216,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         void onSearchClosed();
         void onSearch(OnyxSearchContext& context);
         void processKeyReleaseEvent(int key);
+        void onBatterySignal(int value, int status);
 
     private:
         void updateDefProps();
@@ -244,6 +249,9 @@ class CR3View : public QWidget, public LVDocViewCallback
 
         bool isDictionaryMode();
         void moveDictWidget();
+
+        QImage & image();
+        QString resourcePath();
 
     private:
         DocViewData * _data; // to hide non-qt implementation
@@ -282,7 +290,16 @@ class CR3View : public QWidget, public LVDocViewCallback
         bool able_turn_page_;
 
         bool _citation_mode_;
+        QString file_name_;
 
+        Images images_;
+        int value_;
+        int status_;
+        bool is_full_screen_;
+        QRect battery_rcet_;
+
+        bool enable_add_citation_;
+        bool enable_delete_citation_;
 };
 
 #endif // CR3WIDGET_H

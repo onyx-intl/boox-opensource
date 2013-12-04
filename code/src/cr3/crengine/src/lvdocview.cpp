@@ -27,6 +27,7 @@
 #include "../include/chmfmt.h"
 #include "../include/wordfmt.h"
 #include "../include/pdbfmt.h"
+
 /// to show page bounds rectangles
 //#define SHOW_PAGE_RECT
 
@@ -100,7 +101,8 @@ static int def_font_sizes[] = { 18, 20, 22, 24, 29, 33, 39, 44 };
 
 LVDocView::LVDocView(int bitsPerPixel) :
 	m_bitsPerPixel(bitsPerPixel), m_dx(400), m_dy(200), _pos(0), _page(0),
-			_posIsSet(false), m_battery_state(CR_BATTERY_STATE_NO_BATTERY)
+			_posIsSet(false), m_battery_state(CR_BATTERY_STATE_NO_BATTERY),
+			right_space_(120), is_cover_page_(false)
 #if (LBOOK==1)
 			, m_font_size(32)
 #elif defined(__SYMBIAN32__)
@@ -1551,6 +1553,14 @@ void LVDocView::drawPageHeader(LVDrawBuf * drawbuf, const lvRect & headerRc,
 				info.right = brc.left - info.height() / 2;
 			}
 		}
+
+        if(is_full_screen_)
+        {
+            lvRect brc = info;
+            brc.left = brc.right - right_space_;
+            info.right = brc.left - info.height() / 2;
+        }
+
 		lString16 pageinfo;
 		if (pageCount > 0) {
 			if (phi & PGHDR_PAGE_NUMBER)
@@ -1663,7 +1673,14 @@ void LVDocView::drawPageTo(LVDrawBuf * drawbuf, LVRendPageInfo & page,
 			+ offset;
 	clip.right = pageRect->left + pageRect->width() - m_pageMargins.right;
 	if (page.type == PAGE_TYPE_COVER)
-		clip.top = pageRect->top + m_pageMargins.top;
+	{
+        clip.top = pageRect->top + m_pageMargins.top;
+        is_cover_page_ = true;
+	}
+	else
+	{
+	    is_cover_page_ = false;
+	}
 	if ((m_pageHeaderInfo || !m_pageHeaderOverride.empty()) && page.type
 			!= PAGE_TYPE_COVER) {
 		int phi = m_pageHeaderInfo;
@@ -2423,7 +2440,7 @@ void LVDocView::selectRange(const ldomXRange & range) {
 		if (range == *sel[0])
 			return; // the same range is set
 	}
-	sel.clear();
+//	sel.clear();
 	sel.add(new ldomXRange(range));
 	updateSelections();
 }

@@ -177,6 +177,8 @@ OnyxMainWindow::OnyxMainWindow(QWidget *parent)
     view_->restoreWindowPos( this, "main.", true );
 
     loadDocumentOptions(file_name_to_open_);
+
+    view_->paintCitation();
 }
 
 void OnyxMainWindow::closeEvent ( QCloseEvent * event )
@@ -186,7 +188,7 @@ void OnyxMainWindow::closeEvent ( QCloseEvent * event )
 
 OnyxMainWindow::~OnyxMainWindow()
 {
-    storeThumbnail();
+//    storeThumbnail();
     saveDocumentOptions(file_name_to_open_);
     delete status_bar_;
     delete view_;
@@ -313,16 +315,7 @@ void OnyxMainWindow::keyPressEvent(QKeyEvent *ke)
          break;
      case Qt::Key_Escape:
          {
-             if (this->isFullScreenByWidgetSize())
-             {
-                 status_bar_->show();
-                 onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
-                         onyx::screen::ScreenCommand::WAIT_NONE);
-             }
-             else
-             {
-                 this->close();
-             }
+             this->close();
          }
          break;
      }
@@ -390,12 +383,16 @@ void OnyxMainWindow::popupMenu()
         }
         else if (system == FULL_SCREEN)
         {
+            view_->setFullScreen(true);
+            view_->update();
             status_bar_->hide();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
         }
         else if (system == EXIT_FULL_SCREEN)
         {
+            view_->setFullScreen(false);
+            view_->update();
             status_bar_->show();
             onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU,
                     onyx::screen::ScreenCommand::WAIT_NONE);
@@ -522,10 +519,10 @@ bool OnyxMainWindow::updateActions()
     advanced_actions_.generateActions(advanced, true);
 
     advanced.clear();
-    advanced.push_back(CITATION_MODE);
-    advanced.push_back(ADD_CITE);
+    advanced.push_back(ADD_CITATION);
+    advanced.push_back(DELETE_CITE);
     advanced.push_back(SHOW_ALL_CITES);
-    advanced_actions_.generateActions(advanced, true, view_->citationMode());
+    advanced_actions_.generateActions(advanced, true);
 
     // Font family.
     QFont font = currentFont();
@@ -709,18 +706,13 @@ void OnyxMainWindow::processAdvancedActions()
             view_->openRecentBook(rb.selectedInfo());
             break;
                            }
-        case CITATION_MODE:
+        case ADD_CITATION:
             {
-                view_->setCitationMode(!view_->citationMode());
+                view_->enableAddCitation(true);
                 break;
             }
-        case ADD_CITE:
-            addCite();
-            view_->restoreWindowPos(this, "MyBookmark");
-
-            // the citation mode only use once, need to activate again if needed
-            view_->setCitationMode(false);
-            onyx::screen::watcher().enqueue(this, onyx::screen::ScreenProxy::GU);
+        case DELETE_CITE:
+            view_->enableDeleteCitation(true);
             break;
 
         case SHOW_ALL_CITES:
@@ -878,6 +870,23 @@ void OnyxMainWindow::ableGoToPage()
     onyx::screen::watcher().enqueue(0, onyx::screen::ScreenProxy::GU);
 }
 
+void OnyxMainWindow::addToTableOfContents(std::vector<int>& paragraphs,
+                                          std::vector<int>& pages,
+                                          std::vector<QString>& titles,
+                                          std::vector<QString>& paths,
+                                          LVTocItem * tocItem) const
+{
+	if( !tocItem ) return;
+
+    paragraphs.push_back(tocItem->getLevel());
+    titles.push_back( cr2qt(tocItem->getName()));
+    paths.push_back(cr2qt(tocItem->getPath()));
+    pages.push_back(tocItem->getPage());
+
+    for ( int i=0; i<tocItem->getChildCount(); i++ )
+    	addToTableOfContents(paragraphs, pages, titles, paths, tocItem->getChild(i));
+}
+
 void OnyxMainWindow::showTableOfContents()
 {
     std::vector<int> paragraphs;
@@ -887,21 +896,7 @@ void OnyxMainWindow::showTableOfContents()
     LVTocItem * root = this->view_->getToc();
 
     for ( int i=0; i<root->getChildCount(); i++ )
-    {
-        LVTocItem *n = root->getChild(i);
-        paragraphs.push_back(n->getLevel());
-        titles.push_back( cr2qt(n->getName()));
-        paths.push_back(cr2qt(n->getPath()));
-        pages.push_back(n->getPage());
-        for ( int j=0; j<n->getChildCount(); j++ )
-        {
-            LVTocItem *m = n->getChild(j);
-            paragraphs.push_back(m->getLevel());
-            titles.push_back( cr2qt(m->getName()));
-            paths.push_back(cr2qt(m->getPath()));
-            pages.push_back(m->getPage());
-        }
-    }
+        addToTableOfContents(paragraphs, pages, titles, paths, root->getChild(i));
 
     std::vector<QStandardItem *> ptrs;
     QStandardItemModel model;
@@ -961,7 +956,7 @@ bool OnyxMainWindow::addBookmark()
 
 bool OnyxMainWindow::addCite()
 {
-    view_->createCite();
+    view_->createCitation();
     return true;
 }
 
@@ -1009,23 +1004,21 @@ void OnyxMainWindow::citeModel(QStandardItemModel & model,
         if (!bmk || (bmk->getType() != bmkt_comment && bmk->getType() != bmkt_correction))
             continue;
 
-        //QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
         QString t = cr2qt(list[i]->getPosText());
+        qDebug() << "citation, get position text: " << t;
         t.truncate(100);
         QStandardItem *title = new QStandardItem(t);
         title->setData((int)list[i]);
         title->setEditable(false);
         model.setItem(row, 0, title);
 
-        int pg = 1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() ));
-        QString str(tr("Page %1"));
-        str = str.arg(pg);
-        /*
-        double pos = list[i]->getPercent() / 100.0;
-        QString str(tr("Page %1 (%2%)"));
-        str = str.arg(pg);
-        str = str.arg(pos);
-        */
+        int pos = list[i]->getPercent();
+        QString str("%1%");
+        double percentage = pos;
+        percentage = percentage/100;
+        qDebug() << "percentage: " << percentage;
+        str = str.arg(percentage);
+
         QStandardItem *page = new QStandardItem(str);
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
@@ -1079,7 +1072,8 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         if (!bmk || (bmk->getType() == bmkt_comment || bmk->getType() == bmkt_correction))
             continue;
 
-        QString t =cr2qt(view_->getDocView()->getPageText(true, list[i]->getBookmarkPage()));
+        QString t = cr2qt(bmk->getPosText());
+        qDebug() << "bookmark, get position text: " << t;
         t.truncate(100);
         QStandardItem *title = new QStandardItem(t);
         title->setData((int)list[i]);
@@ -1087,8 +1081,14 @@ void OnyxMainWindow::bookmarkModel(QStandardItemModel & model,
         model.setItem(row, 0, title);
 
         int pos = list[i]->getPercent();
-        QString str(tr("%1"));
-        str = str.arg(pos);
+        QString str("%1%");
+        qDebug() << "page number: " << (1 + view_->getDocView()->getBookmarkPage(view_->getDocView()->getDocument()->createXPointer( list[i]->getStartPos() )));
+        qDebug() << "page count: " << view_->getDocView()->getPageCount();
+        double percentage = pos;
+        percentage = percentage/100;
+        qDebug() << "percentage: " << percentage;
+        str = str.arg(percentage);
+
         QStandardItem *page = new QStandardItem(str);
         page->setTextAlignment(Qt::AlignCenter);
         page->setEditable(false);
@@ -1120,8 +1120,19 @@ bool OnyxMainWindow::loadDocumentOptions(const QString &path)
     {
         return false;
     }
+    if(!vbf::loadDocumentOptions(database, path, conf_))
+    {
+        return false;
+    }
 
-    return vbf::loadDocumentOptions(database, path, conf_);
+    bool full = qgetenv("COOL_READER_FULL_SCREEN").toInt();
+    if (conf_.options.contains(vbf::CONFIG_FULLSCREEN))
+    {
+        full = conf_.options[vbf::CONFIG_FULLSCREEN].toBool();
+    }
+    view_->setFullScreen(full);
+    status_bar_->setVisible(!full);
+    return true;
 }
 
 bool OnyxMainWindow::saveDocumentOptions(const QString &path)
@@ -1136,7 +1147,7 @@ bool OnyxMainWindow::saveDocumentOptions(const QString &path)
 
     conf_.info.mutable_authors() = authors;
     conf_.info.mutable_title() = title;
-
+    conf_.options[vbf::CONFIG_FULLSCREEN] = !status_bar_->isVisibleTo(this);
     return vbf::saveDocumentOptions(database, path, conf_);
 }
 

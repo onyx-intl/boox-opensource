@@ -170,7 +170,7 @@ MainWidget::MainWidget(QWidget* parent)
     tab_widget_->addTab(article_list_page_, tr("Items"));
     tab_widget_->addTab(article_page_, tr("Article"));
     ui::StatusBar* status_bar = new ui::StatusBar(
-            this, ui::MENU| ui::MESSAGE|ui::BATTERY|ui::CONNECTION|ui::CLOCK|
+            this, ui::MENU| ui::MESSAGE|ui::BATTERY|ui::CLOCK|
             ui::SCREEN_REFRESH);
     layout->addWidget(status_bar);
     setLayout(layout);
