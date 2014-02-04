@@ -703,7 +703,8 @@ void OnyxMainWindow::processAdvancedActions()
             if (rb.popup(tr("Recent Books")) != QDialog::Accepted)
                break;
 
-            view_->openRecentBook(rb.selectedInfo());
+            QString fn = view_->openRecentBook(rb.selectedInfo());
+            if( !fn.isNull() ) file_name_to_open_ = fn;
             break;
                            }
         case ADD_CITATION:
