@@ -476,7 +476,7 @@ void RssReaderView::createListView()
         dd->insert(TAG_ROW, i);
         list_data_.push_back(dd);
 
-        dd->insert(TAG_POINTER, (int)info);
+        dd->insert(TAG_POINTER, *((int*)(&info)));
         info->AssociateListItem(dd);
 
         if (info->Selected && selected_data.size() < ROWS)
