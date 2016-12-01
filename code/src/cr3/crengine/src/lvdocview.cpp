@@ -461,8 +461,11 @@ void LVDocView::checkPos() {
 		}
 	} else {
 		if (isPageMode()) {
+		    // do not change current position bookmark, just get page containing it
+		    ldomXPointer bm = _posBookmark;
 			int p = getBookmarkPage(_posBookmark);
 			goToPage(p);
+			_posBookmark = bm; // _posBookmark was set to the top left position; bm is still on the same page; restore it
 		} else {
 			//CRLog::trace("checkPos() _posBookmark node=%08X offset=%d", (unsigned)_posBookmark.getNode(), (int)_posBookmark.getOffset());
 			lvPoint pt = _posBookmark.toPoint();
@@ -3135,7 +3138,7 @@ void SaveBase64Objects( ldomNode * node )
 #endif
 
 /// returns pointer to bookmark/last position containter of currently opened file
-CRFileHistRecord * LVDocView::getCurrentFileHistRecord() {
+CRFileHistRecord * LVDocView::getCurrentFileHistRecord(bool updateCurrentPos) {
 	if (m_filename.empty())
 		return NULL;
 	CRLog::trace("LVDocView::getCurrentFileHistRecord()");
@@ -3143,8 +3146,13 @@ CRFileHistRecord * LVDocView::getCurrentFileHistRecord() {
 	lString16 title = getTitle();
 	lString16 authors = getAuthors();
 	lString16 series = getSeries();
-	CRLog::trace("get bookmark");
-	ldomXPointer bmk = getBookmark();
+	ldomXPointer bmk;
+	if( _posBookmark.isNull() || updateCurrentPos )	// current bookmark is needed; use existing if possible
+	{
+	    CRLog::trace("get bookmark");
+	    bmk = getBookmark();
+	}else
+	    bmk = _posBookmark;
     lString16 fn = m_filename;
 #ifdef ORIGINAL_FILENAME_PATCH
     if ( !m_originalFilename.empty() )
@@ -3159,7 +3167,7 @@ CRFileHistRecord * LVDocView::getCurrentFileHistRecord() {
 
 /// save last file position
 void LVDocView::savePosition() {
-	getCurrentFileHistRecord();
+	getCurrentFileHistRecord(true);
 }
 
 /// restore last file position

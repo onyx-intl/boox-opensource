@@ -567,7 +567,7 @@ public:
     /// packs current file path and name
     lString16 getNavigationPath();
     /// returns pointer to bookmark/last position containter of currently opened file
-    CRFileHistRecord * getCurrentFileHistRecord();
+    CRFileHistRecord * getCurrentFileHistRecord(bool updateCurrentPos = false);
 	/// -1 moveto previous chapter, 0 to current chaoter first pae, 1 to next chapter
 	bool moveByChapter( int delta );
 	/// -1 moveto previous page, 1 to next page
