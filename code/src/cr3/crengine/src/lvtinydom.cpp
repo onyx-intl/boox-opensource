@@ -3999,25 +3999,40 @@ void ldomElementWriter::onText( const lChar16 * text, int len, lUInt32 )
 bool ldomNode::applyNodeStylesheet()
 {
 #ifndef DISABLE_STYLESHEET_REL
-    if ( getNodeId()!=el_DocFragment || !hasAttribute(attr_StyleSheet) )
+    if ( getNodeId()!=el_DocFragment || !(hasAttribute(attr_StyleSheet) || hasAttribute(attr_EmbeddedStyle)) )
         return false;
     lString16 v = getAttributeValue(attr_StyleSheet);
-    if ( v.empty() )
+    lString16 vEmbedded = getAttributeValue(attr_EmbeddedStyle);
+    if ( v.empty() && vEmbedded.empty() )
         return false;
-    if ( getDocument()->getContainer().isNull() )
-        return false;
-    LVStreamRef cssStream = getDocument()->getContainer()->OpenStream(v.c_str(), LVOM_READ);
-    if ( !cssStream.isNull() ) {
-        lString16 css;
-        css << LVReadTextFile( cssStream );
-        if ( !css.empty() ) {
-            getDocument()->_stylesheet.push();
-            getDocument()->_stylesheet.parse(UnicodeToUtf8(css).c_str());
-            return true;
-        }
+    bool applied = false;
+    if( !v.empty() )
+    {
+    	if ( !getDocument()->getContainer().isNull() )
+    	{
+			LVStreamRef cssStream = getDocument()->getContainer()->OpenStream(v.c_str(), LVOM_READ);
+			if ( !cssStream.isNull() ) {
+				lString16 css;
+				css << LVReadTextFile( cssStream );
+				if ( !css.empty() ) {
+					getDocument()->_stylesheet.push();
+					getDocument()->_stylesheet.parse(UnicodeToUtf8(css).c_str());
+				applied = true;
+				}
+			}
+    	}
+    }
+    if( !vEmbedded.empty() )
+    {
+    	if( !applied )
+    	{
+    		getDocument()->_stylesheet.push();
+    		applied = true;
+    	}
+		getDocument()->_stylesheet.parse(UnicodeToUtf8(vEmbedded).c_str());
     }
 #endif
-    return false;
+    return applied;
 }
 #endif
 
@@ -4025,7 +4040,8 @@ void ldomElementWriter::addAttribute( lUInt16 nsid, lUInt16 id, const wchar_t * 
 {
     getElement()->setAttributeValue(nsid, id, value);
 #if BUILD_LITE!=1
-    if ( id==attr_StyleSheet ) {
+    if ( id==attr_StyleSheet || id==attr_EmbeddedStyle ) {
+    	if( _stylesheetIsSet ) _document->getStyleSheet()->pop();
         _stylesheetIsSet = _element->applyNodeStylesheet();
     }
 #endif
@@ -7186,6 +7202,7 @@ void ldomDocumentFragmentWriter::setCodeBase( lString16 fileName )
         codeBasePrefix = pathSubstitutions.get(fileName);
     }
     stylesheetFile.clear();
+    embeddedStyle.clear();
 }
 
 /// called on attribute
@@ -7219,6 +7236,8 @@ void ldomDocumentFragmentWriter::OnAttribute( const lChar16 * nsname, const lCha
                 CRLog::trace("CSS file href: %s", LCSTR(stylesheetFile));
             }
         }
+         else if ( embeddedStyleDetectionState && !lStr_cmp(attrname, L"type") && !lStr_cmp(attrvalue, L"text/css") )
+        	embeddedStyleDetectionState++;
     }
 }
 
@@ -7230,6 +7249,8 @@ ldomNode * ldomDocumentFragmentWriter::OnTagOpen( const lChar16 * nsname, const 
     } else {
         if ( !lStr_cmp(tagname, L"link") )
             styleDetectionState = 1;
+        else if ( !lStr_cmp(tagname, L"style") )
+        	embeddedStyleDetectionState = 1;
     }
     if ( !insideTag && baseTag==tagname ) {
         insideTag = true;
@@ -7240,6 +7261,8 @@ ldomNode * ldomDocumentFragmentWriter::OnTagOpen( const lChar16 * nsname, const 
                 parent->OnAttribute(L"", L"StyleSheet", stylesheetFile.c_str() );
                 CRLog::debug("Setting StyleSheet attribute to %s for document fragment", LCSTR(stylesheetFile) );
             }
+            if( !embeddedStyle.empty() )
+                parent->OnAttribute(L"", L"EmbeddedStyle", embeddedStyle.c_str() );
             if ( !codeBasePrefix.empty() )
                 parent->OnAttribute(L"", L"id", codeBasePrefix.c_str() );
             parent->OnTagBody();
@@ -7253,6 +7276,7 @@ ldomNode * ldomDocumentFragmentWriter::OnTagOpen( const lChar16 * nsname, const 
 void ldomDocumentFragmentWriter::OnTagClose( const lChar16 * nsname, const lChar16 * tagname )
 {
     styleDetectionState = 0;
+    embeddedStyleDetectionState = 0;
     if ( insideTag && baseTag==tagname ) {
         insideTag = false;
         if ( !baseTagReplacement.empty() ) {
