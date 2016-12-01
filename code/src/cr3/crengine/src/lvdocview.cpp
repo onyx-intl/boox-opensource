@@ -4247,7 +4247,7 @@ int LVDocView::getBookmarkPage(ldomXPointer bm) {
 	if (bm.isNull()) {
 		return 0;
 	} else {
-		lvPoint pt = bm.toPoint();
+		lvPoint pt = bm.toPoint(true);
 		if (pt.y < 0)
 			return 0;
 		return m_pages.FindNearestPage(pt.y, 0);

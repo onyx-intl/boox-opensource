@@ -61,7 +61,7 @@ class CR3View : public QWidget, public LVDocViewCallback
         /// return LVDocView associated with widget
         LVDocView * getDocView() { return _docview; }
         /// go to position specified by xPointer string
-        void goToXPointer(QString xPointer);
+        void goToXPointer(QString xPointer, bool linkTarget = false);
 
         /// returns current page
         int getCurPage();

@@ -4777,16 +4777,16 @@ ldomXPointer ldomDocument::createXPointer( lvPoint pt, int direction )
 }
 
 /// returns coordinates of pointer inside formatted document
-lvPoint ldomXPointer::toPoint() const
+lvPoint ldomXPointer::toPoint(bool linkTarget) const
 {
     lvRect rc;
-    if ( !getRect( rc ) )
+    if ( !getRect( rc, linkTarget ) )
         return lvPoint(-1, -1);
     return rc.topLeft();
 }
 
 /// returns caret rectangle for pointer inside formatted document
-bool ldomXPointer::getRect(lvRect & rect) const
+bool ldomXPointer::getRect(lvRect & rect, bool linkTarget) const
 {
     //CRLog::trace("ldomXPointer::getRect()");
     if ( isNull() )
@@ -4892,7 +4892,16 @@ bool ldomXPointer::getRect(lvRect & rect) const
         }
         if ( srcIndex == -1 ) {
             if ( lastIndex<0 )
+            {
+                if( linkTarget && (p0->hasAttribute(attr_id) || p0->hasAttribute(attr_name)) )
+                {   // set top left corner position inside page; height & length are not used for link targets
+                    rect.left = r.getX() + rc.left;
+                    rect.top = r.getY() + rc.top;
+                    rect.right = rect.bottom = 0;
+                    return true;
+                }
                 return false;
+            }
             srcIndex = lastIndex;
             srcLen = lastLen;
             offset = lastOffset;

@@ -929,7 +929,7 @@ void OnyxMainWindow::showTableOfContents()
     {
         return;
     }
-    view_->goToXPointer(index.data(Qt::UserRole+100).toString());
+    view_->goToXPointer(index.data(Qt::UserRole+100).toString(), true);
 }
 
 QStandardItem * OnyxMainWindow::searchParent(const int index,
